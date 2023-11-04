@@ -1,97 +1,58 @@
-from fastapi import FastAPI, Request, Response
-from fastapi.responses import HTMLResponse
-from fastapi.staticfiles import StaticFiles
-from vp4onnx import version
 from vp4onnx.app import common
-from vp4onnx.app.processes import predict
+from vp4onnx.app import redis_client
+from vp4onnx.app import redis_server
 from pathlib import Path
-import eel
-import random
-import socket
-import time
+import sys
 
 
-def is_port_in_use(port: int) -> bool:
+def main(data_dir:Path,  boot_mode:str, redis_host:str, redis_port:int, cmd_type:str = None, cmd_name:str = None, cmd_timeout:int = 60,
+         cmd_deploy_img_width:int = None, cmd_deploy_img_height:int = None, cmd_deploy_model_onnx:Path = None, cmd_deploy_postprocess_py:Path = None,
+         cmd_predict_image_file:Path = None):
       """
-      ローカルマシンで指定されたポートが既に使用されているかどうかを確認します。
+      Redisサーバーまたはクライアントを起動し、コマンドを実行する。
 
       Args:
-            port (int): 確認するポート番号。
+          data_dir (Path): データディレクトリのパス
+          boot_mode (str): 起動モード。'server'または'client'のいずれか。
+          redis_host (str): Redisサーバーのホスト名
+          redis_port (int): Redisサーバーのポート番号
+          cmd_type (str, optional): コマンドの種類。'deploy', 'undeploy', 'start', 'stop', 'predict'のいずれか。デフォルトはNone。
+          cmd_name (str, optional): コマンドの名前。デフォルトはNone。
+          cmd_timeout (int, optional): コマンドのタイムアウト時間（秒）。デフォルトは60。
+          cmd_deploy_img_width (int, optional): デプロイする画像の幅。デフォルトはNone。
+          cmd_deploy_img_height (int, optional): デプロイする画像の高さ。デフォルトはNone。
+          cmd_deploy_model_onnx (Path, optional): デプロイするモデルのONNXファイルのパス。デフォルトはNone。
+          cmd_deploy_postprocess_py (Path, optional): デプロイするモデルの後処理スクリプトのパス。デフォルトはNone。
+          cmd_predict_image_file (Path, optional): 予測に使用する画像ファイルのパス。デフォルトはNone。
 
       Returns:
-            bool: ポートが使用されている場合はTrue、それ以外の場合はFalse。
+          str: コマンドの実行結果を表す文字列。
       """
-      with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            return s.connect_ex(('localhost', port)) == 0
+      logger_client, logger_server, config = common.load_config()
 
-def main(data_dir:Path,  boot_mode:str, boot_schema:str, boot_host:str, boot_port:int):
-      """
-      アプリケーションのメイン関数です。
-
-      Args:
-            data_dir (Path): アプリケーションのデータディレクトリのパス。
-            boot_mode (str): 起動モード。
-            boot_schema (str): ブートURLのスキーマ。
-            boot_host (str): ブートURLのホスト。
-            boot_port (int): ブートURLのポート番号。
-      """
-      logger, config = common.load_config()
-      common.CONFIG = config
-      common.LOGGER = logger
-      common.APP_DATA_DIR = data_dir
-
-
-      logger.info(f"Starting webapi..")
-      app = FastAPI(
-            title=f"{version.__title__} webapi",
-            description="{version.__title__} by FastAPI.",
-            version=version.__version__
-      )
-
-      @app.middleware("http")
-      async def add_process_header(request: Request, call_next):
-            start_time = time.time()
-            response = await call_next(request)
-            process_time = time.time() - start_time
-            response.headers["X-Process-Time"] = str(process_time)
-            common.set_responce_header(response)
-            return response
-
-      app.mount("/web", StaticFiles(directory="vp4onnx/web", html=True), name="web")
-
-      @app.get("/", response_class=HTMLResponse)
-      def root():
-            return """
-            <!DOCTYPE html>
-            <html dir="ltr" lang="ja"><head>
-            <meta charset="utf-8">
-            <meta http-equiv="X-UA-Compatible" content="IE=edge">
-            <meta http-equiv="refresh" content="0;URL='/web'" />
-            <title>Loading..</title>
-            </head><body></body></html>
-            """
-      @app.get("/api")
-      def api():
-            return common.make_result({
-                  "title":f"{version.__title__} webapi",
-                  "description":f"{version.__title__} by FastAPI.",
-                  "version":version.__version__
-            })
-
-      app.include_router(predict.router)
-
-      logger.info(f"Started webapi.")
-
-      if boot_mode == 'gui':
-            logger.info(f"Started gui.")
-            @eel.expose
-            def get_booturl():
-                  return f"{boot_schema}://{boot_host}:{boot_port}/index.html"
-
-            eel.init("vp4onnx/web")
-
-            eel_port = 20000
-            while is_port_in_use(eel_port):
-                  eel_port = random.randint(20001, 30000)
-
-            eel.start("/boot.html", size=(480, 320), port=eel_port)
+      if boot_mode == 'server':
+            logger_server.info(f"Starting server.")
+            server = redis_server.RedisServer(data_dir, logger_server, redis_host=redis_host, redis_port=redis_port)
+            server.start_server()
+      else:
+            logger_client.info(f"Start client.")
+            client = redis_client.RedisClient(logger_client, redis_host=redis_host, redis_port=redis_port)
+            if cmd_type == 'deploy':
+                  ret = client.deploy(cmd_name, cmd_deploy_img_width, cmd_deploy_img_height, cmd_deploy_model_onnx, cmd_deploy_postprocess_py, timeout=cmd_timeout)
+                  return ret
+            elif cmd_type == 'undeploy':
+                  ret = client.undeploy(cmd_name, timeout=cmd_timeout)
+                  return ret
+            elif cmd_type == 'start':
+                  ret = client.start(cmd_name, timeout=cmd_timeout)
+                  return ret
+            elif cmd_type == 'stop':
+                  ret = client.start(cmd_name, timeout=cmd_timeout)
+                  return ret
+            elif cmd_type == 'predict':
+                  if cmd_predict_image_file is not None:
+                        ret = client.predict(cmd_name, image_file=cmd_predict_image_file, timeout=cmd_timeout)
+                        return ret
+                  cmd_predict_image = sys.stdin.buffer.read()
+                  ret = client.predict(cmd_name, image=cmd_predict_image, timeout=cmd_timeout)
+                  return ret

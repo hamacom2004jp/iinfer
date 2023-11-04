@@ -11,20 +11,32 @@ handlers:
         level: DEBUG
         formatter: fmt
         stream: ext://sys.stdout
-    main:
+    client:
         class: logging.handlers.TimedRotatingFileHandler
         level: DEBUG
         formatter: fmt
         backupCount: 5
         when : 'D'
         encoding : 'utf-8'
-        filename: app-main.log
+        filename: client.log
+    server:
+        class: logging.handlers.TimedRotatingFileHandler
+        level: DEBUG
+        formatter: fmt
+        backupCount: 5
+        when : 'D'
+        encoding : 'utf-8'
+        filename: server.log
 
 loggers:
-    main:
-        handlers: [main]
+    client:
+        handlers: [client]
         level: DEBUG
-        qualname: main
+        qualname: client
+    server:
+        handlers: [server]
+        level: DEBUG
+        qualname: server
  
 root:
     handlers: [std]

@@ -99,22 +99,6 @@ async def stop(name:str):
 
 @router.post("/predict/image/{name}")
 async def predict(name:str, image_file: UploadFile = File(...)):
-    """
-    画像ファイルを受け取り、ONNXモデルで推論を行う関数。
-
-    Parameters
-    ----------
-    name : str
-        画像ファイルの名前。
-    image_file : UploadFile
-        画像ファイル。
-
-    Returns
-    -------
-    dict
-        推論結果を含む辞書。エラーが発生した場合はエラーメッセージを含む辞書を返す。
-    """
-async def predict(name:str, image_file: UploadFile = File(...)):
     if common.SESSION is None:
         common.LOGGER.error("Session has not been started yet")
         return {"error": "Session has not been started yet"}
