@@ -1,0 +1,6 @@
+eel
+fastapi
+onnxruntime
+opencv-python
+python-multipart
+pyyaml
