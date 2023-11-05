@@ -1,7 +1,6 @@
 from vp4onnx.app import common
 from pathlib import Path
 import base64
-import cv2
 import logging
 import json
 import numpy as np
@@ -11,7 +10,7 @@ import time
 
 
 class RedisServer(object):
-    def __init__(self, data_dir: Path, logger: logging, redis_host: str = "localhost", redis_port: int = 6379):
+    def __init__(self, data_dir: Path, logger: logging, redis_host: str = "localhost", redis_port: int = 6379, redis_password: str = None):
         """
         Redisサーバーに接続し、クライアントからのコマンドを受信し実行する
 
@@ -20,11 +19,13 @@ class RedisServer(object):
             logger (logging): ロガー
             redis_host (str): Redisホスト名, by default "localhost"
             redis_port (int): Redisポート番号, by default 6379
+            redis_password (str): Redisパスワード, by default None
         """
         self.data_dir = data_dir
         self.logger = logger
         self.redis_host = redis_host
         self.redis_port = redis_port
+        self.redis_password = redis_password
         self.redis_cli = None
         self.sessions = {}
         self.is_running = False
@@ -40,14 +41,14 @@ class RedisServer(object):
         """
         サーバー処理を開始する
         """
-        self.redis_cli = redis.Redis(host=self.redis_host, port=self.redis_port, db=0)
+        self.redis_cli = redis.Redis(host=self.redis_host, port=self.redis_port, db=0, password=self.redis_password)
         try:
             self.redis_cli.ping()
             self.is_running = True
             self._run_server()
-        except redis.exceptions.ConnectionError:
+        except redis.exceptions.ConnectionError as e:
             self.is_running = False
-            self.logger.error(f"fail to ping redis-server")
+            self.logger.error(f"fail to ping redis-server. {e}")
 
     def _run_server(self):
         self.logger.info(f"start redis-server")
@@ -58,18 +59,21 @@ class RedisServer(object):
                 if result is None or len(result) <= 0:
                     time.sleep(1)
                     continue
-                msg = result[0].decode().split(' ')
+                msg = result[1].decode().split(' ')
                 if len(msg) <= 0:
                     time.sleep(1)
                     continue
                 if msg[0] == 'deploy':
-                    model_onnx = base64.b64decode(msg[5])
-                    postprocess_py = base64.b64decode(msg[6])
-                    self.deploy(msg[1], msg[2], int(msg[3]), int(msg[4]), model_onnx, postprocess_py)
+                    model_onnx = base64.b64decode(msg[6])
+                    if msg[7] == 'None':
+                        custom_predict_py = None
+                    else:
+                        custom_predict_py = base64.b64decode(msg[7])
+                    self.deploy(msg[1], msg[2], int(msg[3]), int(msg[4]), msg[5], model_onnx, custom_predict_py)
                 elif msg[0] == 'undeploy':
                     self.undeploy(msg[1], msg[2])
                 elif msg[0] == 'start':
-                    self.start(msg[1], msg[2])
+                    self.start(msg[1], msg[2], msg[3])
                 elif msg[0] == 'stop':
                     self.stop(msg[1], msg[2])
                 elif msg[0] == 'predict':
@@ -93,6 +97,15 @@ class RedisServer(object):
             self.redis_cli = None
         self.logger.info(f"terminate server.")
 
+    def _json_enc(self, o):
+        if isinstance(o, np.ndarray):
+            return o.tolist()
+        if isinstance(o, np.float32):
+            return float(o)
+        if isinstance(o, np.intc):
+            return int(o)
+        raise TypeError(f"Type {type(o)} not serializable")
+    
     def responce(self, reskey:str, result:dict):
         """
         処理結果をクライアントに返す
@@ -101,52 +114,55 @@ class RedisServer(object):
             reskey (str): レスポンスキー
             result (dict): レスポンスデータ
         """
-        self.redis_cli.rpush(reskey, json.dumps(result))
+        self.redis_cli.rpush(reskey, json.dumps(result, default=self._json_enc))
+        
 
-    def deploy(self, reskey:str, name:str, img_width: int, img_height: int, model_onnx: bytes, postprocess_py: bytes):
+    def deploy(self, reskey:str, name:str, model_img_width: int, model_img_height: int, predict_type:str, model_onnx: bytes, custom_predict_py: bytes):
         """
         モデルをデプロイする
 
         Args:
             reskey (str): レスポンスキー
             name (dict): モデル名
-            img_width (int): 画像の幅
-            img_height (int): 画像の高さ
+            model_img_width (int): 画像の幅
+            model_img_height (int): 画像の高さ
+            predict_type (str): 推論方法のタイプ
             model_onnx (bytes): モデルのONNX形式
-            postprocess_py (bytes): ポストプロセスのPythonスクリプト
+            custom_predict_py (bytes): 推論のPythonスクリプト
         """
         if name is None or name == "":
-            self.logger.error(f"Name is empty.")
-            self.responce(reskey, {"error": f"Name is empty."})
+            self.logger.warn(f"Name is empty.")
+            self.responce(reskey, {"warn": f"Name is empty."})
             return
-        if img_width is None or img_width <= 0:
-            self.logger.error(f"Image width is invalid.")
-            self.responce(reskey, {"error": f"Image width is invalid."})
+        if model_img_width is None or model_img_width <= 0:
+            self.logger.warn(f"Image width is invalid.")
+            self.responce(reskey, {"warn": f"Image width is invalid."})
             return
-        if img_height is None or img_height <= 0:
-            self.logger.error(f"Image height is invalid.")
-            self.responce(reskey, {"error": f"Image height is invalid."})
+        if model_img_height is None or model_img_height <= 0:
+            self.logger.warn(f"Image height is invalid.")
+            self.responce(reskey, {"warn": f"Image height is invalid."})
             return
 
         deploy_dir = self.data_dir / name
         if name in self.sessions:
-            self.logger.error(f"{name} has already started a session.")
-            self.responce(reskey, {"error": f"{name} has already started a session."})
+            self.logger.warn(f"{name} has already started a session.")
+            self.responce(reskey, {"warn": f"{name} has already started a session."})
             return
         if deploy_dir.exists():
-            self.logger.error(f"Could not be deployed. '{deploy_dir}' already exists")
-            self.responce(reskey, {"error": f"Could not be deployed. '{deploy_dir}' already exists"})
+            self.logger.warn(f"Could not be deployed. '{deploy_dir}' already exists")
+            self.responce(reskey, {"warn": f"Could not be deployed. '{deploy_dir}' already exists"})
             return
         
         common.mkdirs(deploy_dir)
         with open(deploy_dir / "model.onnx", "wb") as f:
             f.write(model_onnx)
             self.logger.info(f"Save model.onnx to {str(deploy_dir)}")
-        with open(deploy_dir / "postprocess.py", "wb") as f:
-            f.write(postprocess_py)
-            self.logger.info(f"Save postprocess.py to {str(deploy_dir)}")
+        if custom_predict_py is not None:
+            with open(deploy_dir / "custom_predict.py", "wb") as f:
+                f.write(custom_predict_py)
+                self.logger.info(f"Save custom_predict.py to {str(deploy_dir)}")
         with open(deploy_dir / "conf.json", "w") as f:
-            conf = {"IMAGE_SIZE": (img_width, img_height)}
+            conf = dict(model_img_width=model_img_width, model_img_height=model_img_height, predict_type=predict_type)
             json.dump(conf, f)
             self.logger.info(f"Save conf.json to {str(deploy_dir)}")
         self.responce(reskey, {"success": f"Save conf.json to {str(deploy_dir)}"})
@@ -161,57 +177,62 @@ class RedisServer(object):
             name (dict): モデル名
         """
         if name is None or name == "":
-            self.logger.error(f"Name is empty.")
-            self.responce(reskey, {"error": f"Name is empty."})
+            self.logger.warn(f"Name is empty.")
+            self.responce(reskey, {"warn": f"Name is empty."})
             return
         if name in self.sessions:
-            self.logger.error(f"{name} has already started a session.")
-            self.responce(reskey, {"error": f"{name} has already started a session."})
+            self.logger.warn(f"{name} has already started a session.")
+            self.responce(reskey, {"warn": f"{name} has already started a session."})
             return
         deploy_dir = self.data_dir / name
         common.rmdirs(deploy_dir)
         self.responce(reskey, {"success": f"Undeployed {name}. {str(deploy_dir)}"})
         return
 
-    def start(self, reskey:str, name:str):
+    def start(self, reskey:str, name:str, model_provider:str):
         """
         モデルを読み込み、処理が実行できるようにする
 
         Args:
             reskey (str): レスポンスキー
             name (dict): モデル名
+            model_provider (str, optional): 推論実行時のモデルプロバイダー。
         """
         if name is None or name == "":
-            self.logger.error(f"Name is empty.")
-            self.responce(reskey, {"error": f"Name is empty."})
+            self.logger.warn(f"Name is empty.")
+            self.responce(reskey, {"warn": f"Name is empty."})
             return
         deploy_dir = self.data_dir / name
         model_path = deploy_dir / "model.onnx"
         if name in self.sessions:
-            self.logger.error(f"{name} has already started a session.")
-            self.responce(reskey, {"error": f"{name} has already started a session."})
+            self.logger.warn(f"{name} has already started a session.")
+            self.responce(reskey, {"warn": f"{name} has already started a session."})
             return
         if not model_path.exists():
-            self.logger.error(f"Model path {str(model_path)} does not exist")
-            self.responce(reskey, {"error": f"Model path {str(model_path)} does not exist"})
+            self.logger.warn(f"Model path {str(model_path)} does not exist")
+            self.responce(reskey, {"warn": f"Model path {str(model_path)} does not exist"})
             return
         conf_path = deploy_dir / "conf.json"
         if not conf_path.exists():
-            self.logger.error(f"Conf path {str(conf_path)} does not exist")
-            self.responce(reskey, {"error": f"Conf path {str(conf_path)} does not exist"})
+            self.logger.warn(f"Conf path {str(conf_path)} does not exist")
+            self.responce(reskey, {"warn": f"Conf path {str(conf_path)} does not exist"})
             return
-        post_path = deploy_dir / "postprocess.py"
-        if not post_path.exists():
-            self.logger.error(f"Postprocess path {str(post_path)} does not exist")
-            self.responce(reskey, {"error": f"Postprocess path {str(post_path)} does not exist"})
-            return
-        with open(conf_path, "r") as cf, open(post_path, "r") as pf:
+        with open(conf_path, "r") as cf:
             conf = json.load(cf)
-            postfunc = common.load_postprocess(post_path)
+            if conf["predict_type"] == 'Custom':
+                custom_predict_py = deploy_dir / "custom_predict.py"
+                if not custom_predict_py.exists():
+                    self.logger.warn(f"custom_predict_py path {str(custom_predict_py)} does not exist")
+                    self.responce(reskey, {"warn": f"custom_predict_py path {str(custom_predict_py)} does not exist"})
+                    return
+                predictfunc = common.load_custom_predict(custom_predict_py)
+            else:
+                predictfunc = common.load_predict(conf["predict_type"])
             self.sessions[name] = dict(
-                session=rt.InferenceSession(model_path),
-                img_size=conf["IMAGE_SIZE"],
-                postfunc=postfunc
+                session=rt.InferenceSession(model_path, providers=[model_provider]),
+                model_img_width=conf["model_img_width"],
+                model_img_height=conf["model_img_height"],
+                predictfunc=predictfunc
             )
         self.logger.info(f"Successful start of {name} session.")
         self.responce(reskey, {"success": f"Successful start of {name} session."})
@@ -226,14 +247,14 @@ class RedisServer(object):
             name (dict): モデル名
         """
         if name is None or name == "":
-            self.logger.error(f"Name is empty.")
-            self.responce(reskey, {"error": f"Name is empty."})
+            self.logger.warn(f"Name is empty.")
+            self.responce(reskey, {"warn": f"Name is empty."})
             return
         if name not in self.sessions:
-            self.logger.error(f"{name} has not yet started a session.")
-            self.responce(reskey, {"error": f"{name} has not yet started a session."})
+            self.logger.warn(f"{name} has not yet started a session.")
+            self.responce(reskey, {"warn": f"{name} has not yet started a session."})
             return
-        self.sessions[name]['session'].close()
+        #self.sessions[name]['session'].close()
         del self.sessions[name]
         self.logger.info(f"Successful stop of {name} session.")
         self.responce(reskey, {"success": f"Successful stop of {name} session."})
@@ -249,41 +270,29 @@ class RedisServer(object):
             image (bytes): 推論する画像データ
         """
         if name is None or name == "":
-            self.logger.error(f"Name is empty.")
-            self.responce(reskey, {"error": f"Name is empty."})
+            self.logger.warn(f"Name is empty.")
+            self.responce(reskey, {"warn": f"Name is empty."})
             return
         if image is None or image == "":
-            self.logger.error(f"Image is empty.")
-            self.responce(reskey, {"error": f"Image is empty."})
+            self.logger.warn(f"Image is empty.")
+            self.responce(reskey, {"warn": f"Image is empty."})
             return
         if name not in self.sessions:
-            self.logger.error(f"{name} has not yet started a session.")
-            self.responce(reskey, {"error": f"{name} has not yet started a session."})
+            self.logger.warn(f"{name} has not yet started a session.")
+            self.responce(reskey, {"warn": f"{name} has not yet started a session."})
             return
-        try:
-            nparr = np.frombuffer(image, np.uint8)
-            img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-            img = cv2.resize(img, self.sessions[name]['img_size'])
-            img_array = np.array(img).astype(np.float32)
-            img_array = np.transpose(img_array, (2, 0, 1))
-            img_array = np.expand_dims(img_array, axis=0)
-        except Exception as e:
-            common.LOGGER.error(f"Failed to read image file: {e}")
-            self.responce(reskey, {"error": f"Failed to read image file: {e}"})
-            return
+        session = self.sessions[name]
         try:
             # ONNX Runtimeで推論を実行
-            outputs = self.sessions[name]['session'].run(None, {"input": img_array})
-        except Exception as e:
-            common.LOGGER.error(f"Failed to run inference: {e}")
-            self.responce(reskey, {"error": f"Failed to run inference: {e}"})
+            predictfunc = session['predictfunc']
+            outputs, output_image = predictfunc(session['session'], session['model_img_width'], session['model_img_height'], image)
+            if output_image is not None:
+                output_image_b64 = base64.b64encode(common.image_to_bytes(output_image)).decode('utf-8')
+                self.responce(reskey, {"success": outputs, "output_image": output_image_b64})
+                return
+            self.responce(reskey, {"success": outputs})
             return
-        try:
-            # 推論結果を後処理
-            outputs_postprocess = self.sessions[name]['postfunc'](outputs)
-            self.responce(reskey, {"success": outputs_postprocess})
         except Exception as e:
-            common.LOGGER.error(f"Failed to run postprocess: {e}")
-            self.responce(reskey, {"error": f"Failed to run postprocess: {e}"})
+            self.logger.warn(f"Failed to run inference: {e}", exc_info=True)
+            self.responce(reskey, {"warn": f"Failed to run inference: {e}"})
             return
-

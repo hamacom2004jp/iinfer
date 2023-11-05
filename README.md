@@ -54,7 +54,7 @@ wsl --import Ubuntu_docker-20.04 Ubuntu_docker-20.04 Ubuntu_wsl2_docker-20.04.ta
 wsl -u ubuntu -d Ubuntu_docker-20.04
 
 # redis-server起動
-docker run -d --name redis-container --rm -e TZ=UTC -p 6379:6379 -e REDIS_PASSWORD=password ubuntu/redis:latest
+docker run -d --name redis-container --rm -e TZ=UTC -p 6379:6379 -e REDIS_PASSWORD=<password> ubuntu/redis:latest
 
 ```
 
@@ -69,6 +69,13 @@ deactivate
 ```
 pathlib.Path(HOME_DIR) / '.vp4onnx'
 ```
+
+## 動作確認したモデル
+|AI Task|base|Model|
+|------|------|------|
+|Object Detection|[YOLOv3](https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/yolov3)|YOLOv3-10|
+|Object Detection|[YOLOv3](https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/yolov3)|YOLOv3-12|
+|Object Detection|[YOLOv3](https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/yolov3)|YOLOv3-int8|
 
 # Lisence
 
