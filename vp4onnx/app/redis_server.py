@@ -70,6 +70,8 @@ class RedisServer(object):
                     else:
                         custom_predict_py = base64.b64decode(msg[7])
                     self.deploy(msg[1], msg[2], int(msg[3]), int(msg[4]), msg[5], model_onnx, custom_predict_py)
+                elif msg[0] == 'deploy_list':
+                    self.deploy_list(msg[1])
                 elif msg[0] == 'undeploy':
                     self.undeploy(msg[1], msg[2])
                 elif msg[0] == 'start':
@@ -167,6 +169,29 @@ class RedisServer(object):
             self.logger.info(f"Save conf.json to {str(deploy_dir)}")
         self.responce(reskey, {"success": f"Save conf.json to {str(deploy_dir)}"})
         return
+
+    def deploy_list(self, reskey:str):
+        """
+        デプロイされたモデルのリストを取得する
+
+        Args:
+            reskey (str): レスポンスキー
+
+        Returns:
+            dict: デプロイされたモデルのリスト
+        """
+        deploy_list = []
+        for dir in self.data_dir.iterdir():
+            if not dir.is_dir():
+                continue
+            conf_path = dir / "conf.json"
+            with open(conf_path, "r") as cf:
+                conf = json.load(cf)
+                row = dict(name=dir.name, model_img_width=conf["model_img_width"], model_img_height=conf["model_img_height"],
+                           predict_type=conf["predict_type"], model_onnx=(dir/"model.onnx").exists(), custom_predict=(dir/"custom_predict.py").exists(),
+                           session=dir.name in self.sessions)
+                deploy_list.append(row)
+        self.responce(reskey, {"success": deploy_list})
 
     def undeploy(self, reskey:str, name:str):
         """

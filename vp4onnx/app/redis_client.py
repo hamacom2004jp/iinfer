@@ -113,6 +113,18 @@ class RedisClient(object):
         res = self.redis_cli.blpop([reskey], timeout=timeout)
         return self._response(res)
 
+    def deploy_list(self, timeout:int = 60):
+        """
+        デプロイされたモデルのリストを取得する
+
+        Returns:
+            dict: Redisサーバーからの応答
+        """
+        reskey = common.random_string()
+        self.redis_cli.rpush('server', f"deploy_list {reskey}")
+        res = self.redis_cli.blpop([reskey], timeout=timeout)
+        return self._response(res)
+
     def undeploy(self, name:str, timeout:int = 60):
         """
         モデルをRedisサーバーからアンデプロイする

@@ -17,7 +17,7 @@ def main(data_dir:Path,  boot_mode:str, redis_host:str, redis_port:int, redis_pa
           redis_host (str): Redisサーバーのホスト名
           redis_port (int): Redisサーバーのポート番号
           redis_password (str): Redisサーバーのパスワード
-          cmd_type (str, optional): コマンドの種類。'deploy', 'undeploy', 'start', 'stop', 'predict'のいずれか。デフォルトはNone。
+          cmd_type (str, optional): コマンドの種類。'deploy', 'deploy_list', 'undeploy', 'start', 'stop', 'predict'のいずれか。デフォルトはNone。
           cmd_name (str, optional): コマンドの名前。デフォルトはNone。
           timeout (int, optional): コマンドのタイムアウト時間（秒）。デフォルトは60。
           model_img_width (int, optional): デプロイする画像の幅。デフォルトはNone。
@@ -33,7 +33,7 @@ def main(data_dir:Path,  boot_mode:str, redis_host:str, redis_port:int, redis_pa
           output_image_file (Path, optional): 予測結果の画像ファイルのパス。デフォルトはNone。
 
       Returns:
-          str: コマンドの実行結果を表す文字列。
+          dict: コマンドの実行結果。
       """
       logger_client, logger_server, config = common.load_config()
 
@@ -46,6 +46,9 @@ def main(data_dir:Path,  boot_mode:str, redis_host:str, redis_port:int, redis_pa
             client = redis_client.RedisClient(logger_client, redis_host=redis_host, redis_port=redis_port, redis_password=redis_password)
             if cmd_type == 'deploy':
                   ret = client.deploy(cmd_name, model_img_width, model_img_height, model_onnx, predict_type, custom_predict_py, timeout=timeout)
+                  return ret
+            elif cmd_type == 'deploy_list':
+                  ret = client.deploy_list(timeout=timeout)
                   return ret
             elif cmd_type == 'undeploy':
                   ret = client.undeploy(cmd_name, timeout=timeout)
@@ -64,3 +67,5 @@ def main(data_dir:Path,  boot_mode:str, redis_host:str, redis_port:int, redis_pa
                         ret = client.predict(cmd_name, image=sys.stdin.buffer.read(), output_image_file=output_image_file, timeout=timeout)
                         return ret
                   logger_client.warn(str({"warn":f"Image file or stdin is empty."}))
+                  return {"warn":f"Image file or stdin is empty."}
+      return {"warn":f"Unkown command."}

@@ -34,10 +34,10 @@ loggers:
         level: DEBUG
         qualname: client
     server:
-        handlers: [server]
+        handlers: [server, std]
         level: DEBUG
         qualname: server
  
-root:
-    handlers: [std]
-    level: DEBUG
+#root:
+#    handlers: [std]
+#    level: NOTSET

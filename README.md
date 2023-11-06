@@ -75,7 +75,7 @@ pathlib.Path(HOME_DIR) / '.vp4onnx'
 |------|------|------|
 |Object Detection|[YOLOv3](https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/yolov3)|YOLOv3-10|
 |Object Detection|[YOLOv3](https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/yolov3)|YOLOv3-12|
-|Object Detection|[YOLOv3](https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/yolov3)|YOLOv3-int8|
+|Object Detection|[YOLOv3](https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/yolov3)|YOLOv3-12-int8|
 
 # Lisence
 

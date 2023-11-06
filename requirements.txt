@@ -3,3 +3,4 @@ Pillow
 python-multipart
 pyyaml
 redis
+tabulate
