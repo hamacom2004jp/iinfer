@@ -2,6 +2,7 @@ from pathlib import Path
 from tabulate import tabulate
 import argparse
 import os
+import time
 
 
 HOME_DIR = os.path.expanduser("~")
@@ -43,13 +44,17 @@ if __name__ == "__main__":
     predict_parser.add_argument('--image_stdin', help='Setting the cmd predict image for stdin.', action='store_true')
 
     args = parser.parse_args()
+    tm = time.time()
     from vp4onnx.app import app
-    def print_format(data:dict, format:bool):
+    def print_format(data:dict, format:bool, tm:float):
         if format:
             if 'success' in data and type(data['success']) == list:
                 print(tabulate(data['success'], headers='keys'))
+            elif 'success' in data:
+                print(tabulate([data['success']], headers='keys'))
             else:
                 print(tabulate([data], headers='keys'))
+            print(f"{time.time() - tm:.03f} seconds.")
         else:
             print(data)
     if args.boot_mode == 'client':
@@ -66,26 +71,26 @@ if __name__ == "__main__":
                 cmd_type=args.cmd_type, cmd_name=args.name, timeout=args.timeout,
                 model_img_width=args.model_img_width, model_img_height=args.model_img_height,
                 model_onnx=model_onnx, predict_type=args.predict_type, custom_predict_py=custom_predict_py)
-            print_format(res, args.format)
+            print_format(res, args.format, tm)
         elif args.cmd_type == 'start':
             res = app.main(None, args.boot_mode, args.host, args.port, args.password, cmd_type=args.cmd_type, cmd_name=args.name, timeout=args.timeout, model_provider=args.model_provider)
-            print_format(res, args.format)
+            print_format(res, args.format, tm)
         elif args.cmd_type == 'predict':
             image_file = Path(args.image_file) if args.image_file is not None else None
             res = app.main(None, args.boot_mode, args.host, args.port, args.password, cmd_type=args.cmd_type, cmd_name=args.name, timeout=args.timeout,
                      image_file=image_file, image_stdin=args.image_stdin, output_image_file=args.output_image_file)
-            print_format(res, args.format)
+            print_format(res, args.format, tm)
         elif args.cmd_type == 'deploy_list':
             res = app.main(None, args.boot_mode, args.host, args.port, args.password, cmd_type=args.cmd_type, timeout=args.timeout)
-            print_format(res, args.format)
+            print_format(res, args.format, tm)
         else:
             res = app.main(None, args.boot_mode, args.host, args.port, args.password, cmd_type=args.cmd_type, cmd_name=args.name, timeout=args.timeout)
-            print_format(res, args.format)
+            print_format(res, args.format, tm)
     elif args.boot_mode == 'server':
         if args.data is None:
             server_parser.print_help()
             exit(1)
         res = app.main(Path(args.data), args.boot_mode, args.host, args.port, args.password)
-        print_format(res, args.format)
+        print_format(res, args.format, tm)
     else:
         parser.print_help()
