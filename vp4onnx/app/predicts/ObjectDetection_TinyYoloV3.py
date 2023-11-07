@@ -13,13 +13,13 @@ def predict(session:rt.InferenceSession, img_width:int, img_height:int, image:by
     output_name_scores = session.get_outputs()[1].name  # 'scores'
     output_name_indices = session.get_outputs()[2].name # 'indices'
 
-    outputs_index = session.run([output_name_boxes, output_name_scores, output_name_indices],
+    boxes, scores, indices = session.run([output_name_boxes, output_name_scores, output_name_indices],
                                 {input_name: image_data, input_name_img_shape: image_size})
     output_boxes, output_scores, output_classes = [], [], []
-    for idx in outputs_index[2]:
+    for idx in indices[0]:
         output_classes.append(idx[1])
-        output_scores.append(outputs_index[1][tuple(idx)])
-        output_boxes.append(outputs_index[0][idx[0], idx[2]])
+        output_scores.append(scores[tuple(idx)])
+        output_boxes.append(boxes[idx[0], idx[2]])
 
     output_image = draw_boxes(image_obj, output_boxes, output_scores, output_classes)
 

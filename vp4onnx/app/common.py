@@ -1,14 +1,16 @@
 from io import BytesIO
 from pathlib import Path
-from PIL import Image, ImageDraw
+from PIL import Image
+from tabulate import tabulate
 import importlib.util
 import logging
 import logging.config
-import numpy as np
 import random
 import shutil
 import string
+import requests
 import yaml
+import time
 
 PGM_DIR = Path("vp4onnx")
 APP_ID = 'vp4onnx'
@@ -48,44 +50,50 @@ def load_predict(predict_type:str):
 def random_string(size:int=16):
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=size))
 
-def resize_img(image:Image, to_w, to_h):
-    '''resize image with unchanged aspect ratio using padding'''
-    iw, ih = image.size
-    scale = min(to_w/iw, to_h/ih)
-    nw = int(iw*scale)
-    nh = int(ih*scale)
-    image = image.resize((nw,nh), Image.BICUBIC)
-    new_image = Image.new('RGB', (to_w, to_h), (128,128,128))
-    new_image.paste(image, ((to_w-nw)//2, (to_h-nh)//2))
-    return new_image
-
-def preprocess_img(img:bytes, model_img_width:int, model_img_height:int):
-    image = Image.open(BytesIO(img))
-    boxed_image = resize_img(image, model_img_width, model_img_height)
-    image_data = np.array(boxed_image, dtype='float32')
-    image_data /= 255.
-    image_data = np.transpose(image_data, [2, 0, 1])
-    image_data = np.expand_dims(image_data, 0)
-    image_size = np.array([image.size[1], image.size[0]], dtype=np.float32).reshape(1, 2)
-    return image_data, image_size, image
-
-def draw_boxes(image:Image, boxes:list[list[float]], scores:list[float], classes:list[int], labels:list[str] = None, colors = None):
-    draw = ImageDraw.Draw(image)
-    for box, score, cl in zip(boxes, scores, classes):
-        x, y, w, h = box
-        top = max(0, np.floor(x + 0.5).astype(int))
-        left = max(0, np.floor(y + 0.5).astype(int))
-        right = min(image.width, np.floor(x + w + 0.5).astype(int))
-        bottom = min(image.height, np.floor(y + h + 0.5).astype(int))
-        color = colors[cl] if colors is not None else (255, 0, 0)
-        draw.rectangle(((top, left), (right, bottom)), outline=color)
-
-        label = labels[cl] if labels is not None else str(cl)
-        draw.text((top, left), label, fill=(0, 0, 0))
-    
-    return image
-
 def image_to_bytes(image:Image):
     with BytesIO() as buffer:
         image.save(buffer, format="JPEG")
         return buffer.getvalue()
+
+def print_format(data:dict, format:bool, tm:float):
+    if format:
+        if 'success' in data and type(data['success']) == list:
+            print(tabulate(data['success'], headers='keys'))
+        elif 'success' in data and type(data['success']) == dict:
+            print(tabulate([data['success']], headers='keys'))
+        elif type(data) == list:
+            print(tabulate(data, headers='keys'))
+        else:
+            print(tabulate([data], headers='keys'))
+        print(f"{time.time() - tm:.03f} seconds.")
+    else:
+        print(data)
+
+BASE_MODELS = dict(
+    Classification_EfficientNet_Lite4=dict(
+        site='https://github.com/onnx/models/tree/main/vision/classification/efficientnet-lite4',
+        image_width=224,
+        image_height=224
+    ),
+    #Classification_Resnet=dict(
+    #    site='https://github.com/onnx/models/tree/main/vision/classification/resnet',
+    #    image_width=224,
+    #    image_height=224
+    #),
+    ObjectDetection_YoloV3=dict(
+        site='https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/yolov3',
+        image_width=416,
+        image_height=416
+    ),
+    ObjectDetection_TinyYoloV3=dict(
+        site='https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/tiny-yolov3',
+        image_width=416,
+        image_height=416
+    )
+)
+    
+def download_file(url:str, save_path:Path):
+    r = requests.get(url, stream=True)
+    with open(save_path, 'wb') as f:
+        f.write(r.content)
+    return save_path

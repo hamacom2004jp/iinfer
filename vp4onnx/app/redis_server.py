@@ -104,6 +104,8 @@ class RedisServer(object):
             return o.tolist()
         if isinstance(o, np.float32):
             return float(o)
+        if isinstance(o, np.int64):
+            return int(o)
         if isinstance(o, np.intc):
             return int(o)
         raise TypeError(f"Type {type(o)} not serializable")

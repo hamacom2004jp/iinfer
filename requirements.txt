@@ -3,4 +3,5 @@ Pillow
 python-multipart
 pyyaml
 redis
+requests
 tabulate
