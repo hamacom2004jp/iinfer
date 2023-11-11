@@ -3,14 +3,15 @@ from pathlib import Path
 from PIL import Image
 from tabulate import tabulate
 import importlib.util
+import json
 import logging
 import logging.config
 import random
 import shutil
 import string
 import requests
-import yaml
 import time
+import yaml
 
 PGM_DIR = Path("vp4onnx")
 APP_ID = 'vp4onnx'
@@ -23,6 +24,38 @@ def load_config():
         config = yaml.safe_load(f)
     return logger_client, logger_server, config
 
+def saveopt(opt:dict, opt_path:Path):
+    if opt_path is None:
+        return
+    def _json_enc(o):
+        if isinstance(o, Path):
+            return str(o)
+        raise TypeError(f"Type {type(o)} not serializable")
+    with open(opt_path, 'w') as f:
+        json.dump(opt, f, indent=4, default=_json_enc)
+
+def loadopt(opt_path:str):
+    if opt_path is None or not Path(opt_path).exists():
+        return dict()
+    with open(opt_path) as f:
+        return json.load(f)
+
+def getopt(opt:dict, key:str, preval=None, defval=None, withset=False):
+    if preval is not None:
+        v = preval
+        if isinstance(preval, dict):
+            v = preval.get(key, defval)
+        if v is None and key in opt:
+            v = opt[key]
+        if withset:
+            opt[key] = v
+        return v
+    if key in opt:
+        return opt[key]
+    else:
+        if withset:
+            opt[key] = defval
+        return defval
 
 def mkdirs(dir_path:Path):
     if not dir_path.exists():

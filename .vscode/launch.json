@@ -8,7 +8,7 @@
             "name": "Python: vp4onnx",
             "type": "python",
             "request": "launch",
-            "args": ["-p", "password", "server"],
+            "args": ["-u", "vp4onnx.server.json"],
             /*
             "args": [
                 "-p", "password",

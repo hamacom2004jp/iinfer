@@ -9,7 +9,7 @@ import redis
 import time
 
 
-class RedisServer(object):
+class Server(object):
     def __init__(self, data_dir: Path, logger: logging, redis_host: str = "localhost", redis_port: int = 6379, redis_password: str = None):
         """
         Redisサーバーに接続し、クライアントからのコマンドを受信し実行する

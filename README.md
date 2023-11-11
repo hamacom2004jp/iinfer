@@ -10,6 +10,27 @@ onnxフォーマットの重みファイルを実行するWebアプリケーシ�
 - `Windows 10 Pro`
 - `Windows 11 Pro`
 
+## vp4onnxの実行方法
+```
+.venv\Scripts\activate
+python -m vp4onnx
+deactivate
+```
+
+
+
+### データの保存場所
+```
+pathlib.Path(HOME_DIR) / '.vp4onnx'
+```
+
+## 動作確認したモデル
+|AI Task|base|Model|
+|------|------|------|
+|Object Detection|[YOLOv3](https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/yolov3)|YOLOv3-10|
+|Object Detection|[YOLOv3](https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/yolov3)|YOLOv3-12|
+|Object Detection|[YOLOv3](https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/yolov3)|YOLOv3-12-int8|
+
 
 ## 開発環境構築
 ```
@@ -57,25 +78,6 @@ wsl -u ubuntu -d Ubuntu_docker-20.04
 docker run -d --name redis-container --rm -e TZ=UTC -p 6379:6379 -e REDIS_PASSWORD=<password> ubuntu/redis:latest
 
 ```
-
-## vp4onnxの実行方法
-```
-.venv\Scripts\activate
-python -m vp4onnx
-deactivate
-```
-
-### データの保存場所
-```
-pathlib.Path(HOME_DIR) / '.vp4onnx'
-```
-
-## 動作確認したモデル
-|AI Task|base|Model|
-|------|------|------|
-|Object Detection|[YOLOv3](https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/yolov3)|YOLOv3-10|
-|Object Detection|[YOLOv3](https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/yolov3)|YOLOv3-12|
-|Object Detection|[YOLOv3](https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/yolov3)|YOLOv3-12-int8|
 
 # Lisence
 

@@ -6,7 +6,7 @@ import json
 import redis
 
 
-class RedisClient(object):
+class Client(object):
     def __init__(self, logger: logging, redis_host: str = "localhost", redis_port: int = 6379, redis_password: str = None):
         """
         Redisサーバーとの通信を行うクラス
