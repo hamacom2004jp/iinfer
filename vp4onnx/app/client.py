@@ -7,7 +7,7 @@ import redis
 
 
 class Client(object):
-    def __init__(self, logger: logging, redis_host: str = "localhost", redis_port: int = 6379, redis_password: str = None):
+    def __init__(self, logger: logging.Logger, redis_host: str = "localhost", redis_port: int = 6379, redis_password: str = None):
         """
         Redisサーバーとの通信を行うクラス
 
@@ -84,20 +84,26 @@ class Client(object):
             dict: Redisサーバーからの応答
         """
         if name is None or name == "":
-            self.logger.error(f"Name is empty.")
-            return {"error": f"Name is empty."}
+            self.logger.error(f"name is empty.")
+            return {"error": f"name is empty."}
         if " " in name:
-            self.logger.error(f"Name contains whitespace.")
-            return {"error": f"Name contains whitespace."}
+            self.logger.error(f"name contains whitespace.")
+            return {"error": f"name contains whitespace."}
         if model_img_width is None or model_img_width <= 0:
-            self.logger.error(f"Image width is invalid.")
-            return {"error": f"Image width is invalid."}
+            self.logger.error(f"model_img_width is invalid.")
+            return {"error": f"model_img_width is invalid."}
         if model_img_height is None or model_img_height <= 0:
-            self.logger.error(f"Image height is invalid.")
-            return {"error": f"Image height is invalid."}
+            self.logger.error(f"model_img_height is invalid.")
+            return {"error": f"model_img_height is invalid."}
+        if model_onnx is None:
+            self.logger.error(f"model_onnx is empty.")
+            return {"error": f"model_onnx is empty."}
+        if predict_type is None:
+            self.logger.error(f"predict_type is empty.")
+            return {"error": f"predict_type is empty."}
         if not model_onnx.exists():
-            self.logger.error(f"Model path {str(model_onnx)} does not exist")
-            return {"error": f"Model path {str(model_onnx)} does not exist"}
+            self.logger.error(f"model_onnx {str(model_onnx)} does not exist")
+            return {"error": f"model_onnx {str(model_onnx)} does not exist"}
         if predict_type == 'Custom':
             if custom_predict_py is None or not custom_predict_py.exists():
                 self.logger.error(f"custom_predict_py path {str(custom_predict_py)} does not exist")
@@ -137,8 +143,8 @@ class Client(object):
             dict: Redisサーバーからの応答
         """
         if name is None or name == "":
-            self.logger.error(f"Name is empty.")
-            return {"error": f"Name is empty."}
+            self.logger.error(f"name is empty.")
+            return {"error": f"name is empty."}
         reskey = common.random_string()
         self.redis_cli.rpush('server', f"undeploy {reskey} {name}")
         res = self.redis_cli.blpop([reskey], timeout=timeout)
@@ -157,8 +163,11 @@ class Client(object):
             dict: Redisサーバーからの応答
         """
         if name is None or name == "":
-            self.logger.error(f"Name is empty.")
-            return {"error": f"Name is empty."}
+            self.logger.error(f"name is empty.")
+            return {"error": f"name is empty."}
+        if model_provider is None or model_provider == "":
+            self.logger.error(f"model_provider is empty.")
+            return {"error": f"model_provider is empty."}
         reskey = common.random_string()
         self.redis_cli.rpush('server', f"start {reskey} {name} {model_provider}")
         res = self.redis_cli.blpop([reskey], timeout=timeout)
@@ -176,8 +185,8 @@ class Client(object):
             dict: Redisサーバーからの応答
         """
         if name is None or name == "":
-            self.logger.error(f"Name is empty.")
-            return {"error": f"Name is empty."}
+            self.logger.error(f"name is empty.")
+            return {"error": f"name is empty."}
         reskey = common.random_string()
         self.redis_cli.rpush('server', f"stop {reskey} {name}")
         res = self.redis_cli.blpop([reskey], timeout=timeout)
@@ -198,16 +207,16 @@ class Client(object):
             dict: Redisサーバーからの応答
         """
         if name is None or name == "":
-            self.logger.error(f"Name is empty.")
-            return {"error": f"Name is empty."}
+            self.logger.error(f"name is empty.")
+            return {"error": f"name is empty."}
         if image is None and image_file is None:
-            self.logger.error(f"Image and Image file is empty.")
-            return {"error": f"Image and Image file is empty."}
+            self.logger.error(f"image and image_file is empty.")
+            return {"error": f"image and image_file is empty."}
         image_b64 = None
         if image_file is not None:
             if not image_file.exists():
-                self.logger.error(f"Not found Image file. {image_file}.")
-                return {"error": f"Not found Image file. {image_file}."}
+                self.logger.error(f"Not found image_file. {image_file}.")
+                return {"error": f"Not found image_file. {image_file}."}
             with open(image_file, "rb") as f:
                 image_b64 = base64.b64encode(f.read()).decode('utf-8')
         else:

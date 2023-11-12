@@ -1,8 +1,10 @@
 from vp4onnx.app import common
 from vp4onnx.app import client
+from vp4onnx.app import redis
 from vp4onnx.app import server
 from pathlib import Path
 import argparse
+import platform
 import sys
 import time
 
@@ -23,12 +25,11 @@ def main(HOME_DIR:str):
     parser.add_argument('-u', '--useopt', help=f'Use options file.')
     parser.add_argument('-s', '--saveopt', help=f'save options file. with --useopt option.', action='store_true')
     parser.add_argument('-f', '--format', help='Setting the cmd format.', action='store_true')
-    parser.add_argument('-m', '--mode', help='Setting the boot mode.', choices=['server', 'client'])
+    parser.add_argument('-m', '--mode', help='Setting the boot mode.', choices=['server', 'client', 'redis'])
     parser.add_argument('--data', help='Setting the data directory.', default=Path(HOME_DIR) / ".vp4onnx")
     parser.add_argument('-n', '--name', help='Setting the cmd name.')
     parser.add_argument('--timeout', help='Setting the cmd timeout.', type=int, default=15)
-    parser.add_argument('-c', '--cmd', help='Setting the cmd type.', choices=['deploy', 'deploy_list', 'undeploy', 'start', 'stop', 'predict', 'predict_type_list'])
-    #parser.add_argument('--redis', help='Commands to operate the redis container.', choices=['docker_run', 'docker_stop'])
+    parser.add_argument('-c', '--cmd', help='Setting the cmd type.', choices=['deploy', 'deploy_list', 'undeploy', 'start', 'stop', 'predict', 'predict_type_list', 'docker_run', 'docker_stop'])
     parser.add_argument('--model_img_width', help='Setting the cmd deploy model_img_width.', type=int)
     parser.add_argument('--model_img_height', help='Setting the cmd deploy model_img_height.', type=int)
     parser.add_argument('--model_onnx', help='Setting the cmd deploy model_onnx file.')
@@ -40,6 +41,8 @@ def main(HOME_DIR:str):
     parser.add_argument('-i', '--image_file', help='Setting the cmd predict image file.', default=None)
     parser.add_argument('-o', '--output_image_file', help='Setting the cmd predict output image file.', default=None)
     parser.add_argument('--image_stdin', help='Setting the cmd predict image for stdin.', action='store_true')
+    parser.add_argument('--wsl_name', help='WSL distribution name.')
+    parser.add_argument('--wsl_user', help='WSL distribution user.')
 
     args = parser.parse_args()
     args_dict = vars(args)
@@ -62,7 +65,8 @@ def main(HOME_DIR:str):
     image_file = common.getopt(opt, 'image_file', preval=args_dict, withset=True)
     output_image_file = common.getopt(opt, 'output_image_file', preval=args_dict, withset=True)
     image_stdin = common.getopt(opt, 'image_stdin', preval=args_dict, withset=True)
-    redis = common.getopt(opt, 'redis', preval=args_dict, withset=True)
+    wsl_name = common.getopt(opt, 'wsl_name', preval=args_dict, withset=True)
+    wsl_user = common.getopt(opt, 'wsl_user', preval=args_dict, withset=True)
     tm = time.time()
 
     if args.saveopt:
@@ -71,7 +75,7 @@ def main(HOME_DIR:str):
             exit(1)
         common.saveopt(opt, args.useopt)
 
-    logger_client, logger_server, config = common.load_config()
+    logger_client, logger_server, logger_redis, config = common.load_config()
     if mode == 'server':
         if data is None:
             parser.print_help()
@@ -84,9 +88,6 @@ def main(HOME_DIR:str):
         if cmd == 'deploy':
             model_onnx = Path(model_onnx) if model_onnx is not None else None
             custom_predict_py = Path(custom_predict_py) if custom_predict_py is not None else None
-            if predict_type == 'Custom' and custom_predict_py is None:
-                parser.print_help()
-                exit(1)
             ret = cl.deploy(name, model_img_width, model_img_height, model_onnx, predict_type, custom_predict_py, timeout=timeout)
             common.print_format(ret, format, tm)
 
@@ -121,6 +122,20 @@ def main(HOME_DIR:str):
                                       site=val['site'],
                                       image_width=val['image_width'],
                                       image_height=val['image_height']) for key,val in common.BASE_MODELS.items()], format, tm)
+        else:
+            common.print_format({"warn":f"Unkown command."}, format, tm)
+            parser.print_help()
+
+    elif mode == 'redis':
+        rd = redis.Redis(logger=logger_redis, wsl_name=wsl_name, wsl_user=wsl_user)
+        if cmd == 'docker_run':
+            ret = rd.docker_run(port, password)
+            common.print_format(ret, format, tm)
+
+        elif cmd == 'docker_stop':
+            ret = rd.docker_stop()
+            common.print_format(ret, format, tm)
+
         else:
             common.print_format({"warn":f"Unkown command."}, format, tm)
             parser.print_help()

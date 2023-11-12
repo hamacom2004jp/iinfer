@@ -8,7 +8,7 @@
             "name": "Python: vp4onnx",
             "type": "python",
             "request": "launch",
-            "args": ["-u", "vp4onnx.server.json"],
+            "args": ["-u", "vp4onnx.redis-docker_run.json"],
             /*
             "args": [
                 "-p", "password",

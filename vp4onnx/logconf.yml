@@ -27,6 +27,14 @@ handlers:
         when : 'D'
         encoding : 'utf-8'
         filename: server.log
+    redis:
+        class: logging.handlers.TimedRotatingFileHandler
+        level: DEBUG
+        formatter: fmt
+        backupCount: 5
+        when : 'D'
+        encoding : 'utf-8'
+        filename: redis.log
 
 loggers:
     client:
@@ -37,6 +45,10 @@ loggers:
         handlers: [server, std]
         level: DEBUG
         qualname: server
+    redis:
+        handlers: [redis, std]
+        level: DEBUG
+        qualname: redis
  
 #root:
 #    handlers: [std]

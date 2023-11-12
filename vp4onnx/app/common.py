@@ -10,6 +10,7 @@ import random
 import shutil
 import string
 import requests
+import subprocess
 import time
 import yaml
 
@@ -20,9 +21,10 @@ def load_config():
     logging.config.dictConfig(yaml.safe_load(open(PGM_DIR / "logconf.yml", encoding='UTF-8').read()))
     logger_client = logging.getLogger('client')
     logger_server = logging.getLogger('server')
+    logger_redis = logging.getLogger('redis')
     with open(PGM_DIR / 'config.yml') as f:
         config = yaml.safe_load(f)
-    return logger_client, logger_server, config
+    return logger_client, logger_server, logger_redis, config
 
 def saveopt(opt:dict, opt_path:Path):
     if opt_path is None:
@@ -45,7 +47,7 @@ def getopt(opt:dict, key:str, preval=None, defval=None, withset=False):
         v = preval
         if isinstance(preval, dict):
             v = preval.get(key, defval)
-        if v is None and key in opt:
+        if (v is None or not v) and key in opt:
             v = opt[key]
         if withset:
             opt[key] = v
@@ -130,3 +132,22 @@ def download_file(url:str, save_path:Path):
     with open(save_path, 'wb') as f:
         f.write(r.content)
     return save_path
+
+def cmd(cmd:str, logger:logging.Logger):
+    logger.debug(f"cmd:{cmd}")
+    #proc = subprocess.run(cmd, stdout=subprocess.PIPE)
+    proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    output = None
+    while proc.returncode is None:
+        out = proc.stdout.readline()
+        if out == b'' and proc.poll() is not None:
+            break
+        for enc in ['utf-8', 'cp932', 'utf-16', 'utf-16-le', 'utf-16-be']:
+            try:
+                output = out.decode(enc)
+                logger.debug(f"output:{output}")
+                break
+            except UnicodeDecodeError:
+                pass
+
+    return proc.returncode, output

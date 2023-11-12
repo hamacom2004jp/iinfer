@@ -1,6 +1,10 @@
 # Visual Prediction for onnx
 
-onnxフォーマットの重みファイルを実行するWebアプリケーションです。
+onnxフォーマットの重みファイルを実行するCLIアプリケーションです。
+DockerコンテナのRedisサーバーを使用します。
+Windowsの場合はWSL2上のLinuxの中にDockerがインストールされている必要があります。
+Linuxの場合はホスト内にDockerがインストールされている必要があります。
+
 サポートしているAIタスクは以下のとおりです。
 - Image Classification
 - Object Detection
@@ -10,13 +14,68 @@ onnxフォーマットの重みファイルを実行するWebアプリケーシ�
 - `Windows 10 Pro`
 - `Windows 11 Pro`
 
-## vp4onnxの実行方法
-```
-.venv\Scripts\activate
-python -m vp4onnx
-deactivate
+
+## インストール方法
+
+``` cmd or bash
+pip install vp4onnx
 ```
 
+## vp4onnxの実行方法
+``` cmd or bash
+# Redisサーバーコンテナの起動（Windowsの場合）
+python -m vp4onnx -p <任意PW> -m redis -c docker_run --wsl_name <WSLのディストリビューションの名前> --wsl_user <WSLのLinux内のDockerが使えるユーザー>
+
+# Redisサーバーコンテナの起動（Linuxの場合）
+python -m vp4onnx -p <任意PW> -m redis -c docker_run
+
+# 推論処理を実行するサーバープロセスの起動
+python -m vp4onnx -p password -m server -f
+
+# 画像AIモデルのデプロイ
+python -m vp4onnx -p password -m client -c deploy -n <任意のモデル名> --model_img_width <モデルの画像INPUTサイズ(横幅)> --model_img_width <モデルの画像INPUTサイズ(縦幅)> --model_onnx <モデルファイル> --predict_type <推論タイプ(後述)> --custom_predict_py <カスタム推論ファイル(後述)> -f
+# predict_typeはモデルのAIタスクやアルゴリズムに合わせて指定する。指定可能なキーワードはヘルプ参照。
+
+# デプロイされている画像AIモデルの一覧
+python -m vp4onnx -p password -m client -c deploy_list -f
+
+# 画像AIモデルを起動させて推論可能な状態に(セッションを確保)する
+python -m vp4onnx -p password -m client -c start -n <モデル名> --model_provider <推論プロバイダー名(後述)> -f
+# model_providerは推論で使用する実行環境を指定する。指定可能なキーワードはヘルプ参照。
+
+# 推論を実行する
+python -m vp4onnx -p password -m client -c predict -n <モデル名> -i <推論させる画像ファイル> -o <推論結果の画像ファイル> -f
+
+# 画像AIモデルを停止させてセッションを開放
+python -m vp4onnx -p password -m client -c start -n <モデル名> -f
+
+# 画像AIモデルのアンデプロイ
+python -m vp4onnx -p password -m client -c undeploy -n <任意のモデル名> -f
+```
+
+## その他便利なオプション
+コマンドラインオプションが多いので、それを保存して再利用できるようにする（例：画像AIモデルの一覧）
+``` cmd or bash
+# 通常のコマンドに「-u」と「-s」オプションを追加する
+python -m vp4onnx -p password -m client -c deploy_list -f -u <オプションを保存するファイル> -s
+
+# 次から使用するときは「-u」を使用する
+python -m vp4onnx -u <オプションを保存するファイル>
+```
+
+コマンドの実行結果を見やすくする。（例：画像AIモデルの一覧）
+``` cmd or bash
+# 通常のコマンドに「-f」オプションを追加する
+python -m vp4onnx -p password -m client -c deploy_list -f
+
+# 「-f」オプションを外せば、結果はjson形式で取得できる
+python -m vp4onnx -p password -m client -c deploy_list
+```
+
+コマンドラインオプションのヘルプ。
+``` cmd or bash
+python -m vp4onnx -h
+```
 
 
 ### データの保存場所
@@ -30,6 +89,9 @@ pathlib.Path(HOME_DIR) / '.vp4onnx'
 |Object Detection|[YOLOv3](https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/yolov3)|YOLOv3-10|
 |Object Detection|[YOLOv3](https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/yolov3)|YOLOv3-12|
 |Object Detection|[YOLOv3](https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/yolov3)|YOLOv3-12-int8|
+|Image Classification|[EfficientNet-Lite4](https://github.com/onnx/models/tree/main/vision/classification/efficientnet-lite4)|EfficientNet-Lite4-11|
+|Image Classification|[EfficientNet-Lite4](https://github.com/onnx/models/tree/main/vision/classification/efficientnet-lite4)|EfficientNet-Lite4-11-int8|
+|Image Classification|[EfficientNet-Lite4](https://github.com/onnx/models/tree/main/vision/classification/efficientnet-lite4)|EfficientNet-Lite4-11-qdq|
 
 
 ## 開発環境構築
@@ -79,6 +141,55 @@ docker run -d --name redis-container --rm -e TZ=UTC -p 6379:6379 -e REDIS_PASSWO
 
 ```
 
-# Lisence
+## pyplにアップするための準備
+
+``` cmd or bash
+python setup.py sdist
+python setup.py bdist_wheel
+```
+
+- pyplのユーザー登録【本番】
+  https://pypi.org/account/register/
+
+- pyplのユーザー登録【テスト】
+  https://test.pypi.org/account/register/
+
+- それぞれ2要素認証とAPIトークンを登録
+
+- ホームディレクトリに```.pypirc```を作成
+``` .pypirc
+[distutils]
+index-servers =
+  pypi
+  testpypi
+
+[pypi]
+repository: https://upload.pypi.org/legacy/
+username: __token__
+password: 本番環境のAPIトークン
+
+[testpypi]
+repository: https://test.pypi.org/legacy/
+username: __token__
+password: テスト環境のAPIトークン
+```
+
+- テスト環境にアップロード
+  ```.pyplrc```を作っていない場合はコマンド実行時にusernameとpasswordを要求される
+  成功するとURLが返ってくる。
+``` cmd or bash
+twine upload --repository testpypi dist/*
+```
+- pipコマンドのテスト
+``` cmd or bash
+pip install -i https://test.pypi.org/simple/ collectlicense
+```
+
+- 本番環境にアップロード
+``` cmd or bash
+twine upload --repository pypi dist/*
+```
+
+## Lisence
 
 This project is licensed under the MIT License, see the LICENSE.txt file for details
