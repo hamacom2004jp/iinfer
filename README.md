@@ -24,59 +24,62 @@ pip install vp4onnx
 ## vp4onnxの実行方法
 ``` cmd or bash
 # Redisサーバーコンテナの起動（Windowsの場合）
-python -m vp4onnx -p <任意PW> -m redis -c docker_run --wsl_name <WSLのディストリビューションの名前> --wsl_user <WSLのLinux内のDockerが使えるユーザー>
+vp4onnx -p <任意PW> -m redis -c docker_run --wsl_name <WSLのディストリビューションの名前> --wsl_user <WSLのLinux内のDockerが使えるユーザー>
 
 # Redisサーバーコンテナの起動（Linuxの場合）
-python -m vp4onnx -p <任意PW> -m redis -c docker_run
+vp4onnx -p <任意PW> -m redis -c docker_run
 
 # 推論処理を実行するサーバープロセスの起動
-python -m vp4onnx -p password -m server -f
+vp4onnx -p password -m server -f
 
 # 画像AIモデルのデプロイ
-python -m vp4onnx -p password -m client -c deploy -n <任意のモデル名> --model_img_width <モデルの画像INPUTサイズ(横幅)> --model_img_width <モデルの画像INPUTサイズ(縦幅)> --model_onnx <モデルファイル> --predict_type <推論タイプ(後述)> --custom_predict_py <カスタム推論ファイル(後述)> -f
+vp4onnx -p password -m client -c deploy -n <任意のモデル名> --model_img_width <モデルの画像INPUTサイズ(横幅)> --model_img_width <モデルの画像INPUTサイズ(縦幅)> --model_onnx <モデルファイル> --predict_type <推論タイプ(後述)> --custom_predict_py <カスタム推論ファイル(後述)> -f
 # predict_typeはモデルのAIタスクやアルゴリズムに合わせて指定する。指定可能なキーワードはヘルプ参照。
 
 # デプロイされている画像AIモデルの一覧
-python -m vp4onnx -p password -m client -c deploy_list -f
+vp4onnx -p password -m client -c deploy_list -f
 
 # 画像AIモデルを起動させて推論可能な状態に(セッションを確保)する
-python -m vp4onnx -p password -m client -c start -n <モデル名> --model_provider <推論プロバイダー名(後述)> -f
+vp4onnx -p password -m client -c start -n <モデル名> --model_provider <推論プロバイダー名(後述)> -f
 # model_providerは推論で使用する実行環境を指定する。指定可能なキーワードはヘルプ参照。
 
 # 推論を実行する
-python -m vp4onnx -p password -m client -c predict -n <モデル名> -i <推論させる画像ファイル> -o <推論結果の画像ファイル> -f
+vp4onnx -p password -m client -c predict -n <モデル名> -i <推論させる画像ファイル> -o <推論結果の画像ファイル> -f
 
 # 画像AIモデルを停止させてセッションを開放
-python -m vp4onnx -p password -m client -c start -n <モデル名> -f
+vp4onnx -p password -m client -c start -n <モデル名> -f
 
 # 画像AIモデルのアンデプロイ
-python -m vp4onnx -p password -m client -c undeploy -n <任意のモデル名> -f
+vp4onnx -p password -m client -c undeploy -n <任意のモデル名> -f
 ```
 
 ## その他便利なオプション
 コマンドラインオプションが多いので、それを保存して再利用できるようにする（例：画像AIモデルの一覧）
 ``` cmd or bash
 # 通常のコマンドに「-u」と「-s」オプションを追加する
-python -m vp4onnx -p password -m client -c deploy_list -f -u <オプションを保存するファイル> -s
+vp4onnx -p password -m client -c deploy_list -f -u <オプションを保存するファイル> -s
 
 # 次から使用するときは「-u」を使用する
-python -m vp4onnx -u <オプションを保存するファイル>
+vp4onnx -u <オプションを保存するファイル>
 ```
 
 コマンドの実行結果を見やすくする。（例：画像AIモデルの一覧）
 ``` cmd or bash
 # 通常のコマンドに「-f」オプションを追加する
-python -m vp4onnx -p password -m client -c deploy_list -f
+vp4onnx -p password -m client -c deploy_list -f
 
 # 「-f」オプションを外せば、結果はjson形式で取得できる
-python -m vp4onnx -p password -m client -c deploy_list
+vp4onnx -p password -m client -c deploy_list
 ```
 
 コマンドラインオプションのヘルプ。
 ``` cmd or bash
-python -m vp4onnx -h
+vp4onnx -h
 ```
 
+## vp4onnxコマンドについて
+```python -m vp4onnx```の省略形です。
+実体は```scripts```ディレクトリ内にあります。
 
 ### データの保存場所
 ```

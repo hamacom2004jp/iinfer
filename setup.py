@@ -12,12 +12,12 @@ DOWNLOAD_URL = URL
 VERSION = version.__version__
 PYTHON_REQUIRES = '>=3.8'
 INSTALL_REQUIRES = [
-    'onnxruntime>=1.16.2',
-    'Pillow>=10.1.0',
-    'pyyaml>=6.0.1',
-    'redis>=5.0.1',
-    'requests>=2.3.1.0',
-    'tabulate>=0.9.0'
+    'onnxruntime',
+    'Pillow',
+    'pyyaml',
+    'redis',
+    'requests',
+    'tabulate'
 ]
 PACKAGES = [
     'vp4onnx',
@@ -39,7 +39,8 @@ with open('README.md', 'r', encoding='utf-8') as fp:
     readme = fp.read()
 LONG_DESCRIPTION = readme
 LONG_DESCRIPTION_CONTENT_TYPE = 'text/markdown'
-RESORCE_TEXT_FILES = dict(collectlicense=['config.yml','logconf.yml'])
+RESORCE_TEXT_FILES = dict(vp4onnx=[
+    'config.yml', 'logconf.yml', 'scripts/vp4onnx.bat', 'scripts/vp4onnx.sh'])
 
 setup(
     name=NAME,
@@ -59,5 +60,6 @@ setup(
     keywords=KEYWORDS,
     install_requires=INSTALL_REQUIRES,
     package_data=RESORCE_TEXT_FILES,
-    include_package_data=True
+    include_package_data=True,
+    scripts=['vp4onnx/scripts/vp4onnx.bat','vp4onnx/scripts/vp4onnx.sh']
 )

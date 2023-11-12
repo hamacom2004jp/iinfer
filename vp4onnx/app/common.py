@@ -1,6 +1,7 @@
 from io import BytesIO
 from pathlib import Path
 from PIL import Image
+from pkg_resources import resource_string
 from tabulate import tabulate
 import importlib.util
 import json
@@ -14,16 +15,15 @@ import subprocess
 import time
 import yaml
 
-PGM_DIR = Path("vp4onnx")
 APP_ID = 'vp4onnx'
 
 def load_config():
-    logging.config.dictConfig(yaml.safe_load(open(PGM_DIR / "logconf.yml", encoding='UTF-8').read()))
+    log_config = yaml.safe_load(resource_string(APP_ID, "logconf.yml"))
+    logging.config.dictConfig(log_config)
     logger_client = logging.getLogger('client')
     logger_server = logging.getLogger('server')
     logger_redis = logging.getLogger('redis')
-    with open(PGM_DIR / 'config.yml') as f:
-        config = yaml.safe_load(f)
+    config = yaml.safe_load(resource_string(APP_ID, "config.yml"))
     return logger_client, logger_server, logger_redis, config
 
 def saveopt(opt:dict, opt_path:Path):
@@ -144,7 +144,7 @@ def cmd(cmd:str, logger:logging.Logger):
             break
         for enc in ['utf-8', 'cp932', 'utf-16', 'utf-16-le', 'utf-16-be']:
             try:
-                output = out.decode(enc)
+                output = out.decode(enc).rstrip()
                 logger.debug(f"output:{output}")
                 break
             except UnicodeDecodeError:
