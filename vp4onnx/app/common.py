@@ -320,16 +320,21 @@ def b64str2npy(b64str:str, shape:tuple, dtype:str='uint8') -> np.ndarray:
     """
     return np.frombuffer(base64.b64decode(b64str), dtype=dtype).reshape(shape)
 
-def npy2imgfile(npy, output_image_file:Path) -> None:
+def npy2imgfile(npy, output_image_file:Path=None, image_type:str='jpg') -> None:
     """
-    ndarrayを画像ファイルに保存します。
+    ndarrayを画像bytesに変換しoutput_image_fileに保存します。
+    output_image_fileが省略された場合は保存されません
 
     Args:
         npy ([type]): ndarray
         output_image_file (Path): 保存先の画像ファイルパス
     """
     image = Image.fromarray(npy)
-    image.save(output_image_file)
+    img_byte = img2byte(image, format=image_type)
+    if output_image_file is not None:
+        with open(output_image_file, 'wb') as f:
+            f.write(img_byte)
+    return img_byte
 
 def imgbytes2npy(img:bytes, dtype:str='uint8') -> np.ndarray:
     """

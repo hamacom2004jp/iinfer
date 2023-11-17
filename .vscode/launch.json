@@ -21,8 +21,8 @@
                 "--predict_type", "ObjectDetection_YoloV3",
             ],
             */
-            //"args": ["-p", "password", "-m", "server", "-f"],
-            "args": ["-p", "password", "-m", "client", "-n", "yolov3", "-c", "start"],
+            "args": ["-p", "password", "-m", "server", "-f"],
+            //"args": ["-p", "password", "-m", "client", "-n", "yolov3", "-c", "start"],
             //"args": ["-p", "password", "-m", "client", "-n", "yolov3", "-c", "predict", "--image_file", "animal001.jpg", "--output_image_file", "aaa.jpg"],
             //"args": ["-p", "password", "-m", "capture", "-c", "video", "-n", "yolov3"],
             //"args": ["-p", "password", "client", "-n", "yolov3", "undeploy"],

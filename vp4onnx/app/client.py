@@ -1,9 +1,12 @@
 from pathlib import Path
 from vp4onnx.app import common
 import base64
+import cv2
 import logging
 import json
+import numpy as np
 import redis
+import time
 
 
 class Client(object):
@@ -210,13 +213,13 @@ class Client(object):
         res = self.redis_cli.blpop([reskey], timeout=timeout)
         return self._response(reskey, res)
 
-    def predict(self, name:str, image:bytes = None, image_file:Path = None, image_type:str = 'jpg', output_image_file:Path = None, timeout:int = 60):
+    def predict(self, name:str, image = None, image_file:Path = None, image_type:str = 'jpg', output_image_file:Path = None, timeout:int = 60):
         """
         画像をRedisサーバーに送信し、推論結果を取得する
 
         Args:
             name (str): モデル名
-            image (bytes, optional): 画像データ. Defaults to None.
+            image (bytes, optional): 画像データ. Defaults to None. np.ndarray型の場合はデコードしない.
             image_file (Path, optional): 画像ファイルのパス. Defaults to None.
             image_type (str, optional): 画像の形式. Defaults to 'jpg'.
             output_image_file (Path, optional): 予測結果の画像ファイルのパス. Defaults to None.
@@ -248,12 +251,12 @@ class Client(object):
                     self.logger.error(f"image_type is invalid. {image_type}.")
                     return {"error": f"image_type is invalid. {image_type}."}
         else:
-            if image_type == 'npy':
+            if type(image) == np.ndarray:
+                img_npy = image
+            elif image_type == 'npy':
                 img_npy = common.npybytes2npy(image)
             elif image_type == 'jpg' or image_type == 'png':
                 img_npy = common.imgbytes2npy(image)
-            elif image_type == 'npy_array':
-                img_npy = image
             else:
                 self.logger.error(f"image_type is invalid. {image_type}.")
                 return {"error": f"image_type is invalid. {image_type}."}
@@ -269,5 +272,53 @@ class Client(object):
             #byteio = BytesIO(base64.b64decode(res_json["output_image"]))
             #img_npy = np.load(byteio)
             img_npy = common.b64str2npy(res_json["output_image"], res_json["output_image_shape"])
-            common.npy2imgfile(img_npy, output_image_file)
+            common.npy2imgfile(img_npy, output_image_file=output_image_file, image_type=image_type)
         return res_json
+
+    def capture(self, name:str, output_image_file:Path = None, image_type:str = 'jpg', timeout:int = 60,
+              capture_device = 0, capture_output_type:str = 'preview', capture_frame_width:int = None, capture_frame_height:int = None, capture_fps:int = None, capture_output_fps:int = 10):
+        """
+        ビデオをキャプチャする
+
+        Args:
+            name (str): モデル名
+            output_image_file (Path, optional): 予測結果の画像ファイルのパス. Defaults to None.
+            timeout (int, optional): タイムアウト時間. Defaults to 60.
+            capture_device (int or str): キャプチャするディバイス、ビデオデバイスのID, ビデオファイルのパス。rtspのURL. by default 0
+            capture_output_type (str): キャプチャしたビデオの出力形式, by default 'preview'
+            capture_frame_width (int): キャプチャするビデオのフレーム幅, by default None
+            capture_frame_height (int): キャプチャするビデオのフレーム高さ, by default None
+            capture_fps (int): キャプチャするビデオのフレームレート, by default None
+            capture_output_fps (int): キャプチャするビデオのフレームレート, by default 30
+        """
+        cap = cv2.VideoCapture(capture_device)
+        if capture_frame_width is not None:
+            cap.set(cv2.CAP_PROP_FRAME_WIDTH, capture_frame_width)
+        if capture_frame_height is not None:
+            cap.set(cv2.CAP_PROP_FRAME_HEIGHT, capture_frame_height)
+        if capture_fps is not None:
+            cap.set(cv2.CAP_PROP_FPS, capture_fps)
+        try:
+            interval = float(1 / capture_output_fps)
+            while True:
+                start = time.perf_counter()
+                ret, frame = cap.read()
+                if ret:
+                    res_json = self.predict(name, image=frame, image_type=image_type, output_image_file=output_image_file, timeout=timeout)
+                    if capture_output_type == 'preview':
+                        if "output_image" in res_json and "output_image_shape" in res_json:
+                            img_npy = common.b64str2npy(res_json["output_image"], res_json["output_image_shape"])
+                            cv2.imshow('preview', img_npy)
+                            cv2.waitKey(1)
+                    yield res_json
+                else:
+                    logging.error(f"Capture failed. devide_id={capture_device}", stack_info=True)
+                    break
+                end = time.perf_counter()
+                if interval - (end - start) > 0:
+                    time.sleep(interval - (end - start))
+
+        except KeyboardInterrupt:
+            logging.info("KeyboardInterrupt", exc_info=True)
+        finally:
+            cap.release()

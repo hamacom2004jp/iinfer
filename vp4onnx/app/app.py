@@ -24,13 +24,12 @@ def main(HOME_DIR:str):
     parser.add_argument('-u', '--useopt', help=f'Use options file.')
     parser.add_argument('-s', '--saveopt', help=f'save options file. with --useopt option.', action='store_true')
     parser.add_argument('-f', '--format', help='Setting the cmd format.', action='store_true')
-    parser.add_argument('-m', '--mode', help='Setting the boot mode.', choices=['server', 'client', 'capture', 'redis'])
+    parser.add_argument('-m', '--mode', help='Setting the boot mode.', choices=['server', 'client', 'redis'])
     parser.add_argument('--data', help='Setting the data directory.', default=Path(HOME_DIR) / ".vp4onnx")
     parser.add_argument('-n', '--name', help='Setting the cmd name.')
     parser.add_argument('--timeout', help='Setting the cmd timeout.', type=int, default=15)
-    parser.add_argument('-c', '--cmd', help='Setting the cmd type.', choices=['deploy', 'deploy_list', 'undeploy', 'start', 'stop', 'predict', 'predict_type_list',
-                                                                              'docker_run', 'docker_stop',
-                                                                              'video'])
+    parser.add_argument('-c', '--cmd', help='Setting the cmd type.',
+                        choices=['deploy', 'deploy_list', 'undeploy', 'start', 'stop', 'predict', 'predict_type_list', 'capture', 'docker_run', 'docker_stop'])
     parser.add_argument('--model_img_width', help='Setting the cmd deploy model_img_width.', type=int)
     parser.add_argument('--model_img_height', help='Setting the cmd deploy model_img_height.', type=int)
     parser.add_argument('--model_onnx', help='Setting the cmd deploy model_onnx file.')
@@ -45,8 +44,7 @@ def main(HOME_DIR:str):
     parser.add_argument('--image_type', help='Setting the cmd predict image type.', choices=['npy', 'png', 'jpg'], default='jpg')
     parser.add_argument('--wsl_name', help='WSL distribution name.')
     parser.add_argument('--wsl_user', help='WSL distribution user.')
-    parser.add_argument('-d', '--capture_devide_id', help='Setting the capture input devide_id.', default=0)
-    parser.add_argument('--capture_file', help='Setting the capture input file.If specified, capture_devide_id is ignored.', default=None)
+    parser.add_argument('-d', '--capture_device', help='Setting the capture input device. device id, video file, rtsp url.', default=0)
     parser.add_argument('--capture_output_type', help='Setting the capture output type.', choices=['preview', 'stdout'], default='preview')
     parser.add_argument('--capture_frame_width', help='Setting the capture input frame width.', type=int, default=None)
     parser.add_argument('--capture_frame_height', help='Setting the capture input frame height.', type=int, default=None)
@@ -79,8 +77,7 @@ def main(HOME_DIR:str):
     wsl_name = common.getopt(opt, 'wsl_name', preval=args_dict, withset=True)
     wsl_user = common.getopt(opt, 'wsl_user', preval=args_dict, withset=True)
 
-    capture_devide_id = common.getopt(opt, 'capture_devide_id', preval=args_dict, withset=True)
-    capture_file = common.getopt(opt, 'capture_file', preval=args_dict, withset=True)
+    capture_device = common.getopt(opt, 'capture_device', preval=args_dict, withset=True)
     capture_output_type = common.getopt(opt, 'capture_output_type', preval=args_dict, withset=True)
     capture_frame_width = common.getopt(opt, 'capture_frame_width', preval=args_dict, withset=True)
     capture_frame_height = common.getopt(opt, 'capture_frame_height', preval=args_dict, withset=True)
@@ -142,18 +139,14 @@ def main(HOME_DIR:str):
                                       site=val['site'],
                                       image_width=val['image_width'],
                                       image_height=val['image_height']) for key,val in common.BASE_MODELS.items()], format, tm)
-        else:
-            common.print_format({"warn":f"Unkown command."}, format, tm)
-            parser.print_help()
 
-    elif mode == 'capture':
-        logger, _ = common.load_config(mode)
-        cap = capture.Capture(logger, redis_host=host, redis_port=port, redis_password=password)
-        if cmd == 'video':
-            for ret in cap.video(name, output_image_file=output_image_file, image_type=image_type, timeout=timeout,
-                                 capture_devide_id=capture_devide_id, capture_file=capture_file, capture_output_type=capture_output_type,
+        elif cmd == 'capture':
+            for ret in cl.capture(name, output_image_file=output_image_file, image_type=image_type, timeout=timeout,
+                                 capture_device=capture_device, capture_output_type=capture_output_type,
                                  capture_frame_width=capture_frame_width, capture_frame_height=capture_frame_height, capture_fps=capture_fps, capture_output_fps=capture_output_fps):
                 common.print_format(ret, format, tm)
+                tm = time.time()
+
         else:
             common.print_format({"warn":f"Unkown command."}, format, tm)
             parser.print_help()

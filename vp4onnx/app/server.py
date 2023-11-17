@@ -49,10 +49,10 @@ class Server(object):
             self._run_server()
         except redis.exceptions.ConnectionError as e:
             self.is_running = False
-            self.logger.error(f"fail to ping redis-server. {e}")
+            self.logger.error(f"fail to ping server. {e}")
 
     def _run_server(self):
-        self.logger.info(f"start redis-server")
+        self.logger.info(f"start server")
         while self.is_running:
             try:
                 # ブロッキングリストから要素を取り出す
@@ -89,9 +89,10 @@ class Server(object):
                     self.predict(msg[1], msg[2], image)
             except redis.exceptions.TimeoutError:
                 pass
-            except redis.exceptions.ConnectionError:
-                self.redis_cli = redis.Redis(host=self.redis_host, port=self.redis_port, db=0)
-                time.sleep(1)
+            except redis.exceptions.ConnectionError as e:
+                self.logger.error(f"Connection to the server was lost. {e}")
+                self.is_running = False
+                break
             except KeyboardInterrupt as e:
                 self.is_running = False
                 break
