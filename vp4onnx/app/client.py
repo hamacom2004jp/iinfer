@@ -1,5 +1,5 @@
-from vp4onnx.app import common
 from pathlib import Path
+from vp4onnx.app import common
 import base64
 import logging
 import json
@@ -20,6 +20,7 @@ class Client(object):
         self.logger = logger
         self.redis_host = redis_host
         self.redis_port = redis_port
+        self.password = redis_password
         self.redis_cli = redis.Redis(host=self.redis_host, port=self.redis_port, db=0, password=redis_password)
 
     def __enter__(self):
@@ -38,16 +39,18 @@ class Client(object):
             self.logger.error(f"fail to ping redis-server")
             raise Exception("fail to ping redis-server")
 
-    def _response(self, res_msg:list[str]):
+    def _response(self, reskey:str, res_msg:list[str]):
         """
         Redisサーバーからの応答を解析する
 
         Args:
+            reskey (str): Redisサーバーからの応答のキー
             res_msg (list[str]): Redisサーバーからの応答
 
         Returns:
             dict: 解析された応答
         """
+        self.redis_cli.delete(reskey)
         if res_msg is None:
             self.logger.error(f"Response timed out.")
             return {"error": f"Response timed out."}
@@ -83,6 +86,9 @@ class Client(object):
         Returns:
             dict: Redisサーバーからの応答
         """
+        if self.password is None or self.password == "":
+            self.logger.error(f"password is empty.")
+            return {"error": f"password is empty."}
         if name is None or name == "":
             self.logger.error(f"name is empty.")
             return {"error": f"name is empty."}
@@ -117,7 +123,7 @@ class Client(object):
         reskey = common.random_string()
         self.redis_cli.rpush('server', f"deploy {reskey} {name} {model_img_width} {model_img_height} {predict_type} {model_onnx_bytes_b64} {custom_predict_py_b64}")
         res = self.redis_cli.blpop([reskey], timeout=timeout)
-        return self._response(res)
+        return self._response(reskey, res)
 
     def deploy_list(self, timeout:int = 60):
         """
@@ -126,10 +132,13 @@ class Client(object):
         Returns:
             dict: Redisサーバーからの応答
         """
+        if self.password is None or self.password == "":
+            self.logger.error(f"password is empty.")
+            return {"error": f"password is empty."}
         reskey = common.random_string()
         self.redis_cli.rpush('server', f"deploy_list {reskey}")
         res = self.redis_cli.blpop([reskey], timeout=timeout)
-        return self._response(res)
+        return self._response(reskey, res)
 
     def undeploy(self, name:str, timeout:int = 60):
         """
@@ -142,13 +151,16 @@ class Client(object):
         Returns:
             dict: Redisサーバーからの応答
         """
+        if self.password is None or self.password == "":
+            self.logger.error(f"password is empty.")
+            return {"error": f"password is empty."}
         if name is None or name == "":
             self.logger.error(f"name is empty.")
             return {"error": f"name is empty."}
         reskey = common.random_string()
         self.redis_cli.rpush('server', f"undeploy {reskey} {name}")
         res = self.redis_cli.blpop([reskey], timeout=timeout)
-        return self._response(res)
+        return self._response(reskey, res)
 
     def start(self, name:str, model_provider:str = 'CPUExecutionProvider', timeout:int = 60):
         """
@@ -162,6 +174,9 @@ class Client(object):
         Returns:
             dict: Redisサーバーからの応答
         """
+        if self.password is None or self.password == "":
+            self.logger.error(f"password is empty.")
+            return {"error": f"password is empty."}
         if name is None or name == "":
             self.logger.error(f"name is empty.")
             return {"error": f"name is empty."}
@@ -171,7 +186,7 @@ class Client(object):
         reskey = common.random_string()
         self.redis_cli.rpush('server', f"start {reskey} {name} {model_provider}")
         res = self.redis_cli.blpop([reskey], timeout=timeout)
-        return self._response(res)
+        return self._response(reskey, res)
 
     def stop(self, name:str, timeout:int = 60):
         """
@@ -184,15 +199,18 @@ class Client(object):
         Returns:
             dict: Redisサーバーからの応答
         """
+        if self.password is None or self.password == "":
+            self.logger.error(f"password is empty.")
+            return {"error": f"password is empty."}
         if name is None or name == "":
             self.logger.error(f"name is empty.")
             return {"error": f"name is empty."}
         reskey = common.random_string()
         self.redis_cli.rpush('server', f"stop {reskey} {name}")
         res = self.redis_cli.blpop([reskey], timeout=timeout)
-        return self._response(res)
+        return self._response(reskey, res)
 
-    def predict(self, name:str, image: bytes = None, image_file:Path = None, output_image_file:Path = None, timeout:int = 60):
+    def predict(self, name:str, image:bytes = None, image_file:Path = None, image_type:str = 'jpg', output_image_file:Path = None, timeout:int = 60):
         """
         画像をRedisサーバーに送信し、推論結果を取得する
 
@@ -200,33 +218,56 @@ class Client(object):
             name (str): モデル名
             image (bytes, optional): 画像データ. Defaults to None.
             image_file (Path, optional): 画像ファイルのパス. Defaults to None.
+            image_type (str, optional): 画像の形式. Defaults to 'jpg'.
             output_image_file (Path, optional): 予測結果の画像ファイルのパス. Defaults to None.
             timeout (int, optional): タイムアウト時間. Defaults to 60.
 
         Returns:
             dict: Redisサーバーからの応答
         """
+        if self.password is None or self.password == "":
+            self.logger.error(f"password is empty.")
+            return {"error": f"password is empty."}
         if name is None or name == "":
             self.logger.error(f"name is empty.")
             return {"error": f"name is empty."}
         if image is None and image_file is None:
             self.logger.error(f"image and image_file is empty.")
             return {"error": f"image and image_file is empty."}
-        image_b64 = None
+        npy_b64 = None
         if image_file is not None:
             if not image_file.exists():
                 self.logger.error(f"Not found image_file. {image_file}.")
                 return {"error": f"Not found image_file. {image_file}."}
             with open(image_file, "rb") as f:
-                image_b64 = base64.b64encode(f.read()).decode('utf-8')
+                if image_type == 'npy':
+                    img_npy = common.npyfile2npy(f)
+                elif image_type == 'jpg' or image_type == 'png':
+                    img_npy = common.imgfile2npy(f)
+                else:
+                    self.logger.error(f"image_type is invalid. {image_type}.")
+                    return {"error": f"image_type is invalid. {image_type}."}
         else:
-            image_b64 = base64.b64encode(image).decode('utf-8')
+            if image_type == 'npy':
+                img_npy = common.npybytes2npy(image)
+            elif image_type == 'jpg' or image_type == 'png':
+                img_npy = common.imgbytes2npy(image)
+            elif image_type == 'npy_array':
+                img_npy = image
+            else:
+                self.logger.error(f"image_type is invalid. {image_type}.")
+                return {"error": f"image_type is invalid. {image_type}."}
+
+        npy_b64 = common.npy2b64str(img_npy)
+        #img_npy2 = np.frombuffer(base64.b64decode(npy_b64), dtype='uint8').reshape(img_npy.shape)
+
         reskey = common.random_string()
-        self.redis_cli.rpush('server', f"predict {reskey} {name} {image_b64}")
+        self.redis_cli.rpush('server', f"predict {reskey} {name} {npy_b64} {img_npy.shape[0]} {img_npy.shape[1]} {img_npy.shape[2] if len(img_npy.shape) > 2 else ''}")
         res = self.redis_cli.blpop([reskey], timeout=timeout)
-        res_json = self._response(res)
-        if "output_image" in res_json and output_image_file is not None:
-            with open(output_image_file, "wb") as f:
-                f.write(base64.b64decode(res_json["output_image"]))
-            base64.b64decode(res_json["output_image"])
+        res_json = self._response(reskey, res)
+        if "output_image" in res_json and "output_image_shape" in res_json and output_image_file is not None:
+            #byteio = BytesIO(base64.b64decode(res_json["output_image"]))
+            #img_npy = np.load(byteio)
+            img_npy = common.b64str2npy(res_json["output_image"], res_json["output_image_shape"])
+            common.npy2imgfile(img_npy, output_image_file)
         return res_json

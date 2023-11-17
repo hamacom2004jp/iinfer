@@ -4,7 +4,7 @@ import numpy as np
 import onnxruntime as rt
 
 
-def predict(session:rt.InferenceSession, img_width:int, img_height:int, image:bytes):
+def predict(session:rt.InferenceSession, img_width:int, img_height:int, image:Image):
     image_data, _, image_obj = preprocess_img(image, img_width, img_height)
 
     results = session.run(["Softmax:0"], {"images:0": image_data})[0]
@@ -28,8 +28,7 @@ def resize_img(image:Image, to_w, to_h):
     new_image.paste(image, ((to_w-nw)//2, (to_h-nh)//2))
     return new_image
 
-def preprocess_img(img:bytes, model_img_width:int, model_img_height:int):
-    image = Image.open(BytesIO(img))
+def preprocess_img(image:Image, model_img_width:int, model_img_height:int):
     boxed_image = resize_img(image, model_img_width, model_img_height)
     image_data = np.array(boxed_image, dtype='float32')
     image_data /= 255.

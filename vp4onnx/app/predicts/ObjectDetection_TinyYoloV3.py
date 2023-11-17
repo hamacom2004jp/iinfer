@@ -4,7 +4,7 @@ import numpy as np
 import onnxruntime as rt
 
 
-def predict(session:rt.InferenceSession, img_width:int, img_height:int, image:bytes):
+def predict(session:rt.InferenceSession, img_width:int, img_height:int, image:Image):
     image_data, image_size, image_obj = preprocess_img(image, img_width, img_height)
 
     input_name = session.get_inputs()[0].name           # 'image'
@@ -13,17 +13,23 @@ def predict(session:rt.InferenceSession, img_width:int, img_height:int, image:by
     output_name_scores = session.get_outputs()[1].name  # 'scores'
     output_name_indices = session.get_outputs()[2].name # 'indices'
 
-    boxes, scores, indices = session.run([output_name_boxes, output_name_scores, output_name_indices],
+    outputs_index = session.run([output_name_boxes, output_name_scores, output_name_indices],
                                 {input_name: image_data, input_name_img_shape: image_size})
-    output_boxes, output_scores, output_classes = [], [], []
-    for idx in indices[0]:
-        output_classes.append(idx[1])
-        output_scores.append(scores[tuple(idx)])
-        output_boxes.append(boxes[idx[0], idx[2]])
 
-    output_image = draw_boxes(image_obj, output_boxes, output_scores, output_classes)
+    output_boxes = outputs_index[0]
+    output_scores = outputs_index[1]
+    output_indices = outputs_index[2]
 
-    return dict(output_boxes=output_boxes, output_scores=output_scores, output_classes=output_classes), output_image
+    out_boxes, out_scores, out_classes = [], [], []
+    for idx_ in output_indices[0]:
+        out_classes.append(idx_[1])
+        out_scores.append(output_scores[tuple(idx_)])
+        idx_1 = (idx_[0], idx_[2])
+        out_boxes.append(output_boxes[idx_1])
+
+    output_image = draw_boxes(image_obj, out_boxes, out_scores, out_classes)
+
+    return dict(output_boxes=out_boxes, output_scores=out_scores, output_classes=out_classes), output_image
 
 def resize_img(image:Image, to_w, to_h):
     '''resize image with unchanged aspect ratio using padding'''
@@ -36,8 +42,7 @@ def resize_img(image:Image, to_w, to_h):
     new_image.paste(image, ((to_w-nw)//2, (to_h-nh)//2))
     return new_image
 
-def preprocess_img(img:bytes, model_img_width:int, model_img_height:int):
-    image = Image.open(BytesIO(img))
+def preprocess_img(image:Image, model_img_width:int, model_img_height:int):
     boxed_image = resize_img(image, model_img_width, model_img_height)
     image_data = np.array(boxed_image, dtype='float32')
     image_data /= 255.
@@ -49,15 +54,15 @@ def preprocess_img(img:bytes, model_img_width:int, model_img_height:int):
 def draw_boxes(image:Image, boxes:list[list[float]], scores:list[float], classes:list[int], labels:list[str] = None, colors = None):
     draw = ImageDraw.Draw(image)
     for box, score, cl in zip(boxes, scores, classes):
-        x, y, w, h = box
-        top = max(0, np.floor(x + 0.5).astype(int))
-        left = max(0, np.floor(y + 0.5).astype(int))
-        right = min(image.width, np.floor(x + w + 0.5).astype(int))
-        bottom = min(image.height, np.floor(y + h + 0.5).astype(int))
+        y1, x1, y2, x2 = box
+        x1 = max(0, np.floor(x1 + 0.5).astype(int))
+        y1 = max(0, np.floor(y1 + 0.5).astype(int))
+        x2 = min(image.width, np.floor(x2 + 0.5).astype(int))
+        y2 = min(image.height, np.floor(y2 + 0.5).astype(int))
         color = colors[cl] if colors is not None else (255, 0, 0)
-        draw.rectangle(((top, left), (right, bottom)), outline=color)
+        draw.rectangle(((x1, y1), (x2, y2)), outline=color)
 
         label = labels[cl] if labels is not None else str(cl)
-        draw.text((top, left), label, fill=(0, 0, 0))
+        draw.text((x1, y1), label, bbox={'facecolor': 'white', 'alpha': 0.7, 'pad': 10})
     
     return image

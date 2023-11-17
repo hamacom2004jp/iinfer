@@ -1,5 +1,6 @@
-from vp4onnx.app import common
 from pathlib import Path
+from PIL import Image
+from vp4onnx.app import common
 import base64
 import logging
 import json
@@ -79,7 +80,12 @@ class Server(object):
                 elif msg[0] == 'stop':
                     self.stop(msg[1], msg[2])
                 elif msg[0] == 'predict':
-                    image = base64.b64decode(msg[3])
+                    #byteio = BytesIO(base64.b64decode(msg[3]))
+                    #img_npy = np.load(byteio)
+                    shape = [int(msg[4]), int(msg[5])]
+                    if len(msg) > 6: shape.append(int(msg[6]))
+                    img_npy = common.b64str2npy(msg[3], shape)
+                    image = common.npy2img(img_npy)
                     self.predict(msg[1], msg[2], image)
             except redis.exceptions.TimeoutError:
                 pass
@@ -287,22 +293,22 @@ class Server(object):
         self.responce(reskey, {"success": f"Successful stop of {name} session."})
         return
 
-    def predict(self, reskey:str, name:str, image: bytes):
+    def predict(self, reskey:str, name:str, image: Image):
         """
         クライアントから送られてきた画像の推論を行う。
 
         Args:
             reskey (str): レスポンスキー
             name (dict): モデル名
-            image (bytes): 推論する画像データ
+            img_npy (np.array): 推論する画像データ
         """
         if name is None or name == "":
             self.logger.warn(f"Name is empty.")
             self.responce(reskey, {"warn": f"Name is empty."})
             return
-        if image is None or image == "":
-            self.logger.warn(f"Image is empty.")
-            self.responce(reskey, {"warn": f"Image is empty."})
+        if image is None:
+            self.logger.warn(f"img_npy is empty.")
+            self.responce(reskey, {"warn": f"img_npy is empty."})
             return
         if name not in self.sessions:
             self.logger.warn(f"{name} has not yet started a session.")
@@ -314,8 +320,9 @@ class Server(object):
             predictfunc = session['predictfunc']
             outputs, output_image = predictfunc(session['session'], session['model_img_width'], session['model_img_height'], image)
             if output_image is not None:
-                output_image_b64 = base64.b64encode(common.image_to_bytes(output_image)).decode('utf-8')
-                self.responce(reskey, {"success": outputs, "output_image": output_image_b64})
+                output_image_npy = common.img2npy(output_image)
+                output_image_b64 = common.npy2b64str(output_image_npy)
+                self.responce(reskey, {"success": outputs, "output_image": output_image_b64, "output_image_shape": output_image_npy.shape})
                 return
             self.responce(reskey, {"success": outputs})
             return

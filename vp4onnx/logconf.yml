@@ -19,6 +19,14 @@ handlers:
         when : 'D'
         encoding : 'utf-8'
         filename: client.log
+    capture:
+        class: logging.handlers.TimedRotatingFileHandler
+        level: DEBUG
+        formatter: fmt
+        backupCount: 5
+        when : 'D'
+        encoding : 'utf-8'
+        filename: capture.log
     server:
         class: logging.handlers.TimedRotatingFileHandler
         level: DEBUG
@@ -41,6 +49,10 @@ loggers:
         handlers: [client]
         level: DEBUG
         qualname: client
+    capture:
+        handlers: [capture]
+        level: DEBUG
+        qualname: capture
     server:
         handlers: [server, std]
         level: DEBUG

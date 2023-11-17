@@ -8,7 +8,7 @@
             "name": "Python: vp4onnx",
             "type": "python",
             "request": "launch",
-            "args": ["-u", "vp4onnx.redis-docker_run.json"],
+            //"args": ["-u", "vp4onnx.redis-docker_run.json"],
             /*
             "args": [
                 "-p", "password",
@@ -21,10 +21,12 @@
                 "--predict_type", "ObjectDetection_YoloV3",
             ],
             */
-            //"args": ["-p", "password", "client", "-n", "yolov3", "start"],
-            //"args": ["-p", "password", "client", "-n", "yolov3", "predict", "--image_file", "animal001.jpg", "--output_image_file", "aaa.jpg"],
-            //"args": ["-p", "password", "client", "-n", "yolov3", "stop"],
+            //"args": ["-p", "password", "-m", "server", "-f"],
+            "args": ["-p", "password", "-m", "client", "-n", "yolov3", "-c", "start"],
+            //"args": ["-p", "password", "-m", "client", "-n", "yolov3", "-c", "predict", "--image_file", "animal001.jpg", "--output_image_file", "aaa.jpg"],
+            //"args": ["-p", "password", "-m", "capture", "-c", "video", "-n", "yolov3"],
             //"args": ["-p", "password", "client", "-n", "yolov3", "undeploy"],
+            //"args": ["-m", "capture", "-c", "video"],
             "module": "vp4onnx",
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",            
