@@ -2,10 +2,8 @@ from vp4onnx.app import common
 from vp4onnx.app import client
 from vp4onnx.app import redis
 from vp4onnx.app import server
-from vp4onnx.app import capture
 from pathlib import Path
 import argparse
-import platform
 import sys
 import time
 
