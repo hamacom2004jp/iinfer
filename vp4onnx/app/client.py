@@ -213,7 +213,7 @@ class Client(object):
         res = self.redis_cli.blpop([reskey], timeout=timeout)
         return self._response(reskey, res)
 
-    def predict(self, name:str, image = None, image_file:Path = None, image_type:str = 'jpg', output_image_file:Path = None, timeout:int = 60):
+    def predict(self, name:str, image = None, image_file:Path = None, image_type:str = 'jpg', output_image_file:Path = None, output_preview:bool=False, timeout:int = 60):
         """
         画像をRedisサーバーに送信し、推論結果を取得する
 
@@ -223,6 +223,7 @@ class Client(object):
             image_file (Path, optional): 画像ファイルのパス. Defaults to None.
             image_type (str, optional): 画像の形式. Defaults to 'jpg'.
             output_image_file (Path, optional): 予測結果の画像ファイルのパス. Defaults to None.
+            output_preview (bool, optional): 予測結果の画像をプレビューするかどうか. Defaults to False.
             timeout (int, optional): タイムアウト時間. Defaults to 60.
 
         Returns:
@@ -268,15 +269,20 @@ class Client(object):
         self.redis_cli.rpush('server', f"predict {reskey} {name} {npy_b64} {img_npy.shape[0]} {img_npy.shape[1]} {img_npy.shape[2] if len(img_npy.shape) > 2 else ''}")
         res = self.redis_cli.blpop([reskey], timeout=timeout)
         res_json = self._response(reskey, res)
-        if "output_image" in res_json and "output_image_shape" in res_json and output_image_file is not None:
+        if "output_image" in res_json and "output_image_shape" in res_json:
             #byteio = BytesIO(base64.b64decode(res_json["output_image"]))
             #img_npy = np.load(byteio)
             img_npy = common.b64str2npy(res_json["output_image"], res_json["output_image_shape"])
-            common.npy2imgfile(img_npy, output_image_file=output_image_file, image_type=image_type)
+            if output_image_file is not None:
+                common.npy2imgfile(img_npy, output_image_file=output_image_file, image_type=image_type)
+            if output_preview:
+                cv2.imshow('preview', img_npy)
+                cv2.waitKey(0)
         return res_json
 
     def capture(self, name:str, output_image_file:Path = None, image_type:str = 'jpg', timeout:int = 60,
-              capture_device = 0, capture_output_type:str = 'preview', capture_frame_width:int = None, capture_frame_height:int = None, capture_fps:int = None, capture_output_fps:int = 10):
+              capture_device = 0, capture_output_type:str = None, capture_frame_width:int = None, capture_frame_height:int = None, capture_fps:int = None, capture_output_fps:int = 10,
+              output_preview:bool=False):
         """
         ビデオをキャプチャする
 
@@ -285,11 +291,12 @@ class Client(object):
             output_image_file (Path, optional): 予測結果の画像ファイルのパス. Defaults to None.
             timeout (int, optional): タイムアウト時間. Defaults to 60.
             capture_device (int or str): キャプチャするディバイス、ビデオデバイスのID, ビデオファイルのパス。rtspのURL. by default 0
-            capture_output_type (str): キャプチャしたビデオの出力形式, by default 'preview'
+            capture_output_type (str): キャプチャしたビデオの出力形式, by default None
             capture_frame_width (int): キャプチャするビデオのフレーム幅, by default None
             capture_frame_height (int): キャプチャするビデオのフレーム高さ, by default None
             capture_fps (int): キャプチャするビデオのフレームレート, by default None
             capture_output_fps (int): キャプチャするビデオのフレームレート, by default 30
+            output_preview (bool, optional): 予測結果の画像をプレビューするかどうか. Defaults to False.
         """
         cap = cv2.VideoCapture(capture_device)
         if capture_frame_width is not None:
@@ -305,7 +312,7 @@ class Client(object):
                 ret, frame = cap.read()
                 if ret:
                     res_json = self.predict(name, image=frame, image_type=image_type, output_image_file=output_image_file, timeout=timeout)
-                    if capture_output_type == 'preview':
+                    if output_preview:
                         if "output_image" in res_json and "output_image_shape" in res_json:
                             img_npy = common.b64str2npy(res_json["output_image"], res_json["output_image_shape"])
                             cv2.imshow('preview', img_npy)

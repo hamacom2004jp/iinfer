@@ -44,7 +44,7 @@ vp4onnx -p <PW> -m client -c start -n <モデル名> --model_provider <推論プ
 # model_providerは推論で使用する実行環境を指定する。指定可能なキーワードはヘルプ参照。
 
 # 推論を実行する
-vp4onnx -p <PW> -m client -c predict -n <モデル名> -i <推論させる画像ファイル> -o <推論結果の画像ファイル> -f
+vp4onnx -p <PW> -m client -c predict -n <モデル名> -i <推論させる画像ファイル> -o <推論結果の画像ファイル> --output_preview -f
 
 # 画像AIモデルを停止させてセッションを開放
 vp4onnx -p <PW> -m client -c start -n <モデル名> -f
@@ -56,7 +56,7 @@ vp4onnx -p <PW> -m client -c undeploy -n <モデル名> -f
 ## ビデオキャプチャーによる推論
 ```
 # カメラをキャプチャーしながら推論
-vp4onnx -p <PW> -m capture -c video -n <モデル名> -d <カメラID> -f 
+vp4onnx -p <PW> -m client -c capture -n <モデル名> --output_preview -f 
 ```
 
 ## その他便利なオプション
@@ -93,15 +93,21 @@ pathlib.Path(HOME_DIR) / '.vp4onnx'
 ```
 
 ## 動作確認したモデル
-|AI Task|base|Model|
-|------|------|------|
-|Object Detection|[YOLOv3](https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/yolov3)|YOLOv3-10|
-|Object Detection|[YOLOv3](https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/yolov3)|YOLOv3-12|
-|Object Detection|[YOLOv3](https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/yolov3)|YOLOv3-12-int8|
-|Image Classification|[EfficientNet-Lite4](https://github.com/onnx/models/tree/main/vision/classification/efficientnet-lite4)|EfficientNet-Lite4-11|
-|Image Classification|[EfficientNet-Lite4](https://github.com/onnx/models/tree/main/vision/classification/efficientnet-lite4)|EfficientNet-Lite4-11-int8|
-|Image Classification|[EfficientNet-Lite4](https://github.com/onnx/models/tree/main/vision/classification/efficientnet-lite4)|EfficientNet-Lite4-11-qdq|
-
+|AI Task|base|Model|Memo|
+|------|------|------|------|
+|Object Detection|[YOLOX](https://github.com/Megvii-BaseDetection/YOLOX/#benchmark)|YOLOX-Nano|*1|
+|Object Detection|[YOLOX](https://github.com/Megvii-BaseDetection/YOLOX/#benchmark)|YOLOX-Tiny|*1|
+|Object Detection|[YOLOX](https://github.com/Megvii-BaseDetection/YOLOX/#benchmark)|YOLOX-s|*1|
+|Object Detection|[YOLOX](https://github.com/Megvii-BaseDetection/YOLOX/#benchmark)|YOLOX-m|*1|
+|Object Detection|[YOLOX](https://github.com/Megvii-BaseDetection/YOLOX/#benchmark)|YOLOX-l|*1|
+|Object Detection|[YOLOX](https://github.com/Megvii-BaseDetection/YOLOX/#benchmark)|YOLOX-x|*1|
+|Object Detection|[YOLOv3](https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/yolov3)|YOLOv3-10|-|
+|Object Detection|[YOLOv3](https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/yolov3)|YOLOv3-12|-|
+|Object Detection|[YOLOv3](https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/yolov3)|YOLOv3-12-int8|-|
+|Image Classification|[EfficientNet-Lite4](https://github.com/onnx/models/tree/main/vision/classification/efficientnet-lite4)|EfficientNet-Lite4-11|-|
+|Image Classification|[EfficientNet-Lite4](https://github.com/onnx/models/tree/main/vision/classification/efficientnet-lite4)|EfficientNet-Lite4-11-int8|-|
+|Image Classification|[EfficientNet-Lite4](https://github.com/onnx/models/tree/main/vision/classification/efficientnet-lite4)|EfficientNet-Lite4-11-qdq|-|
+ *1）[pth2onnx](https://github.com/hamacom2004jp/pth2onnx)を使用してONNX形式に変換して使用
 
 ## 開発環境構築
 ```
@@ -191,7 +197,7 @@ twine upload --repository testpypi dist/*
 ```
 - pipコマンドのテスト
 ``` cmd or bash
-pip install -i https://test.pypi.org/simple/ collectlicense
+pip install -i https://test.pypi.org/simple/ vp4onnx
 ```
 
 - 本番環境にアップロード

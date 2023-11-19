@@ -1,6 +1,6 @@
 from io import BytesIO
 from pathlib import Path
-from PIL import Image
+from PIL import Image, ImageDraw
 from pkg_resources import resource_string
 from tabulate import tabulate
 import base64
@@ -192,7 +192,7 @@ def print_format(data:dict, format:bool, tm:float):
         print(data)
 
 BASE_MODELS = dict(
-    Classification_EfficientNet_Lite4=dict(
+    cls_EfficientNet_Lite4=dict(
         site='https://github.com/onnx/models/tree/main/vision/classification/efficientnet-lite4',
         image_width=224,
         image_height=224
@@ -202,18 +202,28 @@ BASE_MODELS = dict(
     #    image_width=224,
     #    image_height=224
     #),
-    ObjectDetection_YoloV3=dict(
+    det_YoloV3=dict(
         site='https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/yolov3',
         image_width=416,
         image_height=416
     ),
-    ObjectDetection_TinyYoloV3=dict(
+    det_TinyYoloV3=dict(
         site='https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/tiny-yolov3',
+        image_width=416,
+        image_height=416
+    ),
+    det_YoloX=dict(
+        site='https://github.com/hamacom2004jp/pth2onnx',
+        image_width=640,
+        image_height=640
+    ),
+    det_YoloX_Lite=dict(
+        site='https://github.com/hamacom2004jp/pth2onnx',
         image_width=416,
         image_height=416
     )
 )
-    
+
 def download_file(url:str, save_path:Path):
     """
     ファイルをダウンロードします。
@@ -390,3 +400,33 @@ def img2byte(image:Image, format:str='JPEG') -> bytes:
     with BytesIO() as buffer:
         image.save(buffer, format="JPEG")
         return buffer.getvalue()
+
+def draw_boxes(image:Image, boxes:list[list[float]], scores:list[float], classes:list[int], labels:list[str] = None, colors = None):
+    """
+    画像にバウンディングボックスを描画します。
+
+    Args:
+        image (Image): 描画する画像
+        boxes (list[list[float]]): バウンディングボックスの座標リスト
+        scores (list[float]): 各バウンディングボックスのスコアリスト
+        classes (list[int]): 各バウンディングボックスのクラスリスト
+        labels (list[str], optional): クラスのラベルリスト. Defaults to None.
+        colors (list, optional): クラスごとの色のリスト. Defaults to None.
+
+    Returns:
+        Image: バウンディングボックスが描画された画像
+    """
+    draw = ImageDraw.Draw(image)
+    for box, score, cl in zip(boxes, scores, classes):
+        y1, x1, y2, x2 = box
+        x1 = max(0, np.floor(x1 + 0.5).astype(int))
+        y1 = max(0, np.floor(y1 + 0.5).astype(int))
+        x2 = min(image.width, np.floor(x2 + 0.5).astype(int))
+        y2 = min(image.height, np.floor(y2 + 0.5).astype(int))
+        color = colors[cl] if colors is not None else (255, 0, 0)
+        draw.rectangle(((x1, y1), (x2, y2)), outline=color)
+
+        label = labels[cl] if labels is not None else str(cl)
+        draw.text((x1, y1), label, bbox={'facecolor': 'white', 'alpha': 0.7, 'pad': 10})
+    
+    return image

@@ -38,12 +38,13 @@ def main(HOME_DIR:str):
                         choices=['CPUExecutionProvider','CUDAExecutionProvider','TensorrtExecutionProvider'], default='CPUExecutionProvider')
     parser.add_argument('-i', '--image_file', help='Setting the cmd predict image file.', default=None)
     parser.add_argument('-o', '--output_image_file', help='Setting the cmd predict output image file.', default=None)
+    parser.add_argument('--output_preview', help='Setting the output preview.', action='store_true')
     parser.add_argument('--image_stdin', help='Setting the cmd predict image for stdin.', action='store_true')
     parser.add_argument('--image_type', help='Setting the cmd predict image type.', choices=['npy', 'png', 'jpg'], default='jpg')
     parser.add_argument('--wsl_name', help='WSL distribution name.')
     parser.add_argument('--wsl_user', help='WSL distribution user.')
     parser.add_argument('-d', '--capture_device', help='Setting the capture input device. device id, video file, rtsp url.', default=0)
-    parser.add_argument('--capture_output_type', help='Setting the capture output type.', choices=['preview', 'stdout'], default='preview')
+    parser.add_argument('--capture_output_type', help='Setting the capture output type.', choices=['stdout'], default=None)
     parser.add_argument('--capture_frame_width', help='Setting the capture input frame width.', type=int, default=None)
     parser.add_argument('--capture_frame_height', help='Setting the capture input frame height.', type=int, default=None)
     parser.add_argument('--capture_fps', help='Setting the capture input fps.', type=int, default=None)
@@ -69,6 +70,7 @@ def main(HOME_DIR:str):
     model_provider = common.getopt(opt, 'model_provider', preval=args_dict, withset=True)
     image_file = common.getopt(opt, 'image_file', preval=args_dict, withset=True)
     output_image_file = common.getopt(opt, 'output_image_file', preval=args_dict, withset=True)
+    output_preview = common.getopt(opt, 'output_preview', preval=args_dict, withset=True)
     image_stdin = common.getopt(opt, 'image_stdin', preval=args_dict, withset=True)
     image_type = common.getopt(opt, 'image_type', preval=args_dict, withset=True)
     
@@ -124,10 +126,10 @@ def main(HOME_DIR:str):
 
         elif cmd == 'predict':
             if image_file is not None:
-                ret = cl.predict(name, image_file=Path(image_file), image_type=image_type, output_image_file=output_image_file, timeout=timeout)
+                ret = cl.predict(name, image_file=Path(image_file), image_type=image_type, output_image_file=output_image_file, output_preview=output_preview, timeout=timeout)
                 common.print_format(ret, format, tm)
             elif image_stdin:
-                ret = cl.predict(name, image=sys.stdin.buffer.read(), image_type=image_type, output_image_file=output_image_file, timeout=timeout)
+                ret = cl.predict(name, image=sys.stdin.buffer.read(), image_type=image_type, output_image_file=output_image_file, output_preview=output_preview, timeout=timeout)
                 common.print_format(ret, format, tm)
             else:
                 common.print_format({"warn":f"Image file or stdin is empty."}, format, tm)
@@ -141,7 +143,8 @@ def main(HOME_DIR:str):
         elif cmd == 'capture':
             for ret in cl.capture(name, output_image_file=output_image_file, image_type=image_type, timeout=timeout,
                                  capture_device=capture_device, capture_output_type=capture_output_type,
-                                 capture_frame_width=capture_frame_width, capture_frame_height=capture_frame_height, capture_fps=capture_fps, capture_output_fps=capture_output_fps):
+                                 capture_frame_width=capture_frame_width, capture_frame_height=capture_frame_height, capture_fps=capture_fps, capture_output_fps=capture_output_fps,
+                                 output_preview=output_preview):
                 common.print_format(ret, format, tm)
                 tm = time.time()
 
