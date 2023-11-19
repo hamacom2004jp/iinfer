@@ -1,7 +1,7 @@
 from PIL import Image
-from vp4onnx.app.predicts import det_Yolox
+from vp4onnx.app.predicts import det_YoloX
 import onnxruntime as rt
 
 
 def predict(session:rt.InferenceSession, img_width:int, img_height:int, image:Image):
-    return det_Yolox.predict(session, img_width, img_height, image)
+    return det_YoloX.predict(session, img_width, img_height, image)
