@@ -165,13 +165,14 @@ class Client(object):
         res = self.redis_cli.blpop([reskey], timeout=timeout)
         return self._response(reskey, res)
 
-    def start(self, name:str, model_provider:str = 'CPUExecutionProvider', timeout:int = 60):
+    def start(self, name:str, model_provider:str = 'CPUExecutionProvider', use_mot:bool=False, timeout:int = 60):
         """
         モデルをRedisサーバーで起動する
 
         Args:
             name (str): モデル名
             model_provider (str, optional): 推論実行時のモデルプロバイダー。デフォルトは'CPUExecutionProvider'。
+            use_mot (bool): Multi Object Trackerを使用するかどうか, by default False
             timeout (int, optional): タイムアウト時間. Defaults to 60.
 
         Returns:
@@ -187,7 +188,7 @@ class Client(object):
             self.logger.error(f"model_provider is empty.")
             return {"error": f"model_provider is empty."}
         reskey = common.random_string()
-        self.redis_cli.rpush('server', f"start {reskey} {name} {model_provider}")
+        self.redis_cli.rpush('server', f"start {reskey} {name} {model_provider} {use_mot}")
         res = self.redis_cli.blpop([reskey], timeout=timeout)
         return self._response(reskey, res)
 
@@ -312,9 +313,9 @@ class Client(object):
                 ret, frame = cap.read()
                 if ret:
                     res_json = self.predict(name, image=frame, image_type=image_type, output_image_file=output_image_file, timeout=timeout)
-                    if output_preview:
-                        if "output_image" in res_json and "output_image_shape" in res_json:
-                            img_npy = common.b64str2npy(res_json["output_image"], res_json["output_image_shape"])
+                    if "output_image" in res_json and "output_image_shape" in res_json:
+                        img_npy = common.b64str2npy(res_json["output_image"], res_json["output_image_shape"])
+                        if output_preview:
                             cv2.imshow('preview', img_npy)
                             cv2.waitKey(1)
                     yield res_json

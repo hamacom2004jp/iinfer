@@ -4,7 +4,7 @@ import numpy as np
 import onnxruntime as rt
 
 
-def predict(session:rt.InferenceSession, img_width:int, img_height:int, image:Image):
+def predict(session:rt.InferenceSession, img_width:int, img_height:int, image:Image, labels:list[str]=None, colors:list[tuple[int]]=None):
     image_data, image_size, image_obj = preprocess_img(image, img_width, img_height)
 
     input_name = session.get_inputs()[0].name           # 'image'
@@ -27,7 +27,7 @@ def predict(session:rt.InferenceSession, img_width:int, img_height:int, image:Im
         idx_1 = (idx_[0], idx_[2])
         out_boxes.append(output_boxes[idx_1])
 
-    output_image = common.draw_boxes(image_obj, out_boxes, out_scores, out_classes)
+    output_image = common.draw_boxes(image_obj, out_boxes, out_scores, out_classes, labels=labels, colors=colors)
 
     return dict(output_boxes=out_boxes, output_scores=out_scores, output_classes=out_classes), output_image
 

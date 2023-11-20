@@ -1,3 +1,4 @@
+from motpy import Detection, MultiObjectTracker
 from pathlib import Path
 from PIL import Image
 from vp4onnx.app import common
@@ -76,7 +77,7 @@ class Server(object):
                 elif msg[0] == 'undeploy':
                     self.undeploy(msg[1], msg[2])
                 elif msg[0] == 'start':
-                    self.start(msg[1], msg[2], msg[3])
+                    self.start(msg[1], msg[2], msg[3], (True if msg[4]=='True' else False))
                 elif msg[0] == 'stop':
                     self.stop(msg[1], msg[2])
                 elif msg[0] == 'predict':
@@ -198,7 +199,8 @@ class Server(object):
                 conf = json.load(cf)
                 row = dict(name=dir.name, model_img_width=conf["model_img_width"], model_img_height=conf["model_img_height"],
                            predict_type=conf["predict_type"], model_onnx=(dir/"model.onnx").exists(), custom_predict=(dir/"custom_predict.py").exists(),
-                           session=dir.name in self.sessions)
+                           session=dir.name in self.sessions,
+                           mot=dir.name in self.sessions and self.sessions[dir.name]['tracker'] is not None)
                 deploy_list.append(row)
         self.responce(reskey, {"success": deploy_list})
 
@@ -223,14 +225,15 @@ class Server(object):
         self.responce(reskey, {"success": f"Undeployed {name}. {str(deploy_dir)}"})
         return
 
-    def start(self, reskey:str, name:str, model_provider:str):
+    def start(self, reskey:str, name:str, model_provider:str, use_mot:bool):
         """
         モデルを読み込み、処理が実行できるようにする
 
         Args:
             reskey (str): レスポンスキー
-            name (dict): モデル名
-            model_provider (str, optional): 推論実行時のモデルプロバイダー。
+            name (str): モデル名
+            model_provider (str, optional): 推論実行時のモデルプロバイダー。デフォルトは'CPUExecutionProvider'。
+            use_mot (bool): Multi Object Trackerを使用するかどうか, by default False
         """
         if name is None or name == "":
             self.logger.warn(f"Name is empty.")
@@ -266,7 +269,8 @@ class Server(object):
                 session=rt.InferenceSession(model_path, providers=[model_provider]),
                 model_img_width=conf["model_img_width"],
                 model_img_height=conf["model_img_height"],
-                predictfunc=predictfunc
+                predictfunc=predictfunc,
+                tracker=MultiObjectTracker(dt=0.1) if use_mot else None
             )
         self.logger.info(f"Successful start of {name} session.")
         self.responce(reskey, {"success": f"Successful start of {name} session."})
@@ -319,8 +323,15 @@ class Server(object):
         try:
             # ONNX Runtimeで推論を実行
             predictfunc = session['predictfunc']
-            outputs, output_image = predictfunc(session['session'], session['model_img_width'], session['model_img_height'], image)
+            outputs, output_image = predictfunc(session['session'], session['model_img_width'], session['model_img_height'], image, labels=None, colors=None)
             if output_image is not None:
+                if session['tracker'] is not None:
+                    if 'output_boxes' in outputs and 'output_scores' in outputs and 'output_classes' in outputs:
+                        detections = [Detection(box, score, cls) for box, score, cls in zip(outputs['output_boxes'], outputs['output_scores'], outputs['output_classes'])]
+                        session['tracker'].step(detections=detections)
+                        tracks = session['tracker'].active_tracks()
+                        outputs['output_tracks'] = [t.id for t in tracks]
+                        output_image = common.draw_boxes(output_image, outputs['output_boxes'], outputs['output_scores'], outputs['output_classes'], ids=outputs['output_tracks'])
                 output_image_npy = common.img2npy(output_image)
                 output_image_b64 = common.npy2b64str(output_image_npy)
                 self.responce(reskey, {"success": outputs, "output_image": output_image_b64, "output_image_shape": output_image_npy.shape})

@@ -401,7 +401,7 @@ def img2byte(image:Image, format:str='JPEG') -> bytes:
         image.save(buffer, format="JPEG")
         return buffer.getvalue()
 
-def draw_boxes(image:Image, boxes:list[list[float]], scores:list[float], classes:list[int], labels:list[str] = None, colors = None):
+def draw_boxes(image:Image, boxes:list[list[float]], scores:list[float], classes:list[int], ids:list[str] = None, labels:list[str] = None, colors:list[tuple[int]] = None):
     """
     画像にバウンディングボックスを描画します。
 
@@ -411,22 +411,32 @@ def draw_boxes(image:Image, boxes:list[list[float]], scores:list[float], classes
         scores (list[float]): 各バウンディングボックスのスコアリスト
         classes (list[int]): 各バウンディングボックスのクラスリスト
         labels (list[str], optional): クラスのラベルリスト. Defaults to None.
-        colors (list, optional): クラスごとの色のリスト. Defaults to None.
+        colors (list[tuple[int]], optional): クラスごとの色のリスト. Defaults to None.
 
     Returns:
         Image: バウンディングボックスが描画された画像
     """
     draw = ImageDraw.Draw(image)
-    for box, score, cl in zip(boxes, scores, classes):
+    ids = ids if ids is not None else [None] * len(boxes)
+    for box, score, cl, id in zip(boxes, scores, classes, ids):
         y1, x1, y2, x2 = box
         x1 = max(0, np.floor(x1 + 0.5).astype(int))
         y1 = max(0, np.floor(y1 + 0.5).astype(int))
         x2 = min(image.width, np.floor(x2 + 0.5).astype(int))
         y2 = min(image.height, np.floor(y2 + 0.5).astype(int))
-        color = colors[cl] if colors is not None else (255, 0, 0)
+        color = colors[cl] if colors is not None and cl in colors else make_color(str(int(cl)))
+        
         draw.rectangle(((x1, y1), (x2, y2)), outline=color)
 
-        label = labels[cl] if labels is not None else str(cl)
-        draw.text((x1, y1), label, bbox={'facecolor': 'white', 'alpha': 0.7, 'pad': 10})
+        label = labels[cl] if labels is not None else str(id) if id is not None else None
+        if label is not None:
+            draw.rectangle(((x1, y1), (x2, y1+10)), outline=color, fill=color)
+            draw.text((x1, y1), label, fill='white')
     
     return image
+
+def make_color(idstr:str) -> tuple[int]:
+    if len(idstr) < 3:
+        idstr = idstr.zfill(3)
+    return tuple([ord(c) * ord(c) % 256 for c in idstr[:3]])
+    

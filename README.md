@@ -40,11 +40,13 @@ vp4onnx -p <PW> -m client -c deploy -n <任意のモデル名> --model_img_width
 vp4onnx -p <PW> -m client -c deploy_list -f
 
 # 画像AIモデルを起動させて推論可能な状態に(セッションを確保)する
-vp4onnx -p <PW> -m client -c start -n <モデル名> --model_provider <推論プロバイダー名(後述)> -f
+vp4onnx -p <PW> -m client -c start -n <モデル名> --model_provider <推論プロバイダー名(後述)> --use_mot -f
 # model_providerは推論で使用する実行環境を指定する。指定可能なキーワードはヘルプ参照。
+# use_motを指定するとObjectDetectionタスクの結果に対して、MOT（Multi Object Tracking）を実行しトラッキングIDを出力する。
 
 # 推論を実行する
 vp4onnx -p <PW> -m client -c predict -n <モデル名> -i <推論させる画像ファイル> -o <推論結果の画像ファイル> --output_preview -f
+# output_previewを指定するとimshowで推論結果画像を表示する（GUI必要）
 
 # 画像AIモデルを停止させてセッションを開放
 vp4onnx -p <PW> -m client -c start -n <モデル名> -f
@@ -57,6 +59,8 @@ vp4onnx -p <PW> -m client -c undeploy -n <モデル名> -f
 ```
 # カメラをキャプチャーしながら推論
 vp4onnx -p <PW> -m client -c capture -n <モデル名> --output_preview -f 
+# output_previewを指定するとimshowで推論結果画像を表示する（GUI必要）
+# start時にuse_motオプションを使用するとトラッキングIDを出力する。
 ```
 
 ## その他便利なオプション
@@ -107,7 +111,8 @@ pathlib.Path(HOME_DIR) / '.vp4onnx'
 |Image Classification|[EfficientNet-Lite4](https://github.com/onnx/models/tree/main/vision/classification/efficientnet-lite4)|EfficientNet-Lite4-11|-|
 |Image Classification|[EfficientNet-Lite4](https://github.com/onnx/models/tree/main/vision/classification/efficientnet-lite4)|EfficientNet-Lite4-11-int8|-|
 |Image Classification|[EfficientNet-Lite4](https://github.com/onnx/models/tree/main/vision/classification/efficientnet-lite4)|EfficientNet-Lite4-11-qdq|-|
- *1）[pth2onnx](https://github.com/hamacom2004jp/pth2onnx)を使用してONNX形式に変換して使用
+
+*1）[pth2onnx](https://github.com/hamacom2004jp/pth2onnx)を使用してONNX形式に変換して使用
 
 ## 開発環境構築
 ```

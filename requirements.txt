@@ -1,3 +1,4 @@
+motpy
 onnxruntime
 opencv-python
 Pillow

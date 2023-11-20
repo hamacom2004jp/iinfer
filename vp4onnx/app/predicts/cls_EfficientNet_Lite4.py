@@ -3,7 +3,7 @@ import numpy as np
 import onnxruntime as rt
 
 
-def predict(session:rt.InferenceSession, img_width:int, img_height:int, image:Image):
+def predict(session:rt.InferenceSession, img_width:int, img_height:int, image:Image, labels:list[str]=None, colors:list[tuple[int]]=None):
     image_data, _, image_obj = preprocess_img(image, img_width, img_height)
 
     results = session.run(["Softmax:0"], {"images:0": image_data})[0]

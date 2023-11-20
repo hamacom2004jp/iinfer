@@ -28,6 +28,7 @@ def main(HOME_DIR:str):
     parser.add_argument('--timeout', help='Setting the cmd timeout.', type=int, default=15)
     parser.add_argument('-c', '--cmd', help='Setting the cmd type.',
                         choices=['deploy', 'deploy_list', 'undeploy', 'start', 'stop', 'predict', 'predict_type_list', 'capture', 'docker_run', 'docker_stop'])
+    parser.add_argument('--use_mot', help='Setting the multi object tracking enable for Object Detection.', action='store_true')
     parser.add_argument('--model_img_width', help='Setting the cmd deploy model_img_width.', type=int)
     parser.add_argument('--model_img_height', help='Setting the cmd deploy model_img_height.', type=int)
     parser.add_argument('--model_onnx', help='Setting the cmd deploy model_onnx file.')
@@ -73,7 +74,8 @@ def main(HOME_DIR:str):
     output_preview = common.getopt(opt, 'output_preview', preval=args_dict, withset=True)
     image_stdin = common.getopt(opt, 'image_stdin', preval=args_dict, withset=True)
     image_type = common.getopt(opt, 'image_type', preval=args_dict, withset=True)
-    
+    use_mot = common.getopt(opt, 'use_mot', preval=args_dict, withset=True)
+
     wsl_name = common.getopt(opt, 'wsl_name', preval=args_dict, withset=True)
     wsl_user = common.getopt(opt, 'wsl_user', preval=args_dict, withset=True)
 
@@ -117,7 +119,7 @@ def main(HOME_DIR:str):
             common.print_format(ret, format, tm)
 
         elif cmd == 'start':
-            ret = cl.start(name, model_provider=model_provider, timeout=timeout)
+            ret = cl.start(name, model_provider=model_provider, use_mot=use_mot, timeout=timeout)
             common.print_format(ret, format, tm)
 
         elif cmd == 'stop':

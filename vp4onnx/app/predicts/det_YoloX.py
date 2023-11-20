@@ -5,7 +5,7 @@ import numpy as np
 import onnxruntime as rt
 
 
-def predict(session:rt.InferenceSession, img_width:int, img_height:int, image:Image):
+def predict(session:rt.InferenceSession, img_width:int, img_height:int, image:Image, labels:list[str]=None, colors:list[tuple[int]]=None):
     img_npy = common.img2npy(image)
     input_shape = (img_width, img_height)
     img, ratio = preprocess(img_npy, input_shape)
@@ -25,7 +25,7 @@ def predict(session:rt.InferenceSession, img_width:int, img_height:int, image:Im
     if dets is not None:
         final_boxes, final_scores, final_cls_inds = dets[:, :4], dets[:, 4], dets[:, 5]
         final_boxes = [[row[1],row[0],row[3],row[2]] for row in final_boxes]
-        output_image = common.draw_boxes(image, final_boxes, final_scores, final_cls_inds)
+        output_image = common.draw_boxes(image, final_boxes, final_scores, final_cls_inds, labels=labels, colors=colors)
 
         return dict(output_boxes=final_boxes, output_scores=final_scores, output_classes=final_cls_inds), output_image
 
