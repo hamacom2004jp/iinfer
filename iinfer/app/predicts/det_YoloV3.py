@@ -1,5 +1,5 @@
 from PIL import Image
-from vp4onnx.app import common
+from iinfer.app import common
 import numpy as np
 import onnxruntime as rt
 
@@ -21,7 +21,7 @@ def predict(session:rt.InferenceSession, img_width:int, img_height:int, image:Im
     output_indices = outputs_index[2]
 
     out_boxes, out_scores, out_classes = [], [], []
-    for idx_ in output_indices[0]:
+    for idx_ in output_indices:
         out_classes.append(idx_[1])
         out_scores.append(output_scores[tuple(idx_)])
         idx_1 = (idx_[0], idx_[2])

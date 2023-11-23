@@ -1,4 +1,4 @@
-from vp4onnx.app import common
+from iinfer.app import common
 import platform
 import logging
 

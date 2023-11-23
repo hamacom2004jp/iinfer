@@ -5,7 +5,7 @@
     "version": "0.0.1",
     "configurations": [
         {
-            "name": "Python: vp4onnx",
+            "name": "Python: iinfer",
             "type": "python",
             "request": "launch",
             //"args": ["-p","password","-m","redis","-c","docker_run","--wsl_name","Ubuntu_docker-20.04","--wsl_user","ubuntu","-f"],
@@ -21,7 +21,7 @@
             //"args": ["-p","password","-m","client","-c","capture","-n","yolox_nano","-f"],
             //"args": ["-p","password","-m","client","-c","predict","-n","yolox_nano","-i","animal001.jpg","-o","aaa.jpg","-f"],
             //"args": ["-p","password","-m","client","-c","undeploy""-n","yolox_nano","-f"],
-            "module": "vp4onnx",
+            "module": "iinfer",
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",            
             "justMyCode": true

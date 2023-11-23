@@ -1,5 +1,5 @@
 from PIL import Image
-from vp4onnx.app.predicts import det_YoloX
+from iinfer.app.predicts import det_YoloX
 import onnxruntime as rt
 
 

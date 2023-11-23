@@ -1,7 +1,7 @@
 from motpy import Detection, MultiObjectTracker
 from pathlib import Path
 from PIL import Image
-from vp4onnx.app import common
+from iinfer.app import common
 import base64
 import logging
 import json
@@ -191,6 +191,7 @@ class Server(object):
             dict: デプロイされたモデルのリスト
         """
         deploy_list = []
+        common.mkdirs(self.data_dir)
         for dir in self.data_dir.iterdir():
             if not dir.is_dir():
                 continue

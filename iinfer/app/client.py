@@ -1,5 +1,5 @@
 from pathlib import Path
-from vp4onnx.app import common
+from iinfer.app import common
 import base64
 import cv2
 import logging

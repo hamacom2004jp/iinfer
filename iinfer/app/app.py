@@ -1,7 +1,7 @@
-from vp4onnx.app import common
-from vp4onnx.app import client
-from vp4onnx.app import redis
-from vp4onnx.app import server
+from iinfer.app import common
+from iinfer.app import client
+from iinfer.app import redis
+from iinfer.app import server
 from pathlib import Path
 import argparse
 import sys
@@ -15,7 +15,7 @@ def main(HOME_DIR:str):
     Args:
         data_dir (Path): データディレクトリのパス
     """
-    parser = argparse.ArgumentParser(prog='python -m vp4onnx', description='This application generates modules to set up the application system.')
+    parser = argparse.ArgumentParser(prog='python -m iinfer', description='This application generates modules to set up the application system.')
     parser.add_argument('--host', help='Setting the redis server host.', default='localhost')
     parser.add_argument('--port', help='Setting the redis server port.', type=int, default=6379)
     parser.add_argument('-p', '--password', help='Setting the redis server password.')
@@ -23,12 +23,12 @@ def main(HOME_DIR:str):
     parser.add_argument('-s', '--saveopt', help=f'save options file. with --useopt option.', action='store_true')
     parser.add_argument('-f', '--format', help='Setting the cmd format.', action='store_true')
     parser.add_argument('-m', '--mode', help='Setting the boot mode.', choices=['server', 'client', 'redis'])
-    parser.add_argument('--data', help='Setting the data directory.', default=Path(HOME_DIR) / ".vp4onnx")
+    parser.add_argument('--data', help='Setting the data directory.', default=Path(HOME_DIR) / ".iinfer")
     parser.add_argument('-n', '--name', help='Setting the cmd name.')
     parser.add_argument('--timeout', help='Setting the cmd timeout.', type=int, default=15)
     parser.add_argument('-c', '--cmd', help='Setting the cmd type.',
                         choices=['deploy', 'deploy_list', 'undeploy', 'start', 'stop', 'predict', 'predict_type_list', 'capture', 'docker_run', 'docker_stop'])
-    parser.add_argument('--use_mot', help='Setting the multi object tracking enable for Object Detection.', action='store_true')
+    parser.add_argument('-T','--use_track', help='Setting the multi object tracking enable for Object Detection.', action='store_true')
     parser.add_argument('--model_img_width', help='Setting the cmd deploy model_img_width.', type=int)
     parser.add_argument('--model_img_height', help='Setting the cmd deploy model_img_height.', type=int)
     parser.add_argument('--model_onnx', help='Setting the cmd deploy model_onnx file.')
@@ -39,7 +39,7 @@ def main(HOME_DIR:str):
                         choices=['CPUExecutionProvider','CUDAExecutionProvider','TensorrtExecutionProvider'], default='CPUExecutionProvider')
     parser.add_argument('-i', '--image_file', help='Setting the cmd predict image file.', default=None)
     parser.add_argument('-o', '--output_image_file', help='Setting the cmd predict output image file.', default=None)
-    parser.add_argument('--output_preview', help='Setting the output preview.', action='store_true')
+    parser.add_argument('-P', '--output_preview', help='Setting the output preview.', action='store_true')
     parser.add_argument('--image_stdin', help='Setting the cmd predict image for stdin.', action='store_true')
     parser.add_argument('--image_type', help='Setting the cmd predict image type.', choices=['npy', 'png', 'jpg'], default='jpg')
     parser.add_argument('--wsl_name', help='WSL distribution name.')

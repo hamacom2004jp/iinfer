@@ -17,7 +17,7 @@ import subprocess
 import time
 import yaml
 
-APP_ID = 'vp4onnx'
+APP_ID = 'iinfer'
 
 def load_config(mode:str):
     """
@@ -151,7 +151,7 @@ def load_predict(predict_type:str):
     Returns:
         [type]: 予測関数
     """
-    module = importlib.import_module("vp4onnx.app.predicts." + predict_type)
+    module = importlib.import_module("iinfer.app.predicts." + predict_type)
     for func in dir(module):
         if func == 'predict':
             return getattr(module, func)

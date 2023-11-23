@@ -1,5 +1,5 @@
 from PIL import Image
-from vp4onnx.app import common
+from iinfer.app import common
 import cv2
 import numpy as np
 import onnxruntime as rt
