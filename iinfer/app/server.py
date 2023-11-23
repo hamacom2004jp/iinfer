@@ -66,18 +66,18 @@ class Server(object):
                     time.sleep(1)
                     continue
                 if msg[0] == 'deploy':
-                    model_onnx = base64.b64decode(msg[6])
-                    if msg[7] == 'None':
+                    model_onnx = base64.b64decode(msg[7])
+                    if msg[8] == 'None':
                         custom_predict_py = None
                     else:
-                        custom_predict_py = base64.b64decode(msg[7])
-                    self.deploy(msg[1], msg[2], int(msg[3]), int(msg[4]), msg[5], model_onnx, custom_predict_py)
+                        custom_predict_py = base64.b64decode(msg[8])
+                    self.deploy(msg[1], msg[2], int(msg[3]), int(msg[4]), msg[5], msg[6], model_onnx, custom_predict_py)
                 elif msg[0] == 'deploy_list':
                     self.deploy_list(msg[1])
                 elif msg[0] == 'undeploy':
                     self.undeploy(msg[1], msg[2])
                 elif msg[0] == 'start':
-                    self.start(msg[1], msg[2], msg[3], (True if msg[4]=='True' else False))
+                    self.start(msg[1], msg[2], msg[3], (True if msg[4]=='True' else False), (None if msg[5]=='None' else msg[5]))
                 elif msg[0] == 'stop':
                     self.stop(msg[1], msg[2])
                 elif msg[0] == 'predict':
@@ -129,7 +129,7 @@ class Server(object):
         self.redis_cli.rpush(reskey, json.dumps(result, default=self._json_enc))
         
 
-    def deploy(self, reskey:str, name:str, model_img_width: int, model_img_height: int, predict_type:str, model_onnx: bytes, custom_predict_py: bytes):
+    def deploy(self, reskey:str, name:str, model_img_width: int, model_img_height: int, predict_type:str, model_file:str, model_bin: bytes, custom_predict_py: bytes):
         """
         モデルをデプロイする
 
@@ -139,7 +139,8 @@ class Server(object):
             model_img_width (int): 画像の幅
             model_img_height (int): 画像の高さ
             predict_type (str): 推論方法のタイプ
-            model_onnx (bytes): モデルのONNX形式
+            model_file (str): モデルのファイル名
+            model_bin (bytes): モデルファイル
             custom_predict_py (bytes): 推論のPythonスクリプト
         """
         if name is None or name == "":
@@ -166,16 +167,20 @@ class Server(object):
             return
         
         common.mkdirs(deploy_dir)
-        with open(deploy_dir / "model.onnx", "wb") as f:
-            f.write(model_onnx)
-            self.logger.info(f"Save model.onnx to {str(deploy_dir)}")
+        model_file = deploy_dir / model_file
+        with open(model_file, "wb") as f:
+            f.write(model_bin)
+            self.logger.info(f"Save {model_file} to {str(deploy_dir)}")
+        custom_predict_file = None
         if custom_predict_py is not None:
-            with open(deploy_dir / "custom_predict.py", "wb") as f:
+            custom_predict_file = deploy_dir / "custom_predict.py"
+            with open(custom_predict_file, "wb") as f:
                 f.write(custom_predict_py)
                 self.logger.info(f"Save custom_predict.py to {str(deploy_dir)}")
         with open(deploy_dir / "conf.json", "w") as f:
-            conf = dict(model_img_width=model_img_width, model_img_height=model_img_height, predict_type=predict_type)
-            json.dump(conf, f)
+            conf = dict(model_img_width=model_img_width, model_img_height=model_img_height, predict_type=predict_type,
+                        model_file=model_file, custom_predict_file=(custom_predict_file if custom_predict_file is not None else None))
+            json.dump(conf, f, default=common.default_json_enc)
             self.logger.info(f"Save conf.json to {str(deploy_dir)}")
         self.responce(reskey, {"success": f"Save conf.json to {str(deploy_dir)}"})
         return
@@ -198,8 +203,11 @@ class Server(object):
             conf_path = dir / "conf.json"
             with open(conf_path, "r") as cf:
                 conf = json.load(cf)
-                row = dict(name=dir.name, model_img_width=conf["model_img_width"], model_img_height=conf["model_img_height"],
-                           predict_type=conf["predict_type"], model_onnx=(dir/"model.onnx").exists(), custom_predict=(dir/"custom_predict.py").exists(),
+                model_file = Path(conf["model_file"])
+                custom_predict_file = Path(conf["custom_predict_file"]) if conf["custom_predict_file"] is not None else None
+                row = dict(name=dir.name,
+                           input=(conf["model_img_width"], conf["model_img_height"]), model_file=model_file.name,
+                           predict_type=conf["predict_type"], custom_predict=(custom_predict_file.exists() if custom_predict_file is not None else False),
                            session=dir.name in self.sessions,
                            mot=dir.name in self.sessions and self.sessions[dir.name]['tracker'] is not None)
                 deploy_list.append(row)
@@ -226,7 +234,7 @@ class Server(object):
         self.responce(reskey, {"success": f"Undeployed {name}. {str(deploy_dir)}"})
         return
 
-    def start(self, reskey:str, name:str, model_provider:str, use_mot:bool):
+    def start(self, reskey:str, name:str, model_provider:str, use_track:bool, gpuid:int):
         """
         モデルを読み込み、処理が実行できるようにする
 
@@ -234,21 +242,17 @@ class Server(object):
             reskey (str): レスポンスキー
             name (str): モデル名
             model_provider (str, optional): 推論実行時のモデルプロバイダー。デフォルトは'CPUExecutionProvider'。
-            use_mot (bool): Multi Object Trackerを使用するかどうか, by default False
+            use_track (bool): Multi Object Trackerを使用するかどうか, by default False
+            gpuid (int): GPU ID, by default None
         """
         if name is None or name == "":
             self.logger.warn(f"Name is empty.")
             self.responce(reskey, {"warn": f"Name is empty."})
             return
         deploy_dir = self.data_dir / name
-        model_path = deploy_dir / "model.onnx"
         if name in self.sessions:
             self.logger.warn(f"{name} has already started a session.")
             self.responce(reskey, {"warn": f"{name} has already started a session."})
-            return
-        if not model_path.exists():
-            self.logger.warn(f"Model path {str(model_path)} does not exist")
-            self.responce(reskey, {"warn": f"Model path {str(model_path)} does not exist"})
             return
         conf_path = deploy_dir / "conf.json"
         if not conf_path.exists():
@@ -257,8 +261,17 @@ class Server(object):
             return
         with open(conf_path, "r") as cf:
             conf = json.load(cf)
+            model_path = Path(conf["model_file"])
+            if not model_path.exists():
+                self.logger.warn(f"Model path {str(model_path)} does not exist")
+                self.responce(reskey, {"warn": f"Model path {str(model_path)} does not exist"})
+                return
             if conf["predict_type"] == 'Custom':
-                custom_predict_py = deploy_dir / "custom_predict.py"
+                custom_predict_py = Path(conf["custom_predict_file"]) if conf["custom_predict_file"] is not None else None
+                if custom_predict_py is None:
+                    self.logger.warn(f"predict_type is Custom but custom_predict_py is None.")
+                    self.responce(reskey, {"warn": f"predict_type is Custom but custom_predict_py is None."})
+                    return
                 if not custom_predict_py.exists():
                     self.logger.warn(f"custom_predict_py path {str(custom_predict_py)} does not exist")
                     self.responce(reskey, {"warn": f"custom_predict_py path {str(custom_predict_py)} does not exist"})
@@ -266,12 +279,15 @@ class Server(object):
                 predictfunc = common.load_custom_predict(custom_predict_py)
             else:
                 predictfunc = common.load_predict(conf["predict_type"])
+
+            create_session_func = common.load_predict(conf["predict_type"])
+            session = create_session_func(model_path, providers=[model_provider], gpu_id=gpuid)
             self.sessions[name] = dict(
-                session=rt.InferenceSession(model_path, providers=[model_provider]),
+                session=session,
                 model_img_width=conf["model_img_width"],
                 model_img_height=conf["model_img_height"],
                 predictfunc=predictfunc,
-                tracker=MultiObjectTracker(dt=0.1) if use_mot else None
+                tracker=MultiObjectTracker(dt=0.1) if use_track else None
             )
         self.logger.info(f"Successful start of {name} session.")
         self.responce(reskey, {"success": f"Successful start of {name} session."})
@@ -295,6 +311,7 @@ class Server(object):
             return
         #self.sessions[name]['session'].close()
         del self.sessions[name]
+        self.is_running = False
         self.logger.info(f"Successful stop of {name} session.")
         self.responce(reskey, {"success": f"Successful stop of {name} session."})
         return

@@ -10,7 +10,7 @@ import json
 import logging
 import logging.config
 import numpy as np
-import os
+import pkgutil
 import platform
 import random
 import shutil
@@ -39,6 +39,11 @@ def load_config(mode:str):
     config = yaml.safe_load(resource_string(APP_ID, "config.yml"))
     return logger, config
 
+def default_json_enc(o):
+    if isinstance(o, Path):
+        return str(o)
+    raise TypeError(f"Type {type(o)} not serializable")
+
 def saveopt(opt:dict, opt_path:Path):
     """
     コマンドラインオプションをJSON形式でファイルに保存します。
@@ -49,12 +54,8 @@ def saveopt(opt:dict, opt_path:Path):
     """
     if opt_path is None:
         return
-    def _json_enc(o):
-        if isinstance(o, Path):
-            return str(o)
-        raise TypeError(f"Type {type(o)} not serializable")
     with open(opt_path, 'w') as f:
-        json.dump(opt, f, indent=4, default=_json_enc)
+        json.dump(opt, f, indent=4, default=default_json_enc)
 
 def loadopt(opt_path:str):
     """
@@ -160,6 +161,25 @@ def load_predict(predict_type:str):
             return getattr(module, func)
     raise BaseException(f"Function specified in {predict_type} not found.")
 
+def load_create_session(predict_type:str):
+    """
+    指定されたセッション生成関数を読み込みます。
+
+    Args:
+        predict_type (str): セッション生成関数のパッケージ名
+
+    Raises:
+        BaseException: 指定された関数が見つからない場合
+
+    Returns:
+        [type]: セッション生成関数
+    """
+    module = importlib.import_module("iinfer.app.predicts." + predict_type)
+    for func in dir(module):
+        if func == 'create_session':
+            return getattr(module, func)
+    raise BaseException(f"Function specified in {predict_type} not found.")
+
 def random_string(size:int=16):
     """
     ランダムな文字列を生成します。
@@ -194,38 +214,23 @@ def print_format(data:dict, format:bool, tm:float):
     else:
         print(data)
 
-BASE_MODELS = dict(
-    cls_EfficientNet_Lite4=dict(
-        site='https://github.com/onnx/models/tree/main/vision/classification/efficientnet-lite4',
-        image_width=224,
-        image_height=224
-    ),
-    #Classification_Resnet=dict(
-    #    site='https://github.com/onnx/models/tree/main/vision/classification/resnet',
-    #    image_width=224,
-    #    image_height=224
-    #),
-    det_YoloV3=dict(
-        site='https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/yolov3',
-        image_width=416,
-        image_height=416
-    ),
-    det_TinyYoloV3=dict(
-        site='https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/tiny-yolov3',
-        image_width=416,
-        image_height=416
-    ),
-    det_YoloX=dict(
-        site='https://github.com/hamacom2004jp/pth2onnx',
-        image_width=640,
-        image_height=640
-    ),
-    det_YoloX_Lite=dict(
-        site='https://github.com/hamacom2004jp/pth2onnx',
-        image_width=416,
-        image_height=416
-    )
-)
+def get_module_list(package_name):
+    package = __import__(package_name, fromlist=[''])
+    return [name for _, name, _ in pkgutil.iter_modules(package.__path__)]
+
+BASE_MODELS = {}
+for mod in get_module_list('iinfer.app.predicts'):
+    if mod.startswith('__'):
+        continue
+    m = importlib.import_module("iinfer.app.predicts." + mod)
+    site = None
+    width = None
+    height = None
+    for f in dir(m):
+        if f == 'SITE': site = getattr(m, f)
+        elif f == 'IMAGE_WIDTH': width = getattr(m, f)
+        elif f == 'IMAGE_HEIGHT': height = getattr(m, f)
+    BASE_MODELS[mod] = dict(site=site, image_width=width, image_height=height)
 
 def download_file(url:str, save_path:Path):
     """

@@ -1,8 +1,25 @@
 from PIL import Image
-from iinfer.app.predicts import det_YoloX
+from iinfer.app.predicts import onnx_det_YoloX
 from typing import List, Tuple
 import onnxruntime as rt
 
+
+SITE = 'https://github.com/Megvii-BaseDetection/YOLOX/'
+IMAGE_WIDTH = 416
+IMAGE_HEIGHT = 416
+
+def create_session(model_path:str, model_provider:str, gpu_id:int=None):
+    """
+    推論セッションを作成する関数です。
+
+    Args:
+        model_path (str): モデルファイルのパス
+        gpu_id (int, optional): GPU ID. Defaults to None.
+
+    Returns:
+        rt.InferenceSession: 推論セッション
+    """
+    return onnx_det_YoloX.create_session(model_path, model_provider, gpu_id)
 
 def predict(session:rt.InferenceSession, img_width:int, img_height:int, image:Image, labels:List[str]=None, colors:List[Tuple[int]]=None):
     """

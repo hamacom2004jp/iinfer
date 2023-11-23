@@ -30,12 +30,13 @@ def main():
     parser.add_argument('-T','--use_track', help='Setting the multi object tracking enable for Object Detection.', action='store_true')
     parser.add_argument('--model_img_width', help='Setting the cmd deploy model_img_width.', type=int)
     parser.add_argument('--model_img_height', help='Setting the cmd deploy model_img_height.', type=int)
-    parser.add_argument('--model_onnx', help='Setting the cmd deploy model_onnx file.')
+    parser.add_argument('--model_file', help='Setting the cmd deploy model_file file.')
     parser.add_argument('--predict_type', help='Setting the cmd deploy predict_type. If Custom, custom_predict_py must be specified.',
                         choices=['Custom'] + list(common.BASE_MODELS.keys()))
     parser.add_argument('--custom_predict_py', help='Setting the cmd deploy custom_predict.py file.')
     parser.add_argument('--model_provider', help='Setting the cmd start model_provider.',
                         choices=['CPUExecutionProvider','CUDAExecutionProvider','TensorrtExecutionProvider'], default='CPUExecutionProvider')
+    parser.add_argument('--gpuid', help='Setting the cmd start gpuid.', type=int, default=None)
     parser.add_argument('-i', '--image_file', help='Setting the cmd predict image file.', default=None)
     parser.add_argument('-o', '--output_image_file', help='Setting the cmd predict output image file.', default=None)
     parser.add_argument('-P', '--output_preview', help='Setting the output preview.', action='store_true')
@@ -64,16 +65,17 @@ def main():
     cmd = common.getopt(opt, 'cmd', preval=args_dict, withset=True)
     model_img_width = common.getopt(opt, 'model_img_width', preval=args_dict, withset=True)
     model_img_height = common.getopt(opt, 'model_img_height', preval=args_dict, withset=True)
-    model_onnx = common.getopt(opt, 'model_onnx', preval=args_dict, withset=True)
+    model_file = common.getopt(opt, 'model_file', preval=args_dict, withset=True)
     predict_type = common.getopt(opt, 'predict_type', preval=args_dict, withset=True)
     custom_predict_py = common.getopt(opt, 'custom_predict_py', preval=args_dict, withset=True)
     model_provider = common.getopt(opt, 'model_provider', preval=args_dict, withset=True)
+    gpuid = common.getopt(opt, 'gpuid', preval=args_dict, withset=True)
     image_file = common.getopt(opt, 'image_file', preval=args_dict, withset=True)
     output_image_file = common.getopt(opt, 'output_image_file', preval=args_dict, withset=True)
     output_preview = common.getopt(opt, 'output_preview', preval=args_dict, withset=True)
     image_stdin = common.getopt(opt, 'image_stdin', preval=args_dict, withset=True)
     image_type = common.getopt(opt, 'image_type', preval=args_dict, withset=True)
-    use_mot = common.getopt(opt, 'use_mot', preval=args_dict, withset=True)
+    use_track = common.getopt(opt, 'use_track', preval=args_dict, withset=True)
 
     wsl_name = common.getopt(opt, 'wsl_name', preval=args_dict, withset=True)
     wsl_user = common.getopt(opt, 'wsl_user', preval=args_dict, withset=True)
@@ -104,9 +106,9 @@ def main():
         logger, _ = common.load_config(mode)
         cl = client.Client(logger, redis_host=host, redis_port=port, redis_password=password)
         if cmd == 'deploy':
-            model_onnx = Path(model_onnx) if model_onnx is not None else None
+            model_file = Path(model_file) if model_file is not None else None
             custom_predict_py = Path(custom_predict_py) if custom_predict_py is not None else None
-            ret = cl.deploy(name, model_img_width, model_img_height, model_onnx, predict_type, custom_predict_py, timeout=timeout)
+            ret = cl.deploy(name, model_img_width, model_img_height, model_file, predict_type, custom_predict_py, timeout=timeout)
             common.print_format(ret, format, tm)
 
         elif cmd == 'deploy_list':
@@ -118,7 +120,7 @@ def main():
             common.print_format(ret, format, tm)
 
         elif cmd == 'start':
-            ret = cl.start(name, model_provider=model_provider, use_mot=use_mot, timeout=timeout)
+            ret = cl.start(name, model_provider=model_provider, use_track=use_track, gpuid=gpuid, timeout=timeout)
             common.print_format(ret, format, tm)
 
         elif cmd == 'stop':
@@ -136,13 +138,12 @@ def main():
                 common.print_format({"warn":f"Image file or stdin is empty."}, format, tm)
 
         elif cmd == 'predict_type_list':
-            common.print_format([dict(predict_type=key,
-                                      site=val['site'],
-                                      image_width=val['image_width'],
-                                      image_height=val['image_height']) for key,val in common.BASE_MODELS.items()], format, tm)
+            type_list = [dict(predict_type=key, site=val['site'], image_width=val['image_width'], image_height=val['image_height']) for key,val in common.BASE_MODELS.items()]
+            type_list.append(dict(predict_type='Custom', site='Custom', image_width=None, image_height=None))
+            common.print_format(type_list, format, tm)
 
         elif cmd == 'capture':
-            for ret in cl.capture(name, output_image_file=output_image_file, image_type=image_type, timeout=timeout,
+            for ret in cl.capture(name, output_image_file=output_image_file, timeout=timeout,
                                  capture_device=capture_device, capture_output_type=capture_output_type,
                                  capture_frame_width=capture_frame_width, capture_frame_height=capture_frame_height, capture_fps=capture_fps, capture_output_fps=capture_output_fps,
                                  output_preview=output_preview):

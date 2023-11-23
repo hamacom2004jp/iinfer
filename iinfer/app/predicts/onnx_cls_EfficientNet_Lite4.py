@@ -1,9 +1,30 @@
+from iinfer.app import common
 from PIL import Image
 from typing import List, Tuple
-from iinfer.app import common
 import numpy as np
 import onnxruntime as rt
 
+
+SITE = 'https://github.com/onnx/models/tree/main/vision/classification/efficientnet-lite4'
+IMAGE_WIDTH = 224
+IMAGE_HEIGHT = 224
+
+def create_session(model_path:str, model_provider:str, gpu_id:int=None):
+    """
+    推論セッションを作成する関数です。
+
+    Args:
+        model_path (str): モデルファイルのパス
+        gpu_id (int, optional): GPU ID. Defaults to None.
+
+    Returns:
+        rt.InferenceSession: 推論セッション
+    """
+    if gpu_id is None:
+        session = rt.InferenceSession(model_path, providers=[model_provider])
+    else:
+        session = rt.InferenceSession(model_path, providers=[model_provider], providers_options=[{'device_id': str(gpu_id)}])
+    return session
 
 def predict(session:rt.InferenceSession, img_width:int, img_height:int, image:Image, labels:List[str]=None, colors:List[Tuple[int]]=None):
     """
@@ -20,31 +41,21 @@ def predict(session:rt.InferenceSession, img_width:int, img_height:int, image:Im
     Returns:
         Tuple[Dict[str, Any], Image]: 予測結果と出力画像(RGB)のタプル
     """
-    image_data, image_size, image_obj = preprocess_img(image, img_width, img_height)
+    # RGB画像をBGR画像に変換
+    img_npy = common.img2npy(image)
+    img_npy = common.bgr2rgb(img_npy)
 
-    input_name = session.get_inputs()[0].name           # 'image'
-    input_name_img_shape = session.get_inputs()[1].name # 'image_shape'
-    output_name_boxes = session.get_outputs()[0].name   # 'boxes'
-    output_name_scores = session.get_outputs()[1].name  # 'scores'
-    output_name_indices = session.get_outputs()[2].name # 'indices'
+    image_data, _, image_obj = preprocess_img(image, img_width, img_height)
 
-    outputs_index = session.run([output_name_boxes, output_name_scores, output_name_indices],
-                                {input_name: image_data, input_name_img_shape: image_size})
+    results = session.run(["Softmax:0"], {"images:0": image_data})[0]
 
-    output_boxes = outputs_index[0]
-    output_scores = outputs_index[1]
-    output_indices = outputs_index[2]
+    output_scores, output_classes = [], []
+    result = reversed(results[0].argsort()[-5:])
+    for r in result:
+        output_classes.append(r)
+        output_scores.append(results[0][r])
 
-    out_boxes, out_scores, out_classes = [], [], []
-    for idx_ in output_indices[0]:
-        out_classes.append(idx_[1])
-        out_scores.append(output_scores[tuple(idx_)])
-        idx_1 = (idx_[0], idx_[2])
-        out_boxes.append(output_boxes[idx_1])
-
-    output_image = common.draw_boxes(image_obj, out_boxes, out_scores, out_classes, labels=labels, colors=colors)
-
-    return dict(output_boxes=out_boxes, output_scores=out_scores, output_classes=out_classes), output_image
+    return dict(output_scores=output_scores, output_classes=output_classes), image_obj
 
 def resize_img(image:Image, to_w, to_h):
     '''resize image with unchanged aspect ratio using padding'''
@@ -61,7 +72,6 @@ def preprocess_img(image:Image, model_img_width:int, model_img_height:int):
     boxed_image = resize_img(image, model_img_width, model_img_height)
     image_data = np.array(boxed_image, dtype='float32')
     image_data /= 255.
-    image_data = np.transpose(image_data, [2, 0, 1])
     image_data = np.expand_dims(image_data, 0)
     image_size = np.array([image.size[1], image.size[0]], dtype=np.float32).reshape(1, 2)
     return image_data, image_size, image

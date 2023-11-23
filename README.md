@@ -34,7 +34,7 @@ iinfer -p <任意のPW> -m redis -c docker_run
 iinfer -p <PW> -m server -f
 
 # 画像AIモデルのデプロイ
-iinfer -p <PW> -m client -c deploy -n <任意のモデル名> --model_img_width <モデルの画像INPUTサイズ(横幅)> --model_img_width <モデルの画像INPUTサイズ(縦幅)> --model_onnx <モデルファイル> --predict_type <推論タイプ(後述)> --custom_predict_py <カスタム推論ファイル(後述)> -f
+iinfer -p <PW> -m client -c deploy -n <任意のモデル名> --model_img_width <モデルのINPUTサイズ(横幅)> --model_img_width <モデルのINPUTサイズ(縦幅)> --model_onnx <モデルファイル> --predict_type <推論タイプ(後述)> --custom_predict_py <カスタム推論ファイル(後述)> -f
 # predict_typeはモデルのAIタスクやアルゴリズムに合わせて指定する。指定可能なキーワードはヘルプ参照。
 
 # デプロイされている画像AIモデルの一覧
@@ -56,37 +56,124 @@ iinfer -p <PW> -m client -c start -n <モデル名> -f
 iinfer -p <PW> -m client -c undeploy -n <モデル名> -f
 ```
 
-## ビデオキャプチャーによる推論
-```
-# カメラをキャプチャーしながら推論
-iinfer -p <PW> -m client -c capture -n <モデル名> --output_preview -f 
-# output_previewを指定するとimshowで推論結果画像を表示する（GUI必要）
-# start時にuse_motオプションを使用するとトラッキングIDを出力する。
-```
+### コマンドラインオプション（共通）
+|Option|Required|Description|
+|------|------|------|
+|-h|-|ヘルプ表示|
+|-u,--useopt <オプション保存するファイル>|`-s`を指定している場合〇|オプションを保存しているファイルを使用する|
+|-s,--saveopt|-|指定しているオプションを`-u`で指定したファイルに保存する|
+|-f,--format|-|処理結果を見やすい形式で出力する。指定しない場合json形式で出力する。|
 
-## その他便利なオプション
-コマンドラインオプションが多いので、それを保存して再利用できるようにする（例：画像AIモデルの一覧）
-``` cmd or bash
-# 通常のコマンドに「-u」と「-s」オプションを追加する
-iinfer -p <PW> -m client -c deploy_list -f -u <オプションを保存するファイル> -s
+### コマンドラインオプション（Redisサーバー起動 : `iinfer -m redis -c docker_run <Option>`）
+|Option|Required|Description|
+|------|------|------|
+|--port <ポート番号>|-|Redisサーバーのサービスポート(任意)を指定する|
+|-p,--password <パスワード>|〇|Redisサーバーのアクセスパスワード(任意)を指定する|
+|--wsl_name <ディストリビューション名>|Windowsの場合は〇|Windowsの場合はWSLのディストリビューションの名前を指定する|
+|--wsl_user <user名>|Windowsの場合は〇|Windowsの場合はWSL内のユーザー名を指定する|
 
-# 次から使用するときは「-u」を使用する
-iinfer -u <オプションを保存するファイル>
-```
+### コマンドラインオプション（Redisサーバー停止 : `iinfer -m redis -c docker_stop <Option>`）
+|Option|Required|Description|
+|------|------|------|
+|--wsl_name <ディストリビューション名>|Windowsの場合は〇|Windowsの場合はWSLのディストリビューションの名前を指定する|
+|--wsl_user <user名>|Windowsの場合は〇|Windowsの場合はWSL内のユーザー名を指定する|
 
-コマンドの実行結果を見やすくする。（例：画像AIモデルの一覧）
-``` cmd or bash
-# 通常のコマンドに「-f」オプションを追加する
-iinfer -p <任意PW> -m client -c deploy_list -f
+### コマンドラインオプション（推論サーバー起動 : `iinfer -m server -c start <Option>`）
+|Option|Required|Description|
+|------|------|------|
+|--host <IPアドレス又はホスト名>|-|Redisサーバーのサービスホストを指定する|
+|--port <ポート番号>|-|Redisサーバーのサービスポートを指定する|
+|-p,--password <パスワード>|〇|Redisサーバーのアクセスパスワードを指定する|
 
-# 「-f」オプションを外せば、結果はjson形式で取得できる
-iinfer -p <任意PW> -m client -c deploy_list
-```
+### コマンドラインオプション（クライアント(AIモデルの配備) : `iinfer -m client -c deploy <Option>`）
+|Option|Required|Description|
+|------|------|------|
+|--host <IPアドレス又はホスト名>|-|Redisサーバーのサービスホストを指定する|
+|--port <ポート番号>|-|Redisサーバーのサービスポートを指定する|
+|-p,--password <パスワード>|〇|Redisサーバーのアクセスパスワードを指定する|
+|-n,--name <登録名>|〇|AIモデルの登録名(任意)を指定する|
+|--model_file <モデルファイル>|〇|学習済みのモデルファイルを指定する|
+|--model_img_width <モデルのINPUTサイズ(横px)>|-|AIモデルのINPUTサイズ(横px)を指定する|
+|--model_img_height <モデルのINPUTサイズ(縦px)>|-|AIモデルのINPUTサイズ(縦px)を指定する|
+|--predict_type <推論タイプ>|〇|AIモデルの推論タイプを指定する。指定可能なタイプは`-c predict_type_list`参照|
+|--custom_predict_py <カスタム推論pyファイル>|-|独自の推論タイプを作成するときに指定。この時は`--predict_type Custom`を指定|
+|--timeout <タイムアウト>|-|サーバーの応答が返ってくるまでの最大待ち時間|
 
-コマンドラインオプションのヘルプ。
-``` cmd or bash
-iinfer -h
-```
+### コマンドラインオプション（クライアント(AIモデルの配備一覧) : `iinfer -m client -c deploy_list <Option>`）
+|Option|Required|Description|
+|------|------|------|
+|--host <IPアドレス又はホスト名>|-|Redisサーバーのサービスホストを指定する|
+|--port <ポート番号>|-|Redisサーバーのサービスポートを指定する|
+|-p,--password <パスワード>|〇|Redisサーバーのアクセスパスワードを指定する|
+|--timeout <タイムアウト>|-|サーバーの応答が返ってくるまでの最大待ち時間|
+
+### コマンドラインオプション（クライアント(AIモデルの配備解除) : `iinfer -m client -c undeploy <Option>`）
+|Option|Required|Description|
+|------|------|------|
+|--host <IPアドレス又はホスト名>|-|Redisサーバーのサービスホストを指定する|
+|--port <ポート番号>|-|Redisサーバーのサービスポートを指定する|
+|-p,--password <パスワード>|〇|Redisサーバーのアクセスパスワードを指定する|
+|-n,--name <登録名>|〇|AIモデルの登録名を指定する|
+|--timeout <タイムアウト>|-|サーバーの応答が返ってくるまでの最大待ち時間|
+
+### コマンドラインオプション（クライアント(AIモデルの起動) : `iinfer -m client -c start <Option>`）
+|Option|Required|Description|
+|------|------|------|
+|--host <IPアドレス又はホスト名>|-|Redisサーバーのサービスホストを指定する|
+|--port <ポート番号>|-|Redisサーバーのサービスポートを指定する|
+|-p,--password <パスワード>|〇|Redisサーバーのアクセスパスワードを指定する|
+|-n,--name <登録名>|〇|AIモデルの登録名を指定する|
+|--model_provider <モデルプロバイダー>|-|ONNX形式のモデルファイルの場合に指定可能。指定可能なプロバイダーは`-h`参照|
+|--use_track|-|ObjectDetectionタスクの場合に指定可能。motpyを使ってトラッキングID付与を行う|
+|--gpuid <GPUのid>|-|GPUのディバイスIDを指定する。`--model_provider`でGPUを使用するプロバイダーを指定した時に使用可能|
+|--timeout <タイムアウト>|-|サーバーの応答が返ってくるまでの最大待ち時間|
+
+### コマンドラインオプション（クライアント(推論タイプ一覧) : `iinfer -m client -c predict_type_list <Option>`）
+|Option|Required|Description|
+|------|------|------|
+|--host <IPアドレス又はホスト名>|-|Redisサーバーのサービスホストを指定する|
+|--port <ポート番号>|-|Redisサーバーのサービスポートを指定する|
+|-p,--password <パスワード>|〇|Redisサーバーのアクセスパスワードを指定する|
+
+### コマンドラインオプション（クライアント(AIモデルの停止) : `iinfer -m client -c stop <Option>`）
+|Option|Required|Description|
+|------|------|------|
+|--host <IPアドレス又はホスト名>|-|Redisサーバーのサービスホストを指定する|
+|--port <ポート番号>|-|Redisサーバーのサービスポートを指定する|
+|-p,--password <パスワード>|〇|Redisサーバーのアクセスパスワードを指定する|
+|-n,--name <登録名>|〇|AIモデルの登録名を指定する|
+|--timeout <タイムアウト>|-|サーバーの応答が返ってくるまでの最大待ち時間|
+
+### コマンドラインオプション（クライアント(推論の実行) : `iinfer -m client -c predict <Option>`）
+|Option|Required|Description|
+|------|------|------|
+|--host <IPアドレス又はホスト名>|-|Redisサーバーのサービスホストを指定する|
+|--port <ポート番号>|-|Redisサーバーのサービスポートを指定する|
+|-p,--password <パスワード>|〇|Redisサーバーのアクセスパスワードを指定する|
+|-n,--name <登録名>|〇|AIモデルの登録名を指定する|
+|-i,--image_file <推論対象の画像ファイル>|-|推論させる画像をファイルで指定する|
+|--image_stdin|-|推論させる画像を標準入力から読み込む|
+|--image_type <推論対象の画像タイプ>|-|推論させる画像のタイプを指定する。指定可能な画像タイプは`-h`参照|
+|-o,--output_image_file <推論結果画像の保存先ファイル>|-|推論結果画像の保存先ファイルを指定する|
+|--output_preview|-|推論結果画像を`cv2.imshow`で表示する|
+|--timeout <タイムアウト>|-|サーバーの応答が返ってくるまでの最大待ち時間|
+
+### コマンドラインオプション（クライアント(キャプチャーによる推論の実行) : `iinfer -m client -c capture <Option>`）
+|Option|Required|Description|
+|------|------|------|
+|--host <IPアドレス又はホスト名>|-|Redisサーバーのサービスホストを指定する|
+|--port <ポート番号>|-|Redisサーバーのサービスポートを指定する|
+|-p,--password <パスワード>|〇|Redisサーバーのアクセスパスワードを指定する|
+|-n,--name <登録名>|〇|AIモデルの登録名を指定する|
+|-o,--output_image_file <推論結果画像の保存先ファイル>|-|推論結果画像の保存先ファイルを指定する|
+|--capture_device <device>|-|キャプチャーディバイスを指定する。`cv2.VideoCapture`の第一引数に渡される値。|
+|--capture_output_type <画像の出力方法>|-|キャプチャーした画像の出力方法。現在使用していない。|
+|--capture_frame_width <キャプチャーサイズ(横px)>|-|キャプチャーする画像の横px。`cv2.VideoCapture`オブジェクトの`cv2.CAP_PROP_FRAME_WIDTH`オプションに指定する値。|
+|--capture_frame_height <キャプチャーサイズ(縦px)>|-|キャプチャーする画像の縦px。`cv2.VideoCapture`オブジェクトの`cv2.CAP_PROP_FRAME_HEIGHT`オプションに指定する値。|
+|--capture_fps <キャプチャーFPS>|-|キャプチャーする画像のFPS。`cv2.VideoCapture`オブジェクトの`cv2.CAP_PROP_FPS`オプションに指定する値。|
+|--capture_output_fps <推論結果のFPS>|-|推論結果のFPS。AIの推論速度が指定した値より高速な場合に残り時間分をsleepする|
+|--output_preview|-|推論結果画像を`cv2.imshow`で表示する|
+|--timeout <タイムアウト>|-|サーバーの応答が返ってくるまでの最大待ち時間|
 
 ## iinferコマンドについて
 ```python -m iinfer```の省略形です。
@@ -98,20 +185,21 @@ pathlib.Path(HOME_DIR) / '.iinfer'
 ```
 
 ## 動作確認したモデル
-|AI Task|base|Model|Memo|
-|------|------|------|------|
-|Object Detection|[YOLOX](https://github.com/Megvii-BaseDetection/YOLOX/#benchmark)|YOLOX-Nano|*1|
-|Object Detection|[YOLOX](https://github.com/Megvii-BaseDetection/YOLOX/#benchmark)|YOLOX-Tiny|*1|
-|Object Detection|[YOLOX](https://github.com/Megvii-BaseDetection/YOLOX/#benchmark)|YOLOX-s|*1|
-|Object Detection|[YOLOX](https://github.com/Megvii-BaseDetection/YOLOX/#benchmark)|YOLOX-m|*1|
-|Object Detection|[YOLOX](https://github.com/Megvii-BaseDetection/YOLOX/#benchmark)|YOLOX-l|*1|
-|Object Detection|[YOLOX](https://github.com/Megvii-BaseDetection/YOLOX/#benchmark)|YOLOX-x|*1|
-|Object Detection|[YOLOv3](https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/yolov3)|YOLOv3-10|-|
-|Object Detection|[YOLOv3](https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/yolov3)|YOLOv3-12|-|
-|Object Detection|[YOLOv3](https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/yolov3)|YOLOv3-12-int8|-|
-|Image Classification|[EfficientNet-Lite4](https://github.com/onnx/models/tree/main/vision/classification/efficientnet-lite4)|EfficientNet-Lite4-11|-|
-|Image Classification|[EfficientNet-Lite4](https://github.com/onnx/models/tree/main/vision/classification/efficientnet-lite4)|EfficientNet-Lite4-11-int8|-|
-|Image Classification|[EfficientNet-Lite4](https://github.com/onnx/models/tree/main/vision/classification/efficientnet-lite4)|EfficientNet-Lite4-11-qdq|-|
+|AI Task|base|Model|input|Memo|
+|------|------|------|------|------|
+|Object Detection|[YOLOX](https://github.com/Megvii-BaseDetection/YOLOX/#benchmark)|416x416|YOLOX-Nano|*1|
+|Object Detection|[YOLOX](https://github.com/Megvii-BaseDetection/YOLOX/#benchmark)|416x416|YOLOX-Tiny|*1|
+|Object Detection|[YOLOX](https://github.com/Megvii-BaseDetection/YOLOX/#benchmark)|640x640|YOLOX-s|*1|
+|Object Detection|[YOLOX](https://github.com/Megvii-BaseDetection/YOLOX/#benchmark)|640x640|YOLOX-m|*1|
+|Object Detection|[YOLOX](https://github.com/Megvii-BaseDetection/YOLOX/#benchmark)|640x640|YOLOX-l|*1|
+|Object Detection|[YOLOX](https://github.com/Megvii-BaseDetection/YOLOX/#benchmark)|640x640|YOLOX-x|*1|
+|Object Detection|[YOLOv3](https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/yolov3)|416x416|YOLOv3-10|-|
+|Object Detection|[YOLOv3](https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/yolov3)|416x416|YOLOv3-12|-|
+|Object Detection|[YOLOv3](https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/yolov3)|416x416|YOLOv3-12-int8|-|
+|Object Detection|[TinyYOLOv3](https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/tiny-yolov3)|416x416|TinyYOLOv3|-|
+|Image Classification|[EfficientNet-Lite4](https://github.com/onnx/models/tree/main/vision/classification/efficientnet-lite4)|224x224|EfficientNet-Lite4-11|-|
+|Image Classification|[EfficientNet-Lite4](https://github.com/onnx/models/tree/main/vision/classification/efficientnet-lite4)|224x224|EfficientNet-Lite4-11-int8|-|
+|Image Classification|[EfficientNet-Lite4](https://github.com/onnx/models/tree/main/vision/classification/efficientnet-lite4)|224x224|EfficientNet-Lite4-11-qdq|-|
 
 *1）[pth2onnx](https://github.com/hamacom2004jp/pth2onnx)を使用してONNX形式に変換して使用
 

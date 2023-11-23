@@ -74,7 +74,7 @@ class Client(object):
             self.logger.info(str(msg_json))
         return res_json
 
-    def deploy(self, name:str, model_img_width: int, model_img_height: int, model_onnx: Path, predict_type: str, custom_predict_py: Path, timeout:int = 60):
+    def deploy(self, name:str, model_img_width: int, model_img_height: int, model_file: Path, predict_type: str, custom_predict_py: Path, timeout:int = 60):
         """
         モデルをRedisサーバーにデプロイする
 
@@ -82,7 +82,7 @@ class Client(object):
             name (str): モデル名
             model_img_width (int): 画像の幅
             model_img_height (int): 画像の高さ
-            model_onnx (Path): モデルのONNXファイルのパス
+            model_file (Path): モデルファイルのパス
             predict_type (str): 推論方法のタイプ
             custom_predict_py (Path): 推論スクリプトのパス
             timeout (int, optional): タイムアウト時間. Defaults to 60.
@@ -99,21 +99,22 @@ class Client(object):
         if " " in name:
             self.logger.error(f"name contains whitespace.")
             return {"error": f"name contains whitespace."}
-        if model_img_width is None or model_img_width <= 0:
-            self.logger.error(f"model_img_width is invalid.")
-            return {"error": f"model_img_width is invalid."}
-        if model_img_height is None or model_img_height <= 0:
-            self.logger.error(f"model_img_height is invalid.")
-            return {"error": f"model_img_height is invalid."}
-        if model_onnx is None:
-            self.logger.error(f"model_onnx is empty.")
-            return {"error": f"model_onnx is empty."}
+        if model_file is None:
+            self.logger.error(f"model_file or model_file is empty.")
+            return {"error": f"model_file or model_file is empty."}
         if predict_type is None:
             self.logger.error(f"predict_type is empty.")
             return {"error": f"predict_type is empty."}
-        if not model_onnx.exists():
-            self.logger.error(f"model_onnx {str(model_onnx)} does not exist")
-            return {"error": f"model_onnx {str(model_onnx)} does not exist"}
+        if predict_type not in common.BASE_MODELS:
+            self.logger.error(f"Unknown predict_type. {predict_type}")
+            return {"error": f"predict_type is empty."}
+        if model_img_width is None or model_img_width <= 0:
+            model_img_width = common.BASE_MODELS[predict_type]['image_width']
+        if model_img_height is None or model_img_height <= 0:
+            model_img_height = common.BASE_MODELS[predict_type]['image_height']
+        if not model_file.exists():
+            self.logger.error(f"model_file {str(model_file)} does not exist")
+            return {"error": f"model_file {str(model_file)} does not exist"}
         if predict_type == 'Custom':
             if custom_predict_py is None or not custom_predict_py.exists():
                 self.logger.error(f"custom_predict_py path {str(custom_predict_py)} does not exist")
@@ -122,10 +123,10 @@ class Client(object):
                 custom_predict_py_b64 = base64.b64encode(pf.read()).decode('utf-8')
         else:
             custom_predict_py_b64 = None
-        with open(model_onnx, "rb") as mf:
-            model_onnx_bytes_b64 = base64.b64encode(mf.read()).decode('utf-8')
+        with open(model_file, "rb") as mf:
+            model_bytes_b64 = base64.b64encode(mf.read()).decode('utf-8')
         reskey = common.random_string()
-        self.redis_cli.rpush('server', f"deploy {reskey} {name} {model_img_width} {model_img_height} {predict_type} {model_onnx_bytes_b64} {custom_predict_py_b64}")
+        self.redis_cli.rpush('server', f"deploy {reskey} {name} {model_img_width} {model_img_height} {predict_type} {model_file.name} {model_bytes_b64} {custom_predict_py_b64}")
         res = self.redis_cli.blpop([reskey], timeout=timeout)
         return self._response(reskey, res)
 
@@ -166,14 +167,15 @@ class Client(object):
         res = self.redis_cli.blpop([reskey], timeout=timeout)
         return self._response(reskey, res)
 
-    def start(self, name:str, model_provider:str = 'CPUExecutionProvider', use_mot:bool=False, timeout:int = 60):
+    def start(self, name:str, model_provider:str = 'CPUExecutionProvider', use_track:bool=False, gpuid:int=None, timeout:int = 60):
         """
         モデルをRedisサーバーで起動する
 
         Args:
             name (str): モデル名
             model_provider (str, optional): 推論実行時のモデルプロバイダー。デフォルトは'CPUExecutionProvider'。
-            use_mot (bool): Multi Object Trackerを使用するかどうか, by default False
+            use_track (bool): Multi Object Trackerを使用するかどうか, by default False
+            gpuid (int): GPU ID, by default None
             timeout (int, optional): タイムアウト時間. Defaults to 60.
 
         Returns:
@@ -189,7 +191,7 @@ class Client(object):
             self.logger.error(f"model_provider is empty.")
             return {"error": f"model_provider is empty."}
         reskey = common.random_string()
-        self.redis_cli.rpush('server', f"start {reskey} {name} {model_provider} {use_mot}")
+        self.redis_cli.rpush('server', f"start {reskey} {name} {model_provider} {use_track} {gpuid}")
         res = self.redis_cli.blpop([reskey], timeout=timeout)
         return self._response(reskey, res)
 
@@ -287,7 +289,7 @@ class Client(object):
                     pass
         return res_json
 
-    def capture(self, name:str, output_image_file:Path = None, image_type:str = 'jpg', timeout:int = 60,
+    def capture(self, name:str, output_image_file:Path = None, timeout:int = 60,
               capture_device = 0, capture_output_type:str = None, capture_frame_width:int = None, capture_frame_height:int = None, capture_fps:int = None, capture_output_fps:int = 10,
               output_preview:bool=False):
         """
@@ -319,7 +321,7 @@ class Client(object):
                 ret, frame = cap.read()
                 if ret:
                     frame = common.bgr2rgb(frame)
-                    res_json = self.predict(name, image=frame, image_type=image_type, output_image_file=output_image_file, timeout=timeout)
+                    res_json = self.predict(name, image=frame, output_image_file=output_image_file, timeout=timeout)
                     if "output_image" in res_json and "output_image_shape" in res_json:
                         img_npy = common.b64str2npy(res_json["output_image"], res_json["output_image_shape"])
                         if output_preview:

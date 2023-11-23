@@ -5,6 +5,27 @@ import numpy as np
 import onnxruntime as rt
 
 
+SITE = 'https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/yolov3'
+IMAGE_WIDTH = 416
+IMAGE_HEIGHT = 416
+
+def create_session(model_path:str, model_provider:str, gpu_id:int=None):
+    """
+    推論セッションを作成する関数です。
+
+    Args:
+        model_path (str): モデルファイルのパス
+        gpu_id (int, optional): GPU ID. Defaults to None.
+
+    Returns:
+        rt.InferenceSession: 推論セッション
+    """
+    if gpu_id is None:
+        session = rt.InferenceSession(model_path, providers=[model_provider])
+    else:
+        session = rt.InferenceSession(model_path, providers=[model_provider], providers_options=[{'device_id': str(gpu_id)}])
+    return session
+
 def predict(session:rt.InferenceSession, img_width:int, img_height:int, image:Image, labels:List[str]=None, colors:List[Tuple[int]]=None):
     """
     予測を行う関数です。
