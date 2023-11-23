@@ -13,6 +13,7 @@ Linuxの場合はホスト内にDockerがインストールされている必要
 ## 動作確認OS
 - `Windows 10 Pro`
 - `Windows 11 Pro`
+- `Ubuntu20_04`
 
 
 ## インストール方法

@@ -4,17 +4,16 @@ from iinfer.app import redis
 from iinfer.app import server
 from pathlib import Path
 import argparse
+import os
 import sys
 import time
 
 
-def main(HOME_DIR:str):
+def main():
     """
     コマンドライン引数を処理し、サーバーまたはクライアントを起動し、コマンドを実行する。
-
-    Args:
-        data_dir (Path): データディレクトリのパス
     """
+    HOME_DIR = os.path.expanduser("~")
     parser = argparse.ArgumentParser(prog='python -m iinfer', description='This application generates modules to set up the application system.')
     parser.add_argument('--host', help='Setting the redis server host.', default='localhost')
     parser.add_argument('--port', help='Setting the redis server port.', type=int, default=6379)

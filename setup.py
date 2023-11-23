@@ -19,7 +19,8 @@ INSTALL_REQUIRES = [
     'pyyaml',
     'redis',
     'requests',
-    'tabulate'
+    'tabulate',
+    'wheel'
 ]
 PACKAGES = [
     'iinfer',
@@ -41,8 +42,7 @@ with open('README.md', 'r', encoding='utf-8') as fp:
     readme = fp.read()
 LONG_DESCRIPTION = readme
 LONG_DESCRIPTION_CONTENT_TYPE = 'text/markdown'
-RESORCE_TEXT_FILES = dict(iinfer=[
-    'config.yml', 'logconf.yml', 'scripts/iinfer.bat', 'scripts/iinfer.sh'])
+RESORCE_TEXT_FILES = dict(iinfer=['config.yml', 'logconf.yml'])
 
 setup(
     name=NAME,
@@ -63,5 +63,5 @@ setup(
     install_requires=INSTALL_REQUIRES,
     package_data=RESORCE_TEXT_FILES,
     include_package_data=True,
-    scripts=['iinfer/scripts/iinfer.bat','iinfer/scripts/iinfer.sh']
+    entry_points=dict(console_scripts=['iinfer=iinfer.app.app:main'])
 )

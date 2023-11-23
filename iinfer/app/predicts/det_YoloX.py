@@ -1,12 +1,30 @@
 from PIL import Image
 from iinfer.app import common
+from typing import List, Tuple
 import cv2
 import numpy as np
 import onnxruntime as rt
 
 
-def predict(session:rt.InferenceSession, img_width:int, img_height:int, image:Image, labels:list[str]=None, colors:list[tuple[int]]=None):
+def predict(session:rt.InferenceSession, img_width:int, img_height:int, image:Image, labels:List[str]=None, colors:List[Tuple[int]]=None):
+    """
+    予測を行う関数です。
+
+    Args:
+        session (rt.InferenceSession): 推論セッション
+        img_width (int): モデルのINPUTサイズ（画像の幅）
+        img_height (int): モデルのINPUTサイズ（画像の高さ）
+        image (Image): 入力画像（RGB配列であること）
+        labels (List[str], optional): クラスラベルのリスト. Defaults to None.
+        colors (List[Tuple[int]], optional): ボックスの色のリスト. Defaults to None.
+
+    Returns:
+        Tuple[Dict[str, Any], Image]: 予測結果と出力画像(RGB)のタプル
+    """
+    # RGB画像をBGR画像に変換
     img_npy = common.img2npy(image)
+    img_npy = common.bgr2rgb(img_npy)
+
     input_shape = (img_width, img_height)
     img, ratio = preprocess(img_npy, input_shape)
 
@@ -35,7 +53,7 @@ def preprocess(img, input_size, swap=(2, 0, 1)):
     画像を前処理する関数です。
 
     Args:
-        img (numpy.ndarray): 入力画像
+        img (numpy.ndarray): 入力画像（BGR）
         input_size (tuple): リサイズ後の画像サイズ
         swap (tuple, optional): チャンネルの順番を変更するためのタプル (デフォルト値: (2, 0, 1))
 

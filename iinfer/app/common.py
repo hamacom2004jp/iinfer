@@ -3,12 +3,15 @@ from pathlib import Path
 from PIL import Image, ImageDraw
 from pkg_resources import resource_string
 from tabulate import tabulate
+from typing import List, Tuple
 import base64
 import importlib.util
 import json
 import logging
 import logging.config
 import numpy as np
+import os
+import platform
 import random
 import shutil
 import string
@@ -260,7 +263,9 @@ def cmd(cmd:str, logger:logging.Logger):
             break
         for enc in ['utf-8', 'cp932', 'utf-16', 'utf-16-le', 'utf-16-be']:
             try:
-                output = out.decode(enc).rstrip()
+                output = out.decode(enc)
+                if platform.system() == 'Windows':
+                    output = output.rstrip()
                 logger.debug(f"output:{output}")
                 break
             except UnicodeDecodeError:
@@ -316,7 +321,7 @@ def npy2img(npy:np.ndarray) -> Image:
     """
     return Image.fromarray(npy)
 
-def b64str2npy(b64str:str, shape:tuple, dtype:str='uint8') -> np.ndarray:
+def b64str2npy(b64str:str, shape:Tuple, dtype:str='uint8') -> np.ndarray:
     """
     Base64エンコードされた文字列からndarrayを復元します。
 
@@ -345,6 +350,19 @@ def npy2imgfile(npy, output_image_file:Path=None, image_type:str='jpg') -> None:
         with open(output_image_file, 'wb') as f:
             f.write(img_byte)
     return img_byte
+
+def bgr2rgb(npy:np.ndarray) -> np.ndarray:
+    """
+    BGRのndarrayをRGBに変換します。
+
+    Args:
+        npy (np.ndarray): BGRのndarray
+
+    Returns:
+        np.ndarray: RGBのndarray
+    """
+    return npy[..., ::-1]
+
 
 def imgbytes2npy(img:bytes, dtype:str='uint8') -> np.ndarray:
     """
@@ -401,17 +419,17 @@ def img2byte(image:Image, format:str='JPEG') -> bytes:
         image.save(buffer, format="JPEG")
         return buffer.getvalue()
 
-def draw_boxes(image:Image, boxes:list[list[float]], scores:list[float], classes:list[int], ids:list[str] = None, labels:list[str] = None, colors:list[tuple[int]] = None):
+def draw_boxes(image:Image, boxes:List[List[float]], scores:List[float], classes:List[int], ids:List[str] = None, labels:List[str] = None, colors:List[Tuple[int]] = None):
     """
     画像にバウンディングボックスを描画します。
 
     Args:
         image (Image): 描画する画像
-        boxes (list[list[float]]): バウンディングボックスの座標リスト
-        scores (list[float]): 各バウンディングボックスのスコアリスト
-        classes (list[int]): 各バウンディングボックスのクラスリスト
-        labels (list[str], optional): クラスのラベルリスト. Defaults to None.
-        colors (list[tuple[int]], optional): クラスごとの色のリスト. Defaults to None.
+        boxes (List[List[float]]): バウンディングボックスの座標リスト
+        scores (List[float]): 各バウンディングボックスのスコアリスト
+        classes (List[int]): 各バウンディングボックスのクラスリスト
+        labels (List[str], optional): クラスのラベルリスト. Defaults to None.
+        colors (List[Tuple[int]], optional): クラスごとの色のリスト. Defaults to None.
 
     Returns:
         Image: バウンディングボックスが描画された画像
@@ -435,7 +453,7 @@ def draw_boxes(image:Image, boxes:list[list[float]], scores:list[float], classes
     
     return image
 
-def make_color(idstr:str) -> tuple[int]:
+def make_color(idstr:str) -> Tuple[int]:
     if len(idstr) < 3:
         idstr = idstr.zfill(3)
     return tuple([ord(c) * ord(c) % 256 for c in idstr[:3]])

@@ -1,5 +1,6 @@
 from pathlib import Path
 from iinfer.app import common
+from typing import List
 import base64
 import cv2
 import logging
@@ -42,13 +43,13 @@ class Client(object):
             self.logger.error(f"fail to ping redis-server")
             raise Exception("fail to ping redis-server")
 
-    def _response(self, reskey:str, res_msg:list[str]):
+    def _response(self, reskey:str, res_msg:List[str]):
         """
         Redisサーバーからの応答を解析する
 
         Args:
             reskey (str): Redisサーバーからの応答のキー
-            res_msg (list[str]): Redisサーバーからの応答
+            res_msg (List[str]): Redisサーバーからの応答
 
         Returns:
             dict: 解析された応答
@@ -220,7 +221,7 @@ class Client(object):
 
         Args:
             name (str): モデル名
-            image (bytes, optional): 画像データ. Defaults to None. np.ndarray型の場合はデコードしない.
+            image (bytes, optional): 画像データ. Defaults to None. np.ndarray型の場合はデコードしない(RGBであること).
             image_file (Path, optional): 画像ファイルのパス. Defaults to None.
             image_type (str, optional): 画像の形式. Defaults to 'jpg'.
             output_image_file (Path, optional): 予測結果の画像ファイルのパス. Defaults to None.
@@ -277,8 +278,13 @@ class Client(object):
             if output_image_file is not None:
                 common.npy2imgfile(img_npy, output_image_file=output_image_file, image_type=image_type)
             if output_preview:
-                cv2.imshow('preview', img_npy)
-                cv2.waitKey(0)
+                # RGB画像をBGR画像に変換
+                img_npy = common.bgr2rgb(img_npy)
+                try:
+                    cv2.imshow('preview', img_npy)
+                    cv2.waitKey(0)
+                except KeyboardInterrupt:
+                    pass
         return res_json
 
     def capture(self, name:str, output_image_file:Path = None, image_type:str = 'jpg', timeout:int = 60,
@@ -312,10 +318,13 @@ class Client(object):
                 start = time.perf_counter()
                 ret, frame = cap.read()
                 if ret:
+                    frame = common.bgr2rgb(frame)
                     res_json = self.predict(name, image=frame, image_type=image_type, output_image_file=output_image_file, timeout=timeout)
                     if "output_image" in res_json and "output_image_shape" in res_json:
                         img_npy = common.b64str2npy(res_json["output_image"], res_json["output_image_shape"])
                         if output_preview:
+                            # RGB画像をBGR画像に変換
+                            img_npy = common.bgr2rgb(img_npy)
                             cv2.imshow('preview', img_npy)
                             cv2.waitKey(1)
                     yield res_json
