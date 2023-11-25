@@ -74,7 +74,7 @@ class Client(object):
             self.logger.info(str(msg_json))
         return res_json
 
-    def deploy(self, name:str, model_img_width: int, model_img_height: int, model_file: Path, predict_type: str, custom_predict_py: Path, timeout:int = 60):
+    def deploy(self, name:str, model_img_width:int, model_img_height:int, model_file:Path, model_conf_file:Path, predict_type:str, custom_predict_py:Path, timeout:int = 60):
         """
         モデルをRedisサーバーにデプロイする
 
@@ -83,6 +83,7 @@ class Client(object):
             model_img_width (int): 画像の幅
             model_img_height (int): 画像の高さ
             model_file (Path): モデルファイルのパス
+            model_conf_file (Path): モデル設定ファイルのパス
             predict_type (str): 推論方法のタイプ
             custom_predict_py (Path): 推論スクリプトのパス
             timeout (int, optional): タイムアウト時間. Defaults to 60.
@@ -125,8 +126,13 @@ class Client(object):
             custom_predict_py_b64 = None
         with open(model_file, "rb") as mf:
             model_bytes_b64 = base64.b64encode(mf.read()).decode('utf-8')
+        if model_conf_file is not None:
+            with open(model_conf_file, "rb") as cf:
+                model_conf_bytes_b64 = base64.b64encode(cf.read()).decode('utf-8')
+        else:
+            model_conf_bytes_b64 = None
         reskey = common.random_string()
-        self.redis_cli.rpush('server', f"deploy {reskey} {name} {model_img_width} {model_img_height} {predict_type} {model_file.name} {model_bytes_b64} {custom_predict_py_b64}")
+        self.redis_cli.rpush('server', f"deploy {reskey} {name} {model_img_width} {model_img_height} {predict_type} {model_file.name} {model_bytes_b64} {model_conf_file.name} {model_conf_bytes_b64} {custom_predict_py_b64}")
         res = self.redis_cli.blpop([reskey], timeout=timeout)
         return self._response(reskey, res)
 

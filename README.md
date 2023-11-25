@@ -64,6 +64,20 @@ iinfer -p <PW> -m client -c undeploy -n <モデル名> -f
 |-s,--saveopt|-|指定しているオプションを`-u`で指定したファイルに保存する|
 |-f,--format|-|処理結果を見やすい形式で出力する。指定しない場合json形式で出力する。|
 
+### コマンドラインオプション（初期設定）
+`iinfer`をインストールした直後にはAIフレームワークのインストールがされていない状態です。
+これはAIフレームワークが非常に大きいためで、例えばクライアントとしてのみ動作させたい場合には不適切だからです。
+
+`onnxruntime`をインストールする場合は下記のコマンドを実行します。
+``` cmd or bash
+iinfer install onnx
+```
+
+`pytorch`をインストールする場合は下記のコマンドを実行します。
+``` cmd or bash
+iinfer install torch
+```
+
 ### コマンドラインオプション（Redisサーバー起動 : `iinfer -m redis -c docker_run <Option>`）
 |Option|Required|Description|
 |------|------|------|
@@ -93,6 +107,7 @@ iinfer -p <PW> -m client -c undeploy -n <モデル名> -f
 |-p,--password <パスワード>|〇|Redisサーバーのアクセスパスワードを指定する|
 |-n,--name <登録名>|〇|AIモデルの登録名(任意)を指定する|
 |--model_file <モデルファイル>|〇|学習済みのモデルファイルを指定する|
+|--model_conf_file <モデル設定ファイル>|-|mmlabの場合はモデル設定ファイルを指定する|
 |--model_img_width <モデルのINPUTサイズ(横px)>|-|AIモデルのINPUTサイズ(横px)を指定する|
 |--model_img_height <モデルのINPUTサイズ(縦px)>|-|AIモデルのINPUTサイズ(縦px)を指定する|
 |--predict_type <推論タイプ>|〇|AIモデルの推論タイプを指定する。指定可能なタイプは`-c predict_type_list`参照|
@@ -175,6 +190,59 @@ iinfer -p <PW> -m client -c undeploy -n <モデル名> -f
 |--output_preview|-|推論結果画像を`cv2.imshow`で表示する|
 |--timeout <タイムアウト>|-|サーバーの応答が返ってくるまでの最大待ち時間|
 
+## カスタム推論モジュールについて
+AIモデルの配備`iinfer -m client -c deploy <Option>`コマンドで`--predict_type Custom`且つ`--custom_predict_py <カスタム推論pyファイル>`オプションを指定すると、カスタムモデルを配備できます。
+カスタム推論pyファイルは`iinfer.app.common.Predoct`クラスを継承させたクラスを作成してください。
+`iinfer.app.common.Predoct`クラスの定義は下記の通りで、継承したクラスは`create_session`と`predict`メソッドを定義してください。
+
+``` python
+from pathlib import Path
+from PIL import Image
+from typing import List, Tuple
+
+class Predoct(object):
+    def create_session(self, model_path:Path, model_conf_path:Path, model_provider:str, gpu_id:int=None):
+        """
+        推論セッションを作成する関数です。
+        startコマンド実行時に呼び出されます。
+        この関数内でAIモデルのロードが行われ、推論準備を完了するようにしてください。
+        戻り値の推論セッションの型は問いません。
+
+        Args:
+            model_path (Path): モデルファイルのパス
+            model_conf_path (Path): モデル設定ファイルのパス
+            gpu_id (int, optional): GPU ID. Defaults to None.
+
+        Returns:
+            推論セッション
+        """
+        raise NotImplementedError()
+
+    def predict(self, session, img_width:int, img_height:int, image:Image, labels:List[str]=None, colors:List[Tuple[int]]=None):
+        """
+        予測を行う関数です。
+        predictコマンドやcaptureコマンド実行時に呼び出されます。
+        引数のimageはRGBですので、戻り値の出力画像もRGBにしてください。
+        戻り値の推論結果のdictは、通常推論結果項目ごとに値(list)を設定します。
+        例）Image Classification（EfficientNet_Lite4）の場合
+        return dict(output_scores=output_scores, output_classes=output_classes), image_obj
+        例）Object Detection（YoloX）の場合
+        return dict(output_boxes=final_boxes, output_scores=final_scores, output_classes=final_cls_inds), output_image
+
+        Args:
+            session: 推論セッション
+            img_width (int): モデルのINPUTサイズ（画像の幅）
+            img_height (int): モデルのINPUTサイズ（画像の高さ）
+            image (Image): 入力画像（RGB配列であること）
+            labels (List[str], optional): クラスラベルのリスト. Defaults to None.
+            colors (List[Tuple[int]], optional): ボックスの色のリスト. Defaults to None.
+
+        Returns:
+            Tuple[Dict[str, Any], Image]: 予測結果と出力画像(RGB)のタプル
+        """
+        raise NotImplementedError()
+```
+
 ## iinferコマンドについて
 ```python -m iinfer```の省略形です。
 実体は```scripts```ディレクトリ内にあります。
@@ -185,21 +253,22 @@ pathlib.Path(HOME_DIR) / '.iinfer'
 ```
 
 ## 動作確認したモデル
-|AI Task|base|Model|input|Memo|
-|------|------|------|------|------|
-|Object Detection|[YOLOX](https://github.com/Megvii-BaseDetection/YOLOX/#benchmark)|416x416|YOLOX-Nano|*1|
-|Object Detection|[YOLOX](https://github.com/Megvii-BaseDetection/YOLOX/#benchmark)|416x416|YOLOX-Tiny|*1|
-|Object Detection|[YOLOX](https://github.com/Megvii-BaseDetection/YOLOX/#benchmark)|640x640|YOLOX-s|*1|
-|Object Detection|[YOLOX](https://github.com/Megvii-BaseDetection/YOLOX/#benchmark)|640x640|YOLOX-m|*1|
-|Object Detection|[YOLOX](https://github.com/Megvii-BaseDetection/YOLOX/#benchmark)|640x640|YOLOX-l|*1|
-|Object Detection|[YOLOX](https://github.com/Megvii-BaseDetection/YOLOX/#benchmark)|640x640|YOLOX-x|*1|
-|Object Detection|[YOLOv3](https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/yolov3)|416x416|YOLOv3-10|-|
-|Object Detection|[YOLOv3](https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/yolov3)|416x416|YOLOv3-12|-|
-|Object Detection|[YOLOv3](https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/yolov3)|416x416|YOLOv3-12-int8|-|
-|Object Detection|[TinyYOLOv3](https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/tiny-yolov3)|416x416|TinyYOLOv3|-|
-|Image Classification|[EfficientNet-Lite4](https://github.com/onnx/models/tree/main/vision/classification/efficientnet-lite4)|224x224|EfficientNet-Lite4-11|-|
-|Image Classification|[EfficientNet-Lite4](https://github.com/onnx/models/tree/main/vision/classification/efficientnet-lite4)|224x224|EfficientNet-Lite4-11-int8|-|
-|Image Classification|[EfficientNet-Lite4](https://github.com/onnx/models/tree/main/vision/classification/efficientnet-lite4)|224x224|EfficientNet-Lite4-11-qdq|-|
+|AI Task|base|Model|FrameWork|input|Memo|
+|------|------|------|------|------|------|
+|Object Detection|[YOLOX](https://github.com/open-mmlab/mmdetection/tree/main/configs/yolox)|mmdetection|640x640|YOLOX-s|-|
+|Object Detection|[YOLOX](https://github.com/Megvii-BaseDetection/YOLOX/#benchmark)|onnx|416x416|YOLOX-Nano|*1|
+|Object Detection|[YOLOX](https://github.com/Megvii-BaseDetection/YOLOX/#benchmark)|onnx|416x416|YOLOX-Tiny|*1|
+|Object Detection|[YOLOX](https://github.com/Megvii-BaseDetection/YOLOX/#benchmark)|onnx|640x640|YOLOX-s|*1|
+|Object Detection|[YOLOX](https://github.com/Megvii-BaseDetection/YOLOX/#benchmark)|onnx|640x640|YOLOX-m|*1|
+|Object Detection|[YOLOX](https://github.com/Megvii-BaseDetection/YOLOX/#benchmark)|onnx|640x640|YOLOX-l|*1|
+|Object Detection|[YOLOX](https://github.com/Megvii-BaseDetection/YOLOX/#benchmark)|onnx|640x640|YOLOX-x|*1|
+|Object Detection|[YOLOv3](https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/yolov3)|onnx|416x416|YOLOv3-10|-|
+|Object Detection|[YOLOv3](https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/yolov3)|onnx|416x416|YOLOv3-12|-|
+|Object Detection|[YOLOv3](https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/yolov3)|onnx|416x416|YOLOv3-12-int8|-|
+|Object Detection|[TinyYOLOv3](https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/tiny-yolov3)|onnx|416x416|TinyYOLOv3|-|
+|Image Classification|[EfficientNet-Lite4](https://github.com/onnx/models/tree/main/vision/classification/efficientnet-lite4)|onnx|224x224|EfficientNet-Lite4-11|-|
+|Image Classification|[EfficientNet-Lite4](https://github.com/onnx/models/tree/main/vision/classification/efficientnet-lite4)|onnx|224x224|EfficientNet-Lite4-11-int8|-|
+|Image Classification|[EfficientNet-Lite4](https://github.com/onnx/models/tree/main/vision/classification/efficientnet-lite4)|onnx|224x224|EfficientNet-Lite4-11-qdq|-|
 
 *1）[pth2onnx](https://github.com/hamacom2004jp/pth2onnx)を使用してONNX形式に変換して使用
 

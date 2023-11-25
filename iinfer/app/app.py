@@ -1,5 +1,6 @@
 from iinfer.app import common
 from iinfer.app import client
+from iinfer.app import install
 from iinfer.app import redis
 from iinfer.app import server
 from pathlib import Path
@@ -21,16 +22,17 @@ def main():
     parser.add_argument('-u', '--useopt', help=f'Use options file.')
     parser.add_argument('-s', '--saveopt', help=f'save options file. with --useopt option.', action='store_true')
     parser.add_argument('-f', '--format', help='Setting the cmd format.', action='store_true')
-    parser.add_argument('-m', '--mode', help='Setting the boot mode.', choices=['server', 'client', 'redis'])
+    parser.add_argument('-m', '--mode', help='Setting the boot mode.', choices=['redis', 'install', 'server', 'client'])
     parser.add_argument('--data', help='Setting the data directory.', default=Path(HOME_DIR) / ".iinfer")
     parser.add_argument('-n', '--name', help='Setting the cmd name.')
-    parser.add_argument('--timeout', help='Setting the cmd timeout.', type=int, default=15)
+    parser.add_argument('--timeout', help='Setting the cmd timeout.', type=int, default=60)
     parser.add_argument('-c', '--cmd', help='Setting the cmd type.',
-                        choices=['deploy', 'deploy_list', 'undeploy', 'start', 'stop', 'predict', 'predict_type_list', 'capture', 'docker_run', 'docker_stop'])
+                        choices=['deploy', 'deploy_list', 'undeploy', 'start', 'stop', 'predict', 'predict_type_list', 'capture', 'docker_run', 'docker_stop', 'onnx', 'mmdet'])
     parser.add_argument('-T','--use_track', help='Setting the multi object tracking enable for Object Detection.', action='store_true')
     parser.add_argument('--model_img_width', help='Setting the cmd deploy model_img_width.', type=int)
     parser.add_argument('--model_img_height', help='Setting the cmd deploy model_img_height.', type=int)
     parser.add_argument('--model_file', help='Setting the cmd deploy model_file file.')
+    parser.add_argument('--model_conf_file', help='Setting the cmd deploy model_conf_file file.')
     parser.add_argument('--predict_type', help='Setting the cmd deploy predict_type. If Custom, custom_predict_py must be specified.',
                         choices=['Custom'] + list(common.BASE_MODELS.keys()))
     parser.add_argument('--custom_predict_py', help='Setting the cmd deploy custom_predict.py file.')
@@ -66,6 +68,7 @@ def main():
     model_img_width = common.getopt(opt, 'model_img_width', preval=args_dict, withset=True)
     model_img_height = common.getopt(opt, 'model_img_height', preval=args_dict, withset=True)
     model_file = common.getopt(opt, 'model_file', preval=args_dict, withset=True)
+    model_conf_file = common.getopt(opt, 'model_conf_file', preval=args_dict, withset=True)
     predict_type = common.getopt(opt, 'predict_type', preval=args_dict, withset=True)
     custom_predict_py = common.getopt(opt, 'custom_predict_py', preval=args_dict, withset=True)
     model_provider = common.getopt(opt, 'model_provider', preval=args_dict, withset=True)
@@ -107,8 +110,9 @@ def main():
         cl = client.Client(logger, redis_host=host, redis_port=port, redis_password=password)
         if cmd == 'deploy':
             model_file = Path(model_file) if model_file is not None else None
+            model_conf_file = Path(model_conf_file) if model_conf_file is not None else None
             custom_predict_py = Path(custom_predict_py) if custom_predict_py is not None else None
-            ret = cl.deploy(name, model_img_width, model_img_height, model_file, predict_type, custom_predict_py, timeout=timeout)
+            ret = cl.deploy(name, model_img_width, model_img_height, model_file, model_conf_file, predict_type, custom_predict_py, timeout=timeout)
             common.print_format(ret, format, tm)
 
         elif cmd == 'deploy_list':
@@ -168,6 +172,17 @@ def main():
         else:
             common.print_format({"warn":f"Unkown command."}, format, tm)
             parser.print_help()
+
+    elif mode == 'install':
+        logger, _ = common.load_config(mode)
+        inst = install.Install(logger=logger)
+        if cmd == 'onnx':
+            ret = inst.onnx()
+            common.print_format(ret, format, tm)
+
+        elif cmd == 'mmdet':
+            ret = inst.mmdet()
+            common.print_format(ret, format, tm)
 
     else:
         parser.print_help()

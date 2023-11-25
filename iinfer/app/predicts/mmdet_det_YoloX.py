@@ -6,11 +6,11 @@ import cv2
 import numpy as np
 
 
-SITE = 'https://github.com/Megvii-BaseDetection/YOLOX/'
+SITE = 'https://github.com/open-mmlab/mmdetection/tree/main/configs/yolox'
 IMAGE_WIDTH = 640
 IMAGE_HEIGHT = 640
 
-class OnnxDetYoloX(common.Predoct):
+class MMDetYoloX(common.Predoct):
     def create_session(self, model_path:Path, model_conf_path:Path, model_provider:str, gpu_id:int=None):
         """
         推論セッションを作成する関数です。
@@ -26,14 +26,14 @@ class OnnxDetYoloX(common.Predoct):
         Returns:
             推論セッション
         """
-        import onnxruntime as rt
-        if gpu_id is None:
-            session = rt.InferenceSession(model_path, providers=[model_provider])
-        else:
-            session = rt.InferenceSession(model_path, providers=[model_provider], providers_options=[{'device_id': str(gpu_id)}])
-        return session
+        from mmdet.apis import init_detector
+        import torch
+        gpu = f'cuda:{gpu_id}' if gpu_id is not None else 'gpu'
+        device = torch.device(gpu if torch.cuda.is_available() else 'cpu')
+        model = init_detector(model_conf_path, str(model_path), device=device) # , cfg_options = {'show': True}
+        return model
 
-    def predict(self, session, img_width:int, img_height:int, image:Image, labels:List[str]=None, colors:List[Tuple[int]]=None):
+    def predict(self, model, img_width:int, img_height:int, image:Image, labels:List[str]=None, colors:List[Tuple[int]]=None):
         """
         予測を行う関数です。
         predictコマンドやcaptureコマンド実行時に呼び出されます。
@@ -45,7 +45,7 @@ class OnnxDetYoloX(common.Predoct):
         return dict(output_boxes=final_boxes, output_scores=final_scores, output_classes=final_cls_inds), output_image
 
         Args:
-            session: 推論セッション
+            model: 推論セッション
             img_width (int): モデルのINPUTサイズ（画像の幅）
             img_height (int): モデルのINPUTサイズ（画像の高さ）
             image (Image): 入力画像（RGB配列であること）
@@ -59,10 +59,19 @@ class OnnxDetYoloX(common.Predoct):
         img_npy = common.img2npy(image)
         img_npy = common.bgr2rgb(img_npy)
 
-        input_shape = (img_width, img_height)
-        img, ratio = self.preprocess(img_npy, input_shape)
+        #input_shape = (img_width, img_height)
+        #img, ratio = self.preprocess(img_npy, input_shape)
 
-        output = session.run(None, {session.get_inputs()[0].name: img[None, :, :, :]})
+        #output = session.run(None, {session.get_inputs()[0].name: img[None, :, :, :]})
+        from mmdet.apis import inference_detector
+        result = inference_detector(model, img_npy)
+        boxes = result.pred_instances.bboxes.numpy().tolist()
+        boxes = [[row[1],row[0],row[3],row[2]] for row in boxes]
+        scores = result.pred_instances.scores.numpy().tolist()
+        clses = result.pred_instances.labels.numpy().tolist()
+        output_image = common.draw_boxes(image, boxes, scores, clses, labels=labels, colors=colors)
+        return dict(output_boxes=boxes, output_scores=scores, output_classes=clses), output_image
+        """
         predictions = self.postprocess(output[0], input_shape)[0]
         boxes = predictions[:, :4]
         scores = predictions[:, 4:5] * predictions[:, 5:]
@@ -80,7 +89,7 @@ class OnnxDetYoloX(common.Predoct):
             output_image = common.draw_boxes(image, final_boxes, final_scores, final_cls_inds, labels=labels, colors=colors)
 
             return dict(output_boxes=final_boxes, output_scores=final_scores, output_classes=final_cls_inds), output_image
-
+        """
 
     def preprocess(self, img, input_size, swap=(2, 0, 1)):
         """

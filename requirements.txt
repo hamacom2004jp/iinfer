@@ -1,5 +1,4 @@
 motpy
-onnxruntime
 opencv-python
 Pillow
 pyyaml

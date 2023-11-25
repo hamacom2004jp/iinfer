@@ -6,7 +6,6 @@ import base64
 import logging
 import json
 import numpy as np
-import onnxruntime as rt
 import redis
 import time
 
@@ -68,10 +67,19 @@ class Server(object):
                 if msg[0] == 'deploy':
                     model_onnx = base64.b64decode(msg[7])
                     if msg[8] == 'None':
+                        model_conf_file = None
+                    else:
+                        model_conf_file = msg[8]
+                    if msg[9] == 'None':
+                        model_conf_bin = None
+                    else:
+                        model_conf_bin = base64.b64decode(msg[9])
+                    if msg[10] == 'None':
                         custom_predict_py = None
                     else:
-                        custom_predict_py = base64.b64decode(msg[8])
-                    self.deploy(msg[1], msg[2], int(msg[3]), int(msg[4]), msg[5], msg[6], model_onnx, custom_predict_py)
+                        custom_predict_py = base64.b64decode(msg[10])
+
+                    self.deploy(msg[1], msg[2], int(msg[3]), int(msg[4]), msg[5], msg[6], model_onnx, model_conf_file, model_conf_bin, custom_predict_py)
                 elif msg[0] == 'deploy_list':
                     self.deploy_list(msg[1])
                 elif msg[0] == 'undeploy':
@@ -116,6 +124,8 @@ class Server(object):
             return int(o)
         if isinstance(o, np.intc):
             return int(o)
+        if isinstance(o, Path):
+            return str(o)
         raise TypeError(f"Type {type(o)} not serializable")
     
     def responce(self, reskey:str, result:dict):
@@ -129,7 +139,8 @@ class Server(object):
         self.redis_cli.rpush(reskey, json.dumps(result, default=self._json_enc))
         
 
-    def deploy(self, reskey:str, name:str, model_img_width: int, model_img_height: int, predict_type:str, model_file:str, model_bin: bytes, custom_predict_py: bytes):
+    def deploy(self, reskey:str, name:str, model_img_width: int, model_img_height: int, predict_type:str,
+               model_file:str, model_bin:bytes, model_conf_file:str, model_conf_bin:bytes, custom_predict_py: bytes):
         """
         モデルをデプロイする
 
@@ -141,6 +152,8 @@ class Server(object):
             predict_type (str): 推論方法のタイプ
             model_file (str): モデルのファイル名
             model_bin (bytes): モデルファイル
+            model_conf_file (str): モデル設定のファイル名
+            model_conf_bin (bytes): モデル設定ファイル
             custom_predict_py (bytes): 推論のPythonスクリプト
         """
         if name is None or name == "":
@@ -171,6 +184,19 @@ class Server(object):
         with open(model_file, "wb") as f:
             f.write(model_bin)
             self.logger.info(f"Save {model_file} to {str(deploy_dir)}")
+        if model_conf_file is not None and model_conf_bin is None:
+            self.logger.warn(f"model_conf_file is not None but model_conf_bin is None.")
+            self.responce(reskey, {"warn": f"model_conf_file is not None but model_conf_bin is None."})
+            return
+        if model_conf_file is None and model_conf_bin is not None:
+            self.logger.warn(f"model_conf_file is None but model_conf_bin is not None.")
+            self.responce(reskey, {"warn": f"model_conf_file is None but model_conf_bin is not None."})
+            return
+        if model_conf_file is not None:
+            model_conf_file = deploy_dir / model_conf_file
+            with open(model_conf_file, "wb") as f:
+                f.write(model_conf_bin)
+                self.logger.info(f"Save {model_conf_file} to {str(deploy_dir)}")
         custom_predict_file = None
         if custom_predict_py is not None:
             custom_predict_file = deploy_dir / "custom_predict.py"
@@ -179,7 +205,7 @@ class Server(object):
                 self.logger.info(f"Save custom_predict.py to {str(deploy_dir)}")
         with open(deploy_dir / "conf.json", "w") as f:
             conf = dict(model_img_width=model_img_width, model_img_height=model_img_height, predict_type=predict_type,
-                        model_file=model_file, custom_predict_file=(custom_predict_file if custom_predict_file is not None else None))
+                        model_file=model_file, model_conf_file=model_conf_file, custom_predict_file=(custom_predict_file if custom_predict_file is not None else None))
             json.dump(conf, f, default=common.default_json_enc)
             self.logger.info(f"Save conf.json to {str(deploy_dir)}")
         self.responce(reskey, {"success": f"Save conf.json to {str(deploy_dir)}"})
@@ -204,9 +230,10 @@ class Server(object):
             with open(conf_path, "r") as cf:
                 conf = json.load(cf)
                 model_file = Path(conf["model_file"])
+                model_conf_file = Path(conf["model_conf_file"]).name if "model_conf_file" in conf and conf["model_conf_file"] is not None else None
                 custom_predict_file = Path(conf["custom_predict_file"]) if conf["custom_predict_file"] is not None else None
                 row = dict(name=dir.name,
-                           input=(conf["model_img_width"], conf["model_img_height"]), model_file=model_file.name,
+                           input=(conf["model_img_width"], conf["model_img_height"]), model_file=model_file.name, model_conf_file=model_conf_file,
                            predict_type=conf["predict_type"], custom_predict=(custom_predict_file.exists() if custom_predict_file is not None else False),
                            session=dir.name in self.sessions,
                            mot=dir.name in self.sessions and self.sessions[dir.name]['tracker'] is not None)
@@ -262,6 +289,7 @@ class Server(object):
         with open(conf_path, "r") as cf:
             conf = json.load(cf)
             model_path = Path(conf["model_file"])
+            model_conf_path = Path(conf["model_conf_file"]) if "model_conf_file" in conf and conf["model_conf_file"] is not None else None
             if not model_path.exists():
                 self.logger.warn(f"Model path {str(model_path)} does not exist")
                 self.responce(reskey, {"warn": f"Model path {str(model_path)} does not exist"})
@@ -276,17 +304,16 @@ class Server(object):
                     self.logger.warn(f"custom_predict_py path {str(custom_predict_py)} does not exist")
                     self.responce(reskey, {"warn": f"custom_predict_py path {str(custom_predict_py)} does not exist"})
                     return
-                predictfunc = common.load_custom_predict(custom_predict_py)
+                predict_obj = common.load_custom_predict(custom_predict_py)
             else:
-                predictfunc = common.load_predict(conf["predict_type"])
+                predict_obj = common.load_predict(conf["predict_type"])
 
-            create_session_func = common.load_predict(conf["predict_type"])
-            session = create_session_func(model_path, providers=[model_provider], gpu_id=gpuid)
+            session = predict_obj.create_session(model_path, model_conf_path, model_provider, gpu_id=gpuid)
             self.sessions[name] = dict(
                 session=session,
                 model_img_width=conf["model_img_width"],
                 model_img_height=conf["model_img_height"],
-                predictfunc=predictfunc,
+                predict_obj=predict_obj,
                 tracker=MultiObjectTracker(dt=0.1) if use_track else None
             )
         self.logger.info(f"Successful start of {name} session.")
@@ -340,8 +367,8 @@ class Server(object):
         session = self.sessions[name]
         try:
             # ONNX Runtimeで推論を実行
-            predictfunc = session['predictfunc']
-            outputs, output_image = predictfunc(session['session'], session['model_img_width'], session['model_img_height'], image, labels=None, colors=None)
+            predict_obj = session['predict_obj']
+            outputs, output_image = predict_obj.predict(session['session'], session['model_img_width'], session['model_img_height'], image, labels=None, colors=None)
             if output_image is not None:
                 if session['tracker'] is not None:
                     if 'output_boxes' in outputs and 'output_scores' in outputs and 'output_classes' in outputs:

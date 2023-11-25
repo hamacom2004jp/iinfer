@@ -6,6 +6,7 @@ from tabulate import tabulate
 from typing import List, Tuple
 import base64
 import importlib.util
+import inspect
 import json
 import logging
 import logging.config
@@ -127,59 +128,6 @@ def rmdirs(dir_path:Path):
     """
     shutil.rmtree(dir_path)
 
-def load_custom_predict(custom_predict_py):
-    """
-    カスタム予測関数を読み込みます。
-
-    Args:
-        custom_predict_py ([type]): カスタム予測関数のパス
-
-    Returns:
-        [type]: カスタム予測関数
-    """
-    spec = importlib.util.spec_from_file_location("predict", custom_predict_py)
-    predict = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(predict)
-    return predict.predict
-
-def load_predict(predict_type:str):
-    """
-    指定された予測関数を読み込みます。
-
-    Args:
-        predict_type (str): 予測関数のパッケージ名
-
-    Raises:
-        BaseException: 指定された関数が見つからない場合
-
-    Returns:
-        [type]: 予測関数
-    """
-    module = importlib.import_module("iinfer.app.predicts." + predict_type)
-    for func in dir(module):
-        if func == 'predict':
-            return getattr(module, func)
-    raise BaseException(f"Function specified in {predict_type} not found.")
-
-def load_create_session(predict_type:str):
-    """
-    指定されたセッション生成関数を読み込みます。
-
-    Args:
-        predict_type (str): セッション生成関数のパッケージ名
-
-    Raises:
-        BaseException: 指定された関数が見つからない場合
-
-    Returns:
-        [type]: セッション生成関数
-    """
-    module = importlib.import_module("iinfer.app.predicts." + predict_type)
-    for func in dir(module):
-        if func == 'create_session':
-            return getattr(module, func)
-    raise BaseException(f"Function specified in {predict_type} not found.")
-
 def random_string(size:int=16):
     """
     ランダムな文字列を生成します。
@@ -213,6 +161,83 @@ def print_format(data:dict, format:bool, tm:float):
         print(f"{time.time() - tm:.03f} seconds.")
     else:
         print(data)
+
+class Predoct(object):
+    def create_session(self, model_path:Path, model_conf_path:Path, model_provider:str, gpu_id:int=None):
+        """
+        推論セッションを作成する関数です。
+        startコマンド実行時に呼び出されます。
+        この関数内でAIモデルのロードが行われ、推論準備を完了するようにしてください。
+        戻り値の推論セッションの型は問いません。
+
+        Args:
+            model_path (Path): モデルファイルのパス
+            model_conf_path (Path): モデル設定ファイルのパス
+            gpu_id (int, optional): GPU ID. Defaults to None.
+
+        Returns:
+            推論セッション
+        """
+        raise NotImplementedError()
+
+    def predict(self, session, img_width:int, img_height:int, image:Image, labels:List[str]=None, colors:List[Tuple[int]]=None):
+        """
+        予測を行う関数です。
+        predictコマンドやcaptureコマンド実行時に呼び出されます。
+        引数のimageはRGBですので、戻り値の出力画像もRGBにしてください。
+        戻り値の推論結果のdictは、通常推論結果項目ごとに値(list)を設定します。
+        例）Image Classification（EfficientNet_Lite4）の場合
+        return dict(output_scores=output_scores, output_classes=output_classes), image_obj
+        例）Object Detection（YoloX）の場合
+        return dict(output_boxes=final_boxes, output_scores=final_scores, output_classes=final_cls_inds), output_image
+
+        Args:
+            session: 推論セッション
+            img_width (int): モデルのINPUTサイズ（画像の幅）
+            img_height (int): モデルのINPUTサイズ（画像の高さ）
+            image (Image): 入力画像（RGB配列であること）
+            labels (List[str], optional): クラスラベルのリスト. Defaults to None.
+            colors (List[Tuple[int]], optional): ボックスの色のリスト. Defaults to None.
+
+        Returns:
+            Tuple[Dict[str, Any], Image]: 予測結果と出力画像(RGB)のタプル
+        """
+        raise NotImplementedError()
+
+def load_custom_predict(custom_predict_py):
+    """
+    カスタム予測オブジェクトを読み込みます。
+
+    Args:
+        custom_predict_py ([type]): カスタム予測オブジェクトのパス
+
+    Returns:
+        [type]: 予測オブジェクト
+    """
+    spec = importlib.util.spec_from_file_location("predict", custom_predict_py)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    for name, obj in inspect.getmembers(module):
+        if inspect.isclass(obj) and issubclass(obj, Predoct):
+            return obj()
+
+def load_predict(predict_type:str):
+    """
+    指定された予測オブジェクトを読み込みます。
+
+    Args:
+        predict_type (str): 予測オブジェクトのパッケージ名
+
+    Raises:
+        BaseException: 指定されたオブジェクトが見つからない場合
+
+    Returns:
+        [type]: 予測オブジェクト
+    """
+    module = importlib.import_module("iinfer.app.predicts." + predict_type)
+    for name, obj in inspect.getmembers(module):
+        if inspect.isclass(obj) and issubclass(obj, Predoct):
+            return obj()
 
 def get_module_list(package_name):
     package = __import__(package_name, fromlist=[''])

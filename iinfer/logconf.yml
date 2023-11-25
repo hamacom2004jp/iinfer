@@ -43,6 +43,14 @@ handlers:
         when : 'D'
         encoding : 'utf-8'
         filename: redis.log
+    install:
+        class: logging.handlers.TimedRotatingFileHandler
+        level: DEBUG
+        formatter: fmt
+        backupCount: 5
+        when : 'D'
+        encoding : 'utf-8'
+        filename: install.log
 
 loggers:
     client:
@@ -61,6 +69,10 @@ loggers:
         handlers: [redis, std]
         level: DEBUG
         qualname: redis
+    install:
+        handlers: [install, std]
+        level: DEBUG
+        qualname: install
  
 #root:
 #    handlers: [std]
