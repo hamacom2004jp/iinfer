@@ -70,12 +70,12 @@ iinfer -p <PW> -m client -c undeploy -n <モデル名> -f
 
 `onnxruntime`をインストールする場合は下記のコマンドを実行します。
 ``` cmd or bash
-iinfer install onnx
+iinfer -m install -c onnx
 ```
 
 `mmdetection`をインストールする場合は下記のコマンドを実行します。
 ``` cmd or bash
-iinfer install mmdet
+iinfer -m install -c mmdet
 ```
 
 ### Redisサーバー起動 : `iinfer -m redis -c docker_run <Option>`
