@@ -73,9 +73,9 @@ iinfer -p <PW> -m client -c undeploy -n <モデル名> -f
 iinfer install onnx
 ```
 
-`pytorch`をインストールする場合は下記のコマンドを実行します。
+`mmdetection`をインストールする場合は下記のコマンドを実行します。
 ``` cmd or bash
-iinfer install torch
+iinfer install mmdet
 ```
 
 ### Redisサーバー起動 : `iinfer -m redis -c docker_run <Option>`
