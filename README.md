@@ -1,6 +1,6 @@
-# Visual Prediction for onnx
+# iinfer (Visual Prediction Application)
 
-onnxフォーマットの重みファイルを実行するCLIアプリケーションです。
+onnx又はmmlabフォーマットの重みファイルを実行するCLIアプリケーションです。
 DockerコンテナのRedisサーバーを使用します。
 Windowsの場合はWSL2上のLinuxの中にDockerがインストールされている必要があります。
 Linuxの場合はホスト内にDockerがインストールされている必要があります。
@@ -78,7 +78,7 @@ iinfer install onnx
 iinfer install torch
 ```
 
-### コマンドラインオプション（Redisサーバー起動 : `iinfer -m redis -c docker_run <Option>`）
+### Redisサーバー起動 : `iinfer -m redis -c docker_run <Option>`
 |Option|Required|Description|
 |------|------|------|
 |--port <ポート番号>|-|Redisサーバーのサービスポート(任意)を指定する|
@@ -86,20 +86,20 @@ iinfer install torch
 |--wsl_name <ディストリビューション名>|Windowsの場合は〇|Windowsの場合はWSLのディストリビューションの名前を指定する|
 |--wsl_user <user名>|Windowsの場合は〇|Windowsの場合はWSL内のユーザー名を指定する|
 
-### コマンドラインオプション（Redisサーバー停止 : `iinfer -m redis -c docker_stop <Option>`）
+### Redisサーバー停止 : `iinfer -m redis -c docker_stop <Option>`
 |Option|Required|Description|
 |------|------|------|
 |--wsl_name <ディストリビューション名>|Windowsの場合は〇|Windowsの場合はWSLのディストリビューションの名前を指定する|
 |--wsl_user <user名>|Windowsの場合は〇|Windowsの場合はWSL内のユーザー名を指定する|
 
-### コマンドラインオプション（推論サーバー起動 : `iinfer -m server -c start <Option>`）
+### 推論サーバー起動 : `iinfer -m server -c start <Option>`
 |Option|Required|Description|
 |------|------|------|
 |--host <IPアドレス又はホスト名>|-|Redisサーバーのサービスホストを指定する|
 |--port <ポート番号>|-|Redisサーバーのサービスポートを指定する|
 |-p,--password <パスワード>|〇|Redisサーバーのアクセスパスワードを指定する|
 
-### コマンドラインオプション（クライアント(AIモデルの配備) : `iinfer -m client -c deploy <Option>`）
+### クライアント(AIモデルの配備) : `iinfer -m client -c deploy <Option>`
 |Option|Required|Description|
 |------|------|------|
 |--host <IPアドレス又はホスト名>|-|Redisサーバーのサービスホストを指定する|
@@ -114,7 +114,7 @@ iinfer install torch
 |--custom_predict_py <カスタム推論pyファイル>|-|独自の推論タイプを作成するときに指定。この時は`--predict_type Custom`を指定|
 |--timeout <タイムアウト>|-|サーバーの応答が返ってくるまでの最大待ち時間|
 
-### コマンドラインオプション（クライアント(AIモデルの配備一覧) : `iinfer -m client -c deploy_list <Option>`）
+### クライアント(AIモデルの配備一覧) : `iinfer -m client -c deploy_list <Option>`
 |Option|Required|Description|
 |------|------|------|
 |--host <IPアドレス又はホスト名>|-|Redisサーバーのサービスホストを指定する|
@@ -122,7 +122,7 @@ iinfer install torch
 |-p,--password <パスワード>|〇|Redisサーバーのアクセスパスワードを指定する|
 |--timeout <タイムアウト>|-|サーバーの応答が返ってくるまでの最大待ち時間|
 
-### コマンドラインオプション（クライアント(AIモデルの配備解除) : `iinfer -m client -c undeploy <Option>`）
+### クライアント(AIモデルの配備解除) : `iinfer -m client -c undeploy <Option>`
 |Option|Required|Description|
 |------|------|------|
 |--host <IPアドレス又はホスト名>|-|Redisサーバーのサービスホストを指定する|
@@ -131,7 +131,7 @@ iinfer install torch
 |-n,--name <登録名>|〇|AIモデルの登録名を指定する|
 |--timeout <タイムアウト>|-|サーバーの応答が返ってくるまでの最大待ち時間|
 
-### コマンドラインオプション（クライアント(AIモデルの起動) : `iinfer -m client -c start <Option>`）
+### クライアント(AIモデルの起動) : `iinfer -m client -c start <Option>`
 |Option|Required|Description|
 |------|------|------|
 |--host <IPアドレス又はホスト名>|-|Redisサーバーのサービスホストを指定する|
@@ -143,14 +143,14 @@ iinfer install torch
 |--gpuid <GPUのid>|-|GPUのディバイスIDを指定する。`--model_provider`でGPUを使用するプロバイダーを指定した時に使用可能|
 |--timeout <タイムアウト>|-|サーバーの応答が返ってくるまでの最大待ち時間|
 
-### コマンドラインオプション（クライアント(推論タイプ一覧) : `iinfer -m client -c predict_type_list <Option>`）
+### クライアント(推論タイプ一覧) : `iinfer -m client -c predict_type_list <Option>`
 |Option|Required|Description|
 |------|------|------|
 |--host <IPアドレス又はホスト名>|-|Redisサーバーのサービスホストを指定する|
 |--port <ポート番号>|-|Redisサーバーのサービスポートを指定する|
 |-p,--password <パスワード>|〇|Redisサーバーのアクセスパスワードを指定する|
 
-### コマンドラインオプション（クライアント(AIモデルの停止) : `iinfer -m client -c stop <Option>`）
+### クライアント(AIモデルの停止) : `iinfer -m client -c stop <Option>`
 |Option|Required|Description|
 |------|------|------|
 |--host <IPアドレス又はホスト名>|-|Redisサーバーのサービスホストを指定する|
@@ -159,7 +159,7 @@ iinfer install torch
 |-n,--name <登録名>|〇|AIモデルの登録名を指定する|
 |--timeout <タイムアウト>|-|サーバーの応答が返ってくるまでの最大待ち時間|
 
-### コマンドラインオプション（クライアント(推論の実行) : `iinfer -m client -c predict <Option>`）
+### クライアント(推論の実行) : `iinfer -m client -c predict <Option>`
 |Option|Required|Description|
 |------|------|------|
 |--host <IPアドレス又はホスト名>|-|Redisサーバーのサービスホストを指定する|
@@ -173,7 +173,7 @@ iinfer install torch
 |--output_preview|-|推論結果画像を`cv2.imshow`で表示する|
 |--timeout <タイムアウト>|-|サーバーの応答が返ってくるまでの最大待ち時間|
 
-### コマンドラインオプション（クライアント(キャプチャーによる推論の実行) : `iinfer -m client -c capture <Option>`）
+### クライアント(キャプチャーによる推論の実行) : `iinfer -m client -c capture <Option>`
 |Option|Required|Description|
 |------|------|------|
 |--host <IPアドレス又はホスト名>|-|Redisサーバーのサービスホストを指定する|
