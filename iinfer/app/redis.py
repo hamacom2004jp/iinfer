@@ -18,12 +18,14 @@ class Redis(object):
                 return {"warn":f"wsl_name option is required."}
             if self.wsl_user is None:
                 return {"warn":f"wsl_user option is required."}
-            code, _ = common.cmd(f"wsl -d {self.wsl_name} -u {self.wsl_user} docker run -it --name redis-container --rm -e TZ=UTC -p {port}:{port} -e REDIS_PASSWORD={password} ubuntu/redis:latest",
+            code, _ = common.cmd(f"wsl -d {self.wsl_name} -u {self.wsl_user} docker run -it --name redis --rm -e TZ=UTC -p {port}:{port} -e REDIS_PASSWORD={password} ubuntu/redis:latest",
                                 self.logger)
             return {"output":code}
         elif platform.system() == 'Linux':
-            code, _ = common.cmd(f"docker run -it --name redis-container --rm -e TZ=UTC -p {port}:{port} -e REDIS_PASSWORD={password} ubuntu/redis:latest", self.logger)
+            code, _ = common.cmd(f"docker run -it --name redis --rm -e TZ=UTC -p {port}:{port} -e REDIS_PASSWORD={password} ubuntu/redis:latest", self.logger)
             return {"output":code}
+        else:
+            return {"warn":f"Unsupported platform."}
 
     def docker_stop(self):
         if platform.system() == 'Windows':
@@ -31,9 +33,11 @@ class Redis(object):
                 return {"warn":f"wsl_name option is required."}
             if self.wsl_user is None:
                 return {"warn":f"wsl_user option is required."}
-            code, _ = common.cmd(f"wsl -d {self.wsl_name} -u {self.wsl_user} docker stop redis-container", self.logger)
+            code, _ = common.cmd(f"wsl -d {self.wsl_name} -u {self.wsl_user} docker stop redis", self.logger)
             common.cmd(f"wsl --shutdown", self.logger)
             return {"output":code}
         elif platform.system() == 'Linux':
-            code, _ = common.cmd(f"docker stop redis-container", self.logger)
+            code, _ = common.cmd(f"docker stop redis", self.logger)
             return {"output":code}
+        else:
+            return {"warn":f"Unsupported platform."}

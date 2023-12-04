@@ -1,0 +1,30 @@
+version: '3'
+services:
+  redis:
+    image: ubuntu/redis:latest
+    container_name: redis
+    environment:
+      TZ: UTC
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: password
+    ports:
+      - 6379:6379
+    networks:
+      - backend
+
+  iinfer:
+    image: hamacom/iinfer:0.2.0
+    container_name: iinfer
+    environment:
+      TZ: UTC
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: password
+    volumes:
+      - ~/.iinfer:/root/.iinfer
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge

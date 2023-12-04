@@ -42,7 +42,7 @@ with open('README.md', 'r', encoding='utf-8') as fp:
     readme = fp.read()
 LONG_DESCRIPTION = readme
 LONG_DESCRIPTION_CONTENT_TYPE = 'text/markdown'
-RESORCE_TEXT_FILES = dict(iinfer=['config.yml', 'logconf.yml'])
+RESORCE_TEXT_FILES = dict(iinfer=['config.yml', 'logconf.yml', 'docker/Dockerfile', 'docker/docker-compose.yml'])
 
 setup(
     name=NAME,

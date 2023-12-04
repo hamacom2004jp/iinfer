@@ -27,7 +27,8 @@ def main():
     parser.add_argument('-n', '--name', help='Setting the cmd name.')
     parser.add_argument('--timeout', help='Setting the cmd timeout.', type=int, default=60)
     parser.add_argument('-c', '--cmd', help='Setting the cmd type.',
-                        choices=['deploy', 'deploy_list', 'undeploy', 'start', 'stop', 'predict', 'predict_type_list', 'capture', 'docker_run', 'docker_stop', 'onnx', 'mmdet'])
+                        choices=['deploy', 'deploy_list', 'undeploy', 'start', 'stop', 'predict', 'predict_type_list', 'capture', 'docker_run', 'docker_stop',
+                                 'redis', 'server', 'onnx', 'mmdet'])
     parser.add_argument('-T','--use_track', help='Setting the multi object tracking enable for Object Detection.', action='store_true')
     parser.add_argument('--model_img_width', help='Setting the cmd deploy model_img_width.', type=int)
     parser.add_argument('--model_img_height', help='Setting the cmd deploy model_img_height.', type=int)
@@ -176,7 +177,15 @@ def main():
     elif mode == 'install':
         logger, _ = common.load_config(mode)
         inst = install.Install(logger=logger)
-        if cmd == 'onnx':
+        if cmd == 'redis':
+            ret = inst.redis()
+            common.print_format(ret, format, tm)
+
+        elif cmd == 'server':
+            ret = inst.server()
+            common.print_format(ret, format, tm)
+
+        elif cmd == 'onnx':
             ret = inst.onnx()
             common.print_format(ret, format, tm)
 
