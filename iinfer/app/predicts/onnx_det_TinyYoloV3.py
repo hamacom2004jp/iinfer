@@ -9,6 +9,7 @@ import numpy as np
 SITE = 'https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/tiny-yolov3'
 IMAGE_WIDTH = 416
 IMAGE_HEIGHT = 416
+USE_MODEL_CONF = False
 
 class OnnxDetTinyYoloV3(common.Predoct):
     def create_session(self, model_path:Path, model_conf_path:Path, model_provider:str, gpu_id:int=None):

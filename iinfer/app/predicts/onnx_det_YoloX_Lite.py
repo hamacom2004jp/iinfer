@@ -7,6 +7,7 @@ from typing import List, Tuple
 SITE = 'https://github.com/Megvii-BaseDetection/YOLOX/'
 IMAGE_WIDTH = 416
 IMAGE_HEIGHT = 416
+USE_MODEL_CONF = False
 
 class OnnxdetYoloXLite(onnx_det_YoloX.OnnxDetYoloX):
 

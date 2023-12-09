@@ -5,6 +5,7 @@ from iinfer.app import redis
 from iinfer.app import server
 from pathlib import Path
 import argparse
+import argcomplete
 import os
 import sys
 import time
@@ -28,7 +29,7 @@ def main():
     parser.add_argument('--timeout', help='Setting the cmd timeout.', type=int, default=60)
     parser.add_argument('-c', '--cmd', help='Setting the cmd type.',
                         choices=['deploy', 'deploy_list', 'undeploy', 'start', 'stop', 'predict', 'predict_type_list', 'capture', 'docker_run', 'docker_stop',
-                                 'redis', 'server', 'onnx', 'mmdet'])
+                                 'redis', 'server', 'onnx', 'mmdet', 'mmcls', 'mmpretrain'])
     parser.add_argument('-T','--use_track', help='Setting the multi object tracking enable for Object Detection.', action='store_true')
     parser.add_argument('--model_img_width', help='Setting the cmd deploy model_img_width.', type=int)
     parser.add_argument('--model_img_height', help='Setting the cmd deploy model_img_height.', type=int)
@@ -54,6 +55,7 @@ def main():
     parser.add_argument('--capture_fps', help='Setting the capture input fps.', type=int, default=None)
     parser.add_argument('--capture_output_fps', help='Setting the capture output fps.', type=int, default=10)
 
+    argcomplete.autocomplete(parser)
     args = parser.parse_args()
     args_dict = vars(args)
     opt = common.loadopt(args.useopt)
@@ -101,7 +103,7 @@ def main():
     if mode == 'server':
         logger, _ = common.load_config(mode)
         if data is None:
-            parser.print_help()
+            common.print_format({"warn":f"Please specify the --data option."}, format, tm)
             exit(1)
         sv = server.Server(Path(data), logger, redis_host=host, redis_port=port, redis_password=password)
         sv.start_server()
@@ -143,7 +145,7 @@ def main():
                 common.print_format({"warn":f"Image file or stdin is empty."}, format, tm)
 
         elif cmd == 'predict_type_list':
-            type_list = [dict(predict_type=key, site=val['site'], image_width=val['image_width'], image_height=val['image_height']) for key,val in common.BASE_MODELS.items()]
+            type_list = [dict(predict_type=key, site=val['site'], image_width=val['image_width'], image_height=val['image_height'], use_model_conf=val['use_model_conf']) for key,val in common.BASE_MODELS.items()]
             type_list.append(dict(predict_type='Custom', site='Custom', image_width=None, image_height=None))
             common.print_format(type_list, format, tm)
 
@@ -190,7 +192,21 @@ def main():
             common.print_format(ret, format, tm)
 
         elif cmd == 'mmdet':
-            ret = inst.mmdet()
+            if data is None:
+                common.print_format({"warn":f"Please specify the --data option."}, format, tm)
+                exit(1)
+            ret = inst.mmdet(data)
+            common.print_format(ret, format, tm)
+
+        elif cmd == 'mmcls':
+            ret = inst.mmcls()
+            common.print_format(ret, format, tm)
+
+        elif cmd == 'mmpretrain':
+            if data is None:
+                common.print_format({"warn":f"Please specify the --data option."}, format, tm)
+                exit(1)
+            ret = inst.mmpretrain(Path(data))
             common.print_format(ret, format, tm)
 
     else:

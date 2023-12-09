@@ -9,6 +9,7 @@ import numpy as np
 SITE = 'https://github.com/open-mmlab/mmdetection/tree/main/configs/yolox'
 IMAGE_WIDTH = 640
 IMAGE_HEIGHT = 640
+USE_MODEL_CONF = True
 
 class MMDetYoloX(common.Predoct):
     def create_session(self, model_path:Path, model_conf_path:Path, model_provider:str, gpu_id:int=None):

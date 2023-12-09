@@ -20,6 +20,8 @@ Linuxの場合はホスト内にDockerがインストールされている必要
 
 ``` cmd or bash
 pip install iinfer
+# タブ保管を有効化したい場合（Ubuntuのみ）
+eval "$(register-python-argcomplete iinfer)"
 ```
 
 ## iinferの実行方法
@@ -55,6 +57,15 @@ iinfer -p <PW> -m client -c start -n <モデル名> -f
 # 画像AIモデルのアンデプロイ
 iinfer -p <PW> -m client -c undeploy -n <モデル名> -f
 ```
+
+### よくあるエラー
+|Operation|Message|Cause|How to|
+|------|------|------|------|
+|iinfer -m install -c mmdet|shutil.Error ...|現在のディレクトリにmmdetectionが既に存在したり、データディレクトリ「~/.iinfer/」にmmdetectionが存在する|mmdetectionのディレクトリを削除|
+|iinfer -m install -c mmpretrain|shutil.Error ...|現在のディレクトリにmmpretrainが既に存在したり、データディレクトリ「~/.iinfer/」にmmpretrainが存在する|mmpretrainのディレクトリを削除|
+|iinfer -m install -c <mm系>|Failed to uninstall mmcv|mmdet又はmmpretrainのモデルが起動中|iinfer -m server -p <password>で起動したサーバープロセスを停止|
+|iinfer -m client -c start -p <pssword> -n <model_name>|Failed to create session: No module named 'mmdet'|mmdetがインストールされていません|iinfer -m install -c mmdet|
+|iinfer -m client -c start -p <pssword> -n <model_name>|Failed to create session: No module named 'mmpretrain'|mmpretrainがインストールされていません|iinfer -m install -c mmpretrain|
 
 ### コマンドラインオプション（共通）
 |Option|Required|Description|
@@ -179,7 +190,7 @@ iinfer -p <PW> -m client -c undeploy -n <モデル名> -f
 |-p,--password <パスワード>|〇|Redisサーバーのアクセスパスワードを指定する|
 |-n,--name <登録名>|〇|AIモデルの登録名を指定する|
 |-o,--output_image_file <推論結果画像の保存先ファイル>|-|推論結果画像の保存先ファイルを指定する|
-|--capture_device <device>|-|キャプチャーディバイスを指定する。`cv2.VideoCapture`の第一引数に渡される値。|
+|--capture_device <ディバイス>|-|キャプチャーディバイスを指定する。`cv2.VideoCapture`の第一引数に渡される値。|
 |--capture_output_type <画像の出力方法>|-|キャプチャーした画像の出力方法。現在使用していない。|
 |--capture_frame_width <キャプチャーサイズ(横px)>|-|キャプチャーする画像の横px。`cv2.VideoCapture`オブジェクトの`cv2.CAP_PROP_FRAME_WIDTH`オプションに指定する値。|
 |--capture_frame_height <キャプチャーサイズ(縦px)>|-|キャプチャーする画像の縦px。`cv2.VideoCapture`オブジェクトの`cv2.CAP_PROP_FRAME_HEIGHT`オプションに指定する値。|
@@ -251,22 +262,29 @@ pathlib.Path(HOME_DIR) / '.iinfer'
 ```
 
 ## 動作確認したモデル
-|AI Task|base|Model|FrameWork|input|Memo|
-|------|------|------|------|------|------|
-|Object Detection|[YOLOX](https://github.com/open-mmlab/mmdetection/tree/main/configs/yolox)|mmdetection|640x640|YOLOX-s|-|
-|Object Detection|[YOLOX](https://github.com/Megvii-BaseDetection/YOLOX/#benchmark)|onnx|416x416|YOLOX-Nano|*1|
-|Object Detection|[YOLOX](https://github.com/Megvii-BaseDetection/YOLOX/#benchmark)|onnx|416x416|YOLOX-Tiny|*1|
-|Object Detection|[YOLOX](https://github.com/Megvii-BaseDetection/YOLOX/#benchmark)|onnx|640x640|YOLOX-s|*1|
-|Object Detection|[YOLOX](https://github.com/Megvii-BaseDetection/YOLOX/#benchmark)|onnx|640x640|YOLOX-m|*1|
-|Object Detection|[YOLOX](https://github.com/Megvii-BaseDetection/YOLOX/#benchmark)|onnx|640x640|YOLOX-l|*1|
-|Object Detection|[YOLOX](https://github.com/Megvii-BaseDetection/YOLOX/#benchmark)|onnx|640x640|YOLOX-x|*1|
-|Object Detection|[YOLOv3](https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/yolov3)|onnx|416x416|YOLOv3-10|-|
-|Object Detection|[YOLOv3](https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/yolov3)|onnx|416x416|YOLOv3-12|-|
-|Object Detection|[YOLOv3](https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/yolov3)|onnx|416x416|YOLOv3-12-int8|-|
-|Object Detection|[TinyYOLOv3](https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/tiny-yolov3)|onnx|416x416|TinyYOLOv3|-|
-|Image Classification|[EfficientNet-Lite4](https://github.com/onnx/models/tree/main/vision/classification/efficientnet-lite4)|onnx|224x224|EfficientNet-Lite4-11|-|
-|Image Classification|[EfficientNet-Lite4](https://github.com/onnx/models/tree/main/vision/classification/efficientnet-lite4)|onnx|224x224|EfficientNet-Lite4-11-int8|-|
-|Image Classification|[EfficientNet-Lite4](https://github.com/onnx/models/tree/main/vision/classification/efficientnet-lite4)|onnx|224x224|EfficientNet-Lite4-11-qdq|-|
+|AI Task|base|Model|FrameWork|input|predict_type|Memo|
+|------|------|------|------|------|------|------|
+|Object Detection|[YOLOX](https://github.com/open-mmlab/mmdetection/tree/main/configs/yolox)|mmdetection|416x416|YOLOX-tiny|mmdet_det_YoloX_Lite|-|
+|Object Detection|[YOLOX](https://github.com/open-mmlab/mmdetection/tree/main/configs/yolox)|mmdetection|640x640|YOLOX-s|mmdet_det_YoloX|-|
+|Object Detection|[YOLOX](https://github.com/open-mmlab/mmdetection/tree/main/configs/yolox)|mmdetection|640x640|YOLOX-l|mmdet_det_YoloX|-|
+|Object Detection|[YOLOX](https://github.com/open-mmlab/mmdetection/tree/main/configs/yolox)|mmdetection|640x640|YOLOX-x|mmdet_det_YoloX|-|
+|Object Detection|[YOLOX](https://github.com/Megvii-BaseDetection/YOLOX/#benchmark)|onnx|416x416|YOLOX-Nano|onnx_det_YoloX_Lite|*1|
+|Object Detection|[YOLOX](https://github.com/Megvii-BaseDetection/YOLOX/#benchmark)|onnx|416x416|YOLOX-Tiny|onnx_det_YoloX_Lite|*1|
+|Object Detection|[YOLOX](https://github.com/Megvii-BaseDetection/YOLOX/#benchmark)|onnx|640x640|YOLOX-s|onnx_det_YoloX|*1|
+|Object Detection|[YOLOX](https://github.com/Megvii-BaseDetection/YOLOX/#benchmark)|onnx|640x640|YOLOX-m|onnx_det_YoloX|*1|
+|Object Detection|[YOLOX](https://github.com/Megvii-BaseDetection/YOLOX/#benchmark)|onnx|640x640|YOLOX-l|onnx_det_YoloX|*1|
+|Object Detection|[YOLOX](https://github.com/Megvii-BaseDetection/YOLOX/#benchmark)|onnx|640x640|YOLOX-x|onnx_det_YoloX|*1|
+|Object Detection|[YOLOv3](https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/yolov3)|onnx|416x416|YOLOv3-10|onnx_det_YoloV3|-|
+|Object Detection|[YOLOv3](https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/yolov3)|onnx|416x416|YOLOv3-12|onnx_det_YoloV3|-|
+|Object Detection|[YOLOv3](https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/yolov3)|onnx|416x416|YOLOv3-12-int8|onnx_det_YoloV3|-|
+|Object Detection|[TinyYOLOv3](https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/tiny-yolov3)|onnx|416x416|TinyYOLOv3|onnx_det_TinyYoloV3|-|
+|Image Classification|[Swin Transformer](https://github.com/open-mmlab/mmpretrain/tree/master/configs/swin_transformer)|mmpretrain|224x224|swin-tiny_16xb64_in1k|mmpretrain_cls_swin_Lite|-|
+|Image Classification|[Swin Transformer](https://github.com/open-mmlab/mmpretrain/tree/master/configs/swin_transformer)|mmpretrain|224x224|swin-small_16xb64_in1k|mmpretrain_cls_swin_Lite|-|
+|Image Classification|[Swin Transformer](https://github.com/open-mmlab/mmpretrain/tree/master/configs/swin_transformer)|mmpretrain|384x384|swin-base_16xb64_in1k-384px|mmpretrain_cls_swin|-|
+|Image Classification|[Swin Transformer](https://github.com/open-mmlab/mmpretrain/tree/master/configs/swin_transformer)|mmpretrain|384x384|swin-large_16xb64_in1k-384px|mmpretrain_cls_swin|-|
+|Image Classification|[EfficientNet-Lite4](https://github.com/onnx/models/tree/main/vision/classification/efficientnet-lite4)|onnx|224x224|EfficientNet-Lite4-11|onnx_cls_EfficientNet_Lite4|-|
+|Image Classification|[EfficientNet-Lite4](https://github.com/onnx/models/tree/main/vision/classification/efficientnet-lite4)|onnx|224x224|EfficientNet-Lite4-11-int8|onnx_cls_EfficientNet_Lite4|-|
+|Image Classification|[EfficientNet-Lite4](https://github.com/onnx/models/tree/main/vision/classification/efficientnet-lite4)|onnx|224x224|EfficientNet-Lite4-11-qdq|onnx_cls_EfficientNet_Lite4|-|
 
 *1）[pth2onnx](https://github.com/hamacom2004jp/pth2onnx)を使用してONNX形式に変換して使用
 

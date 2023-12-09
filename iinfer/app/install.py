@@ -1,5 +1,6 @@
 from iinfer.app import common
 from importlib.resources import files
+from pathlib import Path
 import logging
 import platform
 import shutil
@@ -63,7 +64,15 @@ class Install(object):
             return {"error": f"Failed to install onnxruntime."}
         return {"success": f"Success to install onnxruntime."}
 
-    def mmdet(self):
+    def mmdet(self, data_dir: Path):
+        returncode, _ = common.cmd(f'git clone https://github.com/open-mmlab/mmdetection.git', logger=self.logger)
+        if returncode != 0:
+            self.logger.error(f"Failed to git clone mmdetection.")
+            return {"error": f"Failed to git clone mmdetection."}
+        srcdir = Path('.') / 'mmdetection'
+        shutil.copytree(srcdir, data_dir / 'mmdetection', dirs_exist_ok=True)
+        shutil.rmtree(srcdir, ignore_errors=True)
+
         returncode, _ = common.cmd('pip install torch torchvision openmim', logger=self.logger)
         if returncode != 0:
             self.logger.error(f"Failed to install torch.")
@@ -71,7 +80,50 @@ class Install(object):
 
         returncode, _ = common.cmd('mim install mmengine mmcv mmdet', logger=self.logger)
         if returncode != 0:
-            self.logger.error(f"Failed to install mmengine.")
-            return {"error": f"Failed to install mmengine."}
+            self.logger.error(f"Failed to install mmdet.")
+            return {"error": f"Failed to install mmdet."}
 
+        if srcdir.exists():
+            return {"success": f"Please remove '{srcdir / 'mmdetection'}' manually."}
         return {"success": f"Success to install mmdet."}
+
+    def mmcls(self):
+        returncode, _ = common.cmd('pip install torch torchvision openmim', logger=self.logger)
+        if returncode != 0:
+            self.logger.error(f"Failed to install torch.")
+            return {"error": f"Failed to install torch."}
+
+        returncode, _ = common.cmd('mim install mmengine mmcv mmcls', logger=self.logger)
+        if returncode != 0:
+            self.logger.error(f"Failed to install mmcls.")
+            return {"error": f"Failed to install mmcls."}
+
+        return {"success": f"Success to install mmcls."}
+
+    def mmpretrain(self, data_dir: Path):
+        returncode, _ = common.cmd(f'git clone https://github.com/open-mmlab/mmpretrain.git', logger=self.logger)
+        if returncode != 0:
+            self.logger.error(f"Failed to git clone mmpretrain.")
+            return {"error": f"Failed to git clone mmpretrain."}
+        srcdir = Path('.') / 'mmpretrain'
+        shutil.copytree(srcdir, data_dir / 'mmpretrain', dirs_exist_ok=True)
+        shutil.rmtree(srcdir, ignore_errors=True)
+
+        returncode, _ = common.cmd('pip install torch torchvision openmim', logger=self.logger)
+        if returncode != 0:
+            self.logger.error(f"Failed to install torch.")
+            return {"error": f"Failed to install torch."}
+
+        returncode, _ = common.cmd('pip uninstall -y mmcv', logger=self.logger)
+        if returncode != 0:
+            self.logger.error(f"Failed to uninstall mmcv.")
+            return {"error": f"Failed to uninstall mmcv."}
+
+        returncode, _ = common.cmd('mim install mmengine mmcv>=2.0.0 mmpretrain', logger=self.logger)
+        if returncode != 0:
+            self.logger.error(f"Failed to install mmpretrain.")
+            return {"error": f"Failed to install mmpretrain."}
+
+        if srcdir.exists():
+            return {"success": f"Please remove '{srcdir}' manually."}
+        return {"success": f"Success to install mmpretrain."}

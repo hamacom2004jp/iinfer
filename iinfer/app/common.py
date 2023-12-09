@@ -251,11 +251,13 @@ for mod in get_module_list('iinfer.app.predicts'):
     site = None
     width = None
     height = None
+    use_model_conf = False
     for f in dir(m):
         if f == 'SITE': site = getattr(m, f)
         elif f == 'IMAGE_WIDTH': width = getattr(m, f)
         elif f == 'IMAGE_HEIGHT': height = getattr(m, f)
-    BASE_MODELS[mod] = dict(site=site, image_width=width, image_height=height)
+        elif f == 'USE_MODEL_CONF': use_model_conf = getattr(m, f)
+    BASE_MODELS[mod] = dict(site=site, image_width=width, image_height=height, use_model_conf=use_model_conf)
 
 def download_file(url:str, save_path:Path):
     """
@@ -446,7 +448,7 @@ def img2byte(image:Image, format:str='JPEG') -> bytes:
         bytes: 画像のバイト列
     """
     with BytesIO() as buffer:
-        image.save(buffer, format="JPEG")
+        image.save(buffer, format=format)
         return buffer.getvalue()
 
 def draw_boxes(image:Image, boxes:List[List[float]], scores:List[float], classes:List[int], ids:List[str] = None, labels:List[str] = None, colors:List[Tuple[int]] = None):

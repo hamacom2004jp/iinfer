@@ -129,10 +129,12 @@ class Client(object):
         if model_conf_file is not None:
             with open(model_conf_file, "rb") as cf:
                 model_conf_bytes_b64 = base64.b64encode(cf.read()).decode('utf-8')
+            model_conf_file_name = model_conf_file.name
         else:
             model_conf_bytes_b64 = None
+            model_conf_file_name = None
         reskey = common.random_string()
-        self.redis_cli.rpush('server', f"deploy {reskey} {name} {model_img_width} {model_img_height} {predict_type} {model_file.name} {model_bytes_b64} {model_conf_file.name} {model_conf_bytes_b64} {custom_predict_py_b64}")
+        self.redis_cli.rpush('server', f"deploy {reskey} {name} {model_img_width} {model_img_height} {predict_type} {model_file.name} {model_bytes_b64} {model_conf_file_name} {model_conf_bytes_b64} {custom_predict_py_b64}")
         res = self.redis_cli.blpop([reskey], timeout=timeout)
         return self._response(reskey, res)
 

@@ -12,8 +12,8 @@ DOWNLOAD_URL = URL
 VERSION = version.__version__
 PYTHON_REQUIRES = '>=3.8'
 INSTALL_REQUIRES = [
+    'argcomplete',
     'motpy',
-    'onnxruntime',
     'opencv-python',
     'Pillow',
     'pyyaml',

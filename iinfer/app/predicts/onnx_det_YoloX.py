@@ -9,6 +9,7 @@ import numpy as np
 SITE = 'https://github.com/Megvii-BaseDetection/YOLOX/'
 IMAGE_WIDTH = 640
 IMAGE_HEIGHT = 640
+USE_MODEL_CONF = False
 
 class OnnxDetYoloX(common.Predoct):
     def create_session(self, model_path:Path, model_conf_path:Path, model_provider:str, gpu_id:int=None):

@@ -8,6 +8,7 @@ import numpy as np
 SITE = 'https://github.com/onnx/models/tree/main/vision/classification/efficientnet-lite4'
 IMAGE_WIDTH = 224
 IMAGE_HEIGHT = 224
+USE_MODEL_CONF = False
 
 class OnnxClsEfficientNetLite4(common.Predoct):
     def create_session(self, model_path:Path, model_conf_path:Path, model_provider:str, gpu_id:int=None):

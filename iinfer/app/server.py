@@ -7,6 +7,7 @@ import logging
 import json
 import numpy as np
 import redis
+import shutil
 import time
 
 
@@ -179,6 +180,15 @@ class Server(object):
             self.responce(reskey, {"warn": f"Could not be deployed. '{deploy_dir}' already exists"})
             return
         
+        if predict_type not in common.BASE_MODELS:
+            self.logger.warn(f"Incorrect predict_type. '{predict_type}'")
+            self.responce(reskey, {"warn": f"Incorrect predict_type. '{predict_type}'"})
+            return
+        if common.BASE_MODELS[predict_type]['use_model_conf']==True and model_conf_file is None:
+            self.logger.warn(f"model_conf_file is None.")
+            self.responce(reskey, {"warn": f"model_conf_file is None."})
+            return
+
         common.mkdirs(deploy_dir)
         model_file = deploy_dir / model_file
         with open(model_file, "wb") as f:
@@ -208,6 +218,14 @@ class Server(object):
                         model_file=model_file, model_conf_file=model_conf_file, custom_predict_file=(custom_predict_file if custom_predict_file is not None else None))
             json.dump(conf, f, default=common.default_json_enc)
             self.logger.info(f"Save conf.json to {str(deploy_dir)}")
+
+        if predict_type.startswith('mmpretrain_'):
+            shutil.copytree(self.data_dir / "mmpretrain" / "configs", deploy_dir / "configs", dirs_exist_ok=True)
+            self.logger.info(f"Copy mmpretrain configs to {str(deploy_dir / 'configs')}")
+        elif predict_type.startswith('mmdet_'):
+            shutil.copytree(self.data_dir / "mmdetection" / "configs", deploy_dir / "configs", dirs_exist_ok=True)
+            self.logger.info(f"Copy mmdetection configs to {str(deploy_dir / 'configs')}")
+
         self.responce(reskey, {"success": f"Save conf.json to {str(deploy_dir)}"})
         return
 
@@ -225,6 +243,8 @@ class Server(object):
         common.mkdirs(self.data_dir)
         for dir in self.data_dir.iterdir():
             if not dir.is_dir():
+                continue
+            if dir.name == 'mmpretrain' or dir.name == 'mmdetection':
                 continue
             conf_path = dir / "conf.json"
             with open(conf_path, "r") as cf:
@@ -308,14 +328,19 @@ class Server(object):
             else:
                 predict_obj = common.load_predict(conf["predict_type"])
 
-            session = predict_obj.create_session(model_path, model_conf_path, model_provider, gpu_id=gpuid)
-            self.sessions[name] = dict(
-                session=session,
-                model_img_width=conf["model_img_width"],
-                model_img_height=conf["model_img_height"],
-                predict_obj=predict_obj,
-                tracker=MultiObjectTracker(dt=0.1) if use_track else None
-            )
+            try:
+                session = predict_obj.create_session(model_path, model_conf_path, model_provider, gpu_id=gpuid)
+                self.sessions[name] = dict(
+                    session=session,
+                    model_img_width=conf["model_img_width"],
+                    model_img_height=conf["model_img_height"],
+                    predict_obj=predict_obj,
+                    tracker=MultiObjectTracker(dt=0.1) if use_track else None
+                )
+            except Exception as e:
+                self.logger.warn(f"Failed to create session: {e}", exc_info=True)
+                self.responce(reskey, {"warn": f"Failed to create session: {e}"})
+                return
         self.logger.info(f"Successful start of {name} session.")
         self.responce(reskey, {"success": f"Successful start of {name} session."})
         return
