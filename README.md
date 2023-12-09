@@ -262,7 +262,7 @@ pathlib.Path(HOME_DIR) / '.iinfer'
 ```
 
 ## 動作確認したモデル
-|AI Task|base|Model|FrameWork|input|predict_type|Memo|
+|AI Task|base|frameWork|input|model|predict_type|memo|
 |------|------|------|------|------|------|------|
 |Object Detection|[YOLOX](https://github.com/open-mmlab/mmdetection/tree/main/configs/yolox)|mmdetection|416x416|YOLOX-tiny|mmdet_det_YoloX_Lite|-|
 |Object Detection|[YOLOX](https://github.com/open-mmlab/mmdetection/tree/main/configs/yolox)|mmdetection|640x640|YOLOX-s|mmdet_det_YoloX|-|
