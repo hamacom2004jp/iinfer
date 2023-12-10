@@ -97,6 +97,12 @@ class Server(object):
                     img_npy = common.b64str2npy(msg[3], shape)
                     image = common.npy2img(img_npy)
                     self.predict(msg[1], msg[2], image)
+                elif msg[0] == 'stop_server':
+                    self.is_running = False
+                    self.responce(msg[1], {"success": f"Successful stop server."})
+                    break
+                else:
+                    self.logger.warn(f"Unknown command {msg}")
             except redis.exceptions.TimeoutError:
                 pass
             except redis.exceptions.ConnectionError as e:
@@ -106,6 +112,7 @@ class Server(object):
             except KeyboardInterrupt as e:
                 self.is_running = False
                 break
+        self.logger.info(f"stop server")
 
     def terminate_server(self):
         """
@@ -391,7 +398,7 @@ class Server(object):
             return
         session = self.sessions[name]
         try:
-            # ONNX Runtimeで推論を実行
+            # 推論を実行
             predict_obj = session['predict_obj']
             outputs, output_image = predict_obj.predict(session['session'], session['model_img_width'], session['model_img_height'], image, labels=None, colors=None)
             if output_image is not None:

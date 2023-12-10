@@ -353,7 +353,19 @@ def npy2img(npy:np.ndarray) -> Image:
     """
     return Image.fromarray(npy)
 
-def b64str2npy(b64str:str, shape:Tuple, dtype:str='uint8') -> np.ndarray:
+def b64str2bytes(b64str:str) -> bytes:
+    """
+    Base64文字列をバイト列に変換します。
+
+    Parameters:
+        b64str (str): Base64形式の文字列
+
+    Returns:
+        bytes: バイト列
+    """
+    return base64.b64decode(b64str)
+
+def b64str2npy(b64str:str, shape:Tuple=None, dtype:str='uint8') -> np.ndarray:
     """
     Base64エンコードされた文字列からndarrayを復元します。
 
@@ -365,6 +377,8 @@ def b64str2npy(b64str:str, shape:Tuple, dtype:str='uint8') -> np.ndarray:
     Returns:
         np.ndarray: 復元したndarray
     """
+    if shape is None:
+        return np.frombuffer(base64.b64decode(b64str), dtype=dtype)
     return np.frombuffer(base64.b64decode(b64str), dtype=dtype).reshape(shape)
 
 def npy2imgfile(npy, output_image_file:Path=None, image_type:str='jpg') -> None:

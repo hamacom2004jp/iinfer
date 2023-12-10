@@ -33,29 +33,35 @@ iinfer -p <任意のPW> -m redis -c docker_run --wsl_name <WSLのディストリ
 iinfer -p <任意のPW> -m redis -c docker_run
 
 # 推論処理を実行するサーバープロセスの起動
-iinfer -p <PW> -m server -f
+iinfer -p <PW> -m server -c start -f
 
 # 画像AIモデルのデプロイ
 iinfer -p <PW> -m client -c deploy -n <任意のモデル名> --model_img_width <モデルのINPUTサイズ(横幅)> --model_img_width <モデルのINPUTサイズ(縦幅)> --model_onnx <モデルファイル> --predict_type <推論タイプ(後述)> --custom_predict_py <カスタム推論ファイル(後述)> -f
-# predict_typeはモデルのAIタスクやアルゴリズムに合わせて指定する。指定可能なキーワードはヘルプ参照。
+# predict_typeはモデルのAIタスクやアルゴリズムに合わせて指定する。指定可能なキーワードは"iinfer -m client -c predict_type_list"コマンド参照。
 
 # デプロイされている画像AIモデルの一覧
 iinfer -p <PW> -m client -c deploy_list -f
 
 # 画像AIモデルを起動させて推論可能な状態に(セッションを確保)する
-iinfer -p <PW> -m client -c start -n <モデル名> --model_provider <推論プロバイダー名(後述)> --use_track -f
-# model_providerは推論で使用する実行環境を指定する。指定可能なキーワードはヘルプ参照。
+iinfer -p <PW> -m client -c start -n <モデル名> --use_track -f
 # use_trackを指定するとObjectDetectionタスクの結果に対して、MOT（Multi Object Tracking）を実行しトラッキングIDを出力する。
 
 # 推論を実行する
 iinfer -p <PW> -m client -c predict -n <モデル名> -i <推論させる画像ファイル> -o <推論結果の画像ファイル> --output_preview -f
 # output_previewを指定するとimshowで推論結果画像を表示する（GUI必要）
 
+# カメラキャプチャー画像を元に推論を実行する
+iinfer -m client -c capture | iinfer -p <PW> -m client -c predict -n <モデル名> --output_preview --image_stdin --image_type capture -f
+# --image_stdin --image_type capture で標準入力のキャプチャー画像を推論する
+
 # 画像AIモデルを停止させてセッションを開放
 iinfer -p <PW> -m client -c start -n <モデル名> -f
 
 # 画像AIモデルのアンデプロイ
 iinfer -p <PW> -m client -c undeploy -n <モデル名> -f
+
+# 推論処理を実行するサーバープロセスの停止
+iinfer -p <PW> -m server -c stop -f
 ```
 
 ### よくあるエラー
@@ -101,12 +107,20 @@ iinfer -p <PW> -m client -c undeploy -n <モデル名> -f
 |--wsl_name <ディストリビューション名>|Windowsの場合は〇|Windowsの場合はWSLのディストリビューションの名前を指定する|
 |--wsl_user <user名>|Windowsの場合は〇|Windowsの場合はWSL内のユーザー名を指定する|
 
-### 推論サーバー起動 : `iinfer -m server <Option>`
+### 推論サーバー起動 : `iinfer -m server -c start <Option>`
 |Option|Required|Description|
 |------|------|------|
 |--host <IPアドレス又はホスト名>|-|Redisサーバーのサービスホストを指定する|
 |--port <ポート番号>|-|Redisサーバーのサービスポートを指定する|
 |-p,--password <パスワード>|〇|Redisサーバーのアクセスパスワードを指定する|
+
+### 推論サーバー停止 : `iinfer -m server -c stop <Option>`
+|Option|Required|Description|
+|------|------|------|
+|--host <IPアドレス又はホスト名>|-|Redisサーバーのサービスホストを指定する|
+|--port <ポート番号>|-|Redisサーバーのサービスポートを指定する|
+|-p,--password <パスワード>|〇|Redisサーバーのアクセスパスワードを指定する|
+|--timeout <タイムアウト>|-|サーバーの応答が返ってくるまでの最大待ち時間|
 
 ### クライアント(AIモデルの配備) : `iinfer -m client -c deploy <Option>`
 |Option|Required|Description|
@@ -119,7 +133,7 @@ iinfer -p <PW> -m client -c undeploy -n <モデル名> -f
 |--model_conf_file <モデル設定ファイル>|-|mmlabの場合はモデル設定ファイルを指定する|
 |--model_img_width <モデルのINPUTサイズ(横px)>|-|AIモデルのINPUTサイズ(横px)を指定する|
 |--model_img_height <モデルのINPUTサイズ(縦px)>|-|AIモデルのINPUTサイズ(縦px)を指定する|
-|--predict_type <推論タイプ>|〇|AIモデルの推論タイプを指定する。指定可能なタイプは`-c predict_type_list`参照|
+|--predict_type <推論タイプ>|〇|AIモデルの推論タイプを指定する。指定可能なタイプは`predict_type_list`参照|
 |--custom_predict_py <カスタム推論pyファイル>|-|独自の推論タイプを作成するときに指定。この時は`--predict_type Custom`を指定|
 |--timeout <タイムアウト>|-|サーバーの応答が返ってくるまでの最大待ち時間|
 
@@ -147,7 +161,7 @@ iinfer -p <PW> -m client -c undeploy -n <モデル名> -f
 |--port <ポート番号>|-|Redisサーバーのサービスポートを指定する|
 |-p,--password <パスワード>|〇|Redisサーバーのアクセスパスワードを指定する|
 |-n,--name <登録名>|〇|AIモデルの登録名を指定する|
-|--model_provider <モデルプロバイダー>|-|ONNX形式のモデルファイルの場合に指定可能。指定可能なプロバイダーは`-h`参照|
+|--model_provider <モデルプロバイダー>|-|ONNX形式のモデルファイルの場合に指定可能。指定可能なプロバイダーは`CPUExecutionProvider`,`CUDAExecutionProvider`,`TensorrtExecutionProvider`|
 |--use_track|-|ObjectDetectionタスクの場合に指定可能。motpyを使ってトラッキングID付与を行う|
 |--gpuid <GPUのid>|-|GPUのディバイスIDを指定する。`--model_provider`でGPUを使用するプロバイダーを指定した時に使用可能|
 |--timeout <タイムアウト>|-|サーバーの応答が返ってくるまでの最大待ち時間|
@@ -177,27 +191,26 @@ iinfer -p <PW> -m client -c undeploy -n <モデル名> -f
 |-n,--name <登録名>|〇|AIモデルの登録名を指定する|
 |-i,--image_file <推論対象の画像ファイル>|-|推論させる画像をファイルで指定する|
 |--image_stdin|-|推論させる画像を標準入力から読み込む|
-|--image_type <推論対象の画像タイプ>|-|推論させる画像のタイプを指定する。指定可能な画像タイプは`-h`参照|
+|--image_type <推論対象の画像タイプ>|-|推論させる画像のタイプを指定する。指定可能な画像タイプは`bmp`, `png`, `jpg`, `capture`|
 |-o,--output_image_file <推論結果画像の保存先ファイル>|-|推論結果画像の保存先ファイルを指定する|
 |--output_preview|-|推論結果画像を`cv2.imshow`で表示する|
 |--timeout <タイムアウト>|-|サーバーの応答が返ってくるまでの最大待ち時間|
 
-### クライアント(キャプチャーによる推論の実行) : `iinfer -m client -c capture <Option>`
+
+### クライアント(キャプチャーの実行) : `iinfer -m client -c capture <Option>`
+このコマンドは、パイプで接続して下記のように使用します。
+``` cmd or bash
+iinfer -m client -c capture <Option> | iinfer -m client -c predict --image_stdin --image_type capture <Option>
+```
 |Option|Required|Description|
 |------|------|------|
-|--host <IPアドレス又はホスト名>|-|Redisサーバーのサービスホストを指定する|
-|--port <ポート番号>|-|Redisサーバーのサービスポートを指定する|
-|-p,--password <パスワード>|〇|Redisサーバーのアクセスパスワードを指定する|
-|-n,--name <登録名>|〇|AIモデルの登録名を指定する|
-|-o,--output_image_file <推論結果画像の保存先ファイル>|-|推論結果画像の保存先ファイルを指定する|
 |--capture_device <ディバイス>|-|キャプチャーディバイスを指定する。`cv2.VideoCapture`の第一引数に渡される値。|
-|--capture_output_type <画像の出力方法>|-|キャプチャーした画像の出力方法。現在使用していない。|
 |--capture_frame_width <キャプチャーサイズ(横px)>|-|キャプチャーする画像の横px。`cv2.VideoCapture`オブジェクトの`cv2.CAP_PROP_FRAME_WIDTH`オプションに指定する値。|
 |--capture_frame_height <キャプチャーサイズ(縦px)>|-|キャプチャーする画像の縦px。`cv2.VideoCapture`オブジェクトの`cv2.CAP_PROP_FRAME_HEIGHT`オプションに指定する値。|
 |--capture_fps <キャプチャーFPS>|-|キャプチャーする画像のFPS。`cv2.VideoCapture`オブジェクトの`cv2.CAP_PROP_FPS`オプションに指定する値。|
 |--capture_output_fps <推論結果のFPS>|-|推論結果のFPS。AIの推論速度が指定した値より高速な場合に残り時間分をsleepする|
 |--output_preview|-|推論結果画像を`cv2.imshow`で表示する|
-|--timeout <タイムアウト>|-|サーバーの応答が返ってくるまでの最大待ち時間|
+
 
 ## カスタム推論モジュールについて
 AIモデルの配備`iinfer -m client -c deploy <Option>`コマンドで`--predict_type Custom`且つ`--custom_predict_py <カスタム推論pyファイル>`オプションを指定すると、カスタムモデルを配備できます。

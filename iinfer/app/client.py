@@ -225,13 +225,20 @@ class Client(object):
         res = self.redis_cli.blpop([reskey], timeout=timeout)
         return self._response(reskey, res)
 
+
+    def stop_server(self, timeout:int = 60):
+        reskey = common.random_string()
+        self.redis_cli.rpush('server', f"stop_server {reskey}")
+        res = self.redis_cli.blpop([reskey], timeout=timeout)
+        return self._response(reskey, res)
+
     def predict(self, name:str, image = None, image_file:Path = None, image_type:str = 'jpg', output_image_file:Path = None, output_preview:bool=False, timeout:int = 60):
         """
         画像をRedisサーバーに送信し、推論結果を取得する
 
         Args:
             name (str): モデル名
-            image (bytes, optional): 画像データ. Defaults to None. np.ndarray型の場合はデコードしない(RGBであること).
+            image (np.ndarray | bytes, optional): 画像データ. Defaults to None. np.ndarray型の場合はデコードしない(RGBであること).
             image_file (Path, optional): 画像ファイルのパス. Defaults to None.
             image_type (str, optional): 画像の形式. Defaults to 'jpg'.
             output_image_file (Path, optional): 予測結果の画像ファイルのパス. Defaults to None.
@@ -256,9 +263,7 @@ class Client(object):
                 self.logger.error(f"Not found image_file. {image_file}.")
                 return {"error": f"Not found image_file. {image_file}."}
             with open(image_file, "rb") as f:
-                if image_type == 'npy':
-                    img_npy = common.npyfile2npy(f)
-                elif image_type == 'jpg' or image_type == 'png':
+                if image_type == 'jpg' or image_type == 'png' or image_type == 'bmp':
                     img_npy = common.imgfile2npy(f)
                 else:
                     self.logger.error(f"image_type is invalid. {image_type}.")
@@ -266,9 +271,15 @@ class Client(object):
         else:
             if type(image) == np.ndarray:
                 img_npy = image
-            elif image_type == 'npy':
-                img_npy = common.npybytes2npy(image)
-            elif image_type == 'jpg' or image_type == 'png':
+            elif image_type == 'capture':
+                capture_data = image.split(',')
+                self.logger.info(f"capture_data={capture_data[1:]}")
+                img = capture_data[0]
+                h = int(capture_data[1])
+                w = int(capture_data[2])
+                c = int(capture_data[3])
+                img_npy = common.b64str2npy(img, shape=(h, w, c) if c > 0 else (h, w))
+            elif image_type == 'jpg' or image_type == 'png' or image_type == 'bmp':
                 img_npy = common.imgbytes2npy(image)
             else:
                 self.logger.error(f"image_type is invalid. {image_type}.")
@@ -292,23 +303,67 @@ class Client(object):
                 img_npy = common.bgr2rgb(img_npy)
                 try:
                     cv2.imshow('preview', img_npy)
-                    cv2.waitKey(0)
+                    cv2.waitKey(1)
                 except KeyboardInterrupt:
                     pass
         return res_json
 
-    def capture(self, name:str, output_image_file:Path = None, timeout:int = 60,
-              capture_device = 0, capture_output_type:str = None, capture_frame_width:int = None, capture_frame_height:int = None, capture_fps:int = None, capture_output_fps:int = 10,
+    def capture(self, capture_device = 0, capture_frame_width:int = None, capture_frame_height:int = None, capture_fps:int = None, capture_output_fps:int = 10,
               output_preview:bool=False):
         """
-        ビデオをキャプチャする
+        ビデオをキャプチャしてその結果を出力する
+
+        Args:
+            capture_device (int or str): キャプチャするディバイス、ビデオデバイスのID, ビデオファイルのパス。rtspのURL. by default 0
+            capture_frame_width (int): キャプチャするビデオのフレーム幅, by default None
+            capture_frame_height (int): キャプチャするビデオのフレーム高さ, by default None
+            capture_fps (int): キャプチャするビデオのフレームレート, by default None
+            capture_output_fps (int): キャプチャするビデオのフレームレート, by default 30
+            output_preview (bool, optional): 予測結果の画像をプレビューするかどうか. Defaults to False.
+        """
+        cap = cv2.VideoCapture(capture_device)
+        if capture_frame_width is not None:
+            cap.set(cv2.CAP_PROP_FRAME_WIDTH, capture_frame_width)
+        if capture_frame_height is not None:
+            cap.set(cv2.CAP_PROP_FRAME_HEIGHT, capture_frame_height)
+        if capture_fps is not None:
+            cap.set(cv2.CAP_PROP_FPS, capture_fps)
+        try:
+            interval = float(1 / capture_output_fps)
+            while True:
+                start = time.perf_counter()
+                ret, frame = cap.read()
+                if ret:
+                    img_npy = common.bgr2rgb(frame)
+                    if output_preview:
+                        # RGB画像をBGR画像に変換
+                        img_npy = common.bgr2rgb(img_npy)
+                        cv2.imshow('preview', img_npy)
+                        cv2.waitKey(1)
+                    yield common.npy2b64str(img_npy), img_npy.shape[0], img_npy.shape[1], img_npy.shape[2] if len(img_npy.shape) > 2 else -1
+                else:
+                    self.logger.error(f"Capture failed. devide_id={capture_device}", stack_info=True)
+                    break
+                end = time.perf_counter()
+                if interval - (end - start) > 0:
+                    time.sleep(interval - (end - start))
+
+        except KeyboardInterrupt:
+            self.logger.info("KeyboardInterrupt", exc_info=True)
+        finally:
+            cap.release()
+
+    def capture_predict(self, name:str, output_image_file:Path = None, timeout:int = 60,
+              capture_device = 0, capture_frame_width:int = None, capture_frame_height:int = None, capture_fps:int = None, capture_output_fps:int = 10,
+              output_preview:bool=False):
+        """
+        ビデオをキャプチャしてその結果をRedisサーバーに送信し、推論結果を取得する
 
         Args:
             name (str): モデル名
             output_image_file (Path, optional): 予測結果の画像ファイルのパス. Defaults to None.
             timeout (int, optional): タイムアウト時間. Defaults to 60.
             capture_device (int or str): キャプチャするディバイス、ビデオデバイスのID, ビデオファイルのパス。rtspのURL. by default 0
-            capture_output_type (str): キャプチャしたビデオの出力形式, by default None
             capture_frame_width (int): キャプチャするビデオのフレーム幅, by default None
             capture_frame_height (int): キャプチャするビデオのフレーム高さ, by default None
             capture_fps (int): キャプチャするビデオのフレームレート, by default None
@@ -346,6 +401,6 @@ class Client(object):
                     time.sleep(interval - (end - start))
 
         except KeyboardInterrupt:
-            logging.info("KeyboardInterrupt", exc_info=True)
+            self.logger.info("KeyboardInterrupt", exc_info=True)
         finally:
             cap.release()

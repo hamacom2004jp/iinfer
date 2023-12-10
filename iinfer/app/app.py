@@ -28,8 +28,10 @@ def main():
     parser.add_argument('-n', '--name', help='Setting the cmd name.')
     parser.add_argument('--timeout', help='Setting the cmd timeout.', type=int, default=60)
     parser.add_argument('-c', '--cmd', help='Setting the cmd type.',
-                        choices=['deploy', 'deploy_list', 'undeploy', 'start', 'stop', 'predict', 'predict_type_list', 'capture', 'docker_run', 'docker_stop',
-                                 'redis', 'server', 'onnx', 'mmdet', 'mmcls', 'mmpretrain'])
+                        choices=['deploy', 'deploy_list', 'undeploy', 'start', 'stop', 'predict', 'predict_type_list', 'capture', # client mode
+                                 'docker_run', 'docker_stop', # redis mode
+                                 'redis', 'server', 'onnx', 'mmdet', 'mmcls', 'mmpretrain' # install mode
+                                ])
     parser.add_argument('-T','--use_track', help='Setting the multi object tracking enable for Object Detection.', action='store_true')
     parser.add_argument('--model_img_width', help='Setting the cmd deploy model_img_width.', type=int)
     parser.add_argument('--model_img_height', help='Setting the cmd deploy model_img_height.', type=int)
@@ -45,11 +47,10 @@ def main():
     parser.add_argument('-o', '--output_image_file', help='Setting the cmd predict output image file.', default=None)
     parser.add_argument('-P', '--output_preview', help='Setting the output preview.', action='store_true')
     parser.add_argument('--image_stdin', help='Setting the cmd predict image for stdin.', action='store_true')
-    parser.add_argument('--image_type', help='Setting the cmd predict image type.', choices=['npy', 'png', 'jpg'], default='jpg')
+    parser.add_argument('--image_type', help='Setting the cmd predict image type.', choices=['bmp', 'png', 'jpg', 'capture'], default='jpg')
     parser.add_argument('--wsl_name', help='WSL distribution name.')
     parser.add_argument('--wsl_user', help='WSL distribution user.')
     parser.add_argument('-d', '--capture_device', help='Setting the capture input device. device id, video file, rtsp url.', default=0)
-    parser.add_argument('--capture_output_type', help='Setting the capture output type.', choices=['stdout'], default=None)
     parser.add_argument('--capture_frame_width', help='Setting the capture input frame width.', type=int, default=None)
     parser.add_argument('--capture_frame_height', help='Setting the capture input frame height.', type=int, default=None)
     parser.add_argument('--capture_fps', help='Setting the capture input fps.', type=int, default=None)
@@ -87,7 +88,6 @@ def main():
     wsl_user = common.getopt(opt, 'wsl_user', preval=args_dict, withset=True)
 
     capture_device = common.getopt(opt, 'capture_device', preval=args_dict, withset=True)
-    capture_output_type = common.getopt(opt, 'capture_output_type', preval=args_dict, withset=True)
     capture_frame_width = common.getopt(opt, 'capture_frame_width', preval=args_dict, withset=True)
     capture_frame_height = common.getopt(opt, 'capture_frame_height', preval=args_dict, withset=True)
     capture_fps = common.getopt(opt, 'capture_fps', preval=args_dict, withset=True)
@@ -102,11 +102,19 @@ def main():
 
     if mode == 'server':
         logger, _ = common.load_config(mode)
-        if data is None:
-            common.print_format({"warn":f"Please specify the --data option."}, format, tm)
-            exit(1)
-        sv = server.Server(Path(data), logger, redis_host=host, redis_port=port, redis_password=password)
-        sv.start_server()
+        if cmd == 'start':
+            if data is None:
+                common.print_format({"warn":f"Please specify the --data option."}, format, tm)
+                exit(1)
+            sv = server.Server(Path(data), logger, redis_host=host, redis_port=port, redis_password=password)
+            sv.start_server()
+        elif cmd == 'stop':
+            cl = client.Client(logger, redis_host=host, redis_port=port, redis_password=password)
+            ret = cl.stop_server(timeout=timeout)
+            common.print_format(ret, format, tm)
+        else:
+            common.print_format({"warn":f"Unkown command."}, format, tm)
+            parser.print_help()
 
     elif mode == 'client':
         logger, _ = common.load_config(mode)
@@ -139,8 +147,10 @@ def main():
                 ret = cl.predict(name, image_file=Path(image_file), image_type=image_type, output_image_file=output_image_file, output_preview=output_preview, timeout=timeout)
                 common.print_format(ret, format, tm)
             elif image_stdin:
-                ret = cl.predict(name, image=sys.stdin.buffer.read(), image_type=image_type, output_image_file=output_image_file, output_preview=output_preview, timeout=timeout)
-                common.print_format(ret, format, tm)
+                for line in sys.stdin:
+                    ret = cl.predict(name, image=line, image_type=image_type, output_image_file=output_image_file, output_preview=output_preview, timeout=timeout)
+                    common.print_format(ret, format, tm)
+                    tm = time.time()
             else:
                 common.print_format({"warn":f"Image file or stdin is empty."}, format, tm)
 
@@ -149,12 +159,19 @@ def main():
             type_list.append(dict(predict_type='Custom', site='Custom', image_width=None, image_height=None))
             common.print_format(type_list, format, tm)
 
+        #elif cmd == 'capture_predict':
+        #    for ret in cl.capture_predict(name, output_image_file=output_image_file, timeout=timeout,
+        #                         capture_device=capture_device, capture_frame_width=capture_frame_width, capture_frame_height=capture_frame_height,
+        #                         capture_fps=capture_fps, capture_output_fps=capture_output_fps,
+        #                         output_preview=output_preview):
+        #        common.print_format(ret, format, tm)
+        #        tm = time.time()
+
         elif cmd == 'capture':
-            for ret in cl.capture(name, output_image_file=output_image_file, timeout=timeout,
-                                 capture_device=capture_device, capture_output_type=capture_output_type,
+            for b64,h,w,c in cl.capture(capture_device=capture_device,
                                  capture_frame_width=capture_frame_width, capture_frame_height=capture_frame_height, capture_fps=capture_fps, capture_output_fps=capture_output_fps,
                                  output_preview=output_preview):
-                common.print_format(ret, format, tm)
+                common.print_format(b64+f",{h},{w},{c}", False, tm)
                 tm = time.time()
 
         else:
