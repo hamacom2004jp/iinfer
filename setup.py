@@ -25,7 +25,8 @@ INSTALL_REQUIRES = [
 PACKAGES = [
     'iinfer',
     'iinfer.app',
-    'iinfer.app.predicts'
+    'iinfer.app.predicts',
+    'iinfer.docker'
 ]
 KEYWORDS = 'onnxruntime predict inference image ai model'
 CLASSIFIERS=[

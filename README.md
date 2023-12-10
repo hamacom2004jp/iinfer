@@ -64,15 +64,6 @@ iinfer -p <PW> -m client -c undeploy -n <モデル名> -f
 iinfer -p <PW> -m server -c stop -f
 ```
 
-### よくあるエラー
-|Operation|Message|Cause|How to|
-|------|------|------|------|
-|iinfer -m install -c mmdet|shutil.Error ...|現在のディレクトリにmmdetectionが既に存在したり、データディレクトリ「~/.iinfer/」にmmdetectionが存在する|mmdetectionのディレクトリを削除|
-|iinfer -m install -c mmpretrain|shutil.Error ...|現在のディレクトリにmmpretrainが既に存在したり、データディレクトリ「~/.iinfer/」にmmpretrainが存在する|mmpretrainのディレクトリを削除|
-|iinfer -m install -c <mm系>|Failed to uninstall mmcv|mmdet又はmmpretrainのモデルが起動中|iinfer -m server -p <password>で起動したサーバープロセスを停止|
-|iinfer -m client -c start -p <pssword> -n <model_name>|Failed to create session: No module named 'mmdet'|mmdetがインストールされていません|iinfer -m install -c mmdet|
-|iinfer -m client -c start -p <pssword> -n <model_name>|Failed to create session: No module named 'mmpretrain'|mmpretrainがインストールされていません|iinfer -m install -c mmpretrain|
-
 ### コマンドラインオプション（共通）
 |Option|Required|Description|
 |------|------|------|
@@ -192,7 +183,7 @@ iinfer -p <PW> -m server -c stop -f
 |-i,--image_file <推論対象の画像ファイル>|-|推論させる画像をファイルで指定する|
 |--image_stdin|-|推論させる画像を標準入力から読み込む|
 |--image_type <推論対象の画像タイプ>|-|推論させる画像のタイプを指定する。指定可能な画像タイプは`bmp`, `png`, `jpg`, `capture`|
-|-o,--output_image_file <推論結果画像の保存先ファイル>|-|推論結果画像の保存先ファイルを指定する|
+|-o,--output_image_file <推論結果画像の保存先ファイル>|--image_stdinを指定した時〇|推論結果画像の保存先ファイルを指定する|
 |--output_preview|-|推論結果画像を`cv2.imshow`で表示する|
 |--timeout <タイムアウト>|-|サーバーの応答が返ってくるまでの最大待ち時間|
 
@@ -210,6 +201,16 @@ iinfer -m client -c capture <Option> | iinfer -m client -c predict --image_stdin
 |--capture_fps <キャプチャーFPS>|-|キャプチャーする画像のFPS。`cv2.VideoCapture`オブジェクトの`cv2.CAP_PROP_FPS`オプションに指定する値。|
 |--capture_output_fps <推論結果のFPS>|-|推論結果のFPS。AIの推論速度が指定した値より高速な場合に残り時間分をsleepする|
 |--output_preview|-|推論結果画像を`cv2.imshow`で表示する|
+
+
+### よくあるエラー
+|Operation|Message|Cause|How to|
+|------|------|------|------|
+|iinfer -m install -c mmdet|shutil.Error ...|現在のディレクトリにmmdetectionが既に存在したり、データディレクトリ「~/.iinfer/」にmmdetectionが存在する|mmdetectionのディレクトリを削除|
+|iinfer -m install -c mmpretrain|shutil.Error ...|現在のディレクトリにmmpretrainが既に存在したり、データディレクトリ「~/.iinfer/」にmmpretrainが存在する|mmpretrainのディレクトリを削除|
+|iinfer -m install -c <mm系>|Failed to uninstall mmcv|mmdet又はmmpretrainのモデルが起動中|iinfer -m server -p <password>で起動したサーバープロセスを停止|
+|iinfer -m client -c start -p <pssword> -n <model_name>|Failed to create session: No module named 'mmdet'|mmdetがインストールされていません|iinfer -m install -c mmdet|
+|iinfer -m client -c start -p <pssword> -n <model_name>|Failed to create session: No module named 'mmpretrain'|mmpretrainがインストールされていません|iinfer -m install -c mmpretrain|
 
 
 ## カスタム推論モジュールについて

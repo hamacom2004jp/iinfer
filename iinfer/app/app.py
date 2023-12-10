@@ -47,7 +47,7 @@ def main():
     parser.add_argument('-o', '--output_image_file', help='Setting the cmd predict output image file.', default=None)
     parser.add_argument('-P', '--output_preview', help='Setting the output preview.', action='store_true')
     parser.add_argument('--image_stdin', help='Setting the cmd predict image for stdin.', action='store_true')
-    parser.add_argument('--image_type', help='Setting the cmd predict image type.', choices=['bmp', 'png', 'jpg', 'capture'], default='jpg')
+    parser.add_argument('--image_type', help='Setting the cmd predict image type.', choices=['bmp', 'png', 'jpg', 'capture'], default=None)
     parser.add_argument('--wsl_name', help='WSL distribution name.')
     parser.add_argument('--wsl_user', help='WSL distribution user.')
     parser.add_argument('-d', '--capture_device', help='Setting the capture input device. device id, video file, rtsp url.', default=0)
@@ -147,8 +147,16 @@ def main():
                 ret = cl.predict(name, image_file=Path(image_file), image_type=image_type, output_image_file=output_image_file, output_preview=output_preview, timeout=timeout)
                 common.print_format(ret, format, tm)
             elif image_stdin:
-                for line in sys.stdin:
-                    ret = cl.predict(name, image=line, image_type=image_type, output_image_file=output_image_file, output_preview=output_preview, timeout=timeout)
+                if image_type is None:
+                    common.print_format({"warn":f"Please specify the --image_type option."}, format, tm)
+                    exit(1)
+                if image_type == 'capture':
+                    for line in sys.stdin:
+                        ret = cl.predict(name, image=line, image_type=image_type, output_image_file=output_image_file, output_preview=output_preview, timeout=timeout)
+                        common.print_format(ret, format, tm)
+                        tm = time.time()
+                else:
+                    ret = cl.predict(name, image=sys.stdin.buffer.read(), image_type=image_type, output_image_file=output_image_file, output_preview=output_preview, timeout=timeout)
                     common.print_format(ret, format, tm)
                     tm = time.time()
             else:
