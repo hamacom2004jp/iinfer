@@ -191,7 +191,6 @@ iinfer -m server -c stop -f
 |-P,--output_preview|-|推論結果画像を`cv2.imshow`で表示する|
 |--timeout <タイムアウト>|-|サーバーの応答が返ってくるまでの最大待ち時間|
 
-
 ### クライアント(キャプチャーの実行) : `iinfer -m client -c capture <Option>`
 このコマンドは、パイプで接続して下記のように使用します。
 ``` cmd or bash
@@ -219,7 +218,6 @@ iinfer -m client -c capture <Option> | iinfer -m client -c predict --stdin --ima
 |--nodraw|-|推論結果画像にbbox等の描き込みを行わない|
 |-P,--output_preview|-|推論結果画像を`cv2.imshow`で表示する|
 
-
 ### 後処理(CSV出力) : `iinfer -m postprocess -c csv <Option>`
 |Option|Required|Description|
 |------|------|------|
@@ -235,7 +233,6 @@ iinfer -m client -c capture <Option> | iinfer -m client -c predict --stdin --ima
 |--json_connectstr <URL>|〇|推論結果のJSONのPOST先URLを指定する|
 |--img_connectstr <URL>|-|推論結果の画像のPOST先URLを指定する|
 |--fileup_name <パラメータ名>|-|推論結果の画像をPOSTするときのパラメータ名を指定する。省略すると`file`が使用される。|
-
 
 ### よくあるエラー
 |Operation|Message|Cause|How to|
@@ -255,7 +252,7 @@ AIモデルの配備`iinfer -m client -c deploy <Option>`コマンドで`--predi
 ``` python
 from pathlib import Path
 from PIL import Image
-from typing import List, Tuple
+from typing import List, Tuple, Dict, Any
 import logging
 
 class Predict(object):
@@ -267,6 +264,7 @@ class Predict(object):
         戻り値の推論セッションの型は問いません。
 
         Args:
+            logger (logging.Logger): ロガー
             model_path (Path): モデルファイルのパス
             model_conf_path (Path): モデル設定ファイルのパス
             gpu_id (int, optional): GPU ID. Defaults to None.
@@ -276,7 +274,7 @@ class Predict(object):
         """
         raise NotImplementedError()
 
-    def predict(self, session, img_width:int, img_height:int, image:Image, labels:List[str]=None, colors:List[Tuple[int]]=None) -> Tuple[Dict[str, Any], Image.Image]:
+    def predict(self, session, img_width:int, img_height:int, image:Image, labels:List[str]=None, colors:List[Tuple[int]]=None, nodraw:bool=False) -> Tuple[Dict[str, Any], Image.Image]:
         """
         予測を行う関数です。
         predictコマンドやcaptureコマンド実行時に呼び出されます。
@@ -294,6 +292,7 @@ class Predict(object):
             image (Image): 入力画像（RGB配列であること）
             labels (List[str], optional): クラスラベルのリスト. Defaults to None.
             colors (List[Tuple[int]], optional): ボックスの色のリスト. Defaults to None.
+            nodraw (bool, optional): 描画フラグ. Defaults to False.
 
         Returns:
             Tuple[Dict[str, Any], Image]: 予測結果と出力画像(RGB)のタプル
