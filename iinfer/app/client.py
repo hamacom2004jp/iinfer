@@ -43,6 +43,24 @@ class Client(object):
             self.logger.error(f"fail to ping redis-server")
             raise Exception("fail to ping redis-server")
 
+    def _proc(self, key, cmd:str, params:List[str], timeout:int = 60):
+        """
+        コマンドをRedisサーバーに送信し、応答を取得する
+
+        Args:
+            key (str): コマンドのキー
+            cmd (str): コマンド
+            params (List[str]): コマンドのパラメータ
+            timeout (int, optional): タイムアウト時間. Defaults to 60.
+
+        Returns:
+            dict: Redisサーバーからの応答
+        """
+        reskey = common.random_string()
+        self.redis_cli.rpush(key, f"{cmd} {reskey} {' '.join([str(p) for p in params])}")
+        res = self.redis_cli.blpop([reskey], timeout=timeout)
+        return self._response(reskey, res)
+
     def _response(self, reskey:str, res_msg:List[str]):
         """
         Redisサーバーからの応答を解析する
@@ -74,7 +92,8 @@ class Client(object):
             self.logger.info(str(msg_json))
         return res_json
 
-    def deploy(self, name:str, model_img_width:int, model_img_height:int, model_file:Path, model_conf_file:Path, predict_type:str, custom_predict_py:Path, timeout:int = 60):
+    def deploy(self, name:str, model_img_width:int, model_img_height:int, model_file:Path, model_conf_file:List[Path], predict_type:str, custom_predict_py:Path,
+               label_file:Path, color_file:Path, overwrite:bool, timeout:int = 60):
         """
         モデルをRedisサーバーにデプロイする
 
@@ -83,9 +102,12 @@ class Client(object):
             model_img_width (int): 画像の幅
             model_img_height (int): 画像の高さ
             model_file (Path): モデルファイルのパス
-            model_conf_file (Path): モデル設定ファイルのパス
+            model_conf_file (List[Path]): モデル設定ファイルのパス
             predict_type (str): 推論方法のタイプ
             custom_predict_py (Path): 推論スクリプトのパス
+            label_file (Path): ラベルファイルのパス
+            color_file (Path): 色ファイルのパス
+            overwrite (bool): モデルを上書きするかどうか
             timeout (int, optional): タイムアウト時間. Defaults to 60.
 
         Returns:
@@ -124,19 +146,44 @@ class Client(object):
                 custom_predict_py_b64 = base64.b64encode(pf.read()).decode('utf-8')
         else:
             custom_predict_py_b64 = None
+        if label_file is not None and not label_file.exists():
+            self.logger.error(f"label_file {str(label_file)} does not exist")
+            return {"error": f"label_file {str(label_file)} does not exist"}
+        elif label_file is not None:
+            with open(label_file, "rb") as lf:
+                label_file_b64 = base64.b64encode(lf.read()).decode('utf-8')
+        else:
+            label_file_b64 = None
+        if color_file is not None and not color_file.exists():
+            self.logger.error(f"color_file {str(color_file)} does not exist")
+            return {"error": f"color_file {str(color_file)} does not exist"}
+        elif color_file is not None:
+            with open(color_file, "rb") as cf:
+                color_file_b64 = base64.b64encode(cf.read()).decode('utf-8')
+        else:
+            color_file_b64 = None
+
         with open(model_file, "rb") as mf:
             model_bytes_b64 = base64.b64encode(mf.read()).decode('utf-8')
         if model_conf_file is not None:
-            with open(model_conf_file, "rb") as cf:
-                model_conf_bytes_b64 = base64.b64encode(cf.read()).decode('utf-8')
-            model_conf_file_name = model_conf_file.name
+            model_conf_bytes_b64 = []
+            model_conf_file_name = []
+            for cf in model_conf_file:
+                if not cf.exists():
+                    self.logger.error(f"model_conf_file {str(cf)} does not exist")
+                    return {"error": f"model_conf_file {str(cf)} does not exist"}
+                with open(cf, "rb") as f:
+                    model_conf_bytes_b64.append(base64.b64encode(f.read()).decode('utf-8'))
+                model_conf_file_name.append(cf.name)
+            model_conf_bytes_b64 = ','.join(model_conf_bytes_b64)
+            model_conf_file_name = ','.join(model_conf_file_name)
         else:
             model_conf_bytes_b64 = None
             model_conf_file_name = None
-        reskey = common.random_string()
-        self.redis_cli.rpush('server', f"deploy {reskey} {name} {model_img_width} {model_img_height} {predict_type} {model_file.name} {model_bytes_b64} {model_conf_file_name} {model_conf_bytes_b64} {custom_predict_py_b64}")
-        res = self.redis_cli.blpop([reskey], timeout=timeout)
-        return self._response(reskey, res)
+        res_json = self._proc('server', 'deploy', [name, str(model_img_width), str(model_img_height), predict_type,
+                                                   model_file.name, model_bytes_b64, model_conf_file_name, model_conf_bytes_b64, custom_predict_py_b64,
+                                                   label_file_b64, color_file_b64, overwrite], timeout=timeout)
+        return res_json
 
     def deploy_list(self, timeout:int = 60):
         """
@@ -148,10 +195,8 @@ class Client(object):
         if self.password is None or self.password == "":
             self.logger.error(f"password is empty.")
             return {"error": f"password is empty."}
-        reskey = common.random_string()
-        self.redis_cli.rpush('server', f"deploy_list {reskey}")
-        res = self.redis_cli.blpop([reskey], timeout=timeout)
-        return self._response(reskey, res)
+        res_json = self._proc('server', 'deploy_list', [], timeout=timeout)
+        return res_json
 
     def undeploy(self, name:str, timeout:int = 60):
         """
@@ -170,10 +215,8 @@ class Client(object):
         if name is None or name == "":
             self.logger.error(f"name is empty.")
             return {"error": f"name is empty."}
-        reskey = common.random_string()
-        self.redis_cli.rpush('server', f"undeploy {reskey} {name}")
-        res = self.redis_cli.blpop([reskey], timeout=timeout)
-        return self._response(reskey, res)
+        res_json = self._proc('server', 'undeploy', [name], timeout=timeout)
+        return res_json
 
     def start(self, name:str, model_provider:str = 'CPUExecutionProvider', use_track:bool=False, gpuid:int=None, timeout:int = 60):
         """
@@ -198,10 +241,8 @@ class Client(object):
         if model_provider is None or model_provider == "":
             self.logger.error(f"model_provider is empty.")
             return {"error": f"model_provider is empty."}
-        reskey = common.random_string()
-        self.redis_cli.rpush('server', f"start {reskey} {name} {model_provider} {use_track} {gpuid}")
-        res = self.redis_cli.blpop([reskey], timeout=timeout)
-        return self._response(reskey, res)
+        res_json = self._proc('server', 'start', [name, model_provider, str(use_track), str(gpuid)], timeout=timeout)
+        return res_json
 
     def stop(self, name:str, timeout:int = 60):
         """
@@ -220,19 +261,15 @@ class Client(object):
         if name is None or name == "":
             self.logger.error(f"name is empty.")
             return {"error": f"name is empty."}
-        reskey = common.random_string()
-        self.redis_cli.rpush('server', f"stop {reskey} {name}")
-        res = self.redis_cli.blpop([reskey], timeout=timeout)
-        return self._response(reskey, res)
+        res_json = self._proc('server', 'stop', [name], timeout=timeout)
+        return res_json
 
 
     def stop_server(self, timeout:int = 60):
-        reskey = common.random_string()
-        self.redis_cli.rpush('server', f"stop_server {reskey}")
-        res = self.redis_cli.blpop([reskey], timeout=timeout)
-        return self._response(reskey, res)
+        res_json = self._proc('server', 'stop_server', [], timeout=timeout)
+        return res_json
 
-    def predict(self, name:str, image = None, image_file:Path = None, image_type:str = 'jpg', output_image_file:Path = None, output_preview:bool=False, timeout:int = 60):
+    def predict(self, name:str, image = None, image_file:Path = None, image_type:str = 'jpeg', output_image_file:Path = None, output_preview:bool=False, nodraw:bool=False, timeout:int = 60):
         """
         画像をRedisサーバーに送信し、推論結果を取得する
 
@@ -240,9 +277,10 @@ class Client(object):
             name (str): モデル名
             image (np.ndarray | bytes, optional): 画像データ. Defaults to None. np.ndarray型の場合はデコードしない(RGBであること).
             image_file (Path, optional): 画像ファイルのパス. Defaults to None.
-            image_type (str, optional): 画像の形式. Defaults to 'jpg'.
+            image_type (str, optional): 画像の形式. Defaults to 'jpeg'.
             output_image_file (Path, optional): 予測結果の画像ファイルのパス. Defaults to None.
             output_preview (bool, optional): 予測結果の画像をプレビューするかどうか. Defaults to False.
+            nodraw (bool, optional): 描画フラグ. Defaults to False.
             timeout (int, optional): タイムアウト時間. Defaults to 60.
 
         Returns:
@@ -262,12 +300,29 @@ class Client(object):
             if not image_file.exists():
                 self.logger.error(f"Not found image_file. {image_file}.")
                 return {"error": f"Not found image_file. {image_file}."}
-            with open(image_file, "rb") as f:
-                if image_type == 'jpg' or image_type == 'png' or image_type == 'bmp':
+            if image_type == 'jpeg' or image_type == 'png' or image_type == 'bmp':
+                with open(image_file, "rb") as f:
                     img_npy = common.imgfile2npy(f)
-                else:
-                    self.logger.error(f"image_type is invalid. {image_type}.")
-                    return {"error": f"image_type is invalid. {image_type}."}
+            elif image_type == 'capture':
+                with open(image_file, "r", encoding='utf-8') as f:
+                    res_list = []
+                    for line in f:
+                        capture_data = line.split(',')
+                        img = capture_data[0]
+                        h = int(capture_data[1])
+                        w = int(capture_data[2])
+                        c = int(capture_data[3])
+                        img_npy = common.b64str2npy(img, shape=(h, w, c) if c > 0 else (h, w))
+                        res_json = self.predict(name, image=img_npy, output_image_file=output_image_file, output_preview=output_preview, nodraw=nodraw, timeout=timeout)
+                        res_list.append(res_json)
+                    if len(res_list) <= 0:
+                        return {"warn": f"capture file is no data."}
+                    elif len(res_list) == 1:
+                        return res_list[0]
+                    return res_list
+            else:
+                self.logger.error(f"image_type is invalid. {image_type}.")
+                return {"error": f"image_type is invalid. {image_type}."}
         else:
             if type(image) == np.ndarray:
                 img_npy = image
@@ -279,7 +334,7 @@ class Client(object):
                 w = int(capture_data[2])
                 c = int(capture_data[3])
                 img_npy = common.b64str2npy(img, shape=(h, w, c) if c > 0 else (h, w))
-            elif image_type == 'jpg' or image_type == 'png' or image_type == 'bmp':
+            elif image_type == 'jpeg' or image_type == 'png' or image_type == 'bmp':
                 img_npy = common.imgbytes2npy(image)
             else:
                 self.logger.error(f"image_type is invalid. {image_type}.")
@@ -288,10 +343,7 @@ class Client(object):
         npy_b64 = common.npy2b64str(img_npy)
         #img_npy2 = np.frombuffer(base64.b64decode(npy_b64), dtype='uint8').reshape(img_npy.shape)
 
-        reskey = common.random_string()
-        self.redis_cli.rpush('server', f"predict {reskey} {name} {npy_b64} {img_npy.shape[0]} {img_npy.shape[1]} {img_npy.shape[2] if len(img_npy.shape) > 2 else ''}")
-        res = self.redis_cli.blpop([reskey], timeout=timeout)
-        res_json = self._response(reskey, res)
+        res_json = self._proc('server', 'predict', [name, npy_b64, str(nodraw), str(img_npy.shape[0]), str(img_npy.shape[1]), str(img_npy.shape[2] if len(img_npy.shape) > 2 else '')], timeout=timeout)
         if "output_image" in res_json and "output_image_shape" in res_json:
             #byteio = BytesIO(base64.b64decode(res_json["output_image"]))
             #img_npy = np.load(byteio)
@@ -308,8 +360,7 @@ class Client(object):
                     pass
         return res_json
 
-    def capture(self, capture_device = 0, capture_frame_width:int = None, capture_frame_height:int = None, capture_fps:int = None, capture_output_fps:int = 10,
-              output_preview:bool=False):
+    def capture(self, capture_device = 0, capture_frame_width:int = None, capture_frame_height:int = None, capture_fps:int = 1000, output_preview:bool=False):
         """
         ビデオをキャプチャしてその結果を出力する
 
@@ -317,8 +368,7 @@ class Client(object):
             capture_device (int or str): キャプチャするディバイス、ビデオデバイスのID, ビデオファイルのパス。rtspのURL. by default 0
             capture_frame_width (int): キャプチャするビデオのフレーム幅, by default None
             capture_frame_height (int): キャプチャするビデオのフレーム高さ, by default None
-            capture_fps (int): キャプチャするビデオのフレームレート, by default None
-            capture_output_fps (int): キャプチャするビデオのフレームレート, by default 30
+            capture_fps (int): キャプチャするビデオのフレームレート, by default 10
             output_preview (bool, optional): 予測結果の画像をプレビューするかどうか. Defaults to False.
         """
         cap = cv2.VideoCapture(capture_device)
@@ -329,7 +379,7 @@ class Client(object):
         if capture_fps is not None:
             cap.set(cv2.CAP_PROP_FPS, capture_fps)
         try:
-            interval = float(1 / capture_output_fps)
+            interval = float(1 / capture_fps)
             while True:
                 start = time.perf_counter()
                 ret, frame = cap.read()

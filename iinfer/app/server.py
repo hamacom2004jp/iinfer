@@ -2,6 +2,7 @@ from motpy import Detection, MultiObjectTracker
 from pathlib import Path
 from PIL import Image
 from iinfer.app import common
+from typing import List
 import base64
 import logging
 import json
@@ -70,17 +71,29 @@ class Server(object):
                     if msg[8] == 'None':
                         model_conf_file = None
                     else:
-                        model_conf_file = msg[8]
+                        model_conf_file = msg[8].split(',')
                     if msg[9] == 'None':
                         model_conf_bin = None
                     else:
-                        model_conf_bin = base64.b64decode(msg[9])
+                        model_conf_bin = [base64.b64decode(m) for m in msg[9].split(',')]
                     if msg[10] == 'None':
                         custom_predict_py = None
                     else:
                         custom_predict_py = base64.b64decode(msg[10])
+                    if msg[11] == 'None':
+                        label_txt = None
+                    else:
+                        label_txt = base64.b64decode(msg[11])
+                    if msg[12] == 'None':
+                        color_txt = None
+                    else:
+                        color_txt = base64.b64decode(msg[12])
+                    if msg[13] == 'True':
+                        overwrite = True
+                    else:   
+                        overwrite = False
 
-                    self.deploy(msg[1], msg[2], int(msg[3]), int(msg[4]), msg[5], msg[6], model_onnx, model_conf_file, model_conf_bin, custom_predict_py)
+                    self.deploy(msg[1], msg[2], int(msg[3]), int(msg[4]), msg[5], msg[6], model_onnx, model_conf_file, model_conf_bin, custom_predict_py, label_txt, color_txt, overwrite)
                 elif msg[0] == 'deploy_list':
                     self.deploy_list(msg[1])
                 elif msg[0] == 'undeploy':
@@ -92,11 +105,12 @@ class Server(object):
                 elif msg[0] == 'predict':
                     #byteio = BytesIO(base64.b64decode(msg[3]))
                     #img_npy = np.load(byteio)
-                    shape = [int(msg[4]), int(msg[5])]
-                    if len(msg) > 6: shape.append(int(msg[6]))
+                    nodraw = True if msg[4] == 'True' else False
+                    shape = [int(msg[5]), int(msg[6])]
+                    if len(msg) > 7: shape.append(int(msg[7]))
                     img_npy = common.b64str2npy(msg[3], shape)
                     image = common.npy2img(img_npy)
-                    self.predict(msg[1], msg[2], image)
+                    self.predict(msg[1], msg[2], image, nodraw)
                 elif msg[0] == 'stop_server':
                     self.is_running = False
                     self.responce(msg[1], {"success": f"Successful stop server."})
@@ -147,8 +161,9 @@ class Server(object):
         self.redis_cli.rpush(reskey, json.dumps(result, default=self._json_enc))
         
 
-    def deploy(self, reskey:str, name:str, model_img_width: int, model_img_height: int, predict_type:str,
-               model_file:str, model_bin:bytes, model_conf_file:str, model_conf_bin:bytes, custom_predict_py: bytes):
+    def deploy(self, reskey:str, name:str, model_img_width:int, model_img_height:int, predict_type:str,
+               model_file:str, model_bin:bytes, model_conf_file:List[str], model_conf_bin:List[bytes], custom_predict_py:bytes,
+               label_txt:bytes, color_txt:bytes, overwrite:bool):
         """
         モデルをデプロイする
 
@@ -160,9 +175,12 @@ class Server(object):
             predict_type (str): 推論方法のタイプ
             model_file (str): モデルのファイル名
             model_bin (bytes): モデルファイル
-            model_conf_file (str): モデル設定のファイル名
-            model_conf_bin (bytes): モデル設定ファイル
+            model_conf_file (List[str]): モデル設定のファイル名
+            model_conf_bin (List[bytes]): モデル設定ファイル
             custom_predict_py (bytes): 推論のPythonスクリプト
+            label_txt (bytes): ラベルファイル
+            color_txt (bytes): 色設定ファイル
+            overwrite (bool): 上書きするかどうか
         """
         if name is None or name == "":
             self.logger.warn(f"Name is empty.")
@@ -182,11 +200,11 @@ class Server(object):
             self.logger.warn(f"{name} has already started a session.")
             self.responce(reskey, {"warn": f"{name} has already started a session."})
             return
-        if deploy_dir.exists():
+        if not overwrite and deploy_dir.exists():
             self.logger.warn(f"Could not be deployed. '{deploy_dir}' already exists")
             self.responce(reskey, {"warn": f"Could not be deployed. '{deploy_dir}' already exists"})
             return
-        
+
         if predict_type not in common.BASE_MODELS:
             self.logger.warn(f"Incorrect predict_type. '{predict_type}'")
             self.responce(reskey, {"warn": f"Incorrect predict_type. '{predict_type}'"})
@@ -210,19 +228,35 @@ class Server(object):
             self.responce(reskey, {"warn": f"model_conf_file is None but model_conf_bin is not None."})
             return
         if model_conf_file is not None:
-            model_conf_file = deploy_dir / model_conf_file
-            with open(model_conf_file, "wb") as f:
-                f.write(model_conf_bin)
-                self.logger.info(f"Save {model_conf_file} to {str(deploy_dir)}")
+            model_conf_file = [deploy_dir / cf for cf in model_conf_file]
+            for i, cf in enumerate(model_conf_file):
+                with open(cf, "wb") as f:
+                    f.write(model_conf_bin[i])
+                    self.logger.info(f"Save {cf} to {str(deploy_dir)}")
         custom_predict_file = None
         if custom_predict_py is not None:
             custom_predict_file = deploy_dir / "custom_predict.py"
             with open(custom_predict_file, "wb") as f:
                 f.write(custom_predict_py)
                 self.logger.info(f"Save custom_predict.py to {str(deploy_dir)}")
+        if label_txt is not None:
+            label_file = deploy_dir / 'label.txt'
+            with open(label_file, "wb") as f:
+                f.write(label_txt)
+                self.logger.info(f"Save {label_file} to {str(deploy_dir)}")
+        else:
+            label_file = None
+        if color_txt is not None:
+            color_file = deploy_dir / 'color.txt'
+            with open(color_file, "wb") as f:
+                f.write(color_txt)
+                self.logger.info(f"Save {color_file} to {str(deploy_dir)}")
+        else:
+            color_file = None
         with open(deploy_dir / "conf.json", "w") as f:
             conf = dict(model_img_width=model_img_width, model_img_height=model_img_height, predict_type=predict_type,
-                        model_file=model_file, model_conf_file=model_conf_file, custom_predict_file=(custom_predict_file if custom_predict_file is not None else None))
+                        model_file=model_file, model_conf_file=model_conf_file, custom_predict_file=(custom_predict_file if custom_predict_file is not None else None),
+                        label_file=label_file, color_file=color_file)
             json.dump(conf, f, default=common.default_json_enc)
             self.logger.info(f"Save conf.json to {str(deploy_dir)}")
 
@@ -257,11 +291,14 @@ class Server(object):
             with open(conf_path, "r") as cf:
                 conf = json.load(cf)
                 model_file = Path(conf["model_file"])
-                model_conf_file = Path(conf["model_conf_file"]).name if "model_conf_file" in conf and conf["model_conf_file"] is not None else None
-                custom_predict_file = Path(conf["custom_predict_file"]) if conf["custom_predict_file"] is not None else None
+                model_conf_file = 'exists' if "model_conf_file" in conf and conf["model_conf_file"] and Path(conf["model_conf_file"]).exists() is not None else None
+                custom_predict_file = 'exists' if "custom_predict_file" in conf and conf["custom_predict_file"] is not None and Path(conf["custom_predict_file"]).exists() else None
+                label_file = 'exists' if "label_file" in conf and conf["label_file"] is not None and Path(conf["label_file"]).exists() else None
+                color_file = 'exists' if "color_file" in conf and conf["color_file"] is not None and Path(conf["color_file"]).exists() else None
                 row = dict(name=dir.name,
                            input=(conf["model_img_width"], conf["model_img_height"]), model_file=model_file.name, model_conf_file=model_conf_file,
-                           predict_type=conf["predict_type"], custom_predict=(custom_predict_file.exists() if custom_predict_file is not None else False),
+                           predict_type=conf["predict_type"], custom_predict=custom_predict_file,
+                           label_file=label_file, color_file=color_file,
                            session=dir.name in self.sessions,
                            mot=dir.name in self.sessions and self.sessions[dir.name]['tracker'] is not None)
                 deploy_list.append(row)
@@ -316,7 +353,10 @@ class Server(object):
         with open(conf_path, "r") as cf:
             conf = json.load(cf)
             model_path = Path(conf["model_file"])
-            model_conf_path = Path(conf["model_conf_file"]) if "model_conf_file" in conf and conf["model_conf_file"] is not None else None
+            if "model_conf_file" in conf and conf["model_conf_file"] is not None and len(conf["model_conf_file"]) > 0:
+                model_conf_path = Path(conf["model_conf_file"][0])
+            else:
+                model_conf_path = None
             if not model_path.exists():
                 self.logger.warn(f"Model path {str(model_path)} does not exist")
                 self.responce(reskey, {"warn": f"Model path {str(model_path)} does not exist"})
@@ -334,14 +374,35 @@ class Server(object):
                 predict_obj = common.load_custom_predict(custom_predict_py)
             else:
                 predict_obj = common.load_predict(conf["predict_type"])
-
+            if "label_file" in conf and conf["label_file"] is not None:
+                label_file = Path(conf["label_file"])
+                if not label_file.exists():
+                    self.logger.warn(f"label_file path {str(label_file)} does not exist")
+                    self.responce(reskey, {"warn": f"label_file path {str(label_file)} does not exist"})
+                    return
+                with open(label_file, "r") as f:
+                    labels = f.read().splitlines()
+            else:
+                labels = None
+            if "color_file" in conf and conf["color_file"] is not None:
+                color_file = Path(conf["color_file"])
+                if not color_file.exists():
+                    self.logger.warn(f"color_file path {str(color_file)} does not exist")
+                    self.responce(reskey, {"warn": f"color_file path {str(color_file)} does not exist"})
+                    return
+                with open(color_file, "r") as f:
+                    colors = f.read().splitlines()
+            else:
+                colors = None
             try:
-                session = predict_obj.create_session(model_path, model_conf_path, model_provider, gpu_id=gpuid)
+                session = predict_obj.create_session(self.logger, model_path, model_conf_path, model_provider, gpu_id=gpuid)
                 self.sessions[name] = dict(
                     session=session,
                     model_img_width=conf["model_img_width"],
                     model_img_height=conf["model_img_height"],
                     predict_obj=predict_obj,
+                    labels=labels,
+                    colors=colors,
                     tracker=MultiObjectTracker(dt=0.1) if use_track else None
                 )
             except Exception as e:
@@ -375,7 +436,7 @@ class Server(object):
         self.responce(reskey, {"success": f"Successful stop of {name} session."})
         return
 
-    def predict(self, reskey:str, name:str, image: Image):
+    def predict(self, reskey:str, name:str, image: Image, nodraw:bool):
         """
         クライアントから送られてきた画像の推論を行う。
 
@@ -383,6 +444,7 @@ class Server(object):
             reskey (str): レスポンスキー
             name (dict): モデル名
             img_npy (np.array): 推論する画像データ
+            nodraw (bool): 描画フラグ
         """
         if name is None or name == "":
             self.logger.warn(f"Name is empty.")
@@ -396,19 +458,23 @@ class Server(object):
             self.logger.warn(f"{name} has not yet started a session.")
             self.responce(reskey, {"warn": f"{name} has not yet started a session."})
             return
+        if nodraw is None:
+            nodraw = False
         session = self.sessions[name]
         try:
             # 推論を実行
             predict_obj = session['predict_obj']
-            outputs, output_image = predict_obj.predict(session['session'], session['model_img_width'], session['model_img_height'], image, labels=None, colors=None)
+            outputs, output_image = predict_obj.predict(session['session'], session['model_img_width'], session['model_img_height'], image,
+                                                        labels=session['labels'], colors=session['colors'], nodraw=nodraw)
+            if session['tracker'] is not None:
+                if 'output_boxes' in outputs and 'output_scores' in outputs and 'output_classes' in outputs:
+                    detections = [Detection(box, score, cls) for box, score, cls in zip(outputs['output_boxes'], outputs['output_scores'], outputs['output_classes'])]
+                    session['tracker'].step(detections=detections)
+                    tracks = session['tracker'].active_tracks()
+                    outputs['output_tracks'] = [t.id for t in tracks]
+                    if image is not None:
+                        image = common.draw_boxes(image, outputs['output_boxes'], outputs['output_scores'], outputs['output_classes'], ids=outputs['output_tracks'])
             if output_image is not None:
-                if session['tracker'] is not None:
-                    if 'output_boxes' in outputs and 'output_scores' in outputs and 'output_classes' in outputs:
-                        detections = [Detection(box, score, cls) for box, score, cls in zip(outputs['output_boxes'], outputs['output_scores'], outputs['output_classes'])]
-                        session['tracker'].step(detections=detections)
-                        tracks = session['tracker'].active_tracks()
-                        outputs['output_tracks'] = [t.id for t in tracks]
-                        output_image = common.draw_boxes(output_image, outputs['output_boxes'], outputs['output_scores'], outputs['output_classes'], ids=outputs['output_tracks'])
                 output_image_npy = common.img2npy(output_image)
                 output_image_b64 = common.npy2b64str(output_image_npy)
                 self.responce(reskey, {"success": outputs, "output_image": output_image_b64, "output_image_shape": output_image_npy.shape})

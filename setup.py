@@ -26,6 +26,7 @@ PACKAGES = [
     'iinfer',
     'iinfer.app',
     'iinfer.app.predicts',
+    'iinfer.app.postprocesses',
     'iinfer.docker'
 ]
 KEYWORDS = 'onnxruntime predict inference image ai model'
@@ -43,7 +44,9 @@ with open('README.md', 'r', encoding='utf-8') as fp:
     readme = fp.read()
 LONG_DESCRIPTION = readme
 LONG_DESCRIPTION_CONTENT_TYPE = 'text/markdown'
-RESORCE_TEXT_FILES = dict(iinfer=['config.yml', 'logconf.yml', 'docker/Dockerfile', 'docker/docker-compose.yml'])
+RESORCE_TEXT_FILES = dict(iinfer=['config.yml', 'logconf.yml',
+                                  'docker/Dockerfile', 'docker/docker-compose.yml',
+                                  'datasets/label_coco.txt', 'datasets/label_voc.txt'])
 
 setup(
     name=NAME,

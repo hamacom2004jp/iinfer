@@ -1,3 +1,4 @@
+from iinfer.app import predict
 from io import BytesIO
 from pathlib import Path
 from PIL import Image, ImageDraw
@@ -140,7 +141,7 @@ def random_string(size:int=16):
     """
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=size))
 
-def print_format(data:dict, format:bool, tm:float):
+def print_format(data:dict, format:bool, tm:float, stdout:bool=True, tablefmt:str='github'):
     """
     データを指定されたフォーマットで出力します。
 
@@ -148,61 +149,33 @@ def print_format(data:dict, format:bool, tm:float):
         data (dict): 出力するデータ
         format (bool): フォーマットするかどうか
         tm (float): 処理時間
+    Returns:
+        str: 生成された文字列
     """
+    txt = ''
     if format:
         if 'success' in data and type(data['success']) == list:
-            print(tabulate(data['success'], headers='keys'))
+            txt = tabulate(data['success'], headers='keys', tablefmt=tablefmt)
         elif 'success' in data and type(data['success']) == dict:
-            print(tabulate([data['success']], headers='keys'))
+            txt = tabulate([data['success']], headers='keys', tablefmt=tablefmt)
         elif type(data) == list:
-            print(tabulate(data, headers='keys'))
+            txt = tabulate(data, headers='keys', tablefmt=tablefmt)
         else:
-            print(tabulate([data], headers='keys'))
-        print(f"{time.time() - tm:.03f} seconds.")
+            txt = tabulate([data], headers='keys', tablefmt=tablefmt)
+        if stdout:
+            print(txt)
+            print(f"{time.time() - tm:.03f} seconds.")
     else:
-        print(data)
-
-class Predoct(object):
-    def create_session(self, model_path:Path, model_conf_path:Path, model_provider:str, gpu_id:int=None):
-        """
-        推論セッションを作成する関数です。
-        startコマンド実行時に呼び出されます。
-        この関数内でAIモデルのロードが行われ、推論準備を完了するようにしてください。
-        戻り値の推論セッションの型は問いません。
-
-        Args:
-            model_path (Path): モデルファイルのパス
-            model_conf_path (Path): モデル設定ファイルのパス
-            gpu_id (int, optional): GPU ID. Defaults to None.
-
-        Returns:
-            推論セッション
-        """
-        raise NotImplementedError()
-
-    def predict(self, session, img_width:int, img_height:int, image:Image, labels:List[str]=None, colors:List[Tuple[int]]=None):
-        """
-        予測を行う関数です。
-        predictコマンドやcaptureコマンド実行時に呼び出されます。
-        引数のimageはRGBですので、戻り値の出力画像もRGBにしてください。
-        戻り値の推論結果のdictは、通常推論結果項目ごとに値(list)を設定します。
-        例）Image Classification（EfficientNet_Lite4）の場合
-        return dict(output_scores=output_scores, output_classes=output_classes), image_obj
-        例）Object Detection（YoloX）の場合
-        return dict(output_boxes=final_boxes, output_scores=final_scores, output_classes=final_cls_inds), output_image
-
-        Args:
-            session: 推論セッション
-            img_width (int): モデルのINPUTサイズ（画像の幅）
-            img_height (int): モデルのINPUTサイズ（画像の高さ）
-            image (Image): 入力画像（RGB配列であること）
-            labels (List[str], optional): クラスラベルのリスト. Defaults to None.
-            colors (List[Tuple[int]], optional): ボックスの色のリスト. Defaults to None.
-
-        Returns:
-            Tuple[Dict[str, Any], Image]: 予測結果と出力画像(RGB)のタプル
-        """
-        raise NotImplementedError()
+        try:
+            if type(data) == dict:
+                txt = json.dumps(data, ensure_ascii=False)
+            else:
+                txt = data
+        except:
+            txt = data
+        if stdout:
+            print(txt)
+    return txt
 
 def load_custom_predict(custom_predict_py):
     """
@@ -218,7 +191,7 @@ def load_custom_predict(custom_predict_py):
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     for name, obj in inspect.getmembers(module):
-        if inspect.isclass(obj) and issubclass(obj, Predoct):
+        if inspect.isclass(obj) and issubclass(obj, predict.Predict):
             return obj()
 
 def load_predict(predict_type:str):
@@ -236,7 +209,7 @@ def load_predict(predict_type:str):
     """
     module = importlib.import_module("iinfer.app.predicts." + predict_type)
     for name, obj in inspect.getmembers(module):
-        if inspect.isclass(obj) and issubclass(obj, Predoct):
+        if inspect.isclass(obj) and issubclass(obj, predict.Predict):
             return obj()
 
 def get_module_list(package_name):
@@ -341,7 +314,7 @@ def npy2b64str(npy:np.ndarray) -> str:
     """
     return base64.b64encode(npy.tobytes()).decode('utf-8')
 
-def npy2img(npy:np.ndarray) -> Image:
+def npy2img(npy:np.ndarray) -> Image.Image:
     """
     ndarrayをPILのImageオブジェクトに変換します。
 
@@ -349,7 +322,7 @@ def npy2img(npy:np.ndarray) -> Image:
         npy (np.ndarray): ndarray
 
     Returns:
-        Image: PILのImageオブジェクト
+        Image.Image: PILのImageオブジェクト
     """
     return Image.fromarray(npy)
 
@@ -381,7 +354,7 @@ def b64str2npy(b64str:str, shape:Tuple=None, dtype:str='uint8') -> np.ndarray:
         return np.frombuffer(base64.b64decode(b64str), dtype=dtype)
     return np.frombuffer(base64.b64decode(b64str), dtype=dtype).reshape(shape)
 
-def npy2imgfile(npy, output_image_file:Path=None, image_type:str='jpg') -> None:
+def npy2imgfile(npy, output_image_file:Path=None, image_type:str='jpeg') -> bytes:
     """
     ndarrayを画像bytesに変換しoutput_image_fileに保存します。
     output_image_fileが省略された場合は保存されません
@@ -438,12 +411,12 @@ def imgfile2npy(fp, dtype:str='uint8') -> np.ndarray:
     img = Image.open(fp)
     return np.array(img, dtype=dtype)
 
-def img2npy(image:Image, dtype:str='uint8') -> np.ndarray:
+def img2npy(image:Image.Image, dtype:str='uint8') -> np.ndarray:
     """
     PILのImageオブジェクトをndarrayに変換します。
 
     Args:
-        image (Image): PILのImageオブジェクト
+        image (Image.Image): PILのImageオブジェクト
         dtype (str, optional): ndarrayのデータ型. Defaults to 'uint8'.
 
     Returns:
@@ -451,12 +424,12 @@ def img2npy(image:Image, dtype:str='uint8') -> np.ndarray:
     """
     return np.array(image, dtype=dtype)
 
-def img2byte(image:Image, format:str='JPEG') -> bytes:
+def img2byte(image:Image.Image, format:str='jpeg') -> bytes:
     """
     画像をバイト列に変換します。
 
     Args:
-        image (Image): PILのImageオブジェクト
+        image (Image.Image): PILのImageオブジェクト
 
     Returns:
         bytes: 画像のバイト列
@@ -465,39 +438,68 @@ def img2byte(image:Image, format:str='JPEG') -> bytes:
         image.save(buffer, format=format)
         return buffer.getvalue()
 
-def draw_boxes(image:Image, boxes:List[List[float]], scores:List[float], classes:List[int], ids:List[str] = None, labels:List[str] = None, colors:List[Tuple[int]] = None):
+def str2b64str(s:str) -> str:
+    """
+    文字列をBase64エンコードします。
+
+    Args:
+        s (str): 文字列
+
+    Returns:
+        str: Base64エンコードされた文字列
+    """
+    return base64.b64encode(s.encode()).decode('utf-8')
+
+def b64str2str(b64str:str) -> str:
+    """
+    Base64エンコードされた文字列をデコードします。
+
+    Args:
+        b64str (str): Base64エンコードされた文字列
+
+    Returns:
+        str: デコードされた文字列
+    """
+    return base64.b64decode(b64str).decode('utf-8')
+
+def draw_boxes(image:Image.Image, boxes:List[List[float]], scores:List[float], classes:List[int], ids:List[str]=None, labels:List[str]=None, colors:List[Tuple[int]]=None, nodraw:bool=False) -> Tuple[Image.Image, List[str]]:
     """
     画像にバウンディングボックスを描画します。
 
     Args:
-        image (Image): 描画する画像
+        image (Image.Image): 描画する画像
         boxes (List[List[float]]): バウンディングボックスの座標リスト
         scores (List[float]): 各バウンディングボックスのスコアリスト
         classes (List[int]): 各バウンディングボックスのクラスリスト
+        ids (List[str]): 各バウンディングボックスのIDリスト
         labels (List[str], optional): クラスのラベルリスト. Defaults to None.
         colors (List[Tuple[int]], optional): クラスごとの色のリスト. Defaults to None.
+        nodraw (bool, optional): 描画しない場合はTrue. Defaults to False.
 
     Returns:
         Image: バウンディングボックスが描画された画像
+        List[str]: 各バウンディングボックスのラベルリスト
     """
     draw = ImageDraw.Draw(image)
     ids = ids if ids is not None else [None] * len(boxes)
+    output_labels = []
     for box, score, cl, id in zip(boxes, scores, classes, ids):
         y1, x1, y2, x2 = box
         x1 = max(0, np.floor(x1 + 0.5).astype(int))
         y1 = max(0, np.floor(y1 + 0.5).astype(int))
         x2 = min(image.width, np.floor(x2 + 0.5).astype(int))
         y2 = min(image.height, np.floor(y2 + 0.5).astype(int))
-        color = colors[cl] if colors is not None and cl in colors else make_color(str(int(cl)))
+        color = colors[int(cl)] if colors is not None and cl in colors else make_color(str(int(cl)))
         
-        draw.rectangle(((x1, y1), (x2, y2)), outline=color)
+        label = labels[int(cl)] if labels is not None else str(id) if id is not None else None
+        if not nodraw:
+            draw.rectangle(((x1, y1), (x2, y2)), outline=color)
+            if label is not None:
+                draw.rectangle(((x1, y1), (x2, y1+10)), outline=color, fill=color)
+                draw.text((x1, y1), label, tuple([int(255-c) for c in color]))
+        output_labels.append(label)
 
-        label = labels[cl] if labels is not None else str(id) if id is not None else None
-        if label is not None:
-            draw.rectangle(((x1, y1), (x2, y1+10)), outline=color, fill=color)
-            draw.text((x1, y1), label, fill='white')
-    
-    return image
+    return image, output_labels
 
 def make_color(idstr:str) -> Tuple[int]:
     if len(idstr) < 3:

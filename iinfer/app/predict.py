@@ -1,18 +1,10 @@
 from pathlib import Path
 from PIL import Image
-from iinfer.app.predicts import onnx_det_YoloX
-from typing import List, Tuple
+from typing import List, Tuple, Dict, Any
 import logging
 
-
-SITE = 'https://github.com/Megvii-BaseDetection/YOLOX/'
-IMAGE_WIDTH = 416
-IMAGE_HEIGHT = 416
-USE_MODEL_CONF = False
-
-class OnnxdetYoloXLite(onnx_det_YoloX.OnnxDetYoloX):
-
-    def create_session(self, logger:logging.Logger, model_path:Path, model_conf_path:Path, model_provider:str, gpu_id:int=None):
+class Predict(object):
+    def create_session(self, logger:logging.Logger, model_path:Path, model_conf_path:Path, model_provider:str, gpu_id:int=None) -> Any:
         """
         推論セッションを作成する関数です。
         startコマンド実行時に呼び出されます。
@@ -28,9 +20,9 @@ class OnnxdetYoloXLite(onnx_det_YoloX.OnnxDetYoloX):
         Returns:
             推論セッション
         """
-        return super().create_session(logger, model_path, model_conf_path, model_provider, gpu_id)
+        raise NotImplementedError()
 
-    def predict(self, session, img_width:int, img_height:int, image:Image, labels:List[str]=None, colors:List[Tuple[int]]=None, nodraw:bool=False):
+    def predict(self, session, img_width:int, img_height:int, image:Image, labels:List[str]=None, colors:List[Tuple[int]]=None, nodraw:bool=False) -> Tuple[Dict[str, Any], Image.Image]:
         """
         予測を行う関数です。
         predictコマンドやcaptureコマンド実行時に呼び出されます。
@@ -51,6 +43,7 @@ class OnnxdetYoloXLite(onnx_det_YoloX.OnnxDetYoloX):
             nodraw (bool, optional): 描画フラグ. Defaults to False.
 
         Returns:
-            Tuple[Dict[str, Any], Image]: 予測結果と出力画像のタプル
+            Tuple[Dict[str, Any], Image]: 予測結果と出力画像(RGB)のタプル
         """
-        return super().predict(session, img_width, img_height, image, labels=labels, colors=colors, nodraw=nodraw)
+        raise NotImplementedError()
+    

@@ -1,7 +1,8 @@
 from pathlib import Path
 from PIL import Image
-from iinfer.app import common
+from iinfer.app import common, predict
 from typing import List, Tuple
+import logging
 import numpy as np
 
 
@@ -10,15 +11,16 @@ IMAGE_WIDTH = 416
 IMAGE_HEIGHT = 416
 USE_MODEL_CONF = False
 
-class OnnxDetTinyYoloV3(common.Predoct):
-    def create_session(self, model_path:Path, model_conf_path:Path, model_provider:str, gpu_id:int=None):
+class OnnxDetTinyYoloV3(predict.Predict):
+    def create_session(self, logger:logging.Logger, model_path:Path, model_conf_path:Path, model_provider:str, gpu_id:int=None):
         """
         推論セッションを作成する関数です。
         startコマンド実行時に呼び出されます。
-        この関数内でAIモデルのロードが行われ、推論準備を完了するようにしてください。
+        この関数内でAIモデルのロードを行い、推論準備を完了するようにしてください。
         戻り値の推論セッションの型は問いません。
 
         Args:
+            logger (logging.Logger): ロガー
             model_path (Path): モデルファイルのパス
             model_conf_path (Path): モデル設定ファイルのパス
             gpu_id (int, optional): GPU ID. Defaults to None.
@@ -33,7 +35,7 @@ class OnnxDetTinyYoloV3(common.Predoct):
             session = rt.InferenceSession(model_path, providers=[model_provider], providers_options=[{'device_id': str(gpu_id)}])
         return session
 
-    def predict(self, session, img_width:int, img_height:int, image:Image, labels:List[str]=None, colors:List[Tuple[int]]=None):
+    def predict(self, session, img_width:int, img_height:int, image:Image, labels:List[str]=None, colors:List[Tuple[int]]=None, nodraw:bool=False):
         """
         予測を行う関数です。
         predictコマンドやcaptureコマンド実行時に呼び出されます。
@@ -51,6 +53,7 @@ class OnnxDetTinyYoloV3(common.Predoct):
             image (Image): 入力画像（RGB配列であること）
             labels (List[str], optional): クラスラベルのリスト. Defaults to None.
             colors (List[Tuple[int]], optional): ボックスの色のリスト. Defaults to None.
+            nodraw (bool, optional): 描画フラグ. Defaults to False.
 
         Returns:
             Tuple[Dict[str, Any], Image]: 予測結果と出力画像(RGB)のタプル
@@ -77,9 +80,9 @@ class OnnxDetTinyYoloV3(common.Predoct):
             idx_1 = (idx_[0], idx_[2])
             out_boxes.append(output_boxes[idx_1])
 
-        output_image = common.draw_boxes(image_obj, out_boxes, out_scores, out_classes, labels=labels, colors=colors)
+        output_image, output_labels = common.draw_boxes(image_obj, out_boxes, out_scores, out_classes, labels=labels, colors=colors, nodraw=nodraw)
 
-        return dict(output_boxes=out_boxes, output_scores=out_scores, output_classes=out_classes), output_image
+        return dict(output_boxes=out_boxes, output_scores=out_scores, output_classes=out_classes, output_labels=output_labels), output_image
 
     def resize_img(self, image:Image, to_w, to_h):
         '''resize image with unchanged aspect ratio using padding'''
