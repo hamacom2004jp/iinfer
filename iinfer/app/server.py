@@ -291,7 +291,9 @@ class Server(object):
             with open(conf_path, "r") as cf:
                 conf = json.load(cf)
                 model_file = Path(conf["model_file"])
-                model_conf_file = 'exists' if "model_conf_file" in conf and conf["model_conf_file"] and Path(conf["model_conf_file"]).exists() is not None else None
+                model_conf_file = None
+                if "model_conf_file" in conf and conf["model_conf_file"] is not None and len(conf["model_conf_file"]) > 0 and Path(conf["model_conf_file"][0]).exists():
+                    model_conf_file = 'exists'
                 custom_predict_file = 'exists' if "custom_predict_file" in conf and conf["custom_predict_file"] is not None and Path(conf["custom_predict_file"]).exists() else None
                 label_file = 'exists' if "label_file" in conf and conf["label_file"] is not None and Path(conf["label_file"]).exists() else None
                 color_file = 'exists' if "color_file" in conf and conf["color_file"] is not None and Path(conf["color_file"]).exists() else None

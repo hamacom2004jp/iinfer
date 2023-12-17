@@ -7,4 +7,5 @@ redis
 requests
 tabulate
 twine
+six
 wheel

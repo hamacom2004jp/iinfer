@@ -163,8 +163,11 @@ def print_format(data:dict, format:bool, tm:float, stdout:bool=True, tablefmt:st
         else:
             txt = tabulate([data], headers='keys', tablefmt=tablefmt)
         if stdout:
-            print(txt)
-            print(f"{time.time() - tm:.03f} seconds.")
+            try:
+                print(txt)
+                print(f"{time.time() - tm:.03f} seconds.")
+            except BrokenPipeError:
+                pass
     else:
         try:
             if type(data) == dict:
@@ -174,7 +177,10 @@ def print_format(data:dict, format:bool, tm:float, stdout:bool=True, tablefmt:st
         except:
             txt = data
         if stdout:
-            print(txt)
+            try:
+                print(txt)
+            except BrokenPipeError:
+                pass
     return txt
 
 def load_custom_predict(custom_predict_py):
