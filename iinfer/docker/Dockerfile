@@ -5,7 +5,7 @@ ARG MKUSER
 RUN groupadd ${MKUSER} && \
     useradd -m -g ${MKUSER} -s /usr/bin/bash ${MKUSER}
 RUN apt-get update && \
-    apt-get install -y libgl1-mesa-dev libglib2.0-0
+    apt-get install -y libgl1-mesa-dev libglib2.0-0 git
 RUN pip install --upgrade pip && \
     pip install iinfer
 RUN iinfer -m install -c mmdet && \

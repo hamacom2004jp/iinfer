@@ -1,3 +1,4 @@
+from iinfer import version
 from iinfer.app import common
 from iinfer.app import client
 from iinfer.app import install
@@ -20,7 +21,8 @@ def main():
     コマンドライン引数を処理し、サーバーまたはクライアントを起動し、コマンドを実行する。
     """
     HOME_DIR = os.path.expanduser("~")
-    parser = argparse.ArgumentParser(prog='python -m iinfer', description='This application generates modules to set up the application system.')
+    parser = argparse.ArgumentParser(prog='iinfer', description='This application generates modules to set up the application system.')
+    parser.add_argument('--version', help='show version infomation.', action='store_true')
     parser.add_argument('--host', help='Setting the redis server host.', default=os.environ.get('REDIS_HOST', 'localhost'))
     parser.add_argument('--port', help='Setting the redis server port.', type=int, default=int(os.environ.get('REDIS_PORT', '6379')))
     parser.add_argument('--password', help='Setting the redis server password.', default=os.environ.get('REDIS_PASSWORD', 'password'))
@@ -136,7 +138,14 @@ def main():
             exit(1)
         common.saveopt(opt, args.useopt)
 
-    if mode == 'server':
+    if args.version:
+        common.print_format(f'iinfer (Visual Prediction Application) {version.__version__}\n'
+                        f'Copyright (c) 2023 hamacom2004jp\n'
+                        f'License: MIT License <https://opensource.org/license/mit/>\n'
+                        f'This is free software: you are free to change and redistribute it.\n'
+                        f'There is NO WARRANTY, to the extent permitted by law.', False, tm)
+        exit(0)
+    elif mode == 'server':
         logger, _ = common.load_config(mode)
         if cmd == 'start':
             if data is None:
@@ -148,6 +157,8 @@ def main():
             cl = client.Client(logger, redis_host=host, redis_port=port, redis_password=password)
             ret = cl.stop_server(timeout=timeout)
             common.print_format(ret, format, tm)
+            if 'success' not in ret:
+                exit(1)
         else:
             common.print_format({"warn":f"Unkown command."}, format, tm)
 
@@ -164,22 +175,32 @@ def main():
             ret = cl.deploy(name, model_img_width, model_img_height, model_file, model_conf_file, predict_type, custom_predict_py,
                             label_file=label_file, color_file=color_file, overwrite=overwrite, timeout=timeout)
             common.print_format(ret, format, tm)
+            if 'success' not in ret:
+                exit(1)
 
         elif cmd == 'deploy_list':
             ret = cl.deploy_list(timeout=timeout)
             common.print_format(ret, format, tm)
+            if 'success' not in ret:
+                exit(1)
 
         elif cmd == 'undeploy':
             ret = cl.undeploy(name, timeout=timeout)
             common.print_format(ret, format, tm)
+            if 'success' not in ret:
+                exit(1)
 
         elif cmd == 'start':
             ret = cl.start(name, model_provider=model_provider, use_track=use_track, gpuid=gpuid, timeout=timeout)
             common.print_format(ret, format, tm)
+            if 'success' not in ret:
+                exit(1)
 
         elif cmd == 'stop':
             ret = cl.stop(name, timeout=timeout)
             common.print_format(ret, format, tm)
+            if 'success' not in ret:
+                exit(1)
 
         elif cmd == 'predict':
             if input_file is not None:
@@ -204,6 +225,7 @@ def main():
                     tm = time.time()
             else:
                 common.print_format({"warn":f"Image file or stdin is empty."}, format, tm)
+                exit(1)
 
         elif cmd == 'predict_type_list':
             type_list = [dict(predict_type=key, site=val['site'], image_width=val['image_width'], image_height=val['image_height'], use_model_conf=val['use_model_conf']) for key,val in common.BASE_MODELS.items()]
@@ -231,6 +253,7 @@ def main():
 
         else:
             common.print_format({"warn":f"Unkown command."}, format, tm)
+            exit(1)
 
     elif mode == 'postprocess':
         logger, _ = common.load_config(mode)
@@ -251,6 +274,7 @@ def main():
                 _to_proc(sys.stdin, proc, json_connectstr, img_connectstr, timeout, format, tm)
             else:
                 common.print_format({"warn":f"Image file or stdin is empty."}, format, tm)
+                exit(1)
         elif cmd == 'csv':
             proc = csv.Csv(logger)
             if input_file is not None:
@@ -260,6 +284,7 @@ def main():
                 _to_proc(sys.stdin, proc, json_connectstr, img_connectstr, timeout, False, tm)
             else:
                 common.print_format({"warn":f"Image file or stdin is empty."}, format, tm)
+                exit(1)
         elif cmd == 'httpreq':
             proc = httpreq.Httpreq(logger, fileup_name=fileup_name)
             if input_file is not None:
@@ -269,8 +294,10 @@ def main():
                 _to_proc(sys.stdin, proc, json_connectstr, img_connectstr, timeout, format, tm)
             else:
                 common.print_format({"warn":f"Image file or stdin is empty."}, format, tm)
+                exit(1)
         else:
             common.print_format({"warn":f"Unkown command."}, format, tm)
+            exit(1)
 
     elif mode == 'redis':
         logger, _ = common.load_config(mode)
@@ -285,6 +312,7 @@ def main():
 
         else:
             common.print_format({"warn":f"Unkown command."}, format, tm)
+            exit(1)
 
     elif mode == 'install':
         logger, _ = common.load_config(mode)
@@ -292,14 +320,20 @@ def main():
         if cmd == 'redis':
             ret = inst.redis()
             common.print_format(ret, format, tm)
+            if 'success' not in ret:
+                exit(1)
 
         elif cmd == 'server':
             ret = inst.server()
             common.print_format(ret, format, tm)
+            if 'success' not in ret:
+                exit(1)
 
         elif cmd == 'onnx':
             ret = inst.onnx()
             common.print_format(ret, format, tm)
+            if 'success' not in ret:
+                exit(1)
 
         elif cmd == 'mmdet':
             if data is None:
@@ -307,10 +341,14 @@ def main():
                 exit(1)
             ret = inst.mmdet(data)
             common.print_format(ret, format, tm)
+            if 'success' not in ret:
+                exit(1)
 
         elif cmd == 'mmcls':
             ret = inst.mmcls()
             common.print_format(ret, format, tm)
+            if 'success' not in ret:
+                exit(1)
 
         elif cmd == 'mmpretrain':
             if data is None:
@@ -318,6 +356,8 @@ def main():
                 exit(1)
             ret = inst.mmpretrain(Path(data))
             common.print_format(ret, format, tm)
+            if 'success' not in ret:
+                exit(1)
 
     else:
         common.print_format({"warn":f"Unkown mode."}, format, tm)
