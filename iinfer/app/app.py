@@ -339,7 +339,7 @@ def main():
             if data is None:
                 common.print_format({"warn":f"Please specify the --data option."}, format, tm)
                 exit(1)
-            ret = inst.mmdet(data)
+            ret = inst.mmdet(Path(data))
             common.print_format(ret, format, tm)
             if 'success' not in ret:
                 exit(1)
@@ -361,4 +361,6 @@ def main():
 
     else:
         common.print_format({"warn":f"Unkown mode."}, format, tm)
+        exit(1)
 
+    exit(0)

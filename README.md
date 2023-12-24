@@ -36,7 +36,7 @@ iinfer -m redis -c docker_run
 iinfer -m server -c start -f
 
 # 画像AIモデルのデプロイ
-iinfer -m client -c deploy -n <任意のモデル名> --model_img_width <モデルのINPUTサイズ(横幅)> --model_img_width <モデルのINPUTサイズ(縦幅)> --model_onnx <モデルファイル> --predict_type <推論タイプ(後述)> --custom_predict_py <カスタム推論ファイル(後述)> -f
+iinfer -m client -c deploy -n <任意のモデル名> --model_img_width <モデルのINPUTサイズ(横幅)> --model_img_width <モデルのINPUTサイズ(縦幅)> --model_file <モデルファイル> --predict_type <推論タイプ(後述)> --custom_predict_py <カスタム推論ファイル(後述)> -f
 # predict_typeはモデルのAIタスクやアルゴリズムに合わせて指定する。指定可能なキーワードは"iinfer -m client -c predict_type_list"コマンド参照。
 
 # デプロイされている画像AIモデルの一覧
@@ -84,6 +84,7 @@ iinfer -m server -c stop -f
 |^|--wsl_name <ディストリビューション名>|Windowsの場合は〇|Windowsの場合はWSLのディストリビューションの名前を指定する|
 |^|--wsl_user <user名>|Windowsの場合は〇|Windowsの場合はWSL内のユーザー名を指定する|
 |server|-|-|`推論サーバー`のdockerイメージを`build`する。<br>このコマンドで作成されるdockerイメージには、上記`onnxruntime`と`mmdetection`が含まれる。<br>`build`が成功すると`docker-compose.yml`ファイルが生成される。<br>windows環境は未サポートなので、普通に`iinfer -m server`を使ってください。|
+|--data <データディレクトリ>|-|省略した時は`$HONE/.iinfer`を使用する|
 
 ### Redisサーバー起動 : `iinfer -m redis -c docker_run <Option>`
 |Option|Required|Description|
@@ -105,6 +106,7 @@ iinfer -m server -c stop -f
 |--host <IPアドレス又はホスト名>|-|Redisサーバーのサービスホストを指定する|
 |--port <ポート番号>|-|Redisサーバーのサービスポートを指定する|
 |--password <パスワード>|-|Redisサーバーのアクセスパスワード(任意)を指定する。省略時は`password`を使用する|
+|--data <データディレクトリ>|-|省略した時は`$HONE/.iinfer`を使用する|
 
 ### 推論サーバー停止 : `iinfer -m server -c stop <Option>`
 |Option|Required|Description|

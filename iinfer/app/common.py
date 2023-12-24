@@ -24,7 +24,7 @@ import yaml
 
 APP_ID = 'iinfer'
 
-def load_config(mode:str):
+def load_config(mode:str) -> Tuple[logging.Logger, dict]:
     """
     指定されたモードのロガーと設定を読み込みます。
 
@@ -41,12 +41,12 @@ def load_config(mode:str):
     config = yaml.safe_load(resource_string(APP_ID, "config.yml"))
     return logger, config
 
-def default_json_enc(o):
+def default_json_enc(o) -> str:
     if isinstance(o, Path):
         return str(o)
     raise TypeError(f"Type {type(o)} not serializable")
 
-def saveopt(opt:dict, opt_path:Path):
+def saveopt(opt:dict, opt_path:Path) -> None:
     """
     コマンドラインオプションをJSON形式でファイルに保存します。
 
@@ -59,7 +59,7 @@ def saveopt(opt:dict, opt_path:Path):
     with open(opt_path, 'w') as f:
         json.dump(opt, f, indent=4, default=default_json_enc)
 
-def loadopt(opt_path:str):
+def loadopt(opt_path:str) -> dict:
     """
     JSON形式のファイルからコマンドラインオプションを読み込みます。
 
@@ -74,16 +74,16 @@ def loadopt(opt_path:str):
     with open(opt_path) as f:
         return json.load(f)
 
-def getopt(opt:dict, key:str, preval=None, defval=None, withset=False):
+def getopt(opt:dict, key:str, preval=None, defval=None, withset=False) -> any:
     """
     コマンドラインオプションから指定されたキーの値を取得します。
 
     Args:
-        opt (dict): コマンドラインオプション
+        opt (dict): 読み込んだコマンドラインオプション
         key (str): キー
-        preval (Any, optional): 優先する値. Defaults to None.
+        preval (Any, optional): 引数で指定されたコマンドラインオプション. Defaults to None.
         defval (Any, optional): デフォルト値. Defaults to None.
-        withset (bool, optional): キーが存在しない場合にデフォルト値を設定するかどうか. Defaults to False.
+        withset (bool, optional): optに引数のコマンドラインオプションを設定するかどうか. Defaults to False.
 
     Returns:
         Any: 取得した値
@@ -183,15 +183,15 @@ def print_format(data:dict, format:bool, tm:float, stdout:bool=True, tablefmt:st
                 pass
     return txt
 
-def load_custom_predict(custom_predict_py):
+def load_custom_predict(custom_predict_py:Path) -> predict.Predict:
     """
     カスタム予測オブジェクトを読み込みます。
 
     Args:
-        custom_predict_py ([type]): カスタム予測オブジェクトのパス
+        custom_predict_py (Path): カスタム予測オブジェクトのパス
 
     Returns:
-        [type]: 予測オブジェクト
+        iinder.app.predict.Predict: 予測オブジェクト
     """
     spec = importlib.util.spec_from_file_location("predict", custom_predict_py)
     module = importlib.util.module_from_spec(spec)
@@ -200,7 +200,7 @@ def load_custom_predict(custom_predict_py):
         if inspect.isclass(obj) and issubclass(obj, predict.Predict):
             return obj()
 
-def load_predict(predict_type:str):
+def load_predict(predict_type:str) -> predict.Predict:
     """
     指定された予測オブジェクトを読み込みます。
 
@@ -218,7 +218,7 @@ def load_predict(predict_type:str):
         if inspect.isclass(obj) and issubclass(obj, predict.Predict):
             return obj()
 
-def get_module_list(package_name):
+def get_module_list(package_name) -> List[str]:
     package = __import__(package_name, fromlist=[''])
     return [name for _, name, _ in pkgutil.iter_modules(package.__path__)]
 
@@ -238,7 +238,7 @@ for mod in get_module_list('iinfer.app.predicts'):
         elif f == 'USE_MODEL_CONF': use_model_conf = getattr(m, f)
     BASE_MODELS[mod] = dict(site=site, image_width=width, image_height=height, use_model_conf=use_model_conf)
 
-def download_file(url:str, save_path:Path):
+def download_file(url:str, save_path:Path) -> Path:
     """
     ファイルをダウンロードします。
 
@@ -495,7 +495,7 @@ def draw_boxes(image:Image.Image, boxes:List[List[float]], scores:List[float], c
         y1 = max(0, np.floor(y1 + 0.5).astype(int))
         x2 = min(image.width, np.floor(x2 + 0.5).astype(int))
         y2 = min(image.height, np.floor(y2 + 0.5).astype(int))
-        color = colors[int(cl)] if colors is not None and cl in colors else make_color(str(int(cl)))
+        color = colors[int(cl)] if colors is not None and len(colors) > cl else make_color(str(int(cl)))
         
         label = labels[int(cl)] if labels is not None else str(id) if id is not None else None
         if not nodraw:
