@@ -268,7 +268,7 @@ def main():
         if cmd == 'det_filter':
             proc = det_filter.DetFilter(logger, score_th=score_th, width_th=width_th, height_th=height_th, classes=classes, labels=labels, nodraw=nodraw, output_preview=output_preview)
             if input_file is not None:
-                with open(input_file, 'r') as f:
+                with open(input_file, 'r', encoding="UTF-8") as f:
                     _to_proc(f, proc, json_connectstr, img_connectstr, timeout, format, tm)
             elif stdin:
                 _to_proc(sys.stdin, proc, json_connectstr, img_connectstr, timeout, format, tm)

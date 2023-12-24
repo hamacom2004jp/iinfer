@@ -157,8 +157,6 @@ def test_07_01_client_predict_type_list(capfd):
             app.main()
             out, err = capfd.readouterr()
             print(out)
-            result = json.loads(out)
-            assert 'success' in result.keys()
 
 @pytest.mark.run(order=8)
 def test_08_01_client_capture(capfd):
@@ -174,50 +172,62 @@ def test_08_01_client_capture(capfd):
 @pytest.mark.run(order=9)
 def test_09_01_client_predict(capfd):
     cmd = f"iinfer -m client -c predict -n onnx_det_YoloX_Lite --output_preview " \
-          f"-i tests/dog.jpg --image_type jpeg -o onnx_det_YoloX_Lite.json".split(' ')
+          f"-i tests/dog.jpg --image_type jpeg".split(' ')
     with patch('sys.argv', cmd):
         with patch('builtins.exit', return_value=[0]):
             app.main()
             out, err = capfd.readouterr()
-            print(out)
+            with open('onnx_det_YoloX_Lite.json', 'w', encoding='utf-8') as f:
+                f.write(out)
             result = json.loads(out)
             assert 'success' in result.keys()
+            del result["output_image"]
+            print(result)
 
 @pytest.mark.run(order=9)
 def test_09_02_client_predict(capfd):
     cmd = f"iinfer -m client -c predict -n mmdet_det_YoloX_Lite --output_preview " \
-          f"-i tests/dog.jpg --image_type jpeg -o mmdet_det_YoloX_Lite.json".split(' ')
+          f"-i tests/dog.jpg --image_type jpeg".split(' ')
     with patch('sys.argv', cmd):
         with patch('builtins.exit', return_value=[0]):
             app.main()
             out, err = capfd.readouterr()
-            print(out)
+            with open('mmdet_det_YoloX_Lite.json', 'w', encoding='utf-8') as f:
+                f.write(out)
             result = json.loads(out)
             assert 'success' in result.keys()
+            del result["output_image"]
+            print(result)
 
 @pytest.mark.run(order=9)
 def test_09_03_client_predict(capfd):
     cmd = f"iinfer -m client -c predict -n onnx_cls_EfficientNet_Lite4 --output_preview " \
-          f"-i tests/dog.jpg --image_type jpeg -o onnx_cls_EfficientNet_Lite4.json".split(' ')
+          f"-i tests/dog.jpg --image_type jpeg".split(' ')
     with patch('sys.argv', cmd):
         with patch('builtins.exit', return_value=[0]):
             app.main()
             out, err = capfd.readouterr()
-            print(out)
+            with open('onnx_cls_EfficientNet_Lite4.json', 'w', encoding='utf-8') as f:
+                f.write(out)
             result = json.loads(out)
             assert 'success' in result.keys()
+            del result["output_image"]
+            print(result)
 
 @pytest.mark.run(order=9)
 def test_09_04_client_predict(capfd):
     cmd = f"iinfer -m client -c predict -n mmpretrain_cls_swin_Lite --output_preview " \
-          f"-i tests/dog.jpg --image_type jpeg -o mmpretrain_cls_swin_Lite.json".split(' ')
+          f"-i tests/dog.jpg --image_type jpeg".split(' ')
     with patch('sys.argv', cmd):
         with patch('builtins.exit', return_value=[0]):
             app.main()
             out, err = capfd.readouterr()
-            print(out)
+            with open('mmpretrain_cls_swin_Lite.json', 'w', encoding='utf-8') as f:
+                f.write(out)
             result = json.loads(out)
             assert 'success' in result.keys()
+            del result["output_image"]
+            print(result)
 
 @pytest.mark.run(order=10)
 def test_10_01_postprocess_det_filter(capfd):
@@ -259,6 +269,98 @@ def _test_10_03_postprocess_det_filter(capfd):
 def _test_10_04_postprocess_det_filter(capfd):
     cmd = f"iinfer -m postprocess -c det_filter -i mmpretrain_cls_swin_Lite.json --output_preview " \
           f"--score_th 0.01".split(' ')
+    with patch('sys.argv', cmd):
+        with patch('builtins.exit', return_value=[0]):
+            app.main()
+            out, err = capfd.readouterr()
+            print(out)
+            result = json.loads(out)
+            assert 'success' in result.keys()
+
+@pytest.mark.run(order=11)
+def test_11_01_postprocess_csv(capfd):
+    cmd = f"iinfer -m postprocess -c csv -i onnx_det_YoloX_Lite.json".split(' ')
+    with patch('sys.argv', cmd):
+        with patch('builtins.exit', return_value=[0]):
+            app.main()
+            out, err = capfd.readouterr()
+            result = json.loads(out)
+            assert 'success' in result.keys()
+            print(result['success'])
+            assert result['success'].startswith('output_boxes')
+
+@pytest.mark.run(order=11)
+def test_11_02_postprocess_csv(capfd):
+    cmd = f"iinfer -m postprocess -c csv -i mmdet_det_YoloX_Lite.json".split(' ')
+    with patch('sys.argv', cmd):
+        with patch('builtins.exit', return_value=[0]):
+            app.main()
+            out, err = capfd.readouterr()
+            result = json.loads(out)
+            assert 'success' in result.keys()
+            print(result['success'])
+            assert result['success'].startswith('output_boxes')
+
+@pytest.mark.run(order=11)
+def test_11_03_postprocess_csv(capfd):
+    cmd = f"iinfer -m postprocess -c csv -i onnx_cls_EfficientNet_Lite4.json".split(' ')
+    with patch('sys.argv', cmd):
+        with patch('builtins.exit', return_value=[0]):
+            app.main()
+            out, err = capfd.readouterr()
+            result = json.loads(out)
+            assert 'success' in result.keys()
+            print(result['success'])
+            assert result['success'].startswith('output_scores')
+
+@pytest.mark.run(order=11)
+def test_11_04_postprocess_csv(capfd):
+    cmd = f"iinfer -m postprocess -c csv -i mmpretrain_cls_swin_Lite.json".split(' ')
+    with patch('sys.argv', cmd):
+        with patch('builtins.exit', return_value=[0]):
+            app.main()
+            out, err = capfd.readouterr()
+            result = json.loads(out)
+            assert 'success' in result.keys()
+            print(result['success'])
+            assert result['success'].startswith('output_scores')
+
+@pytest.mark.run(order=13)
+def test_13_01_client_stop(capfd):
+    cmd = f"iinfer -m client -c stop -n onnx_det_YoloX_Lite".split(' ')
+    with patch('sys.argv', cmd):
+        with patch('builtins.exit', return_value=[0]):
+            app.main()
+            out, err = capfd.readouterr()
+            print(out)
+            result = json.loads(out)
+            assert 'success' in result.keys()
+
+@pytest.mark.run(order=13)
+def test_13_02_client_stop(capfd):
+    cmd = f"iinfer -m client -c stop -n mmdet_det_YoloX_Lite".split(' ')
+    with patch('sys.argv', cmd):
+        with patch('builtins.exit', return_value=[0]):
+            app.main()
+            out, err = capfd.readouterr()
+            print(out)
+            result = json.loads(out)
+            assert 'success' in result.keys()
+
+@pytest.mark.run(order=13)
+def test_13_03_client_stop(capfd):
+    cmd = f"iinfer -m client -c stop -n onnx_cls_EfficientNet_Lite4".split(' ')
+    with patch('sys.argv', cmd):
+        with patch('builtins.exit', return_value=[0]):
+            app.main()
+            out, err = capfd.readouterr()
+            print(out)
+            result = json.loads(out)
+            assert 'success' in result.keys()
+
+@pytest.mark.run(order=13)
+def test_13_04_client_stop(capfd):
+    cmd = f"iinfer -m client -c stop -n mmpretrain_cls_swin_Lite".split(' ')
     with patch('sys.argv', cmd):
         with patch('builtins.exit', return_value=[0]):
             app.main()

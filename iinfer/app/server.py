@@ -261,9 +261,21 @@ class Server(object):
             self.logger.info(f"Save conf.json to {str(deploy_dir)}")
 
         if predict_type.startswith('mmpretrain_'):
+            if not (self.data_dir / "mmpretrain").exists():
+                returncode, _ = common.cmd(f'cd {self.data_dir} && git clone https://github.com/open-mmlab/mmpretrain.git', logger=self.logger)
+                if returncode != 0:
+                    self.logger.error(f"Failed to git clone mmpretrain.")
+                    self.responce(reskey, {"error": f"Failed to git clone mmpretrain."})
+                    return
             shutil.copytree(self.data_dir / "mmpretrain" / "configs", deploy_dir / "configs", dirs_exist_ok=True)
             self.logger.info(f"Copy mmpretrain configs to {str(deploy_dir / 'configs')}")
         elif predict_type.startswith('mmdet_'):
+            if not (self.data_dir / "mmdetection").exists():
+                returncode, _ = common.cmd(f'cd {self.data_dir} && git clone https://github.com/open-mmlab/mmdetection.git', logger=self.logger)
+                if returncode != 0:
+                    self.logger.error(f"Failed to git clone mmdetection.")
+                    self.responce(reskey, {"error": f"Failed to git clone mmdetection."})
+                    return
             shutil.copytree(self.data_dir / "mmdetection" / "configs", deploy_dir / "configs", dirs_exist_ok=True)
             self.logger.info(f"Copy mmdetection configs to {str(deploy_dir / 'configs')}")
 

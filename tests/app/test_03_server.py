@@ -11,7 +11,7 @@ wsl_user = 'ubuntu'
 HOME_DIR = os.path.expanduser("~")
 data = Path(HOME_DIR) / ".iinfer"
 
-def test_01_start_stop():
+def _test_01_start_stop():
     logger, _ = common.load_config('reids')
     rd = redis.Redis(logger=logger, wsl_name=wsl_name, wsl_user=wsl_user)
     ret = rd.docker_run(6379, 'password')

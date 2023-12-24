@@ -468,7 +468,8 @@ def b64str2str(b64str:str) -> str:
     """
     return base64.b64decode(b64str).decode('utf-8')
 
-def draw_boxes(image:Image.Image, boxes:List[List[float]], scores:List[float], classes:List[int], ids:List[str]=None, labels:List[str]=None, colors:List[Tuple[int]]=None, nodraw:bool=False) -> Tuple[Image.Image, List[str]]:
+def draw_boxes(image:Image.Image, boxes:List[List[float]], scores:List[float], classes:List[int], ids:List[str]=None, labels:List[str]=None, colors:List[Tuple[int]]=None,
+               nodraw:bool=False, nolookup:bool=False) -> Tuple[Image.Image, List[str]]:
     """
     画像にバウンディングボックスを描画します。
 
@@ -481,6 +482,7 @@ def draw_boxes(image:Image.Image, boxes:List[List[float]], scores:List[float], c
         labels (List[str], optional): クラスのラベルリスト. Defaults to None.
         colors (List[Tuple[int]], optional): クラスごとの色のリスト. Defaults to None.
         nodraw (bool, optional): 描画しない場合はTrue. Defaults to False.
+        nolookup (bool, optional): ラベル及び色をクラスIDから取得しない場合はTrue. Defaults to False.
 
     Returns:
         Image: バウンディングボックスが描画された画像
@@ -489,15 +491,18 @@ def draw_boxes(image:Image.Image, boxes:List[List[float]], scores:List[float], c
     draw = ImageDraw.Draw(image)
     ids = ids if ids is not None else [None] * len(boxes)
     output_labels = []
-    for box, score, cl, id in zip(boxes, scores, classes, ids):
+    for i, (box, score, cl, id) in enumerate(zip(boxes, scores, classes, ids)):
         y1, x1, y2, x2 = box
         x1 = max(0, np.floor(x1 + 0.5).astype(int))
         y1 = max(0, np.floor(y1 + 0.5).astype(int))
         x2 = min(image.width, np.floor(x2 + 0.5).astype(int))
         y2 = min(image.height, np.floor(y2 + 0.5).astype(int))
-        color = colors[int(cl)] if colors is not None and len(colors) > cl else make_color(str(int(cl)))
-        
-        label = labels[int(cl)] if labels is not None else str(id) if id is not None else None
+        if not nolookup:
+            color = colors[int(cl)] if colors is not None and len(colors) > cl else make_color(str(int(cl)))
+            label = labels[int(cl)] if labels is not None else str(id) if id is not None else None
+        else:
+            color = colors[i] if colors is not None and len(colors) > i else make_color(str(int(cl)))
+            label = labels[i] if labels is not None and len(labels) > i else None
         if not nodraw:
             draw.rectangle(((x1, y1), (x2, y2)), outline=color)
             if label is not None:

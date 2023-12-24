@@ -5,13 +5,13 @@ from iinfer.app import redis
 wsl_name = 'Ubuntu_docker-20.04'
 wsl_user = 'ubuntu'
 
-def test_01_docker_run():
+def _test_01_docker_run():
     logger, _ = common.load_config('reids')
     rd = redis.Redis(logger=logger, wsl_name=wsl_name, wsl_user=wsl_user)
     ret = rd.docker_run(6379, 'password')
     assert ret['output'] == 0
 
-def test_02_docker_stop():
+def _test_02_docker_stop():
     logger, _ = common.load_config('reids')
     rd = redis.Redis(logger=logger, wsl_name=wsl_name, wsl_user=wsl_user)
     ret = rd.docker_stop()

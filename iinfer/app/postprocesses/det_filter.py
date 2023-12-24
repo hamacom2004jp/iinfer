@@ -92,7 +92,7 @@ class DetFilter(postprocess.Postprocess):
         output_labels = data["output_labels"] if "output_labels" in data else None
         output_tracks = data["output_tracks"] if "output_tracks" in data else None
         image, output_labels = common.draw_boxes(output_image, data["output_boxes"], data["output_scores"], data["output_classes"],
-                                                 ids=output_labels, labels=output_tracks, nodraw=self.nodraw)
+                                                 ids=output_labels, labels=output_tracks, nodraw=self.nodraw, nolookup=True)
         if self.output_preview:
             # RGB画像をBGR画像に変換
             img_npy = common.img2npy(image)
