@@ -1,6 +1,8 @@
 from iinfer.app import common
 from pathlib import Path
+import getpass
 import logging
+import os
 import platform
 import shutil
 
@@ -34,18 +36,19 @@ class Install(object):
             return {"warn":f"Unsupported platform."}
 
     def server(self):
+        if platform.system() == 'Windows':
+            return {"warn": f"Build server command is Unsupported in windows platform."}
         from importlib.resources import read_text
-        from iinfer import version
         with open('Dockerfile', 'w', encoding='utf-8') as fp:
             fp.write(read_text(f'{common.APP_ID}.docker', 'Dockerfile'))
         with open('docker-compose.yml', 'w', encoding='utf-8') as fp:
             fp.write(read_text(f'{common.APP_ID}.docker', 'docker-compose.yml'))
-        cmd = f"docker build -t hamacom/iinfer:{version.__version__} --build-arg VERSION={version.__version__} -f Dockerfile ."
-        if platform.system() == 'Windows':
-            return {"warn": f"Build server command is Unsupported in windows platform."}
+        user = getpass.getuser()
+        cmd = f"docker build -t hamacom/iinfer:latest --build-arg MKUSER={user} -f Dockerfile ."
 
-        elif platform.system() == 'Linux':
-            returncode, _ = common.cmd(f"{cmd}", self.logger)
+        if platform.system() == 'Linux':
+            returncode, _ = common.cmd(f"{cmd}", self.logger, True)
+            os.remove('Dockerfile')
             if returncode != 0:
                 self.logger.error(f"Failed to install iinfer-server.")
                 return {"error": f"Failed to install iinfer-server."}

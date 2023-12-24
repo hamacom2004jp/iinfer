@@ -82,7 +82,7 @@ iinfer -m server -c stop -f
 |redis|-|-|`redis-server`のdockerイメージをPULLする|
 |^|--wsl_name <ディストリビューション名>|Windowsの場合は〇|Windowsの場合はWSLのディストリビューションの名前を指定する|
 |^|--wsl_user <user名>|Windowsの場合は〇|Windowsの場合はWSL内のユーザー名を指定する|
-|server|-|-|`推論サーバー`のdockerイメージを`build`する<br>このコマンドで作成されるdockerイメージには、上記`onnxruntime`と`mmdetection`が含まれる<br>`build`が成功すると`docker-compose.yml`ファイルが生成される<br>windows環境は未サポートなので、普通に`iinfer -m server`を使ってください|
+|server|-|-|`推論サーバー`のdockerイメージを`build`する。<br>このコマンドで作成されるdockerイメージには、上記`onnxruntime`と`mmdetection`が含まれる。<br>`build`が成功すると`docker-compose.yml`ファイルが生成される。<br>windows環境は未サポートなので、普通に`iinfer -m server`を使ってください。|
 
 ### Redisサーバー起動 : `iinfer -m redis -c docker_run <Option>`
 |Option|Required|Description|

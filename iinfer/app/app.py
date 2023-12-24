@@ -21,9 +21,9 @@ def main():
     """
     HOME_DIR = os.path.expanduser("~")
     parser = argparse.ArgumentParser(prog='python -m iinfer', description='This application generates modules to set up the application system.')
-    parser.add_argument('--host', help='Setting the redis server host.', default='localhost')
-    parser.add_argument('--port', help='Setting the redis server port.', type=int, default=6379)
-    parser.add_argument('--password', help='Setting the redis server password.', default='password')
+    parser.add_argument('--host', help='Setting the redis server host.', default=os.environ.get('REDIS_HOST', 'localhost'))
+    parser.add_argument('--port', help='Setting the redis server port.', type=int, default=int(os.environ.get('REDIS_PORT', '6379')))
+    parser.add_argument('--password', help='Setting the redis server password.', default=os.environ.get('REDIS_PASSWORD', 'password'))
     parser.add_argument('-u', '--useopt', help=f'Use options file.')
     parser.add_argument('-s', '--saveopt', help=f'save options file. with --useopt option.', action='store_true')
     parser.add_argument('-f', '--format', help='Setting the cmd format.', action='store_true')

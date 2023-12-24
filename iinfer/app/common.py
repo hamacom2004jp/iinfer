@@ -254,7 +254,7 @@ def download_file(url:str, save_path:Path):
         f.write(r.content)
     return save_path
 
-def cmd(cmd:str, logger:logging.Logger):
+def cmd(cmd:str, logger:logging.Logger, strip:bool=False):
     """
     コマンドを実行します。
 
@@ -275,7 +275,7 @@ def cmd(cmd:str, logger:logging.Logger):
         for enc in ['utf-8', 'cp932', 'utf-16', 'utf-16-le', 'utf-16-be']:
             try:
                 output = out.decode(enc)
-                if platform.system() == 'Windows':
+                if platform.system() == 'Windows' or strip:
                     output = output.rstrip()
                 logger.debug(f"output:{output}")
                 break

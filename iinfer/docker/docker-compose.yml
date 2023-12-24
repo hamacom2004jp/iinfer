@@ -4,26 +4,30 @@ services:
     image: ubuntu/redis:latest
     container_name: redis
     environment:
-      TZ: UTC
+      TZ: Asia/Tokyo
       REDIS_PORT: 6379
       REDIS_PASSWORD: password
-    ports:
-      - 6379:6379
     networks:
       - backend
+    ports:
+      - 6379:6379
+    restart: always
 
   iinfer:
-    image: hamacom/iinfer:0.2.0
+    image: hamacom/iinfer:latest
     container_name: iinfer
     environment:
-      TZ: UTC
+      TZ: Asia/Tokyo
       REDIS_HOST: redis
       REDIS_PORT: 6379
       REDIS_PASSWORD: password
-    volumes:
-      - ~/.iinfer:/root/.iinfer
     networks:
       - backend
+    user: ${USER}
+    restart: always
+    working_dir: /home/${USER}
+    volumes:
+      - ~/:/home/${USER}/
 
 networks:
   backend:
