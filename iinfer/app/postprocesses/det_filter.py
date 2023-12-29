@@ -15,6 +15,10 @@ class DetFilter(postprocess.Postprocess):
             score_th (float): スコアの閾値
             width_th (int): ボックスの幅の閾値
             height_th (int): ボックスの高さの閾値
+            classes (List[int]): クラスのリスト
+            labels (List[str]): ラベルのリスト
+            nodraw (bool): 描画しない
+            output_preview (bool): プレビューを出力する
         """
         super().__init__(logger)
         self.score_th = score_th

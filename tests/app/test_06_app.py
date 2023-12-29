@@ -118,7 +118,7 @@ def test_06_01_client_start(capfd):
 
 @pytest.mark.run(order=6)
 def test_06_02_client_start(capfd):
-    cmd = f"iinfer -m client -c start -n mmdet_det_YoloX_Lite --use_track".split(' ')
+    cmd = f"iinfer -m client -c start -n mmdet_det_YoloX_Lite".split(' ')
     with patch('sys.argv', cmd):
         with patch('builtins.exit', return_value=[0]):
             app.main()
@@ -278,7 +278,63 @@ def _test_10_04_postprocess_det_filter(capfd):
             assert 'success' in result.keys()
 
 @pytest.mark.run(order=11)
-def test_11_01_postprocess_csv(capfd):
+def test_11_01_postprocess_det_jadge(capfd):
+    cmd = f"iinfer -m postprocess -c det_jadge -i onnx_det_YoloX_Lite.json --output_preview " \
+          f"--ok_score_th 0.9 --ok_labels dog --ok_labels person " \
+          f"--ng_score_th 0.8 --ng_labels truck --ng_labels bicycle " \
+          f"--ext_score_th 0.3 --ext_labels car --ext_labels pottedplant".split(' ')
+    with patch('sys.argv', cmd):
+        with patch('builtins.exit', return_value=[0]):
+            app.main()
+            out, err = capfd.readouterr()
+            print(out)
+            result = json.loads(out)
+            assert 'success' in result.keys()
+
+@pytest.mark.run(order=11)
+def test_11_02_postprocess_det_jadge(capfd):
+    cmd = f"iinfer -m postprocess -c det_jadge -i mmdet_det_YoloX_Lite.json --output_preview " \
+          f"--ok_score_th 0.3 --ok_classes 16 --ok_classes 0 " \
+          f"--ng_score_th 0.8 --ng_classes 7 --ng_classes 1 " \
+          f"--ext_score_th 0.3 --ext_labels 2 --ext_labels pottedplant".split(' ')
+    with patch('sys.argv', cmd):
+        with patch('builtins.exit', return_value=[0]):
+            app.main()
+            out, err = capfd.readouterr()
+            print(out)
+            result = json.loads(out)
+            assert 'success' in result.keys()
+
+@pytest.mark.run(order=11)
+def test_11_03_postprocess_cls_jadge(capfd):
+    cmd = f"iinfer -m postprocess -c cls_jadge -i onnx_cls_EfficientNet_Lite4.json --output_preview " \
+          f"--ok_score_th 0.8 --ok_classes 249 --ok_classes 235 " \
+          f"--ng_score_th 0.2 --ng_classes 250 " \
+          f"--ext_score_th 0.1 --ext_classes 248".split(' ')
+    with patch('sys.argv', cmd):
+        with patch('builtins.exit', return_value=[0]):
+            app.main()
+            out, err = capfd.readouterr()
+            print(out)
+            result = json.loads(out)
+            assert 'success' in result.keys()
+
+@pytest.mark.run(order=11)
+def test_11_04_postprocess_cls_jadge(capfd):
+    cmd = f"iinfer -m postprocess -c cls_jadge -i mmpretrain_cls_swin_Lite.json --output_preview " \
+          f"--ok_score_th 0.8 --ok_classes 249 --ok_classes 235 " \
+          f"--ng_score_th 0.2 --ng_classes 250 " \
+          f"--ext_score_th 0.1 --ext_classes 248".split(' ')
+    with patch('sys.argv', cmd):
+        with patch('builtins.exit', return_value=[0]):
+            app.main()
+            out, err = capfd.readouterr()
+            print(out)
+            result = json.loads(out)
+            assert 'success' in result.keys()
+
+@pytest.mark.run(order=12)
+def test_12_01_postprocess_csv(capfd):
     cmd = f"iinfer -m postprocess -c csv -i onnx_det_YoloX_Lite.json".split(' ')
     with patch('sys.argv', cmd):
         with patch('builtins.exit', return_value=[0]):
@@ -289,8 +345,8 @@ def test_11_01_postprocess_csv(capfd):
             print(result['success'])
             assert result['success'].startswith('output_boxes')
 
-@pytest.mark.run(order=11)
-def test_11_02_postprocess_csv(capfd):
+@pytest.mark.run(order=12)
+def test_12_02_postprocess_csv(capfd):
     cmd = f"iinfer -m postprocess -c csv -i mmdet_det_YoloX_Lite.json".split(' ')
     with patch('sys.argv', cmd):
         with patch('builtins.exit', return_value=[0]):
@@ -301,8 +357,8 @@ def test_11_02_postprocess_csv(capfd):
             print(result['success'])
             assert result['success'].startswith('output_boxes')
 
-@pytest.mark.run(order=11)
-def test_11_03_postprocess_csv(capfd):
+@pytest.mark.run(order=12)
+def test_12_03_postprocess_csv(capfd):
     cmd = f"iinfer -m postprocess -c csv -i onnx_cls_EfficientNet_Lite4.json".split(' ')
     with patch('sys.argv', cmd):
         with patch('builtins.exit', return_value=[0]):
@@ -313,8 +369,8 @@ def test_11_03_postprocess_csv(capfd):
             print(result['success'])
             assert result['success'].startswith('output_scores')
 
-@pytest.mark.run(order=11)
-def test_11_04_postprocess_csv(capfd):
+@pytest.mark.run(order=12)
+def test_12_04_postprocess_csv(capfd):
     cmd = f"iinfer -m postprocess -c csv -i mmpretrain_cls_swin_Lite.json".split(' ')
     with patch('sys.argv', cmd):
         with patch('builtins.exit', return_value=[0]):
@@ -325,8 +381,8 @@ def test_11_04_postprocess_csv(capfd):
             print(result['success'])
             assert result['success'].startswith('output_scores')
 
-@pytest.mark.run(order=13)
-def test_13_01_client_stop(capfd):
+@pytest.mark.run(order=14)
+def test_14_01_client_stop(capfd):
     cmd = f"iinfer -m client -c stop -n onnx_det_YoloX_Lite".split(' ')
     with patch('sys.argv', cmd):
         with patch('builtins.exit', return_value=[0]):
@@ -336,8 +392,8 @@ def test_13_01_client_stop(capfd):
             result = json.loads(out)
             assert 'success' in result.keys()
 
-@pytest.mark.run(order=13)
-def test_13_02_client_stop(capfd):
+@pytest.mark.run(order=14)
+def test_14_02_client_stop(capfd):
     cmd = f"iinfer -m client -c stop -n mmdet_det_YoloX_Lite".split(' ')
     with patch('sys.argv', cmd):
         with patch('builtins.exit', return_value=[0]):
@@ -347,8 +403,8 @@ def test_13_02_client_stop(capfd):
             result = json.loads(out)
             assert 'success' in result.keys()
 
-@pytest.mark.run(order=13)
-def test_13_03_client_stop(capfd):
+@pytest.mark.run(order=14)
+def test_14_03_client_stop(capfd):
     cmd = f"iinfer -m client -c stop -n onnx_cls_EfficientNet_Lite4".split(' ')
     with patch('sys.argv', cmd):
         with patch('builtins.exit', return_value=[0]):
@@ -358,9 +414,53 @@ def test_13_03_client_stop(capfd):
             result = json.loads(out)
             assert 'success' in result.keys()
 
-@pytest.mark.run(order=13)
-def test_13_04_client_stop(capfd):
+@pytest.mark.run(order=14)
+def test_14_04_client_stop(capfd):
     cmd = f"iinfer -m client -c stop -n mmpretrain_cls_swin_Lite".split(' ')
+    with patch('sys.argv', cmd):
+        with patch('builtins.exit', return_value=[0]):
+            app.main()
+            out, err = capfd.readouterr()
+            print(out)
+            result = json.loads(out)
+            assert 'success' in result.keys()
+
+@pytest.mark.run(order=15)
+def test_15_01_client_undeploy(capfd):
+    cmd = f"iinfer -m client -c undeploy -n onnx_det_YoloX_Lite".split(' ')
+    with patch('sys.argv', cmd):
+        with patch('builtins.exit', return_value=[0]):
+            app.main()
+            out, err = capfd.readouterr()
+            print(out)
+            result = json.loads(out)
+            assert 'success' in result.keys()
+
+@pytest.mark.run(order=15)
+def test_15_02_client_undeploy(capfd):
+    cmd = f"iinfer -m client -c undeploy -n mmdet_det_YoloX_Lite".split(' ')
+    with patch('sys.argv', cmd):
+        with patch('builtins.exit', return_value=[0]):
+            app.main()
+            out, err = capfd.readouterr()
+            print(out)
+            result = json.loads(out)
+            assert 'success' in result.keys()
+
+@pytest.mark.run(order=15)
+def test_15_03_client_undeploy(capfd):
+    cmd = f"iinfer -m client -c undeploy -n onnx_cls_EfficientNet_Lite4".split(' ')
+    with patch('sys.argv', cmd):
+        with patch('builtins.exit', return_value=[0]):
+            app.main()
+            out, err = capfd.readouterr()
+            print(out)
+            result = json.loads(out)
+            assert 'success' in result.keys()
+
+@pytest.mark.run(order=15)
+def test_15_04_client_undeploy(capfd):
+    cmd = f"iinfer -m client -c undeploy -n mmpretrain_cls_swin_Lite".split(' ')
     with patch('sys.argv', cmd):
         with patch('builtins.exit', return_value=[0]):
             app.main()

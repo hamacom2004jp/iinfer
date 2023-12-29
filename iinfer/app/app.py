@@ -7,6 +7,8 @@ from iinfer.app import redis
 from iinfer.app import server
 from iinfer.app.postprocesses import csv
 from iinfer.app.postprocesses import det_filter
+from iinfer.app.postprocesses import det_jadge
+from iinfer.app.postprocesses import cls_jadge
 from iinfer.app.postprocesses import httpreq
 from pathlib import Path
 import argparse
@@ -38,7 +40,7 @@ def main():
                                  'docker_run', 'docker_stop', # redis mode
                                  'start', 'stop', # server and client mode
                                  'deploy', 'deploy_list', 'undeploy', 'predict', 'predict_type_list', 'capture', # client mode
-                                 'det_filter', 'csv', 'httpreq', # postprocess mode
+                                 'det_filter', 'det_jadge', 'cls_jadge', 'csv', 'httpreq', # postprocess mode
                                 ])
     parser.add_argument('-T','--use_track', help='Setting the multi object tracking enable for Object Detection.', action='store_true')
     parser.add_argument('--model_img_width', help='Setting the cmd deploy model_img_width.', type=int)
@@ -77,6 +79,15 @@ def main():
     parser.add_argument('--height_th', help='Setting the postprocess height_th.', type=int, default=0)
     parser.add_argument('--classes', help='Setting the postprocess classes.', type=int, action='append')
     parser.add_argument('--labels', help='Setting the postprocess labels.', type=str, action='append')
+    parser.add_argument('--ok_score_th', help='Setting the postprocess ok_score_th.', type=float, default=None)
+    parser.add_argument('--ok_classes', help='Setting the postprocess ok_classes.', type=int, action='append')
+    parser.add_argument('--ok_labels', help='Setting the postprocess ok_labels.', type=str, action='append')
+    parser.add_argument('--ng_score_th', help='Setting the postprocess ng_score_th.', type=float, default=None)
+    parser.add_argument('--ng_classes', help='Setting the postprocess ng_classes.', type=int, action='append')
+    parser.add_argument('--ng_labels', help='Setting the postprocess ng_labels.', type=str, action='append')
+    parser.add_argument('--ext_score_th', help='Setting the postprocess ext_score_th.', type=float, default=None)
+    parser.add_argument('--ext_classes', help='Setting the postprocess ext_classes.', type=int, action='append')
+    parser.add_argument('--ext_labels', help='Setting the postprocess ext_labels.', type=str, action='append')
 
     argcomplete.autocomplete(parser)
     args = parser.parse_args()
@@ -130,6 +141,16 @@ def main():
     classes = common.getopt(opt, 'classes', preval=args_dict, withset=True)
     labels = common.getopt(opt, 'labels', preval=args_dict, withset=True)
 
+    ok_score_th = common.getopt(opt, 'ok_score_th', preval=args_dict, withset=True)
+    ok_classes = common.getopt(opt, 'ok_classes', preval=args_dict, withset=True)
+    ok_labels = common.getopt(opt, 'ok_labels', preval=args_dict, withset=True)
+    ng_score_th = common.getopt(opt, 'ng_score_th', preval=args_dict, withset=True)
+    ng_classes = common.getopt(opt, 'ng_classes', preval=args_dict, withset=True)
+    ng_labels = common.getopt(opt, 'ng_labels', preval=args_dict, withset=True)
+    ext_score_th = common.getopt(opt, 'ext_score_th', preval=args_dict, withset=True)
+    ext_classes = common.getopt(opt, 'ext_classes', preval=args_dict, withset=True)
+    ext_labels = common.getopt(opt, 'ext_labels', preval=args_dict, withset=True)
+
     tm = time.time()
 
     if args.saveopt:
@@ -140,7 +161,7 @@ def main():
 
     if args.version:
         common.print_format(f'iinfer (Visual Prediction Application) {version.__version__}\n'
-                        f'Copyright (c) 2023 hamacom2004jp\n'
+                        f'Copyright (c) 2023 hamacom2004jp <https://github.com/hamacom2004jp/iinfer>\n'
                         f'License: MIT License <https://opensource.org/license/mit/>\n'
                         f'This is free software: you are free to change and redistribute it.\n'
                         f'There is NO WARRANTY, to the extent permitted by law.', False, tm)
@@ -267,6 +288,32 @@ def main():
                 tm = time.time()
         if cmd == 'det_filter':
             proc = det_filter.DetFilter(logger, score_th=score_th, width_th=width_th, height_th=height_th, classes=classes, labels=labels, nodraw=nodraw, output_preview=output_preview)
+            if input_file is not None:
+                with open(input_file, 'r', encoding="UTF-8") as f:
+                    _to_proc(f, proc, json_connectstr, img_connectstr, timeout, format, tm)
+            elif stdin:
+                _to_proc(sys.stdin, proc, json_connectstr, img_connectstr, timeout, format, tm)
+            else:
+                common.print_format({"warn":f"Image file or stdin is empty."}, format, tm)
+                exit(1)
+        elif cmd == 'det_jadge':
+            proc = det_jadge.DetJadge(logger, ok_score_th=ok_score_th, ok_classes=ok_classes, ok_labels=ok_labels,
+                                      ng_score_th=ng_score_th, ng_classes=ng_classes, ng_labels=ng_labels,
+                                      ext_score_th=ext_score_th, ext_classes=ext_classes, ext_labels=ext_labels,
+                                      nodraw=nodraw, output_preview=output_preview)
+            if input_file is not None:
+                with open(input_file, 'r', encoding="UTF-8") as f:
+                    _to_proc(f, proc, json_connectstr, img_connectstr, timeout, format, tm)
+            elif stdin:
+                _to_proc(sys.stdin, proc, json_connectstr, img_connectstr, timeout, format, tm)
+            else:
+                common.print_format({"warn":f"Image file or stdin is empty."}, format, tm)
+                exit(1)
+        elif cmd == 'cls_jadge':
+            proc = cls_jadge.ClaJadge(logger, ok_score_th=ok_score_th, ok_classes=ok_classes, ok_labels=ok_labels,
+                                      ng_score_th=ng_score_th, ng_classes=ng_classes, ng_labels=ng_labels,
+                                      ext_score_th=ext_score_th, ext_classes=ext_classes, ext_labels=ext_labels,
+                                      nodraw=nodraw, output_preview=output_preview)
             if input_file is not None:
                 with open(input_file, 'r', encoding="UTF-8") as f:
                     _to_proc(f, proc, json_connectstr, img_connectstr, timeout, format, tm)

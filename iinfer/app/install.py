@@ -1,3 +1,4 @@
+from iinfer import version
 from iinfer.app import common
 from pathlib import Path
 import getpass
@@ -42,7 +43,9 @@ class Install(object):
         with open('Dockerfile', 'w', encoding='utf-8') as fp:
             fp.write(read_text(f'{common.APP_ID}.docker', 'Dockerfile'))
         with open('docker-compose.yml', 'w', encoding='utf-8') as fp:
-            fp.write(read_text(f'{common.APP_ID}.docker', 'docker-compose.yml'))
+            text = read_text(f'{common.APP_ID}.docker', 'docker-compose.yml')
+            text = text.replace('${VERSION}', version.__version__)
+            fp.write(text)
         user = getpass.getuser()
         cmd = f"docker build -t hamacom/iinfer:latest --build-arg MKUSER={user} -f Dockerfile ."
 

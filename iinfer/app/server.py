@@ -335,6 +335,10 @@ class Server(object):
             self.responce(reskey, {"warn": f"{name} has already started a session."})
             return
         deploy_dir = self.data_dir / name
+        if not deploy_dir.exists():
+            self.logger.warn(f"{name} is not deployed.")
+            self.responce(reskey, {"warn": f"{name} is not deployed."})
+            return
         common.rmdirs(deploy_dir)
         self.responce(reskey, {"success": f"Undeployed {name}. {str(deploy_dir)}"})
         return
