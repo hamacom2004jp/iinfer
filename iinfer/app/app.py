@@ -74,6 +74,10 @@ def main():
     parser.add_argument('--fileup_name', help='Setting the param name of file upload.', type=str, default='file')
     parser.add_argument('--img_connectstr', help='Setting the postprocess img_connectstr.', type=str, default=None)
     parser.add_argument('--json_connectstr', help='Setting the postprocess json_connectstr.', type=str, default=None)
+
+    parser.add_argument('--out_headers', help='Setting the csv cmd out_headers in postprocess.', type=str, action='append')
+    parser.add_argument('--noheader', help='Setting the csv cmd noheader in postprocess.', action='store_true')
+
     parser.add_argument('--score_th', help='Setting the postprocess score_th.', type=float, default=0.0)
     parser.add_argument('--width_th', help='Setting the postprocess width_th.', type=int, default=0)
     parser.add_argument('--height_th', help='Setting the postprocess height_th.', type=int, default=0)
@@ -134,6 +138,9 @@ def main():
     json_connectstr = common.getopt(opt, 'json_connectstr', preval=args_dict, withset=True)
     img_connectstr = common.getopt(opt, 'img_connectstr', preval=args_dict, withset=True)
     fileup_name = common.getopt(opt, 'fileup_name', preval=args_dict, withset=True)
+
+    out_headers = common.getopt(opt, 'out_headers', preval=args_dict, withset=True)
+    noheader = common.getopt(opt, 'noheader', preval=args_dict, withset=True)
 
     score_th = common.getopt(opt, 'score_th', preval=args_dict, withset=True)
     width_th = common.getopt(opt, 'width_th', preval=args_dict, withset=True)
@@ -323,7 +330,7 @@ def main():
                 common.print_format({"warn":f"Image file or stdin is empty."}, format, tm)
                 exit(1)
         elif cmd == 'csv':
-            proc = csv.Csv(logger)
+            proc = csv.Csv(logger, out_headers=out_headers, noheader=noheader)
             if input_file is not None:
                 with open(input_file, 'r') as f:
                     _to_proc(f, proc, json_connectstr, img_connectstr, timeout, False, tm)

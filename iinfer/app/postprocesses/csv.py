@@ -1,22 +1,24 @@
 from iinfer.app import common, client, postprocess
 from PIL import Image
-from typing import Dict, Any
+from typing import Dict, List, Any
 import csv
 import io
 import logging
 import requests
 
 class Csv(postprocess.Postprocess):
-    def __init__(self, logger:logging.Logger, out_header:bool=True):
+    def __init__(self, logger:logging.Logger, out_headers:List[str]=None, noheader:bool=False):
         """
         JSONをCSVに変換する後処理クラスです。
         
         Args:
             logger (logging.Logger): ロガー
-            out_header (bool, optional): ヘッダーを出力するかどうか. Defaults to True.
+            out_headers (List[str], optional): 出力させるヘッダー. Defaults to None.
+            noheader (bool, optional): ヘッダーを出力しない. Defaults to False.
         """
         super().__init__(logger)
-        self.out_header = out_header
+        self.out_headers = out_headers
+        self.noheader = noheader
 
     def post_json(self, json_connectstr,  outputs:Dict[str, Any]):
         """
@@ -31,8 +33,12 @@ class Csv(postprocess.Postprocess):
         """
         def _to_csv(data, buffer):
             if type(data) == dict:
-                if self.out_header:
-                    csv.DictWriter(buffer, fieldnames=data.keys()).writeheader()
+                notfound = [] if self.out_headers is None else [h for h in self.out_headers if h not in data.keys()]
+                if len(notfound) > 0:
+                    raise Exception(f"notfound headers: {notfound}")
+                headers = self.out_headers if self.out_headers is not None else data.keys()
+                if not self.noheader:
+                    csv.DictWriter(buffer, fieldnames=headers).writeheader()
                 else:
                     csv.DictWriter(buffer).writerow(data)
             elif type(data) == list:
@@ -52,9 +58,14 @@ class Csv(postprocess.Postprocess):
         elif 'success' in outputs and type(outputs['success']) == dict:
             buffer = io.StringIO()
             writer = csv.writer(buffer)
-            if self.out_header:
-                writer.writerow(outputs['success'].keys())
-            writer.writerow(outputs['success'].values())
+            notfound = [] if self.out_headers is None else [h for h in self.out_headers if h not in outputs['success'].keys()]
+            if len(notfound) > 0:
+                raise Exception(f"notfound headers: {notfound}")
+            headers = self.out_headers if self.out_headers is not None else outputs['success'].keys()
+            if not self.noheader:
+                writer.writerow(headers)
+            rows = [v for k, v in outputs['success'].items() if k in headers]
+            writer.writerow(rows)
             result = buffer.getvalue().strip()
             buffer.close()
 
@@ -71,7 +82,7 @@ class Csv(postprocess.Postprocess):
             result = buffer.getvalue().strip()
             buffer.close()
 
-        self.out_header = False
+        self.noheader = True
         return result
 
     def post_img(self, img_connectstr:str, outputs:Dict[str, Any], output_image:Image):

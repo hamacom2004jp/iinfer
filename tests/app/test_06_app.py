@@ -160,7 +160,7 @@ def test_07_01_client_predict_type_list(capfd):
 
 @pytest.mark.run(order=8)
 def test_08_01_client_capture(capfd):
-    cmd = f"iinfer -m client -c capture --capture_count 1 --output_preview".split(' ')
+    cmd = f"iinfer -m client -c capture --capture_count 5 --capture_fps 2 --output_preview".split(' ')
     with patch('sys.argv', cmd):
         with patch('builtins.exit', return_value=[0]):
             app.main()
@@ -168,6 +168,8 @@ def test_08_01_client_capture(capfd):
             assert len(out) > 0
             assert len(out.split(',')) >= 4
             print(out.split(',')[1:])
+            with open('cap.csv', 'w', encoding='utf-8') as f:
+                f.write(out)
 
 @pytest.mark.run(order=9)
 def test_09_01_client_predict(capfd):
@@ -187,14 +189,14 @@ def test_09_01_client_predict(capfd):
 @pytest.mark.run(order=9)
 def test_09_02_client_predict(capfd):
     cmd = f"iinfer -m client -c predict -n mmdet_det_YoloX_Lite --output_preview " \
-          f"-i tests/dog.jpg --image_type jpeg".split(' ')
+          f"-i cap.csv --image_type capture".split(' ')
     with patch('sys.argv', cmd):
         with patch('builtins.exit', return_value=[0]):
             app.main()
             out, err = capfd.readouterr()
             with open('mmdet_det_YoloX_Lite.json', 'w', encoding='utf-8') as f:
                 f.write(out)
-            result = json.loads(out)
+            result = json.loads(out.split('\n')[0])
             assert 'success' in result.keys()
             del result["output_image"]
             print(result)
@@ -250,7 +252,7 @@ def test_10_02_postprocess_det_filter(capfd):
             app.main()
             out, err = capfd.readouterr()
             print(out)
-            result = json.loads(out)
+            result = json.loads(out.split('\n')[0])
             assert 'success' in result.keys()
 
 @pytest.mark.run(order=10)
@@ -335,7 +337,8 @@ def test_11_04_postprocess_cls_jadge(capfd):
 
 @pytest.mark.run(order=12)
 def test_12_01_postprocess_csv(capfd):
-    cmd = f"iinfer -m postprocess -c csv -i onnx_det_YoloX_Lite.json".split(' ')
+    cmd = f"iinfer -m postprocess -c csv -i onnx_det_YoloX_Lite.json " \
+          f"--out_headers output_scores --out_headers output_labels".split(' ')
     with patch('sys.argv', cmd):
         with patch('builtins.exit', return_value=[0]):
             app.main()
@@ -343,23 +346,25 @@ def test_12_01_postprocess_csv(capfd):
             result = json.loads(out)
             assert 'success' in result.keys()
             print(result['success'])
-            assert result['success'].startswith('output_boxes')
+            assert result['success'].startswith('output_scores')
 
 @pytest.mark.run(order=12)
 def test_12_02_postprocess_csv(capfd):
-    cmd = f"iinfer -m postprocess -c csv -i mmdet_det_YoloX_Lite.json".split(' ')
+    cmd = f"iinfer -m postprocess -c csv -i mmdet_det_YoloX_Lite.json " \
+          f"--out_headers output_scores --out_headers output_labels".split(' ')
     with patch('sys.argv', cmd):
         with patch('builtins.exit', return_value=[0]):
             app.main()
             out, err = capfd.readouterr()
-            result = json.loads(out)
+            result = json.loads(out.split('\n')[0])
             assert 'success' in result.keys()
             print(result['success'])
-            assert result['success'].startswith('output_boxes')
+            assert result['success'].startswith('output_scores')
 
 @pytest.mark.run(order=12)
 def test_12_03_postprocess_csv(capfd):
-    cmd = f"iinfer -m postprocess -c csv -i onnx_cls_EfficientNet_Lite4.json".split(' ')
+    cmd = f"iinfer -m postprocess -c csv -i onnx_cls_EfficientNet_Lite4.json " \
+          f"--out_headers output_scores --out_headers output_labels".split(' ')
     with patch('sys.argv', cmd):
         with patch('builtins.exit', return_value=[0]):
             app.main()
@@ -371,7 +376,8 @@ def test_12_03_postprocess_csv(capfd):
 
 @pytest.mark.run(order=12)
 def test_12_04_postprocess_csv(capfd):
-    cmd = f"iinfer -m postprocess -c csv -i mmpretrain_cls_swin_Lite.json".split(' ')
+    cmd = f"iinfer -m postprocess -c csv -i mmpretrain_cls_swin_Lite.json " \
+          f"--out_headers output_scores --out_headers output_labels".split(' ')
     with patch('sys.argv', cmd):
         with patch('builtins.exit', return_value=[0]):
             app.main()

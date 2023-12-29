@@ -449,7 +449,6 @@ class Server(object):
             return
         #self.sessions[name]['session'].close()
         del self.sessions[name]
-        self.is_running = False
         self.logger.info(f"Successful stop of {name} session.")
         self.responce(reskey, {"success": f"Successful stop of {name} session."})
         return
