@@ -1,7 +1,7 @@
 # iinfer (Visual Prediction Application)
 
 onnx又はmmlabフォーマットの重みファイルを実行するCLIアプリケーションです。
-ドキュメントは[こちら](docs/build/index.html)。
+ドキュメントは[こちら](https://hamacom2004jp.github.io/iinfer/)。
 
 ## iinderの動作イメージ
 
