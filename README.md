@@ -5,7 +5,7 @@ onnx又はmmlabフォーマットの重みファイルを実行するCLIアプ�
 
 ## iinderの動作イメージ
 
-![iinderの動作イメージ](docs/source/static/orverview.drawio.png)
+![iinderの動作イメージ](docs_src/static/orverview.drawio.png)
 
 1. **iinfer client** は **imageファイル** や **camera** から画像を取得し、 **推論結果 predict.json** を出力します。
 2. **iinfer server** は推論を行うサーバーです。 **iinfer client** からの要求に応えて、推論結果を **iinfer client** に返します。
