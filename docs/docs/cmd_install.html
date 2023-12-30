@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="jp" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>コマンドリファレンス（installモード） &mdash; iinfer 2023/12/29 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=e370950d"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="コマンドリファレンス（redisモード）" href="cmd_redis.html" />
+    <link rel="prev" title="コマンドリファレンス（共通）" href="cmd_common.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            iinfer
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">iinferの概要</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="command.html">コマンドリファレンス</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="cmd_common.html">共通オプション</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">インストール</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#onnx-iinfer-m-install-c-onnx">インストール(onnx) : <cite>iinfer -m install -c onnx</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mmdet-iinfer-m-install-c-mmdet">インストール(mmdet) : <cite>iinfer -m install -c mmdet</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#redis-iinfer-m-install-c-redis-option">インストール(redis) : <cite>iinfer -m install -c redis &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#server-iinfer-m-install-c-server-option">インストール(server) : <cite>iinfer -m install -c server &lt;Option&gt;</cite></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_redis.html">Redis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_server.html">推論サーバー</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_client.html">クライアント</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_postprocess.html">後処理</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">動作確認済みモデル</a></li>
+<li class="toctree-l1"><a class="reference internal" href="customize.html">カスタマイズ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developer.html">開発者向け情報</a></li>
+<li class="toctree-l1"><a class="reference internal" href="errors.html">よくあるエラー</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">ライセンス</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">iinfer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="command.html">コマンドリファレンス</a></li>
+      <li class="breadcrumb-item active">コマンドリファレンス（installモード）</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/docs/cmd_install.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="install">
+<h1>コマンドリファレンス（installモード）<a class="headerlink" href="#install" title="Link to this heading"></a></h1>
+<ul class="simple">
+<li><p>installモードのコマンド一覧です。</p></li>
+<li><p><cite>iinfer</cite> をインストールした直後にはAIフレームワークのインストールがされていない状態です。</p></li>
+<li><p>通常推論サーバー側にしかAIフレームワークが必要ないため、任意でインストールする必要があります。</p></li>
+</ul>
+<section id="onnx-iinfer-m-install-c-onnx">
+<h2>インストール(onnx) : <cite>iinfer -m install -c onnx</cite><a class="headerlink" href="#onnx-iinfer-m-install-c-onnx" title="Link to this heading"></a></h2>
+<p><cite>onnxruntime</cite> をインストールします。オプションの指定はありません。</p>
+</section>
+<section id="mmdet-iinfer-m-install-c-mmdet">
+<h2>インストール(mmdet) : <cite>iinfer -m install -c mmdet</cite><a class="headerlink" href="#mmdet-iinfer-m-install-c-mmdet" title="Link to this heading"></a></h2>
+<p><cite>mmdetection</cite> をインストールします。オプションの指定はありません。</p>
+</section>
+<section id="redis-iinfer-m-install-c-redis-option">
+<h2>インストール(redis) : <cite>iinfer -m install -c redis &lt;Option&gt;</cite><a class="headerlink" href="#redis-iinfer-m-install-c-redis-option" title="Link to this heading"></a></h2>
+<p><cite>redis-server</cite> のdockerイメージをPULLします。オプションは以下の通りです。</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 10.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>--wsl_name &lt;ディストリビューション名&gt;</p></td>
+<td><p>Windowsの場合は〇</p></td>
+<td><p>Windowsの場合はWSLのディストリビューションの名前を指定します。</p></td>
+</tr>
+<tr class="row-odd"><td><p>--wsl_user &lt;user名&gt;</p></td>
+<td><p>Windowsの場合は〇</p></td>
+<td><p>Windowsの場合はWSL内のユーザー名を指定します。</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="server-iinfer-m-install-c-server-option">
+<h2>インストール(server) : <cite>iinfer -m install -c server &lt;Option&gt;</cite><a class="headerlink" href="#server-iinfer-m-install-c-server-option" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><cite>推論サーバー</cite> のdockerイメージを <cite>build</cite> します。オプションは以下の通りです。</p></li>
+<li><p>このコマンドで作成されるdockerイメージには、上記 <cite>onnxruntime</cite> と <cite>mmdetection</cite> が含まれます。</p></li>
+<li><p><cite>build</cite> が成功すると、実行時ディレクトリに <cite>docker-compose.yml</cite> ファイルが生成されます。</p></li>
+<li><p>サーバーを起動させるには、 <cite>docker-compose.yml</cite> ファイルがある場所で <cite>docker-compose up -d</cite> を実行してください。</p></li>
+<li><p>サーバーを停止させるには、 <cite>docker-compose.yml</cite> ファイルがある場所で <cite>docker-compose down</cite> を実行してください。</p></li>
+<li><p>windows環境ではこのコマンドは未サポートです。</p></li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 10.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>--data &lt;データディレクトリ&gt;</p></td>
+<td></td>
+<td><p>省略した時は <cite>$HONE/.iinfer</cite> を使用します。</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="cmd_common.html" class="btn btn-neutral float-left" title="コマンドリファレンス（共通）" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cmd_redis.html" class="btn btn-neutral float-right" title="コマンドリファレンス（redisモード）" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright (c) 2023 hamacom2004jp.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

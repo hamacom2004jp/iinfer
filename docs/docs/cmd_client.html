@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="jp" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>コマンドリファレンス（clientモード） &mdash; iinfer 2023/12/29 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=e370950d"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="コマンドリファレンス（postprocessモード）" href="cmd_postprocess.html" />
+    <link rel="prev" title="コマンドリファレンス（serverモード）" href="cmd_server.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            iinfer
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">iinferの概要</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="command.html">コマンドリファレンス</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="cmd_common.html">共通オプション</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_install.html">インストール</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_redis.html">Redis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_server.html">推論サーバー</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">クライアント</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#ai-iinfer-m-client-c-deploy-option">クライアント(AIモデルの配備) : <cite>iinfer -m client -c deploy &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ai-iinfer-m-client-c-deploy-list-option">クライアント(AIモデルの配備一覧) : <cite>iinfer -m client -c deploy_list &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ai-iinfer-m-client-c-undeploy-option">クライアント(AIモデルの配備解除) : <cite>iinfer -m client -c undeploy &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ai-iinfer-m-client-c-start-option">クライアント(AIモデルの起動) : <cite>iinfer -m client -c start &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#iinfer-m-client-c-predict-type-list-option">クライアント(推論タイプ一覧) : <cite>iinfer -m client -c predict_type_list &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ai-iinfer-m-client-c-stop-option">クライアント(AIモデルの停止) : <cite>iinfer -m client -c stop &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#iinfer-m-client-c-predict-option">クライアント(推論の実行) : <cite>iinfer -m client -c predict &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#iinfer-m-client-c-capture-option">クライアント(キャプチャーの実行) : <cite>iinfer -m client -c capture &lt;Option&gt;</cite></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_postprocess.html">後処理</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">動作確認済みモデル</a></li>
+<li class="toctree-l1"><a class="reference internal" href="customize.html">カスタマイズ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developer.html">開発者向け情報</a></li>
+<li class="toctree-l1"><a class="reference internal" href="errors.html">よくあるエラー</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">ライセンス</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">iinfer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="command.html">コマンドリファレンス</a></li>
+      <li class="breadcrumb-item active">コマンドリファレンス（clientモード）</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/docs/cmd_client.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="client">
+<h1>コマンドリファレンス（clientモード）<a class="headerlink" href="#client" title="Link to this heading"></a></h1>
+<p>clientモードのコマンド一覧です。</p>
+<section id="ai-iinfer-m-client-c-deploy-option">
+<h2>クライアント(AIモデルの配備) : <cite>iinfer -m client -c deploy &lt;Option&gt;</cite><a class="headerlink" href="#ai-iinfer-m-client-c-deploy-option" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 10.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>--host &lt;IPアドレス又はホスト名&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーのサービスホストを指定する</p></td>
+</tr>
+<tr class="row-odd"><td><p>--port &lt;ポート番号&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーのサービスポートを指定する</p></td>
+</tr>
+<tr class="row-even"><td><p>--password &lt;パスワード&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーのアクセスパスワード(任意)を指定する。省略時は <cite>password</cite> を使用する</p></td>
+</tr>
+<tr class="row-odd"><td><p>-n,--name &lt;登録名&gt;</p></td>
+<td><p>〇</p></td>
+<td><p>AIモデルの登録名(任意)を指定する</p></td>
+</tr>
+<tr class="row-even"><td><p>--model_file &lt;モデルファイル&gt;</p></td>
+<td><p>〇</p></td>
+<td><p>学習済みのモデルファイルを指定する</p></td>
+</tr>
+<tr class="row-odd"><td><p>--model_conf_file &lt;モデル設定ファイル&gt;</p></td>
+<td></td>
+<td><p>mmlabの場合はモデル設定ファイルを指定する。複数指定可能ですが、最初に指定したファイルが <cite>start</cite> 時に使用されます。</p></td>
+</tr>
+<tr class="row-even"><td><p>--model_img_width &lt;モデルのINPUTサイズ(横px)&gt;</p></td>
+<td></td>
+<td><p>AIモデルのINPUTサイズ(横px)を指定する</p></td>
+</tr>
+<tr class="row-odd"><td><p>--model_img_height &lt;モデルのINPUTサイズ(縦px)&gt;</p></td>
+<td></td>
+<td><p>AIモデルのINPUTサイズ(縦px)を指定する</p></td>
+</tr>
+<tr class="row-even"><td><p>--predict_type &lt;推論タイプ&gt;</p></td>
+<td><p>〇</p></td>
+<td><p>AIモデルの推論タイプを指定する。 <a class="reference internal" href="#predict-type-list"><span class="std std-ref">参照</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>--custom_predict_py &lt;カスタム推論pyファイル&gt;</p></td>
+<td></td>
+<td><p>独自の推論タイプを作成するときに指定。この時は <cite>--predict_type Custom</cite> を指定</p></td>
+</tr>
+<tr class="row-even"><td><p>--label_file &lt;ラベルファイル&gt;</p></td>
+<td></td>
+<td><p>推論結果のクラスラベルファイルを指定。改行区切りでラベル名(行indexがクラスと一致する)を指定したファイル。</p></td>
+</tr>
+<tr class="row-odd"><td><p>--color_file &lt;色ファイル&gt;</p></td>
+<td></td>
+<td><p>推論結果の可視化画像の色ファイルを指定。改行区切りで色(行indexがクラスと一致する)を指定したファイル。</p></td>
+</tr>
+<tr class="row-even"><td><p>--overwrite</p></td>
+<td></td>
+<td><p>デプロイ済みであっても上書きする</p></td>
+</tr>
+<tr class="row-odd"><td><p>--timeout &lt;タイムアウト&gt;</p></td>
+<td></td>
+<td><p>サーバーの応答が返ってくるまでの最大待ち時間</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="ai-iinfer-m-client-c-deploy-list-option">
+<h2>クライアント(AIモデルの配備一覧) : <cite>iinfer -m client -c deploy_list &lt;Option&gt;</cite><a class="headerlink" href="#ai-iinfer-m-client-c-deploy-list-option" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 10.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>--host &lt;IPアドレス又はホスト名&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーのサービスホストを指定する</p></td>
+</tr>
+<tr class="row-odd"><td><p>--port &lt;ポート番号&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーのサービスポートを指定する</p></td>
+</tr>
+<tr class="row-even"><td><p>--password &lt;パスワード&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーのアクセスパスワード(任意)を指定する。省略時は <cite>password</cite> を使用する</p></td>
+</tr>
+<tr class="row-odd"><td><p>--timeout &lt;タイムアウト&gt;</p></td>
+<td></td>
+<td><p>サーバーの応答が返ってくるまでの最大待ち時間</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="ai-iinfer-m-client-c-undeploy-option">
+<h2>クライアント(AIモデルの配備解除) : <cite>iinfer -m client -c undeploy &lt;Option&gt;</cite><a class="headerlink" href="#ai-iinfer-m-client-c-undeploy-option" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 10.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>--host &lt;IPアドレス又はホスト名&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーのサービスホストを指定する</p></td>
+</tr>
+<tr class="row-odd"><td><p>--port &lt;ポート番号&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーのサービスポートを指定する</p></td>
+</tr>
+<tr class="row-even"><td><p>--password &lt;パスワード&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーのアクセスパスワード(任意)を指定する。省略時は <cite>password</cite> を使用する</p></td>
+</tr>
+<tr class="row-odd"><td><p>-n,--name &lt;登録名&gt;</p></td>
+<td><p>〇</p></td>
+<td><p>AIモデルの登録名を指定する</p></td>
+</tr>
+<tr class="row-even"><td><p>--timeout &lt;タイムアウト&gt;</p></td>
+<td></td>
+<td><p>サーバーの応答が返ってくるまでの最大待ち時間</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="ai-iinfer-m-client-c-start-option">
+<h2>クライアント(AIモデルの起動) : <cite>iinfer -m client -c start &lt;Option&gt;</cite><a class="headerlink" href="#ai-iinfer-m-client-c-start-option" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 10.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>--host &lt;IPアドレス又はホスト名&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーのサービスホストを指定する</p></td>
+</tr>
+<tr class="row-odd"><td><p>--port &lt;ポート番号&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーのサービスポートを指定する</p></td>
+</tr>
+<tr class="row-even"><td><p>--password &lt;パスワード&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーのアクセスパスワード(任意)を指定する。省略時は <cite>password</cite> を使用する</p></td>
+</tr>
+<tr class="row-odd"><td><p>-n,--name &lt;登録名&gt;</p></td>
+<td><p>〇</p></td>
+<td><p>AIモデルの登録名を指定する</p></td>
+</tr>
+<tr class="row-even"><td><p>--model_provider &lt;モデルプロバイダー&gt;</p></td>
+<td></td>
+<td><p>ONNX形式のモデルファイルの場合に指定可能。指定可能なプロバイダーは <cite>CPUExecutionProvider</cite> , <cite>CUDAExecutionProvider</cite> , <cite>TensorrtExecutionProvider</cite></p></td>
+</tr>
+<tr class="row-odd"><td><p>--use_track</p></td>
+<td></td>
+<td><p>ObjectDetectionタスクの場合に指定可能。motpyを使ってトラッキングID付与を行う</p></td>
+</tr>
+<tr class="row-even"><td><p>--gpuid &lt;GPUのid&gt;</p></td>
+<td></td>
+<td><p>GPUのディバイスIDを指定する。 <cite>--model_provider</cite> でGPUを使用するプロバイダーを指定した時に使用可能</p></td>
+</tr>
+<tr class="row-odd"><td><p>--timeout &lt;タイムアウト&gt;</p></td>
+<td></td>
+<td><p>サーバーの応答が返ってくるまでの最大待ち時間</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="iinfer-m-client-c-predict-type-list-option">
+<span id="predict-type-list"></span><h2>クライアント(推論タイプ一覧) : <cite>iinfer -m client -c predict_type_list &lt;Option&gt;</cite><a class="headerlink" href="#iinfer-m-client-c-predict-type-list-option" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 10.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>--host &lt;IPアドレス又はホスト名&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーのサービスホストを指定する</p></td>
+</tr>
+<tr class="row-odd"><td><p>--port &lt;ポート番号&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーのサービスポートを指定する</p></td>
+</tr>
+<tr class="row-even"><td><p>--password &lt;パスワード&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーのアクセスパスワード(任意)を指定する。省略時は <cite>password</cite> を使用する</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="ai-iinfer-m-client-c-stop-option">
+<h2>クライアント(AIモデルの停止) : <cite>iinfer -m client -c stop &lt;Option&gt;</cite><a class="headerlink" href="#ai-iinfer-m-client-c-stop-option" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 10.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>--host &lt;IPアドレス又はホスト名&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーのサービスホストを指定する</p></td>
+</tr>
+<tr class="row-odd"><td><p>--port &lt;ポート番号&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーのサービスポートを指定する</p></td>
+</tr>
+<tr class="row-even"><td><p>--password &lt;パスワード&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーのアクセスパスワード(任意)を指定する。省略時は <cite>password</cite> を使用する</p></td>
+</tr>
+<tr class="row-odd"><td><p>-n,--name &lt;登録名&gt;</p></td>
+<td><p>〇</p></td>
+<td><p>AIモデルの登録名を指定する</p></td>
+</tr>
+<tr class="row-even"><td><p>--timeout &lt;タイムアウト&gt;</p></td>
+<td></td>
+<td><p>サーバーの応答が返ってくるまでの最大待ち時間</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="iinfer-m-client-c-predict-option">
+<h2>クライアント(推論の実行) : <cite>iinfer -m client -c predict &lt;Option&gt;</cite><a class="headerlink" href="#iinfer-m-client-c-predict-option" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 10.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>--host &lt;IPアドレス又はホスト名&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーのサービスホストを指定する</p></td>
+</tr>
+<tr class="row-odd"><td><p>--port &lt;ポート番号&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーのサービスポートを指定する</p></td>
+</tr>
+<tr class="row-even"><td><p>--password &lt;パスワード&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーのアクセスパスワード(任意)を指定する。省略時は <cite>password</cite> を使用する</p></td>
+</tr>
+<tr class="row-odd"><td><p>-n,--name &lt;登録名&gt;</p></td>
+<td><p>〇</p></td>
+<td><p>AIモデルの登録名を指定する</p></td>
+</tr>
+<tr class="row-even"><td><p>-i,--input_file &lt;推論対象の画像ファイル&gt;</p></td>
+<td></td>
+<td><p>推論させる画像をファイルで指定する</p></td>
+</tr>
+<tr class="row-odd"><td><p>--stdin</p></td>
+<td></td>
+<td><p>推論させる画像を標準入力から読み込む</p></td>
+</tr>
+<tr class="row-even"><td><p>--nodraw</p></td>
+<td></td>
+<td><p>推論結果画像にbbox等の描き込みを行わない</p></td>
+</tr>
+<tr class="row-odd"><td><p>--image_type &lt;推論対象の画像タイプ&gt;</p></td>
+<td></td>
+<td><p>推論させる画像のタイプを指定する。指定可能な画像タイプは <cite>bmp</cite> , <cite>png</cite> , <cite>jpeg</cite> , <cite>capture</cite></p></td>
+</tr>
+<tr class="row-even"><td><p>-o,--output_file &lt;推論結果画像の保存先ファイル&gt;</p></td>
+<td><p>--stdinを指定した時〇</p></td>
+<td><p>推論結果画像の保存先ファイルを指定する</p></td>
+</tr>
+<tr class="row-odd"><td><p>-P,--output_preview</p></td>
+<td></td>
+<td><p>推論結果画像を <cite>cv2.imshow</cite> で表示する</p></td>
+</tr>
+<tr class="row-even"><td><p>--timeout &lt;タイムアウト&gt;</p></td>
+<td></td>
+<td><p>サーバーの応答が返ってくるまでの最大待ち時間</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="iinfer-m-client-c-capture-option">
+<h2>クライアント(キャプチャーの実行) : <cite>iinfer -m client -c capture &lt;Option&gt;</cite><a class="headerlink" href="#iinfer-m-client-c-capture-option" title="Link to this heading"></a></h2>
+<p>このコマンドは、パイプで接続して下記のように使用します。</p>
+<div class="highlight-bat notranslate"><div class="highlight"><pre><span></span>iinfer -m client -c capture <span class="p">&lt;</span>Option<span class="p">&gt;</span> <span class="s2">&quot;,&quot;</span> iinfer -m client -c predict --stdin --image_type capture <span class="p">&lt;</span>Option&gt;
+</pre></div>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 10.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>--capture_device &lt;ディバイス&gt;</p></td>
+<td></td>
+<td><p>キャプチャーディバイスを指定する。 <cite>cv2.VideoCapture</cite> の第一引数に渡される値。</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_frame_width &lt;キャプチャーサイズ(横px)&gt;</p></td>
+<td></td>
+<td><p>キャプチャーする画像の横px。 <cite>cv2.VideoCapture</cite> オブジェクトの <cite>cv2.CAP_PROP_FRAME_WIDTH</cite> オプションに指定する値。</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_frame_height &lt;キャプチャーサイズ(縦px)&gt;</p></td>
+<td></td>
+<td><p>キャプチャーする画像の縦px。 <cite>cv2.VideoCapture</cite> オブジェクトの <cite>cv2.CAP_PROP_FRAME_HEIGHT</cite> オプションに指定する値。</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_fps &lt;キャプチャーFPS&gt;</p></td>
+<td></td>
+<td><p>キャプチャーする画像のFPS。キャプチャーが指定した値より高速な場合に残り時間分をsleepする</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_count &lt;キャプチャー回数&gt;</p></td>
+<td></td>
+<td><p>キャプチャー回数。AIの推論速度が指定した値より高速な場合に残り時間分をsleepする</p></td>
+</tr>
+<tr class="row-odd"><td><p>--output_preview</p></td>
+<td></td>
+<td><p>推論結果画像を <cite>cv2.imshow</cite> で表示する</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="cmd_server.html" class="btn btn-neutral float-left" title="コマンドリファレンス（serverモード）" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cmd_postprocess.html" class="btn btn-neutral float-right" title="コマンドリファレンス（postprocessモード）" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright (c) 2023 hamacom2004jp.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

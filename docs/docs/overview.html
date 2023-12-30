@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="jp" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>iinferの概要 &mdash; iinfer 2023/12/29 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=e370950d"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="コマンドリファレンス" href="command.html" />
+    <link rel="prev" title="iinfer (Visual Prediction Application)" href="../index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            iinfer
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">iinferの概要</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#iinder">iinderの動作イメージ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id1">インストール方法</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id2">iinferの使用方法</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id3">データの保存場所</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="command.html">コマンドリファレンス</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">動作確認済みモデル</a></li>
+<li class="toctree-l1"><a class="reference internal" href="customize.html">カスタマイズ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developer.html">開発者向け情報</a></li>
+<li class="toctree-l1"><a class="reference internal" href="errors.html">よくあるエラー</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">ライセンス</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">iinfer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">iinferの概要</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/docs/overview.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="iinfer">
+<h1>iinferの概要<a class="headerlink" href="#iinfer" title="Link to this heading"></a></h1>
+<ul class="simple">
+<li><p>iinferを使用することで、AIモデルを簡単に実行することが出来ます。</p></li>
+<li><p>onnx又はmmlabフォーマットのAIモデルファイルを実行するアプリケーションです。</p></li>
+</ul>
+<section id="iinder">
+<h2>iinderの動作イメージ<a class="headerlink" href="#iinder" title="Link to this heading"></a></h2>
+<img alt="'iinferの概要'" src="../_images/orverview.drawio.png" />
+<ol class="arabic simple">
+<li><p><strong>iinfer client</strong> は <strong>imageファイル</strong> や <strong>camera</strong> から画像を取得し、 <strong>推論結果 predict.json</strong> を出力します。</p></li>
+<li><p><strong>iinfer server</strong> は推論を行うサーバーです。 <strong>iinfer client</strong> からの要求に応えて、推論結果を <strong>iinfer client</strong> に返します。</p></li>
+<li><p><strong>iinfer server</strong> は予め <strong>ai model</strong> をロードしておくことで、推論を高速化します。</p></li>
+<li><p><strong>iinfer client</strong> と <strong>iinfer server</strong> は <strong>Redis</strong> 経由で通信します。</p></li>
+<li><p><strong>iinfer server</strong> と <strong>Redis</strong> は <strong>dockerコンテナ</strong> を使用して起動させることが出来ます。</p></li>
+</ol>
+</section>
+<section id="id1">
+<h2>インストール方法<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<p>次の手順でインストールしてください:</p>
+<ol class="arabic simple">
+<li><p>pipを使用してインストールします:</p></li>
+</ol>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>iinfer
+</pre></div>
+</div>
+</div></blockquote>
+<ol class="arabic simple" start="2">
+<li><p>コマンドラインオプションを補完するときは次のコマンドを実行します。（Ubuntuの場合のみ）:</p></li>
+</ol>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">eval</span><span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span>register-python-argcomplete<span class="w"> </span>iinfer<span class="k">)</span><span class="s2">&quot;</span>
+</pre></div>
+</div>
+</div></blockquote>
+<ol class="arabic simple" start="3">
+<li><p>サーバーコンテナをインストールする場合は次のコマンドを実行します。（Ubuntuの場合のみ）:</p></li>
+</ol>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>iinfer<span class="w"> </span>-m<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>server
+docker-compose<span class="w"> </span>-f<span class="w"> </span>up<span class="w"> </span>-d
+</pre></div>
+</div>
+</div></blockquote>
+</section>
+<section id="id2">
+<h2>iinferの使用方法<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<p>iinferを使用するには、次のコマンドを実行します:</p>
+<ol class="arabic simple">
+<li><p>サーバーの起動（Windowsの場合）:</p></li>
+</ol>
+<blockquote>
+<div><div class="highlight-bat notranslate"><div class="highlight"><pre><span></span><span class="c1">REM Redisサーバーコンテナの起動</span>
+iinfer -m redis -c docker_run -f \
+                              --wsl_name <span class="p">&lt;</span>WSLのディストリビューションの名前<span class="p">&gt;</span> \
+                              --wsl_user <span class="p">&lt;</span>WSLのLinux内のDockerが使えるユーザー&gt;
+
+<span class="c1">REM 推論処理を実行するサーバープロセスの起動</span>
+iinfer -m server -c start -f
+</pre></div>
+</div>
+</div></blockquote>
+<ol class="arabic simple" start="2">
+<li><p>サーバーの起動（Ubuntuの場合）:</p></li>
+</ol>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Redisサーバーコンテナと推論処理を実行するサーバープロセスの起動</span>
+docker-compose<span class="w"> </span>up<span class="w"> </span>-d
+</pre></div>
+</div>
+</div></blockquote>
+<ol class="arabic simple" start="3">
+<li><p>AIモデルのデプロイ:</p></li>
+</ol>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># 画像AIモデルのデプロイ</span>
+<span class="c1"># 推論タイプはモデルのAIタスクやアルゴリズムに合わせて指定する。指定可能なキーワードは&quot;iinfer -m client -c predict_type_list&quot;コマンド参照。</span>
+iinfer<span class="w"> </span>-m<span class="w"> </span>client<span class="w"> </span>-c<span class="w"> </span>deploy<span class="w"> </span>-n<span class="w"> </span>&lt;任意のモデル名&gt;<span class="w"> </span>-f<span class="w"> </span><span class="se">\</span>
+<span class="w">                            </span>--model_img_width<span class="w"> </span>&lt;モデルのINPUTサイズ<span class="o">(</span>横幅<span class="o">)</span>&gt;<span class="w"> </span><span class="se">\</span>
+<span class="w">                            </span>--model_img_height<span class="w"> </span>&lt;モデルのINPUTサイズ<span class="o">(</span>縦幅<span class="o">)</span>&gt;<span class="w"> </span><span class="se">\</span>
+<span class="w">                            </span>--model_file<span class="w"> </span>&lt;モデルファイル&gt;<span class="w"> </span><span class="se">\</span>
+<span class="w">                            </span>--model_conf_file<span class="w"> </span>&lt;モデル設定ファイル&gt;<span class="w"> </span><span class="se">\</span>
+<span class="w">                            </span>--predict_type<span class="w"> </span>&lt;推論タイプ&gt;<span class="w"> </span><span class="se">\</span>
+<span class="w">                            </span>--label_file<span class="w"> </span>&lt;ラベルファイル&gt;
+
+<span class="c1"># デプロイされている画像AIモデルの一覧</span>
+iinfer<span class="w"> </span>-m<span class="w"> </span>client<span class="w"> </span>-c<span class="w"> </span>deploy_list<span class="w"> </span>-f
+</pre></div>
+</div>
+</div></blockquote>
+<ol class="arabic simple" start="4">
+<li><p>AIモデルのセッションを開始:</p></li>
+</ol>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># 画像AIモデルを起動させて推論可能な状態に(セッションを確保)する</span>
+<span class="c1"># use_trackを指定するとObjectDetectionタスクの結果に対して、MOT（Multi Object Tracking）を実行しトラッキングIDを出力する。</span>
+iinfer<span class="w"> </span>-m<span class="w"> </span>client<span class="w"> </span>-c<span class="w"> </span>start<span class="w"> </span>-n<span class="w"> </span>&lt;モデル名&gt;<span class="w"> </span>-f<span class="w"> </span><span class="se">\</span>
+<span class="w">                          </span>--use_track
+</pre></div>
+</div>
+</div></blockquote>
+<ol class="arabic simple" start="5">
+<li><p>推論を実行:</p></li>
+</ol>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># 推論を実行する</span>
+<span class="c1"># output_previewを指定するとimshowで推論結果画像を表示する（GUI必要）</span>
+iinfer<span class="w"> </span>-m<span class="w"> </span>client<span class="w"> </span>-c<span class="w"> </span>predict<span class="w"> </span>-n<span class="w"> </span>&lt;モデル名&gt;<span class="w"> </span>-f<span class="w"> </span><span class="se">\</span>
+<span class="w">                            </span>-i<span class="w"> </span>&lt;推論させる画像ファイル&gt;<span class="w"> </span><span class="se">\</span>
+<span class="w">                            </span>-o<span class="w"> </span>&lt;推論結果の画像ファイル&gt;<span class="w"> </span><span class="se">\</span>
+<span class="w">                            </span>--output_preview
+
+<span class="c1"># カメラキャプチャー画像を元に推論を実行し、クラススコアが0.8以上の物体のみを検出する</span>
+<span class="c1"># --stdin --image_type capture で標準入力のキャプチャー画像を推論する</span>
+iinfer<span class="w"> </span>-m<span class="w"> </span>client<span class="w"> </span>-c<span class="w"> </span>capture<span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="se">\</span>
+iinfer<span class="w"> </span>-m<span class="w"> </span>client<span class="w"> </span>-c<span class="w"> </span>predict<span class="w"> </span>-n<span class="w"> </span>&lt;モデル名&gt;<span class="w"> </span><span class="se">\</span>
+<span class="w">                            </span>--stdin<span class="w"> </span><span class="se">\</span>
+<span class="w">                            </span>--image_type<span class="w"> </span>capture<span class="w"> </span><span class="se">\</span>
+<span class="w">                            </span>--nodraw<span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="se">\</span>
+iinfer<span class="w"> </span>-m<span class="w"> </span>postprocess<span class="w"> </span>-c<span class="w"> </span>det_filter<span class="w"> </span>-f<span class="w"> </span>-P<span class="w"> </span><span class="se">\</span>
+<span class="w">                            </span>--stdin<span class="w"> </span><span class="se">\</span>
+<span class="w">                            </span>--score_th<span class="w"> </span><span class="m">0</span>.8
+</pre></div>
+</div>
+</div></blockquote>
+<ol class="arabic simple" start="6">
+<li><p>AIモデルのセッションを開放:</p></li>
+</ol>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># 画像AIモデルを停止させてセッションを開放</span>
+iinfer<span class="w"> </span>-m<span class="w"> </span>client<span class="w"> </span>-c<span class="w"> </span>stop<span class="w"> </span>-n<span class="w"> </span>&lt;モデル名&gt;<span class="w"> </span>-f
+</pre></div>
+</div>
+</div></blockquote>
+<ol class="arabic simple" start="7">
+<li><p>サーバーの停止（Ubuntuの場合）:</p></li>
+</ol>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Redisサーバーコンテナと推論処理を実行するサーバープロセスの停止</span>
+docker-compose<span class="w"> </span>down
+</pre></div>
+</div>
+</div></blockquote>
+<ol class="arabic simple" start="8">
+<li><p>サーバーの停止（Windowsの場合）:</p></li>
+</ol>
+<blockquote>
+<div><div class="highlight-bat notranslate"><div class="highlight"><pre><span></span><span class="c1">REM 推論処理を実行するサーバープロセスの停止</span>
+iinfer -m server -c stop -f
+
+<span class="c1">REM Redisサーバーコンテナの停止</span>
+iinfer -m redis -c docker_stop -f \
+                                --wsl_name <span class="p">&lt;</span>WSLのディストリビューションの名前<span class="p">&gt;</span> \
+                                --wsl_user <span class="p">&lt;</span>WSLのLinux内のDockerが使えるユーザー&gt;
+</pre></div>
+</div>
+</div></blockquote>
+</section>
+<section id="id3">
+<h2>データの保存場所<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
+<blockquote>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">HOME_DIR</span><span class="p">)</span> <span class="o">/</span> <span class="s1">&#39;.iinfer&#39;</span>
+</pre></div>
+</div>
+</div></blockquote>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../index.html" class="btn btn-neutral float-left" title="iinfer (Visual Prediction Application)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="command.html" class="btn btn-neutral float-right" title="コマンドリファレンス" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright (c) 2023 hamacom2004jp.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

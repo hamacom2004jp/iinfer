@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="jp" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>iinfer.app.client &mdash; iinfer 2023/12/29 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=e370950d"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            iinfer
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/overview.html">iinferの概要</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/command.html">コマンドリファレンス</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/models.html">動作確認済みモデル</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/customize.html">カスタマイズ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/developer.html">開発者向け情報</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/errors.html">よくあるエラー</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/license.html">ライセンス</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">iinfer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">iinfer.app.client</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for iinfer.app.client</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">iinfer.app</span> <span class="kn">import</span> <span class="n">common</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+<span class="kn">import</span> <span class="nn">base64</span>
+<span class="kn">import</span> <span class="nn">cv2</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">redis</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+
+<div class="viewcode-block" id="Client">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.client.Client">[docs]</a>
+<span class="k">class</span> <span class="nc">Client</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">redis_host</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;localhost&quot;</span><span class="p">,</span> <span class="n">redis_port</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">6379</span><span class="p">,</span> <span class="n">redis_password</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Redisサーバーとの通信を行うクラス</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            logger (logging): ロガー</span>
+<span class="sd">            redis_host (str, optional): Redisサーバーのホスト名. Defaults to &quot;localhost&quot;.</span>
+<span class="sd">            redis_port (int, optional): Redisサーバーのポート番号. Defaults to 6379.</span>
+<span class="sd">            redis_password (str, optional): Redisサーバーのパスワード. Defaults to None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logger</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redis_host</span> <span class="o">=</span> <span class="n">redis_host</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redis_port</span> <span class="o">=</span> <span class="n">redis_port</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">password</span> <span class="o">=</span> <span class="n">redis_password</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span> <span class="o">=</span> <span class="n">redis</span><span class="o">.</span><span class="n">Redis</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">redis_host</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">redis_port</span><span class="p">,</span> <span class="n">db</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="n">redis_password</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_server</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="Client.check_server">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.client.Client.check_server">[docs]</a>
+    <span class="k">def</span> <span class="nf">check_server</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Redisサーバーにpingを送信し、応答があるか確認する</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">ping</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">terminate_server</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;fail to ping redis-server&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;fail to ping redis-server&quot;</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_proc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">cmd</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">timeout</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="mi">60</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        コマンドをRedisサーバーに送信し、応答を取得する</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            key (str): コマンドのキー</span>
+<span class="sd">            cmd (str): コマンド</span>
+<span class="sd">            params (List[str]): コマンドのパラメータ</span>
+<span class="sd">            timeout (int, optional): タイムアウト時間. Defaults to 60.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Redisサーバーからの応答</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">reskey</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">random_string</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">rpush</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">reskey</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">params</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">blpop</span><span class="p">([</span><span class="n">reskey</span><span class="p">],</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_response</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="n">res</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reskey</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">res_msg</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Redisサーバーからの応答を解析する</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            reskey (str): Redisサーバーからの応答のキー</span>
+<span class="sd">            res_msg (List[str]): Redisサーバーからの応答</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: 解析された応答</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">reskey</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">res_msg</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Response timed out.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Response timed out.&quot;</span><span class="p">}</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">res_msg</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No response was received.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;No response was received.&quot;</span><span class="p">}</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">res_msg</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="n">res_json</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="n">msg_json</span> <span class="o">=</span> <span class="n">res_json</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">if</span> <span class="s2">&quot;output_image&quot;</span> <span class="ow">in</span> <span class="n">msg_json</span><span class="p">:</span>
+            <span class="n">msg_json</span><span class="p">[</span><span class="s2">&quot;output_image&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;binary&quot;</span>
+        <span class="k">if</span> <span class="s2">&quot;error&quot;</span> <span class="ow">in</span> <span class="n">res_json</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">msg_json</span><span class="p">))</span>
+        <span class="k">if</span> <span class="s2">&quot;warn&quot;</span> <span class="ow">in</span> <span class="n">res_json</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">msg_json</span><span class="p">))</span>
+        <span class="k">if</span> <span class="s2">&quot;success&quot;</span> <span class="ow">in</span> <span class="n">res_json</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">msg_json</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">res_json</span>
+
+<div class="viewcode-block" id="Client.deploy">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.client.Client.deploy">[docs]</a>
+    <span class="k">def</span> <span class="nf">deploy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">model_img_width</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">model_img_height</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">model_file</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="n">model_conf_file</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Path</span><span class="p">],</span> <span class="n">predict_type</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">custom_predict_py</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span>
+               <span class="n">label_file</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="n">color_file</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="n">overwrite</span><span class="p">:</span><span class="nb">bool</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="mi">60</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        モデルをRedisサーバーにデプロイする</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            name (str): モデル名</span>
+<span class="sd">            model_img_width (int): 画像の幅</span>
+<span class="sd">            model_img_height (int): 画像の高さ</span>
+<span class="sd">            model_file (Path): モデルファイルのパス</span>
+<span class="sd">            model_conf_file (List[Path]): モデル設定ファイルのパス</span>
+<span class="sd">            predict_type (str): 推論方法のタイプ</span>
+<span class="sd">            custom_predict_py (Path): 推論スクリプトのパス</span>
+<span class="sd">            label_file (Path): ラベルファイルのパス</span>
+<span class="sd">            color_file (Path): 色ファイルのパス</span>
+<span class="sd">            overwrite (bool): モデルを上書きするかどうか</span>
+<span class="sd">            timeout (int, optional): タイムアウト時間. Defaults to 60.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Redisサーバーからの応答</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">password</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">password</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;password is empty.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;password is empty.&quot;</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;name is empty.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;name is empty.&quot;</span><span class="p">}</span>
+        <span class="k">if</span> <span class="s2">&quot; &quot;</span> <span class="ow">in</span> <span class="n">name</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;name contains whitespace.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;name contains whitespace.&quot;</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">model_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;model_file or model_file is empty.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;model_file or model_file is empty.&quot;</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">predict_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;predict_type is empty.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;predict_type is empty.&quot;</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">predict_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">common</span><span class="o">.</span><span class="n">BASE_MODELS</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown predict_type. </span><span class="si">{</span><span class="n">predict_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;predict_type is empty.&quot;</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">model_img_width</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">model_img_width</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">model_img_width</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">BASE_MODELS</span><span class="p">[</span><span class="n">predict_type</span><span class="p">][</span><span class="s1">&#39;image_width&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">model_img_height</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">model_img_height</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">model_img_height</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">BASE_MODELS</span><span class="p">[</span><span class="n">predict_type</span><span class="p">][</span><span class="s1">&#39;image_height&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">model_file</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;model_file </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">model_file</span><span class="p">)</span><span class="si">}</span><span class="s2"> does not exist&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;model_file </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">model_file</span><span class="p">)</span><span class="si">}</span><span class="s2"> does not exist&quot;</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">predict_type</span> <span class="o">==</span> <span class="s1">&#39;Custom&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">custom_predict_py</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">custom_predict_py</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;custom_predict_py path </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">custom_predict_py</span><span class="p">)</span><span class="si">}</span><span class="s2"> does not exist&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;custom_predict_py path </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">custom_predict_py</span><span class="p">)</span><span class="si">}</span><span class="s2"> does not exist&quot;</span><span class="p">}</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">custom_predict_py</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">pf</span><span class="p">:</span>
+                <span class="n">custom_predict_py_b64</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">pf</span><span class="o">.</span><span class="n">read</span><span class="p">())</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">custom_predict_py_b64</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">label_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">label_file</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;label_file </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">label_file</span><span class="p">)</span><span class="si">}</span><span class="s2"> does not exist&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;label_file </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">label_file</span><span class="p">)</span><span class="si">}</span><span class="s2"> does not exist&quot;</span><span class="p">}</span>
+        <span class="k">elif</span> <span class="n">label_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">label_file</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">lf</span><span class="p">:</span>
+                <span class="n">label_file_b64</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">lf</span><span class="o">.</span><span class="n">read</span><span class="p">())</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">label_file_b64</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">color_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">color_file</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;color_file </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">color_file</span><span class="p">)</span><span class="si">}</span><span class="s2"> does not exist&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;color_file </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">color_file</span><span class="p">)</span><span class="si">}</span><span class="s2"> does not exist&quot;</span><span class="p">}</span>
+        <span class="k">elif</span> <span class="n">color_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">color_file</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">cf</span><span class="p">:</span>
+                <span class="n">color_file_b64</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">cf</span><span class="o">.</span><span class="n">read</span><span class="p">())</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">color_file_b64</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">model_file</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">mf</span><span class="p">:</span>
+            <span class="n">model_bytes_b64</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">mf</span><span class="o">.</span><span class="n">read</span><span class="p">())</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">model_conf_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">model_conf_bytes_b64</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">model_conf_file_name</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">cf</span> <span class="ow">in</span> <span class="n">model_conf_file</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">cf</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;model_conf_file </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">cf</span><span class="p">)</span><span class="si">}</span><span class="s2"> does not exist&quot;</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;model_conf_file </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">cf</span><span class="p">)</span><span class="si">}</span><span class="s2"> does not exist&quot;</span><span class="p">}</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">cf</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">model_conf_bytes_b64</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">())</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+                <span class="n">model_conf_file_name</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cf</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">model_conf_bytes_b64</span> <span class="o">=</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">model_conf_bytes_b64</span><span class="p">)</span>
+            <span class="n">model_conf_file_name</span> <span class="o">=</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">model_conf_file_name</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">model_conf_bytes_b64</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">model_conf_file_name</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">res_json</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_proc</span><span class="p">(</span><span class="s1">&#39;server&#39;</span><span class="p">,</span> <span class="s1">&#39;deploy&#39;</span><span class="p">,</span> <span class="p">[</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">model_img_width</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">model_img_height</span><span class="p">),</span> <span class="n">predict_type</span><span class="p">,</span>
+                                                   <span class="n">model_file</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">model_bytes_b64</span><span class="p">,</span> <span class="n">model_conf_file_name</span><span class="p">,</span> <span class="n">model_conf_bytes_b64</span><span class="p">,</span> <span class="n">custom_predict_py_b64</span><span class="p">,</span>
+                                                   <span class="n">label_file_b64</span><span class="p">,</span> <span class="n">color_file_b64</span><span class="p">,</span> <span class="n">overwrite</span><span class="p">],</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">res_json</span></div>
+
+
+<div class="viewcode-block" id="Client.deploy_list">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.client.Client.deploy_list">[docs]</a>
+    <span class="k">def</span> <span class="nf">deploy_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="mi">60</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        デプロイされたモデルのリストを取得する</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Redisサーバーからの応答</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">password</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">password</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;password is empty.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;password is empty.&quot;</span><span class="p">}</span>
+        <span class="n">res_json</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_proc</span><span class="p">(</span><span class="s1">&#39;server&#39;</span><span class="p">,</span> <span class="s1">&#39;deploy_list&#39;</span><span class="p">,</span> <span class="p">[],</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">res_json</span></div>
+
+
+<div class="viewcode-block" id="Client.undeploy">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.client.Client.undeploy">[docs]</a>
+    <span class="k">def</span> <span class="nf">undeploy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="mi">60</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        モデルをRedisサーバーからアンデプロイする</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            name (str): モデル名</span>
+<span class="sd">            timeout (int, optional): タイムアウト時間. Defaults to 60.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Redisサーバーからの応答</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">password</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">password</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;password is empty.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;password is empty.&quot;</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;name is empty.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;name is empty.&quot;</span><span class="p">}</span>
+        <span class="n">res_json</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_proc</span><span class="p">(</span><span class="s1">&#39;server&#39;</span><span class="p">,</span> <span class="s1">&#39;undeploy&#39;</span><span class="p">,</span> <span class="p">[</span><span class="n">name</span><span class="p">],</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">res_json</span></div>
+
+
+<div class="viewcode-block" id="Client.start">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.client.Client.start">[docs]</a>
+    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">model_provider</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;CPUExecutionProvider&#39;</span><span class="p">,</span> <span class="n">use_track</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">gpuid</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="mi">60</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        モデルをRedisサーバーで起動する</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            name (str): モデル名</span>
+<span class="sd">            model_provider (str, optional): 推論実行時のモデルプロバイダー。デフォルトは&#39;CPUExecutionProvider&#39;。</span>
+<span class="sd">            use_track (bool): Multi Object Trackerを使用するかどうか, by default False</span>
+<span class="sd">            gpuid (int): GPU ID, by default None</span>
+<span class="sd">            timeout (int, optional): タイムアウト時間. Defaults to 60.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Redisサーバーからの応答</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">password</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">password</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;password is empty.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;password is empty.&quot;</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;name is empty.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;name is empty.&quot;</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">model_provider</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">model_provider</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;model_provider is empty.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;model_provider is empty.&quot;</span><span class="p">}</span>
+        <span class="n">res_json</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_proc</span><span class="p">(</span><span class="s1">&#39;server&#39;</span><span class="p">,</span> <span class="s1">&#39;start&#39;</span><span class="p">,</span> <span class="p">[</span><span class="n">name</span><span class="p">,</span> <span class="n">model_provider</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">use_track</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">gpuid</span><span class="p">)],</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">res_json</span></div>
+
+
+<div class="viewcode-block" id="Client.stop">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.client.Client.stop">[docs]</a>
+    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="mi">60</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        モデルをRedisサーバーで停止する</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            name (str): モデル名</span>
+<span class="sd">            timeout (int, optional): タイムアウト時間. Defaults to 60.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Redisサーバーからの応答</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">password</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">password</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;password is empty.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;password is empty.&quot;</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;name is empty.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;name is empty.&quot;</span><span class="p">}</span>
+        <span class="n">res_json</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_proc</span><span class="p">(</span><span class="s1">&#39;server&#39;</span><span class="p">,</span> <span class="s1">&#39;stop&#39;</span><span class="p">,</span> <span class="p">[</span><span class="n">name</span><span class="p">],</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">res_json</span></div>
+
+
+
+<div class="viewcode-block" id="Client.stop_server">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.client.Client.stop_server">[docs]</a>
+    <span class="k">def</span> <span class="nf">stop_server</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="mi">60</span><span class="p">):</span>
+        <span class="n">res_json</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_proc</span><span class="p">(</span><span class="s1">&#39;server&#39;</span><span class="p">,</span> <span class="s1">&#39;stop_server&#39;</span><span class="p">,</span> <span class="p">[],</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">res_json</span></div>
+
+
+<div class="viewcode-block" id="Client.predict">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.client.Client.predict">[docs]</a>
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">image</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">image_file</span><span class="p">:</span><span class="n">Path</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">image_type</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;jpeg&#39;</span><span class="p">,</span> <span class="n">output_image_file</span><span class="p">:</span><span class="n">Path</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">output_preview</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">nodraw</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="mi">60</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        画像をRedisサーバーに送信し、推論結果を取得する</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            name (str): モデル名</span>
+<span class="sd">            image (np.ndarray | bytes, optional): 画像データ. Defaults to None. np.ndarray型の場合はデコードしない(RGBであること).</span>
+<span class="sd">            image_file (Path, optional): 画像ファイルのパス. Defaults to None.</span>
+<span class="sd">            image_type (str, optional): 画像の形式. Defaults to &#39;jpeg&#39;.</span>
+<span class="sd">            output_image_file (Path, optional): 予測結果の画像ファイルのパス. Defaults to None.</span>
+<span class="sd">            output_preview (bool, optional): 予測結果の画像をプレビューするかどうか. Defaults to False.</span>
+<span class="sd">            nodraw (bool, optional): 描画フラグ. Defaults to False.</span>
+<span class="sd">            timeout (int, optional): タイムアウト時間. Defaults to 60.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Redisサーバーからの応答</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">password</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">password</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;password is empty.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;password is empty.&quot;</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;name is empty.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;name is empty.&quot;</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">image</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">image_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;image and image_file is empty.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;image and image_file is empty.&quot;</span><span class="p">}</span>
+        <span class="n">npy_b64</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">image_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">image_file</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Not found image_file. </span><span class="si">{</span><span class="n">image_file</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Not found image_file. </span><span class="si">{</span><span class="n">image_file</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">}</span>
+            <span class="k">if</span> <span class="n">image_type</span> <span class="o">==</span> <span class="s1">&#39;jpeg&#39;</span> <span class="ow">or</span> <span class="n">image_type</span> <span class="o">==</span> <span class="s1">&#39;png&#39;</span> <span class="ow">or</span> <span class="n">image_type</span> <span class="o">==</span> <span class="s1">&#39;bmp&#39;</span><span class="p">:</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">image_file</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">img_npy</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">imgfile2npy</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">image_type</span> <span class="o">==</span> <span class="s1">&#39;capture&#39;</span><span class="p">:</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">image_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">res_list</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+                        <span class="n">capture_data</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+                        <span class="n">img</span> <span class="o">=</span> <span class="n">capture_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                        <span class="n">h</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">capture_data</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                        <span class="n">w</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">capture_data</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+                        <span class="n">c</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">capture_data</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+                        <span class="n">img_npy</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">b64str2npy</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span> <span class="k">if</span> <span class="n">c</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">))</span>
+                        <span class="n">res_json</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">image</span><span class="o">=</span><span class="n">img_npy</span><span class="p">,</span> <span class="n">output_image_file</span><span class="o">=</span><span class="n">output_image_file</span><span class="p">,</span> <span class="n">output_preview</span><span class="o">=</span><span class="n">output_preview</span><span class="p">,</span> <span class="n">nodraw</span><span class="o">=</span><span class="n">nodraw</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+                        <span class="n">res_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res_json</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">res_list</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;warn&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;capture file is no data.&quot;</span><span class="p">}</span>
+                    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">res_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="n">res_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="k">return</span> <span class="n">res_list</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;image_type is invalid. </span><span class="si">{</span><span class="n">image_type</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;image_type is invalid. </span><span class="si">{</span><span class="n">image_type</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">image</span><span class="p">)</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+                <span class="n">img_npy</span> <span class="o">=</span> <span class="n">image</span>
+            <span class="k">elif</span> <span class="n">image_type</span> <span class="o">==</span> <span class="s1">&#39;capture&#39;</span><span class="p">:</span>
+                <span class="n">capture_data</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;capture_data=</span><span class="si">{</span><span class="n">capture_data</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">img</span> <span class="o">=</span> <span class="n">capture_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">h</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">capture_data</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">w</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">capture_data</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+                <span class="n">c</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">capture_data</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+                <span class="n">img_npy</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">b64str2npy</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span> <span class="k">if</span> <span class="n">c</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="n">image_type</span> <span class="o">==</span> <span class="s1">&#39;jpeg&#39;</span> <span class="ow">or</span> <span class="n">image_type</span> <span class="o">==</span> <span class="s1">&#39;png&#39;</span> <span class="ow">or</span> <span class="n">image_type</span> <span class="o">==</span> <span class="s1">&#39;bmp&#39;</span><span class="p">:</span>
+                <span class="n">img_npy</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">imgbytes2npy</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;image_type is invalid. </span><span class="si">{</span><span class="n">image_type</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;image_type is invalid. </span><span class="si">{</span><span class="n">image_type</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">}</span>
+
+        <span class="n">npy_b64</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">npy2b64str</span><span class="p">(</span><span class="n">img_npy</span><span class="p">)</span>
+        <span class="c1">#img_npy2 = np.frombuffer(base64.b64decode(npy_b64), dtype=&#39;uint8&#39;).reshape(img_npy.shape)</span>
+
+        <span class="n">res_json</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_proc</span><span class="p">(</span><span class="s1">&#39;server&#39;</span><span class="p">,</span> <span class="s1">&#39;predict&#39;</span><span class="p">,</span> <span class="p">[</span><span class="n">name</span><span class="p">,</span> <span class="n">npy_b64</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">nodraw</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">img_npy</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">str</span><span class="p">(</span><span class="n">img_npy</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="nb">str</span><span class="p">(</span><span class="n">img_npy</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">img_npy</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span><span class="p">)],</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;output_image&quot;</span> <span class="ow">in</span> <span class="n">res_json</span> <span class="ow">and</span> <span class="s2">&quot;output_image_shape&quot;</span> <span class="ow">in</span> <span class="n">res_json</span><span class="p">:</span>
+            <span class="c1">#byteio = BytesIO(base64.b64decode(res_json[&quot;output_image&quot;]))</span>
+            <span class="c1">#img_npy = np.load(byteio)</span>
+            <span class="n">img_npy</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">b64str2npy</span><span class="p">(</span><span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;output_image&quot;</span><span class="p">],</span> <span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;output_image_shape&quot;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">output_image_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">common</span><span class="o">.</span><span class="n">npy2imgfile</span><span class="p">(</span><span class="n">img_npy</span><span class="p">,</span> <span class="n">output_image_file</span><span class="o">=</span><span class="n">output_image_file</span><span class="p">,</span> <span class="n">image_type</span><span class="o">=</span><span class="n">image_type</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">output_preview</span><span class="p">:</span>
+                <span class="c1"># RGB画像をBGR画像に変換</span>
+                <span class="n">img_npy</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">bgr2rgb</span><span class="p">(</span><span class="n">img_npy</span><span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">cv2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="s1">&#39;preview&#39;</span><span class="p">,</span> <span class="n">img_npy</span><span class="p">)</span>
+                    <span class="n">cv2</span><span class="o">.</span><span class="n">waitKey</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
+                    <span class="k">pass</span>
+        <span class="k">return</span> <span class="n">res_json</span></div>
+
+
+<div class="viewcode-block" id="Client.capture">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.client.Client.capture">[docs]</a>
+    <span class="k">def</span> <span class="nf">capture</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">capture_device</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">capture_frame_width</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">capture_frame_height</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">capture_fps</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">output_preview</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        ビデオをキャプチャしてその結果を出力する</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            capture_device (int or str): キャプチャするディバイス、ビデオデバイスのID, ビデオファイルのパス。rtspのURL. by default 0</span>
+<span class="sd">            capture_frame_width (int): キャプチャするビデオのフレーム幅, by default None</span>
+<span class="sd">            capture_frame_height (int): キャプチャするビデオのフレーム高さ, by default None</span>
+<span class="sd">            capture_fps (int): キャプチャするビデオのフレームレート, by default 10</span>
+<span class="sd">            output_preview (bool, optional): 予測結果の画像をプレビューするかどうか. Defaults to False.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cap</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">VideoCapture</span><span class="p">(</span><span class="n">capture_device</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">capture_frame_width</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">cap</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">CAP_PROP_FRAME_WIDTH</span><span class="p">,</span> <span class="n">capture_frame_width</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">capture_frame_height</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">cap</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">CAP_PROP_FRAME_HEIGHT</span><span class="p">,</span> <span class="n">capture_frame_height</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">capture_fps</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">cap</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">CAP_PROP_FPS</span><span class="p">,</span> <span class="n">capture_fps</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">interval</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">capture_fps</span><span class="p">)</span>
+            <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+                <span class="n">ret</span><span class="p">,</span> <span class="n">frame</span> <span class="o">=</span> <span class="n">cap</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">ret</span><span class="p">:</span>
+                    <span class="n">img_npy</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">bgr2rgb</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">output_preview</span><span class="p">:</span>
+                        <span class="c1"># RGB画像をBGR画像に変換</span>
+                        <span class="n">img_npy</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">bgr2rgb</span><span class="p">(</span><span class="n">img_npy</span><span class="p">)</span>
+                        <span class="n">cv2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="s1">&#39;preview&#39;</span><span class="p">,</span> <span class="n">img_npy</span><span class="p">)</span>
+                        <span class="n">cv2</span><span class="o">.</span><span class="n">waitKey</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="k">yield</span> <span class="n">common</span><span class="o">.</span><span class="n">npy2b64str</span><span class="p">(</span><span class="n">img_npy</span><span class="p">),</span> <span class="n">img_npy</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">img_npy</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">img_npy</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">img_npy</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Capture failed. devide_id=</span><span class="si">{</span><span class="n">capture_device</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">stack_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                    <span class="k">break</span>
+                <span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">interval</span> <span class="o">-</span> <span class="p">(</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">interval</span> <span class="o">-</span> <span class="p">(</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">))</span>
+
+        <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;KeyboardInterrupt&quot;</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">cap</span><span class="o">.</span><span class="n">release</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Client.capture_predict">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.client.Client.capture_predict">[docs]</a>
+    <span class="k">def</span> <span class="nf">capture_predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">output_image_file</span><span class="p">:</span><span class="n">Path</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="mi">60</span><span class="p">,</span>
+              <span class="n">capture_device</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">capture_frame_width</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">capture_frame_height</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">capture_fps</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">capture_output_fps</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+              <span class="n">output_preview</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        ビデオをキャプチャしてその結果をRedisサーバーに送信し、推論結果を取得する</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            name (str): モデル名</span>
+<span class="sd">            output_image_file (Path, optional): 予測結果の画像ファイルのパス. Defaults to None.</span>
+<span class="sd">            timeout (int, optional): タイムアウト時間. Defaults to 60.</span>
+<span class="sd">            capture_device (int or str): キャプチャするディバイス、ビデオデバイスのID, ビデオファイルのパス。rtspのURL. by default 0</span>
+<span class="sd">            capture_frame_width (int): キャプチャするビデオのフレーム幅, by default None</span>
+<span class="sd">            capture_frame_height (int): キャプチャするビデオのフレーム高さ, by default None</span>
+<span class="sd">            capture_fps (int): キャプチャするビデオのフレームレート, by default None</span>
+<span class="sd">            capture_output_fps (int): キャプチャするビデオのフレームレート, by default 30</span>
+<span class="sd">            output_preview (bool, optional): 予測結果の画像をプレビューするかどうか. Defaults to False.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cap</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">VideoCapture</span><span class="p">(</span><span class="n">capture_device</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">capture_frame_width</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">cap</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">CAP_PROP_FRAME_WIDTH</span><span class="p">,</span> <span class="n">capture_frame_width</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">capture_frame_height</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">cap</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">CAP_PROP_FRAME_HEIGHT</span><span class="p">,</span> <span class="n">capture_frame_height</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">capture_fps</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">cap</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">CAP_PROP_FPS</span><span class="p">,</span> <span class="n">capture_fps</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">interval</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">capture_output_fps</span><span class="p">)</span>
+            <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+                <span class="n">ret</span><span class="p">,</span> <span class="n">frame</span> <span class="o">=</span> <span class="n">cap</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">ret</span><span class="p">:</span>
+                    <span class="n">frame</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">bgr2rgb</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+                    <span class="n">res_json</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">image</span><span class="o">=</span><span class="n">frame</span><span class="p">,</span> <span class="n">output_image_file</span><span class="o">=</span><span class="n">output_image_file</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="s2">&quot;output_image&quot;</span> <span class="ow">in</span> <span class="n">res_json</span> <span class="ow">and</span> <span class="s2">&quot;output_image_shape&quot;</span> <span class="ow">in</span> <span class="n">res_json</span><span class="p">:</span>
+                        <span class="n">img_npy</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">b64str2npy</span><span class="p">(</span><span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;output_image&quot;</span><span class="p">],</span> <span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;output_image_shape&quot;</span><span class="p">])</span>
+                        <span class="k">if</span> <span class="n">output_preview</span><span class="p">:</span>
+                            <span class="c1"># RGB画像をBGR画像に変換</span>
+                            <span class="n">img_npy</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">bgr2rgb</span><span class="p">(</span><span class="n">img_npy</span><span class="p">)</span>
+                            <span class="n">cv2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="s1">&#39;preview&#39;</span><span class="p">,</span> <span class="n">img_npy</span><span class="p">)</span>
+                            <span class="n">cv2</span><span class="o">.</span><span class="n">waitKey</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="k">yield</span> <span class="n">res_json</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Capture failed. devide_id=</span><span class="si">{</span><span class="n">capture_device</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">stack_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                    <span class="k">break</span>
+                <span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">interval</span> <span class="o">-</span> <span class="p">(</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">interval</span> <span class="o">-</span> <span class="p">(</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">))</span>
+
+        <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;KeyboardInterrupt&quot;</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">cap</span><span class="o">.</span><span class="n">release</span><span class="p">()</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright (c) 2023 hamacom2004jp.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
