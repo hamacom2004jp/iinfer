@@ -1,0 +1,1292 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="jp" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>iinfer.app package &mdash; iinfer 2023/12/29 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=e370950d"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="iinfer.app.predicts package" href="iinfer.app.predicts.html" />
+    <link rel="prev" title="iinfer package" href="iinfer.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            iinfer
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../docs/overview.html">iinferの概要</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/command.html">コマンドリファレンス</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/models.html">動作確認済みモデル</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/customize.html">カスタマイズ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/developer.html">開発者向け情報</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">モジュール</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="iinfer.html">iinfer package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="iinfer.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">iinfer.app package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="iinfer.docker.html">iinfer.docker package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="iinfer.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iinfer.html#module-iinfer.version">iinfer.version module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iinfer.html#module-iinfer">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/errors.html">よくあるエラー</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/license.html">ライセンス</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">iinfer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">iinfer</a></li>
+          <li class="breadcrumb-item"><a href="iinfer.html">iinfer package</a></li>
+      <li class="breadcrumb-item active">iinfer.app package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/resources/iinfer.app.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="iinfer-app-package">
+<h1>iinfer.app package<a class="headerlink" href="#iinfer-app-package" title="Link to this heading"></a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="iinfer.app.predicts.html">iinfer.app.predicts package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="iinfer.app.predicts.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="iinfer.app.predicts.html#module-iinfer.app.predicts.mmdet_det_YoloX">iinfer.app.predicts.mmdet_det_YoloX module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.mmdet_det_YoloX.MMDetYoloX"><code class="docutils literal notranslate"><span class="pre">MMDetYoloX</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.mmdet_det_YoloX.MMDetYoloX.create_session"><code class="docutils literal notranslate"><span class="pre">MMDetYoloX.create_session()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.mmdet_det_YoloX.MMDetYoloX.multiclass_nms"><code class="docutils literal notranslate"><span class="pre">MMDetYoloX.multiclass_nms()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.mmdet_det_YoloX.MMDetYoloX.nms"><code class="docutils literal notranslate"><span class="pre">MMDetYoloX.nms()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.mmdet_det_YoloX.MMDetYoloX.postprocess"><code class="docutils literal notranslate"><span class="pre">MMDetYoloX.postprocess()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.mmdet_det_YoloX.MMDetYoloX.predict"><code class="docutils literal notranslate"><span class="pre">MMDetYoloX.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.mmdet_det_YoloX.MMDetYoloX.preprocess"><code class="docutils literal notranslate"><span class="pre">MMDetYoloX.preprocess()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="iinfer.app.predicts.html#module-iinfer.app.predicts.mmdet_det_YoloX_Lite">iinfer.app.predicts.mmdet_det_YoloX_Lite module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.mmdet_det_YoloX_Lite.MMDetYoloXLite"><code class="docutils literal notranslate"><span class="pre">MMDetYoloXLite</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="iinfer.app.predicts.html#module-iinfer.app.predicts.mmpretrain_cls_swin">iinfer.app.predicts.mmpretrain_cls_swin module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.mmpretrain_cls_swin.MMPretrainClsSwin"><code class="docutils literal notranslate"><span class="pre">MMPretrainClsSwin</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.mmpretrain_cls_swin.MMPretrainClsSwin.create_session"><code class="docutils literal notranslate"><span class="pre">MMPretrainClsSwin.create_session()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.mmpretrain_cls_swin.MMPretrainClsSwin.predict"><code class="docutils literal notranslate"><span class="pre">MMPretrainClsSwin.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.mmpretrain_cls_swin.MMPretrainClsSwin.preprocess_img"><code class="docutils literal notranslate"><span class="pre">MMPretrainClsSwin.preprocess_img()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.mmpretrain_cls_swin.MMPretrainClsSwin.resize_img"><code class="docutils literal notranslate"><span class="pre">MMPretrainClsSwin.resize_img()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="iinfer.app.predicts.html#module-iinfer.app.predicts.mmpretrain_cls_swin_Lite">iinfer.app.predicts.mmpretrain_cls_swin_Lite module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.mmpretrain_cls_swin_Lite.MMPretrainClsSwinLite"><code class="docutils literal notranslate"><span class="pre">MMPretrainClsSwinLite</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="iinfer.app.predicts.html#module-iinfer.app.predicts.onnx_cls_EfficientNet_Lite4">iinfer.app.predicts.onnx_cls_EfficientNet_Lite4 module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.onnx_cls_EfficientNet_Lite4.OnnxClsEfficientNetLite4"><code class="docutils literal notranslate"><span class="pre">OnnxClsEfficientNetLite4</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.onnx_cls_EfficientNet_Lite4.OnnxClsEfficientNetLite4.create_session"><code class="docutils literal notranslate"><span class="pre">OnnxClsEfficientNetLite4.create_session()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.onnx_cls_EfficientNet_Lite4.OnnxClsEfficientNetLite4.predict"><code class="docutils literal notranslate"><span class="pre">OnnxClsEfficientNetLite4.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.onnx_cls_EfficientNet_Lite4.OnnxClsEfficientNetLite4.preprocess_img"><code class="docutils literal notranslate"><span class="pre">OnnxClsEfficientNetLite4.preprocess_img()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.onnx_cls_EfficientNet_Lite4.OnnxClsEfficientNetLite4.resize_img"><code class="docutils literal notranslate"><span class="pre">OnnxClsEfficientNetLite4.resize_img()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="iinfer.app.predicts.html#module-iinfer.app.predicts.onnx_det_TinyYoloV3">iinfer.app.predicts.onnx_det_TinyYoloV3 module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.onnx_det_TinyYoloV3.OnnxDetTinyYoloV3"><code class="docutils literal notranslate"><span class="pre">OnnxDetTinyYoloV3</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.onnx_det_TinyYoloV3.OnnxDetTinyYoloV3.create_session"><code class="docutils literal notranslate"><span class="pre">OnnxDetTinyYoloV3.create_session()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.onnx_det_TinyYoloV3.OnnxDetTinyYoloV3.predict"><code class="docutils literal notranslate"><span class="pre">OnnxDetTinyYoloV3.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.onnx_det_TinyYoloV3.OnnxDetTinyYoloV3.preprocess_img"><code class="docutils literal notranslate"><span class="pre">OnnxDetTinyYoloV3.preprocess_img()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.onnx_det_TinyYoloV3.OnnxDetTinyYoloV3.resize_img"><code class="docutils literal notranslate"><span class="pre">OnnxDetTinyYoloV3.resize_img()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="iinfer.app.predicts.html#module-iinfer.app.predicts.onnx_det_YoloV3">iinfer.app.predicts.onnx_det_YoloV3 module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.onnx_det_YoloV3.OnnxDetTinyYoloV3"><code class="docutils literal notranslate"><span class="pre">OnnxDetTinyYoloV3</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.onnx_det_YoloV3.OnnxDetTinyYoloV3.create_session"><code class="docutils literal notranslate"><span class="pre">OnnxDetTinyYoloV3.create_session()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.onnx_det_YoloV3.OnnxDetTinyYoloV3.predict"><code class="docutils literal notranslate"><span class="pre">OnnxDetTinyYoloV3.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.onnx_det_YoloV3.OnnxDetTinyYoloV3.preprocess_img"><code class="docutils literal notranslate"><span class="pre">OnnxDetTinyYoloV3.preprocess_img()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.onnx_det_YoloV3.OnnxDetTinyYoloV3.resize_img"><code class="docutils literal notranslate"><span class="pre">OnnxDetTinyYoloV3.resize_img()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="iinfer.app.predicts.html#module-iinfer.app.predicts.onnx_det_YoloX">iinfer.app.predicts.onnx_det_YoloX module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.onnx_det_YoloX.OnnxDetYoloX"><code class="docutils literal notranslate"><span class="pre">OnnxDetYoloX</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.onnx_det_YoloX.OnnxDetYoloX.create_session"><code class="docutils literal notranslate"><span class="pre">OnnxDetYoloX.create_session()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.onnx_det_YoloX.OnnxDetYoloX.multiclass_nms"><code class="docutils literal notranslate"><span class="pre">OnnxDetYoloX.multiclass_nms()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.onnx_det_YoloX.OnnxDetYoloX.nms"><code class="docutils literal notranslate"><span class="pre">OnnxDetYoloX.nms()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.onnx_det_YoloX.OnnxDetYoloX.postprocess"><code class="docutils literal notranslate"><span class="pre">OnnxDetYoloX.postprocess()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.onnx_det_YoloX.OnnxDetYoloX.predict"><code class="docutils literal notranslate"><span class="pre">OnnxDetYoloX.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.onnx_det_YoloX.OnnxDetYoloX.preprocess"><code class="docutils literal notranslate"><span class="pre">OnnxDetYoloX.preprocess()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="iinfer.app.predicts.html#module-iinfer.app.predicts.onnx_det_YoloX_Lite">iinfer.app.predicts.onnx_det_YoloX_Lite module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.onnx_det_YoloX_Lite.OnnxdetYoloXLite"><code class="docutils literal notranslate"><span class="pre">OnnxdetYoloXLite</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.onnx_det_YoloX_Lite.OnnxdetYoloXLite.create_session"><code class="docutils literal notranslate"><span class="pre">OnnxdetYoloXLite.create_session()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.onnx_det_YoloX_Lite.OnnxdetYoloXLite.predict"><code class="docutils literal notranslate"><span class="pre">OnnxdetYoloXLite.predict()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="iinfer.app.predicts.html#module-iinfer.app.predicts">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-iinfer.app.app">
+<span id="iinfer-app-app-module"></span><h2>iinfer.app.app module<a class="headerlink" href="#module-iinfer.app.app" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="iinfer.app.app.main">
+<span class="sig-prename descclassname"><span class="pre">iinfer.app.app.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/app.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.app.main" title="Link to this definition"></a></dt>
+<dd><p>コマンドライン引数を処理し、サーバーまたはクライアントを起動し、コマンドを実行する。</p>
+</dd></dl>
+
+</section>
+<section id="module-iinfer.app.client">
+<span id="iinfer-app-client-module"></span><h2>iinfer.app.client module<a class="headerlink" href="#module-iinfer.app.client" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="iinfer.app.client.Client">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">iinfer.app.client.</span></span><span class="sig-name descname"><span class="pre">Client</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">redis_host</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'localhost'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">redis_port</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">6379</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">redis_password</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/client.html#Client"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.client.Client" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.client.Client.capture">
+<span class="sig-name descname"><span class="pre">capture</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">capture_device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capture_frame_width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capture_frame_height</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capture_fps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_preview</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/client.html#Client.capture"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.client.Client.capture" title="Link to this definition"></a></dt>
+<dd><p>ビデオをキャプチャしてその結果を出力する</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>capture_device</strong> (<em>int</em><em> or </em><em>str</em>) -- キャプチャするディバイス、ビデオデバイスのID, ビデオファイルのパス。rtspのURL. by default 0</p></li>
+<li><p><strong>capture_frame_width</strong> (<em>int</em>) -- キャプチャするビデオのフレーム幅, by default None</p></li>
+<li><p><strong>capture_frame_height</strong> (<em>int</em>) -- キャプチャするビデオのフレーム高さ, by default None</p></li>
+<li><p><strong>capture_fps</strong> (<em>int</em>) -- キャプチャするビデオのフレームレート, by default 10</p></li>
+<li><p><strong>output_preview</strong> (<em>bool</em><em>, </em><em>optional</em>) -- 予測結果の画像をプレビューするかどうか. Defaults to False.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.client.Client.capture_predict">
+<span class="sig-name descname"><span class="pre">capture_predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_image_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">60</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capture_device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capture_frame_width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capture_frame_height</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capture_fps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capture_output_fps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_preview</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/client.html#Client.capture_predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.client.Client.capture_predict" title="Link to this definition"></a></dt>
+<dd><p>ビデオをキャプチャしてその結果をRedisサーバーに送信し、推論結果を取得する</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) -- モデル名</p></li>
+<li><p><strong>output_image_file</strong> (<em>Path</em><em>, </em><em>optional</em>) -- 予測結果の画像ファイルのパス. Defaults to None.</p></li>
+<li><p><strong>timeout</strong> (<em>int</em><em>, </em><em>optional</em>) -- タイムアウト時間. Defaults to 60.</p></li>
+<li><p><strong>capture_device</strong> (<em>int</em><em> or </em><em>str</em>) -- キャプチャするディバイス、ビデオデバイスのID, ビデオファイルのパス。rtspのURL. by default 0</p></li>
+<li><p><strong>capture_frame_width</strong> (<em>int</em>) -- キャプチャするビデオのフレーム幅, by default None</p></li>
+<li><p><strong>capture_frame_height</strong> (<em>int</em>) -- キャプチャするビデオのフレーム高さ, by default None</p></li>
+<li><p><strong>capture_fps</strong> (<em>int</em>) -- キャプチャするビデオのフレームレート, by default None</p></li>
+<li><p><strong>capture_output_fps</strong> (<em>int</em>) -- キャプチャするビデオのフレームレート, by default 30</p></li>
+<li><p><strong>output_preview</strong> (<em>bool</em><em>, </em><em>optional</em>) -- 予測結果の画像をプレビューするかどうか. Defaults to False.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.client.Client.check_server">
+<span class="sig-name descname"><span class="pre">check_server</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/client.html#Client.check_server"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.client.Client.check_server" title="Link to this definition"></a></dt>
+<dd><p>Redisサーバーにpingを送信し、応答があるか確認する</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.client.Client.deploy">
+<span class="sig-name descname"><span class="pre">deploy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_img_width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_img_height</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_conf_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Path</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predict_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_predict_py</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">60</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/client.html#Client.deploy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.client.Client.deploy" title="Link to this definition"></a></dt>
+<dd><p>モデルをRedisサーバーにデプロイする</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) -- モデル名</p></li>
+<li><p><strong>model_img_width</strong> (<em>int</em>) -- 画像の幅</p></li>
+<li><p><strong>model_img_height</strong> (<em>int</em>) -- 画像の高さ</p></li>
+<li><p><strong>model_file</strong> (<em>Path</em>) -- モデルファイルのパス</p></li>
+<li><p><strong>model_conf_file</strong> (<em>List</em><em>[</em><em>Path</em><em>]</em>) -- モデル設定ファイルのパス</p></li>
+<li><p><strong>predict_type</strong> (<em>str</em>) -- 推論方法のタイプ</p></li>
+<li><p><strong>custom_predict_py</strong> (<em>Path</em>) -- 推論スクリプトのパス</p></li>
+<li><p><strong>label_file</strong> (<em>Path</em>) -- ラベルファイルのパス</p></li>
+<li><p><strong>color_file</strong> (<em>Path</em>) -- 色ファイルのパス</p></li>
+<li><p><strong>overwrite</strong> (<em>bool</em>) -- モデルを上書きするかどうか</p></li>
+<li><p><strong>timeout</strong> (<em>int</em><em>, </em><em>optional</em>) -- タイムアウト時間. Defaults to 60.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Redisサーバーからの応答</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.client.Client.deploy_list">
+<span class="sig-name descname"><span class="pre">deploy_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">60</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/client.html#Client.deploy_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.client.Client.deploy_list" title="Link to this definition"></a></dt>
+<dd><p>デプロイされたモデルのリストを取得する</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Redisサーバーからの応答</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.client.Client.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'jpeg'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_image_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_preview</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodraw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">60</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/client.html#Client.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.client.Client.predict" title="Link to this definition"></a></dt>
+<dd><p>画像をRedisサーバーに送信し、推論結果を取得する</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) -- モデル名</p></li>
+<li><p><strong>image</strong> (<em>np.ndarray</em><em> | </em><em>bytes</em><em>, </em><em>optional</em>) -- 画像データ. Defaults to None. np.ndarray型の場合はデコードしない(RGBであること).</p></li>
+<li><p><strong>image_file</strong> (<em>Path</em><em>, </em><em>optional</em>) -- 画像ファイルのパス. Defaults to None.</p></li>
+<li><p><strong>image_type</strong> (<em>str</em><em>, </em><em>optional</em>) -- 画像の形式. Defaults to 'jpeg'.</p></li>
+<li><p><strong>output_image_file</strong> (<em>Path</em><em>, </em><em>optional</em>) -- 予測結果の画像ファイルのパス. Defaults to None.</p></li>
+<li><p><strong>output_preview</strong> (<em>bool</em><em>, </em><em>optional</em>) -- 予測結果の画像をプレビューするかどうか. Defaults to False.</p></li>
+<li><p><strong>nodraw</strong> (<em>bool</em><em>, </em><em>optional</em>) -- 描画フラグ. Defaults to False.</p></li>
+<li><p><strong>timeout</strong> (<em>int</em><em>, </em><em>optional</em>) -- タイムアウト時間. Defaults to 60.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Redisサーバーからの応答</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.client.Client.start">
+<span class="sig-name descname"><span class="pre">start</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_provider</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'CPUExecutionProvider'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_track</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gpuid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">60</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/client.html#Client.start"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.client.Client.start" title="Link to this definition"></a></dt>
+<dd><p>モデルをRedisサーバーで起動する</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) -- モデル名</p></li>
+<li><p><strong>model_provider</strong> (<em>str</em><em>, </em><em>optional</em>) -- 推論実行時のモデルプロバイダー。デフォルトは'CPUExecutionProvider'。</p></li>
+<li><p><strong>use_track</strong> (<em>bool</em>) -- Multi Object Trackerを使用するかどうか, by default False</p></li>
+<li><p><strong>gpuid</strong> (<em>int</em>) -- GPU ID, by default None</p></li>
+<li><p><strong>timeout</strong> (<em>int</em><em>, </em><em>optional</em>) -- タイムアウト時間. Defaults to 60.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Redisサーバーからの応答</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.client.Client.stop">
+<span class="sig-name descname"><span class="pre">stop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">60</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/client.html#Client.stop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.client.Client.stop" title="Link to this definition"></a></dt>
+<dd><p>モデルをRedisサーバーで停止する</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) -- モデル名</p></li>
+<li><p><strong>timeout</strong> (<em>int</em><em>, </em><em>optional</em>) -- タイムアウト時間. Defaults to 60.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Redisサーバーからの応答</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.client.Client.stop_server">
+<span class="sig-name descname"><span class="pre">stop_server</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">60</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/client.html#Client.stop_server"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.client.Client.stop_server" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.client.Client.undeploy">
+<span class="sig-name descname"><span class="pre">undeploy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">60</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/client.html#Client.undeploy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.client.Client.undeploy" title="Link to this definition"></a></dt>
+<dd><p>モデルをRedisサーバーからアンデプロイする</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) -- モデル名</p></li>
+<li><p><strong>timeout</strong> (<em>int</em><em>, </em><em>optional</em>) -- タイムアウト時間. Defaults to 60.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Redisサーバーからの応答</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-iinfer.app.common">
+<span id="iinfer-app-common-module"></span><h2>iinfer.app.common module<a class="headerlink" href="#module-iinfer.app.common" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="iinfer.app.common.b64str2bytes">
+<span class="sig-prename descclassname"><span class="pre">iinfer.app.common.</span></span><span class="sig-name descname"><span class="pre">b64str2bytes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">b64str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bytes</span></span></span><a class="reference internal" href="../_modules/iinfer/app/common.html#b64str2bytes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.common.b64str2bytes" title="Link to this definition"></a></dt>
+<dd><p>Base64文字列をバイト列に変換します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>b64str</strong> (<em>str</em>) -- Base64形式の文字列</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>バイト列</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bytes</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="iinfer.app.common.b64str2npy">
+<span class="sig-prename descclassname"><span class="pre">iinfer.app.common.</span></span><span class="sig-name descname"><span class="pre">b64str2npy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">b64str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'uint8'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="../_modules/iinfer/app/common.html#b64str2npy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.common.b64str2npy" title="Link to this definition"></a></dt>
+<dd><p>Base64エンコードされた文字列からndarrayを復元します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>b64str</strong> (<em>str</em>) -- Base64エンコードされた文字列</p></li>
+<li><p><strong>shape</strong> (<em>tuple</em>) -- ndarrayの形状</p></li>
+<li><p><strong>dtype</strong> (<em>str</em><em>, </em><em>optional</em>) -- ndarrayのデータ型. Defaults to 'uint8'.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>復元したndarray</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="iinfer.app.common.b64str2str">
+<span class="sig-prename descclassname"><span class="pre">iinfer.app.common.</span></span><span class="sig-name descname"><span class="pre">b64str2str</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">b64str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../_modules/iinfer/app/common.html#b64str2str"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.common.b64str2str" title="Link to this definition"></a></dt>
+<dd><p>Base64エンコードされた文字列をデコードします。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>b64str</strong> (<em>str</em>) -- Base64エンコードされた文字列</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>デコードされた文字列</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="iinfer.app.common.bgr2rgb">
+<span class="sig-prename descclassname"><span class="pre">iinfer.app.common.</span></span><span class="sig-name descname"><span class="pre">bgr2rgb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">npy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="../_modules/iinfer/app/common.html#bgr2rgb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.common.bgr2rgb" title="Link to this definition"></a></dt>
+<dd><p>BGRのndarrayをRGBに変換します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>npy</strong> (<em>np.ndarray</em>) -- BGRのndarray</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>RGBのndarray</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="iinfer.app.common.cmd">
+<span class="sig-prename descclassname"><span class="pre">iinfer.app.common.</span></span><span class="sig-name descname"><span class="pre">cmd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/common.html#cmd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.common.cmd" title="Link to this definition"></a></dt>
+<dd><p>コマンドを実行します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cmd</strong> (<em>str</em>) -- 実行するコマンド</p></li>
+<li><p><strong>logger</strong> (<em>logging.Logger</em>) -- ロガー</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>コマンドの戻り値と出力</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[int, str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="iinfer.app.common.default_json_enc">
+<span class="sig-prename descclassname"><span class="pre">iinfer.app.common.</span></span><span class="sig-name descname"><span class="pre">default_json_enc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">o</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../_modules/iinfer/app/common.html#default_json_enc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.common.default_json_enc" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="iinfer.app.common.download_file">
+<span class="sig-prename descclassname"><span class="pre">iinfer.app.common.</span></span><span class="sig-name descname"><span class="pre">download_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Path</span></span></span><a class="reference internal" href="../_modules/iinfer/app/common.html#download_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.common.download_file" title="Link to this definition"></a></dt>
+<dd><p>ファイルをダウンロードします。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>url</strong> (<em>str</em>) -- ダウンロードするファイルのURL</p></li>
+<li><p><strong>save_path</strong> (<em>Path</em>) -- 保存先のファイルパス</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>保存したファイルのパス</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="iinfer.app.common.draw_boxes">
+<span class="sig-prename descclassname"><span class="pre">iinfer.app.common.</span></span><span class="sig-name descname"><span class="pre">draw_boxes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boxes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">classes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodraw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nolookup</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Image</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/iinfer/app/common.html#draw_boxes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.common.draw_boxes" title="Link to this definition"></a></dt>
+<dd><p>画像にバウンディングボックスを描画します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>image</strong> (<em>Image.Image</em>) -- 描画する画像</p></li>
+<li><p><strong>boxes</strong> (<em>List</em><em>[</em><em>List</em><em>[</em><em>float</em><em>]</em><em>]</em>) -- バウンディングボックスの座標リスト</p></li>
+<li><p><strong>scores</strong> (<em>List</em><em>[</em><em>float</em><em>]</em>) -- 各バウンディングボックスのスコアリスト</p></li>
+<li><p><strong>classes</strong> (<em>List</em><em>[</em><em>int</em><em>]</em>) -- 各バウンディングボックスのクラスリスト</p></li>
+<li><p><strong>ids</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) -- 各バウンディングボックスのIDリスト</p></li>
+<li><p><strong>labels</strong> (<em>List</em><em>[</em><em>str</em><em>]</em><em>, </em><em>optional</em>) -- クラスのラベルリスト. Defaults to None.</p></li>
+<li><p><strong>colors</strong> (<em>List</em><em>[</em><em>Tuple</em><em>[</em><em>int</em><em>]</em><em>]</em><em>, </em><em>optional</em>) -- クラスごとの色のリスト. Defaults to None.</p></li>
+<li><p><strong>nodraw</strong> (<em>bool</em><em>, </em><em>optional</em>) -- 描画しない場合はTrue. Defaults to False.</p></li>
+<li><p><strong>nolookup</strong> (<em>bool</em><em>, </em><em>optional</em>) -- ラベル及び色をクラスIDから取得しない場合はTrue. Defaults to False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>バウンディングボックスが描画された画像
+List[str]: 各バウンディングボックスのラベルリスト</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Image</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="iinfer.app.common.get_module_list">
+<span class="sig-prename descclassname"><span class="pre">iinfer.app.common.</span></span><span class="sig-name descname"><span class="pre">get_module_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">package_name</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/iinfer/app/common.html#get_module_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.common.get_module_list" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="iinfer.app.common.getopt">
+<span class="sig-prename descclassname"><span class="pre">iinfer.app.common.</span></span><span class="sig-name descname"><span class="pre">getopt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">opt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">withset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">any</span></span></span><a class="reference internal" href="../_modules/iinfer/app/common.html#getopt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.common.getopt" title="Link to this definition"></a></dt>
+<dd><p>コマンドラインオプションから指定されたキーの値を取得します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>opt</strong> (<em>dict</em>) -- 読み込んだコマンドラインオプション</p></li>
+<li><p><strong>key</strong> (<em>str</em>) -- キー</p></li>
+<li><p><strong>preval</strong> (<em>Any</em><em>, </em><em>optional</em>) -- 引数で指定されたコマンドラインオプション. Defaults to None.</p></li>
+<li><p><strong>defval</strong> (<em>Any</em><em>, </em><em>optional</em>) -- デフォルト値. Defaults to None.</p></li>
+<li><p><strong>withset</strong> (<em>bool</em><em>, </em><em>optional</em>) -- optに引数のコマンドラインオプションを設定するかどうか. Defaults to False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>取得した値</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Any</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="iinfer.app.common.img2byte">
+<span class="sig-prename descclassname"><span class="pre">iinfer.app.common.</span></span><span class="sig-name descname"><span class="pre">img2byte</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'jpeg'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bytes</span></span></span><a class="reference internal" href="../_modules/iinfer/app/common.html#img2byte"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.common.img2byte" title="Link to this definition"></a></dt>
+<dd><p>画像をバイト列に変換します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>image</strong> (<em>Image.Image</em>) -- PILのImageオブジェクト</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>画像のバイト列</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bytes</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="iinfer.app.common.img2npy">
+<span class="sig-prename descclassname"><span class="pre">iinfer.app.common.</span></span><span class="sig-name descname"><span class="pre">img2npy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'uint8'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="../_modules/iinfer/app/common.html#img2npy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.common.img2npy" title="Link to this definition"></a></dt>
+<dd><p>PILのImageオブジェクトをndarrayに変換します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>image</strong> (<em>Image.Image</em>) -- PILのImageオブジェクト</p></li>
+<li><p><strong>dtype</strong> (<em>str</em><em>, </em><em>optional</em>) -- ndarrayのデータ型. Defaults to 'uint8'.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>ndarray</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="iinfer.app.common.imgbytes2npy">
+<span class="sig-prename descclassname"><span class="pre">iinfer.app.common.</span></span><span class="sig-name descname"><span class="pre">imgbytes2npy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'uint8'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="../_modules/iinfer/app/common.html#imgbytes2npy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.common.imgbytes2npy" title="Link to this definition"></a></dt>
+<dd><p>画像のバイト列をndarrayに変換します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>img</strong> (<em>bytes</em>) -- 画像のバイト列</p></li>
+<li><p><strong>dtype</strong> (<em>str</em><em>, </em><em>optional</em>) -- ndarrayのデータ型. Defaults to 'uint8'.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>ndarray</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="iinfer.app.common.imgfile2npy">
+<span class="sig-prename descclassname"><span class="pre">iinfer.app.common.</span></span><span class="sig-name descname"><span class="pre">imgfile2npy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'uint8'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="../_modules/iinfer/app/common.html#imgfile2npy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.common.imgfile2npy" title="Link to this definition"></a></dt>
+<dd><p>画像ファイルをndarrayに変換します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fp</strong> (<em>[</em><em>type</em><em>]</em>) -- 画像ファイルのパス</p></li>
+<li><p><strong>dtype</strong> (<em>str</em><em>, </em><em>optional</em>) -- ndarrayのデータ型. Defaults to 'uint8'.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>ndarray</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="iinfer.app.common.load_config">
+<span class="sig-prename descclassname"><span class="pre">iinfer.app.common.</span></span><span class="sig-name descname"><span class="pre">load_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Logger</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/iinfer/app/common.html#load_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.common.load_config" title="Link to this definition"></a></dt>
+<dd><p>指定されたモードのロガーと設定を読み込みます。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>mode</strong> (<em>str</em>) -- モード名</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>ロガー
+config (dict): 設定</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>logger (logging.Logger)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="iinfer.app.common.load_custom_predict">
+<span class="sig-prename descclassname"><span class="pre">iinfer.app.common.</span></span><span class="sig-name descname"><span class="pre">load_custom_predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">custom_predict_py</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#iinfer.app.predict.Predict" title="iinfer.app.predict.Predict"><span class="pre">Predict</span></a></span></span><a class="reference internal" href="../_modules/iinfer/app/common.html#load_custom_predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.common.load_custom_predict" title="Link to this definition"></a></dt>
+<dd><p>カスタム予測オブジェクトを読み込みます。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>custom_predict_py</strong> (<em>Path</em>) -- カスタム予測オブジェクトのパス</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>予測オブジェクト</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>iinder.app.predict.Predict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="iinfer.app.common.load_predict">
+<span class="sig-prename descclassname"><span class="pre">iinfer.app.common.</span></span><span class="sig-name descname"><span class="pre">load_predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">predict_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#iinfer.app.predict.Predict" title="iinfer.app.predict.Predict"><span class="pre">Predict</span></a></span></span><a class="reference internal" href="../_modules/iinfer/app/common.html#load_predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.common.load_predict" title="Link to this definition"></a></dt>
+<dd><p>指定された予測オブジェクトを読み込みます。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>predict_type</strong> (<em>str</em>) -- 予測オブジェクトのパッケージ名</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>BaseException</strong> -- 指定されたオブジェクトが見つからない場合</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>予測オブジェクト</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>[type]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="iinfer.app.common.loadopt">
+<span class="sig-prename descclassname"><span class="pre">iinfer.app.common.</span></span><span class="sig-name descname"><span class="pre">loadopt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">opt_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../_modules/iinfer/app/common.html#loadopt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.common.loadopt" title="Link to this definition"></a></dt>
+<dd><p>JSON形式のファイルからコマンドラインオプションを読み込みます。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>opt_path</strong> (<em>str</em>) -- 読み込むファイルパス</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>読み込んだコマンドラインオプション</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="iinfer.app.common.make_color">
+<span class="sig-prename descclassname"><span class="pre">iinfer.app.common.</span></span><span class="sig-name descname"><span class="pre">make_color</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idstr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/iinfer/app/common.html#make_color"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.common.make_color" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="iinfer.app.common.mkdirs">
+<span class="sig-prename descclassname"><span class="pre">iinfer.app.common.</span></span><span class="sig-name descname"><span class="pre">mkdirs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/common.html#mkdirs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.common.mkdirs" title="Link to this definition"></a></dt>
+<dd><p>ディレクトリを中間パスも含めて作成します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>dir_path</strong> (<em>Path</em>) -- 作成するディレクトリのパス</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>作成したディレクトリのパス</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="iinfer.app.common.npy2b64str">
+<span class="sig-prename descclassname"><span class="pre">iinfer.app.common.</span></span><span class="sig-name descname"><span class="pre">npy2b64str</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">npy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../_modules/iinfer/app/common.html#npy2b64str"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.common.npy2b64str" title="Link to this definition"></a></dt>
+<dd><p>ndarrayをBase64エンコードした文字列を返します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>npy</strong> (<em>np.ndarray</em>) -- ndarray</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Base64エンコードされた文字列</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="iinfer.app.common.npy2img">
+<span class="sig-prename descclassname"><span class="pre">iinfer.app.common.</span></span><span class="sig-name descname"><span class="pre">npy2img</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">npy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Image</span></span></span><a class="reference internal" href="../_modules/iinfer/app/common.html#npy2img"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.common.npy2img" title="Link to this definition"></a></dt>
+<dd><p>ndarrayをPILのImageオブジェクトに変換します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>npy</strong> (<em>np.ndarray</em>) -- ndarray</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>PILのImageオブジェクト</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Image.Image</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="iinfer.app.common.npy2imgfile">
+<span class="sig-prename descclassname"><span class="pre">iinfer.app.common.</span></span><span class="sig-name descname"><span class="pre">npy2imgfile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">npy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_image_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'jpeg'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bytes</span></span></span><a class="reference internal" href="../_modules/iinfer/app/common.html#npy2imgfile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.common.npy2imgfile" title="Link to this definition"></a></dt>
+<dd><p>ndarrayを画像bytesに変換しoutput_image_fileに保存します。
+output_image_fileが省略された場合は保存されません</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>npy</strong> (<em>[</em><em>type</em><em>]</em>) -- ndarray</p></li>
+<li><p><strong>output_image_file</strong> (<em>Path</em>) -- 保存先の画像ファイルパス</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="iinfer.app.common.npybytes2npy">
+<span class="sig-prename descclassname"><span class="pre">iinfer.app.common.</span></span><span class="sig-name descname"><span class="pre">npybytes2npy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">npy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="../_modules/iinfer/app/common.html#npybytes2npy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.common.npybytes2npy" title="Link to this definition"></a></dt>
+<dd><p>バイト列からndarrayを読み込みます。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>npy</strong> (<em>bytes</em>) -- ndarrayのバイト列</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>読み込んだndarray</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="iinfer.app.common.npyfile2npy">
+<span class="sig-prename descclassname"><span class="pre">iinfer.app.common.</span></span><span class="sig-name descname"><span class="pre">npyfile2npy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fp</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="../_modules/iinfer/app/common.html#npyfile2npy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.common.npyfile2npy" title="Link to this definition"></a></dt>
+<dd><p>npyファイルからndarrayを読み込みます。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fp</strong> (<em>[</em><em>type</em><em>]</em>) -- npyファイルのパス</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>読み込んだndarray</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="iinfer.app.common.print_format">
+<span class="sig-prename descclassname"><span class="pre">iinfer.app.common.</span></span><span class="sig-name descname"><span class="pre">print_format</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stdout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tablefmt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'github'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/common.html#print_format"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.common.print_format" title="Link to this definition"></a></dt>
+<dd><p>データを指定されたフォーマットで出力します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>dict</em>) -- 出力するデータ</p></li>
+<li><p><strong>format</strong> (<em>bool</em>) -- フォーマットするかどうか</p></li>
+<li><p><strong>tm</strong> (<em>float</em>) -- 処理時間</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>生成された文字列</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="iinfer.app.common.random_string">
+<span class="sig-prename descclassname"><span class="pre">iinfer.app.common.</span></span><span class="sig-name descname"><span class="pre">random_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">16</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/common.html#random_string"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.common.random_string" title="Link to this definition"></a></dt>
+<dd><p>ランダムな文字列を生成します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>size</strong> (<em>int</em><em>, </em><em>optional</em>) -- 文字列の長さ. Defaults to 16.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>生成された文字列</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="iinfer.app.common.rmdirs">
+<span class="sig-prename descclassname"><span class="pre">iinfer.app.common.</span></span><span class="sig-name descname"><span class="pre">rmdirs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/common.html#rmdirs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.common.rmdirs" title="Link to this definition"></a></dt>
+<dd><p>ディレクトリをサブディレクトリ含めて削除します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>dir_path</strong> (<em>Path</em>) -- 削除するディレクトリのパス</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="iinfer.app.common.saveopt">
+<span class="sig-prename descclassname"><span class="pre">iinfer.app.common.</span></span><span class="sig-name descname"><span class="pre">saveopt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">opt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opt_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/iinfer/app/common.html#saveopt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.common.saveopt" title="Link to this definition"></a></dt>
+<dd><p>コマンドラインオプションをJSON形式でファイルに保存します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>opt</strong> (<em>dict</em>) -- コマンドラインオプション</p></li>
+<li><p><strong>opt_path</strong> (<em>Path</em>) -- 保存先のファイルパス</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="iinfer.app.common.str2b64str">
+<span class="sig-prename descclassname"><span class="pre">iinfer.app.common.</span></span><span class="sig-name descname"><span class="pre">str2b64str</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../_modules/iinfer/app/common.html#str2b64str"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.common.str2b64str" title="Link to this definition"></a></dt>
+<dd><p>文字列をBase64エンコードします。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>s</strong> (<em>str</em>) -- 文字列</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Base64エンコードされた文字列</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-iinfer.app.install">
+<span id="iinfer-app-install-module"></span><h2>iinfer.app.install module<a class="headerlink" href="#module-iinfer.app.install" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="iinfer.app.install.Install">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">iinfer.app.install.</span></span><span class="sig-name descname"><span class="pre">Install</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wsl_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wsl_user</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/install.html#Install"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.install.Install" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.install.Install.mmcls">
+<span class="sig-name descname"><span class="pre">mmcls</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/install.html#Install.mmcls"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.install.Install.mmcls" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.install.Install.mmdet">
+<span class="sig-name descname"><span class="pre">mmdet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/install.html#Install.mmdet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.install.Install.mmdet" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.install.Install.mmpretrain">
+<span class="sig-name descname"><span class="pre">mmpretrain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/install.html#Install.mmpretrain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.install.Install.mmpretrain" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.install.Install.onnx">
+<span class="sig-name descname"><span class="pre">onnx</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/install.html#Install.onnx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.install.Install.onnx" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.install.Install.redis">
+<span class="sig-name descname"><span class="pre">redis</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/install.html#Install.redis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.install.Install.redis" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.install.Install.server">
+<span class="sig-name descname"><span class="pre">server</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/install.html#Install.server"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.install.Install.server" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-iinfer.app.postprocess">
+<span id="iinfer-app-postprocess-module"></span><h2>iinfer.app.postprocess module<a class="headerlink" href="#module-iinfer.app.postprocess" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="iinfer.app.postprocess.Postprocess">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">iinfer.app.postprocess.</span></span><span class="sig-name descname"><span class="pre">Postprocess</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/postprocess.html#Postprocess"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.postprocess.Postprocess" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.postprocess.Postprocess.create_session">
+<span class="sig-name descname"><span class="pre">create_session</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">json_connectstr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_connectstr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/postprocess.html#Postprocess.create_session"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.postprocess.Postprocess.create_session" title="Link to this definition"></a></dt>
+<dd><p>後処理のセッションを作成する関数です。
+ここで後処理準備を完了するようにしてください。
+戻り値の後処理セッションの型は問いません。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>json_connectstr</strong> (<em>str</em>) -- 推論結果後処理のセッション確立に必要な接続文字列</p></li>
+<li><p><strong>img_connectstr</strong> (<em>str</em>) -- 可視化画像後処理のセッション確立に必要な接続文字列</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>推論結果後処理のセッション
+可視化画像後処理のセッション</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.postprocess.Postprocess.post_img">
+<span class="sig-name descname"><span class="pre">post_img</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img_connectstr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outputs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Image</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/postprocess.html#Postprocess.post_img"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.postprocess.Postprocess.post_img" title="Link to this definition"></a></dt>
+<dd><p>output_imageに対して後処理を行う関数です。
+引数のimageはRGBですので、戻り値の出力画像もRGBにしてください。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>img_connectstr</strong> (<em>str</em>) -- 可視化画像の後処理に必要な接続文字列</p></li>
+<li><p><strong>outputs</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>) -- 後処理結果</p></li>
+<li><p><strong>output_image</strong> (<em>Image</em>) -- 入力画像（RGB配列であること）</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>後処理結果</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Image</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.postprocess.Postprocess.post_json">
+<span class="sig-name descname"><span class="pre">post_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">json_connectstr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outputs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/postprocess.html#Postprocess.post_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.postprocess.Postprocess.post_json" title="Link to this definition"></a></dt>
+<dd><p>outputsに対して後処理を行う関数です。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>json_connectstr</strong> (<em>str</em>) -- 推論結果の後処理に必要な接続文字列</p></li>
+<li><p><strong>outputs</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>) -- 推論結果</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>後処理結果</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dict[str, Any]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.postprocess.Postprocess.postprocess">
+<span class="sig-name descname"><span class="pre">postprocess</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">json_sessionssion</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_sessionssion</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">res_str</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">60</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/iinfer/app/postprocess.html#Postprocess.postprocess"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.postprocess.Postprocess.postprocess" title="Link to this definition"></a></dt>
+<dd><p>ポストプロセスを実行します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>json_sessionssion</strong> (<em>任意</em>) -- JSONセッション</p></li>
+<li><p><strong>img_sessionssion</strong> (<em>任意</em>) -- 画像セッション</p></li>
+<li><p><strong>res_str</strong> (<em>str</em>) -- 推論結果の文字列</p></li>
+<li><p><strong>timeout</strong> (<em>int</em><em>, </em><em>optional</em>) -- タイムアウト時間（秒）。デフォルトは60。</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>処理結果(処理後の画像含む)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dict[str, Any]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-iinfer.app.predict">
+<span id="iinfer-app-predict-module"></span><h2>iinfer.app.predict module<a class="headerlink" href="#module-iinfer.app.predict" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="iinfer.app.predict.Predict">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">iinfer.app.predict.</span></span><span class="sig-name descname"><span class="pre">Predict</span></span><a class="reference internal" href="../_modules/iinfer/app/predict.html#Predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predict.Predict" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.predict.Predict.create_session">
+<span class="sig-name descname"><span class="pre">create_session</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_conf_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_provider</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gpu_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="../_modules/iinfer/app/predict.html#Predict.create_session"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predict.Predict.create_session" title="Link to this definition"></a></dt>
+<dd><p>推論セッションを作成する関数です。
+startコマンド実行時に呼び出されます。
+この関数内でAIモデルのロードを行い、推論準備を完了するようにしてください。
+戻り値の推論セッションの型は問いません。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>logger</strong> (<em>logging.Logger</em>) -- ロガー</p></li>
+<li><p><strong>model_path</strong> (<em>Path</em>) -- モデルファイルのパス</p></li>
+<li><p><strong>model_conf_path</strong> (<em>Path</em>) -- モデル設定ファイルのパス</p></li>
+<li><p><strong>gpu_id</strong> (<em>int</em><em>, </em><em>optional</em>) -- GPU ID. Defaults to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>推論セッション</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.predict.Predict.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_height</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodraw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Image</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/iinfer/app/predict.html#Predict.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predict.Predict.predict" title="Link to this definition"></a></dt>
+<dd><p>予測を行う関数です。
+predictコマンドやcaptureコマンド実行時に呼び出されます。
+引数のimageはRGBですので、戻り値の出力画像もRGBにしてください。
+戻り値の推論結果のdictは、通常推論結果項目ごとに値(list)を設定します。
+例）Image Classification（EfficientNet_Lite4）の場合
+return dict(output_scores=output_scores, output_classes=output_classes), image_obj
+例）Object Detection（YoloX）の場合
+return dict(output_boxes=final_boxes, output_scores=final_scores, output_classes=final_cls_inds), output_image</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>session</strong> -- 推論セッション</p></li>
+<li><p><strong>img_width</strong> (<em>int</em>) -- モデルのINPUTサイズ（画像の幅）</p></li>
+<li><p><strong>img_height</strong> (<em>int</em>) -- モデルのINPUTサイズ（画像の高さ）</p></li>
+<li><p><strong>image</strong> (<em>Image</em>) -- 入力画像（RGB配列であること）</p></li>
+<li><p><strong>labels</strong> (<em>List</em><em>[</em><em>str</em><em>]</em><em>, </em><em>optional</em>) -- クラスラベルのリスト. Defaults to None.</p></li>
+<li><p><strong>colors</strong> (<em>List</em><em>[</em><em>Tuple</em><em>[</em><em>int</em><em>]</em><em>]</em><em>, </em><em>optional</em>) -- ボックスの色のリスト. Defaults to None.</p></li>
+<li><p><strong>nodraw</strong> (<em>bool</em><em>, </em><em>optional</em>) -- 描画フラグ. Defaults to False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>予測結果と出力画像(RGB)のタプル</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[Dict[str, Any], Image]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-iinfer.app.redis">
+<span id="iinfer-app-redis-module"></span><h2>iinfer.app.redis module<a class="headerlink" href="#module-iinfer.app.redis" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="iinfer.app.redis.Redis">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">iinfer.app.redis.</span></span><span class="sig-name descname"><span class="pre">Redis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wsl_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wsl_user</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/redis.html#Redis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.redis.Redis" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.redis.Redis.docker_run">
+<span class="sig-name descname"><span class="pre">docker_run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/redis.html#Redis.docker_run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.redis.Redis.docker_run" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.redis.Redis.docker_stop">
+<span class="sig-name descname"><span class="pre">docker_stop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/redis.html#Redis.docker_stop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.redis.Redis.docker_stop" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-iinfer.app.server">
+<span id="iinfer-app-server-module"></span><h2>iinfer.app.server module<a class="headerlink" href="#module-iinfer.app.server" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="iinfer.app.server.Server">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">iinfer.app.server.</span></span><span class="sig-name descname"><span class="pre">Server</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">redis_host</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'localhost'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">redis_port</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">6379</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">redis_password</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/server.html#Server"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.server.Server" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.server.Server.deploy">
+<span class="sig-name descname"><span class="pre">deploy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reskey</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_img_width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_img_height</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predict_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_bin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_conf_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_conf_bin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">bytes</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_predict_py</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_txt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_txt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/server.html#Server.deploy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.server.Server.deploy" title="Link to this definition"></a></dt>
+<dd><p>モデルをデプロイする</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reskey</strong> (<em>str</em>) -- レスポンスキー</p></li>
+<li><p><strong>name</strong> (<em>dict</em>) -- モデル名</p></li>
+<li><p><strong>model_img_width</strong> (<em>int</em>) -- 画像の幅</p></li>
+<li><p><strong>model_img_height</strong> (<em>int</em>) -- 画像の高さ</p></li>
+<li><p><strong>predict_type</strong> (<em>str</em>) -- 推論方法のタイプ</p></li>
+<li><p><strong>model_file</strong> (<em>str</em>) -- モデルのファイル名</p></li>
+<li><p><strong>model_bin</strong> (<em>bytes</em>) -- モデルファイル</p></li>
+<li><p><strong>model_conf_file</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) -- モデル設定のファイル名</p></li>
+<li><p><strong>model_conf_bin</strong> (<em>List</em><em>[</em><em>bytes</em><em>]</em>) -- モデル設定ファイル</p></li>
+<li><p><strong>custom_predict_py</strong> (<em>bytes</em>) -- 推論のPythonスクリプト</p></li>
+<li><p><strong>label_txt</strong> (<em>bytes</em>) -- ラベルファイル</p></li>
+<li><p><strong>color_txt</strong> (<em>bytes</em>) -- 色設定ファイル</p></li>
+<li><p><strong>overwrite</strong> (<em>bool</em>) -- 上書きするかどうか</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.server.Server.deploy_list">
+<span class="sig-name descname"><span class="pre">deploy_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reskey</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/server.html#Server.deploy_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.server.Server.deploy_list" title="Link to this definition"></a></dt>
+<dd><p>デプロイされたモデルのリストを取得する</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>reskey</strong> (<em>str</em>) -- レスポンスキー</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>デプロイされたモデルのリスト</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.server.Server.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reskey</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodraw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/server.html#Server.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.server.Server.predict" title="Link to this definition"></a></dt>
+<dd><p>クライアントから送られてきた画像の推論を行う。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reskey</strong> (<em>str</em>) -- レスポンスキー</p></li>
+<li><p><strong>name</strong> (<em>dict</em>) -- モデル名</p></li>
+<li><p><strong>img_npy</strong> (<em>np.array</em>) -- 推論する画像データ</p></li>
+<li><p><strong>nodraw</strong> (<em>bool</em>) -- 描画フラグ</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.server.Server.responce">
+<span class="sig-name descname"><span class="pre">responce</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reskey</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/server.html#Server.responce"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.server.Server.responce" title="Link to this definition"></a></dt>
+<dd><p>処理結果をクライアントに返す</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reskey</strong> (<em>str</em>) -- レスポンスキー</p></li>
+<li><p><strong>result</strong> (<em>dict</em>) -- レスポンスデータ</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.server.Server.start">
+<span class="sig-name descname"><span class="pre">start</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reskey</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_provider</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_track</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gpuid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/server.html#Server.start"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.server.Server.start" title="Link to this definition"></a></dt>
+<dd><p>モデルを読み込み、処理が実行できるようにする</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reskey</strong> (<em>str</em>) -- レスポンスキー</p></li>
+<li><p><strong>name</strong> (<em>str</em>) -- モデル名</p></li>
+<li><p><strong>model_provider</strong> (<em>str</em><em>, </em><em>optional</em>) -- 推論実行時のモデルプロバイダー。デフォルトは'CPUExecutionProvider'。</p></li>
+<li><p><strong>use_track</strong> (<em>bool</em>) -- Multi Object Trackerを使用するかどうか, by default False</p></li>
+<li><p><strong>gpuid</strong> (<em>int</em>) -- GPU ID, by default None</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.server.Server.start_server">
+<span class="sig-name descname"><span class="pre">start_server</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/server.html#Server.start_server"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.server.Server.start_server" title="Link to this definition"></a></dt>
+<dd><p>サーバー処理を開始する</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.server.Server.stop">
+<span class="sig-name descname"><span class="pre">stop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reskey</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/server.html#Server.stop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.server.Server.stop" title="Link to this definition"></a></dt>
+<dd><p>モデルを開放する</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reskey</strong> (<em>str</em>) -- レスポンスキー</p></li>
+<li><p><strong>name</strong> (<em>dict</em>) -- モデル名</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.server.Server.terminate_server">
+<span class="sig-name descname"><span class="pre">terminate_server</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/server.html#Server.terminate_server"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.server.Server.terminate_server" title="Link to this definition"></a></dt>
+<dd><p>サーバー処理を終了する</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.server.Server.undeploy">
+<span class="sig-name descname"><span class="pre">undeploy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reskey</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/server.html#Server.undeploy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.server.Server.undeploy" title="Link to this definition"></a></dt>
+<dd><p>モデルをアンデプロイする</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reskey</strong> (<em>str</em>) -- レスポンスキー</p></li>
+<li><p><strong>name</strong> (<em>dict</em>) -- モデル名</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-iinfer.app">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-iinfer.app" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="iinfer.html" class="btn btn-neutral float-left" title="iinfer package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="iinfer.app.predicts.html" class="btn btn-neutral float-right" title="iinfer.app.predicts package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright (c) 2023 hamacom2004jp.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

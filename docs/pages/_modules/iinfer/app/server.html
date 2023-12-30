@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="jp" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>iinfer.app.server &mdash; iinfer 2023/12/29 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=e370950d"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            iinfer
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/overview.html">iinferの概要</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/command.html">コマンドリファレンス</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/models.html">動作確認済みモデル</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/customize.html">カスタマイズ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/developer.html">開発者向け情報</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../resources/modules.html">モジュール</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/errors.html">よくあるエラー</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/license.html">ライセンス</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">iinfer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">iinfer.app.server</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for iinfer.app.server</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">motpy</span> <span class="kn">import</span> <span class="n">Detection</span><span class="p">,</span> <span class="n">MultiObjectTracker</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
+<span class="kn">from</span> <span class="nn">iinfer.app</span> <span class="kn">import</span> <span class="n">common</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+<span class="kn">import</span> <span class="nn">base64</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">redis</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+
+<div class="viewcode-block" id="Server">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.server.Server">[docs]</a>
+<span class="k">class</span> <span class="nc">Server</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">redis_host</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;localhost&quot;</span><span class="p">,</span> <span class="n">redis_port</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">6379</span><span class="p">,</span> <span class="n">redis_password</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Redisサーバーに接続し、クライアントからのコマンドを受信し実行する</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            data_dir (Path): データディレクトリのパス</span>
+<span class="sd">            logger (logging): ロガー</span>
+<span class="sd">            redis_host (str): Redisホスト名, by default &quot;localhost&quot;</span>
+<span class="sd">            redis_port (int): Redisポート番号, by default 6379</span>
+<span class="sd">            redis_password (str): Redisパスワード, by default None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span> <span class="o">=</span> <span class="n">data_dir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logger</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redis_host</span> <span class="o">=</span> <span class="n">redis_host</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redis_port</span> <span class="o">=</span> <span class="n">redis_port</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redis_password</span> <span class="o">=</span> <span class="n">redis_password</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sessions</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_running</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_server</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">terminate_server</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Server.start_server">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.server.Server.start_server">[docs]</a>
+    <span class="k">def</span> <span class="nf">start_server</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        サーバー処理を開始する</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span> <span class="o">=</span> <span class="n">redis</span><span class="o">.</span><span class="n">Redis</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">redis_host</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">redis_port</span><span class="p">,</span> <span class="n">db</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">redis_password</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">ping</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">is_running</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_run_server</span><span class="p">()</span>
+        <span class="k">except</span> <span class="n">redis</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ConnectionError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">is_running</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;fail to ping server. </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_run_server</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;start server&quot;</span><span class="p">)</span>
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_running</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c1"># ブロッキングリストから要素を取り出す</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">blpop</span><span class="p">(</span><span class="s1">&#39;server&#39;</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="k">continue</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="n">msg</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;deploy&#39;</span><span class="p">:</span>
+                    <span class="n">model_onnx</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64decode</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="mi">7</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="n">msg</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;None&#39;</span><span class="p">:</span>
+                        <span class="n">model_conf_file</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">model_conf_file</span> <span class="o">=</span> <span class="n">msg</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">msg</span><span class="p">[</span><span class="mi">9</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;None&#39;</span><span class="p">:</span>
+                        <span class="n">model_conf_bin</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">model_conf_bin</span> <span class="o">=</span> <span class="p">[</span><span class="n">base64</span><span class="o">.</span><span class="n">b64decode</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">msg</span><span class="p">[</span><span class="mi">9</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)]</span>
+                    <span class="k">if</span> <span class="n">msg</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;None&#39;</span><span class="p">:</span>
+                        <span class="n">custom_predict_py</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">custom_predict_py</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64decode</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="mi">10</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="n">msg</span><span class="p">[</span><span class="mi">11</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;None&#39;</span><span class="p">:</span>
+                        <span class="n">label_txt</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">label_txt</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64decode</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="mi">11</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="n">msg</span><span class="p">[</span><span class="mi">12</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;None&#39;</span><span class="p">:</span>
+                        <span class="n">color_txt</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">color_txt</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64decode</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="mi">12</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="n">msg</span><span class="p">[</span><span class="mi">13</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;True&#39;</span><span class="p">:</span>
+                        <span class="n">overwrite</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">else</span><span class="p">:</span>   
+                        <span class="n">overwrite</span> <span class="o">=</span> <span class="kc">False</span>
+
+                    <span class="bp">self</span><span class="o">.</span><span class="n">deploy</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">msg</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="nb">int</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="mi">3</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="mi">4</span><span class="p">]),</span> <span class="n">msg</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">msg</span><span class="p">[</span><span class="mi">6</span><span class="p">],</span> <span class="n">model_onnx</span><span class="p">,</span> <span class="n">model_conf_file</span><span class="p">,</span> <span class="n">model_conf_bin</span><span class="p">,</span> <span class="n">custom_predict_py</span><span class="p">,</span> <span class="n">label_txt</span><span class="p">,</span> <span class="n">color_txt</span><span class="p">,</span> <span class="n">overwrite</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">msg</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;deploy_list&#39;</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">deploy_list</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="k">elif</span> <span class="n">msg</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;undeploy&#39;</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">undeploy</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">msg</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+                <span class="k">elif</span> <span class="n">msg</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;start&#39;</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">msg</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">msg</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="p">(</span><span class="kc">True</span> <span class="k">if</span> <span class="n">msg</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;True&#39;</span> <span class="k">else</span> <span class="kc">False</span><span class="p">),</span> <span class="p">(</span><span class="kc">None</span> <span class="k">if</span> <span class="n">msg</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;None&#39;</span> <span class="k">else</span> <span class="n">msg</span><span class="p">[</span><span class="mi">5</span><span class="p">]))</span>
+                <span class="k">elif</span> <span class="n">msg</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;stop&#39;</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">stop</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">msg</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+                <span class="k">elif</span> <span class="n">msg</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;predict&#39;</span><span class="p">:</span>
+                    <span class="c1">#byteio = BytesIO(base64.b64decode(msg[3]))</span>
+                    <span class="c1">#img_npy = np.load(byteio)</span>
+                    <span class="n">nodraw</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="n">msg</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;True&#39;</span> <span class="k">else</span> <span class="kc">False</span>
+                    <span class="n">shape</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="mi">5</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="mi">6</span><span class="p">])]</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">7</span><span class="p">:</span> <span class="n">shape</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="mi">7</span><span class="p">]))</span>
+                    <span class="n">img_npy</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">b64str2npy</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">shape</span><span class="p">)</span>
+                    <span class="n">image</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">npy2img</span><span class="p">(</span><span class="n">img_npy</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">msg</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">image</span><span class="p">,</span> <span class="n">nodraw</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">msg</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;stop_server&#39;</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">is_running</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">responce</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">{</span><span class="s2">&quot;success&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Successful stop server.&quot;</span><span class="p">})</span>
+                    <span class="k">break</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown command </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">redis</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">TimeoutError</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="k">except</span> <span class="n">redis</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ConnectionError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Connection to the server was lost. </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">is_running</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">break</span>
+            <span class="k">except</span> <span class="ne">KeyboardInterrupt</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">is_running</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">break</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;stop server&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Server.terminate_server">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.server.Server.terminate_server">[docs]</a>
+    <span class="k">def</span> <span class="nf">terminate_server</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        サーバー処理を終了する</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;terminate server.&quot;</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_json_enc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">o</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">intc</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">Path</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">o</span><span class="p">)</span><span class="si">}</span><span class="s2"> not serializable&quot;</span><span class="p">)</span>
+    
+<div class="viewcode-block" id="Server.responce">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.server.Server.responce">[docs]</a>
+    <span class="k">def</span> <span class="nf">responce</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reskey</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span><span class="nb">dict</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        処理結果をクライアントに返す</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            reskey (str): レスポンスキー</span>
+<span class="sd">            result (dict): レスポンスデータ</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">rpush</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_json_enc</span><span class="p">))</span></div>
+
+        
+
+<div class="viewcode-block" id="Server.deploy">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.server.Server.deploy">[docs]</a>
+    <span class="k">def</span> <span class="nf">deploy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reskey</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">model_img_width</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">model_img_height</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">predict_type</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span>
+               <span class="n">model_file</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">model_bin</span><span class="p">:</span><span class="nb">bytes</span><span class="p">,</span> <span class="n">model_conf_file</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">model_conf_bin</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">bytes</span><span class="p">],</span> <span class="n">custom_predict_py</span><span class="p">:</span><span class="nb">bytes</span><span class="p">,</span>
+               <span class="n">label_txt</span><span class="p">:</span><span class="nb">bytes</span><span class="p">,</span> <span class="n">color_txt</span><span class="p">:</span><span class="nb">bytes</span><span class="p">,</span> <span class="n">overwrite</span><span class="p">:</span><span class="nb">bool</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        モデルをデプロイする</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            reskey (str): レスポンスキー</span>
+<span class="sd">            name (dict): モデル名</span>
+<span class="sd">            model_img_width (int): 画像の幅</span>
+<span class="sd">            model_img_height (int): 画像の高さ</span>
+<span class="sd">            predict_type (str): 推論方法のタイプ</span>
+<span class="sd">            model_file (str): モデルのファイル名</span>
+<span class="sd">            model_bin (bytes): モデルファイル</span>
+<span class="sd">            model_conf_file (List[str]): モデル設定のファイル名</span>
+<span class="sd">            model_conf_bin (List[bytes]): モデル設定ファイル</span>
+<span class="sd">            custom_predict_py (bytes): 推論のPythonスクリプト</span>
+<span class="sd">            label_txt (bytes): ラベルファイル</span>
+<span class="sd">            color_txt (bytes): 色設定ファイル</span>
+<span class="sd">            overwrite (bool): 上書きするかどうか</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Name is empty.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">responce</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;warn&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Name is empty.&quot;</span><span class="p">})</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="n">model_img_width</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">model_img_width</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Image width is invalid.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">responce</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;warn&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Image width is invalid.&quot;</span><span class="p">})</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="n">model_img_height</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">model_img_height</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Image height is invalid.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">responce</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;warn&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Image height is invalid.&quot;</span><span class="p">})</span>
+            <span class="k">return</span>
+
+        <span class="n">deploy_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span> <span class="o">/</span> <span class="n">name</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> has already started a session.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">responce</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;warn&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> has already started a session.&quot;</span><span class="p">})</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">overwrite</span> <span class="ow">and</span> <span class="n">deploy_dir</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not be deployed. &#39;</span><span class="si">{</span><span class="n">deploy_dir</span><span class="si">}</span><span class="s2">&#39; already exists&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">responce</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;warn&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Could not be deployed. &#39;</span><span class="si">{</span><span class="n">deploy_dir</span><span class="si">}</span><span class="s2">&#39; already exists&quot;</span><span class="p">})</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="n">predict_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">common</span><span class="o">.</span><span class="n">BASE_MODELS</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Incorrect predict_type. &#39;</span><span class="si">{</span><span class="n">predict_type</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">responce</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;warn&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Incorrect predict_type. &#39;</span><span class="si">{</span><span class="n">predict_type</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">})</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="n">common</span><span class="o">.</span><span class="n">BASE_MODELS</span><span class="p">[</span><span class="n">predict_type</span><span class="p">][</span><span class="s1">&#39;use_model_conf&#39;</span><span class="p">]</span><span class="o">==</span><span class="kc">True</span> <span class="ow">and</span> <span class="n">model_conf_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;model_conf_file is None.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">responce</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;warn&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;model_conf_file is None.&quot;</span><span class="p">})</span>
+            <span class="k">return</span>
+
+        <span class="n">common</span><span class="o">.</span><span class="n">mkdirs</span><span class="p">(</span><span class="n">deploy_dir</span><span class="p">)</span>
+        <span class="n">model_file</span> <span class="o">=</span> <span class="n">deploy_dir</span> <span class="o">/</span> <span class="n">model_file</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">model_file</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">model_bin</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Save </span><span class="si">{</span><span class="n">model_file</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">deploy_dir</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">model_conf_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">model_conf_bin</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;model_conf_file is not None but model_conf_bin is None.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">responce</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;warn&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;model_conf_file is not None but model_conf_bin is None.&quot;</span><span class="p">})</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="n">model_conf_file</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">model_conf_bin</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;model_conf_file is None but model_conf_bin is not None.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">responce</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;warn&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;model_conf_file is None but model_conf_bin is not None.&quot;</span><span class="p">})</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="n">model_conf_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">model_conf_file</span> <span class="o">=</span> <span class="p">[</span><span class="n">deploy_dir</span> <span class="o">/</span> <span class="n">cf</span> <span class="k">for</span> <span class="n">cf</span> <span class="ow">in</span> <span class="n">model_conf_file</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">cf</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">model_conf_file</span><span class="p">):</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">cf</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">model_conf_bin</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Save </span><span class="si">{</span><span class="n">cf</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">deploy_dir</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">custom_predict_file</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">custom_predict_py</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">custom_predict_file</span> <span class="o">=</span> <span class="n">deploy_dir</span> <span class="o">/</span> <span class="s2">&quot;custom_predict.py&quot;</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">custom_predict_file</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">custom_predict_py</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Save custom_predict.py to </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">deploy_dir</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">label_txt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">label_file</span> <span class="o">=</span> <span class="n">deploy_dir</span> <span class="o">/</span> <span class="s1">&#39;label.txt&#39;</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">label_file</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">label_txt</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Save </span><span class="si">{</span><span class="n">label_file</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">deploy_dir</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">label_file</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">color_txt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">color_file</span> <span class="o">=</span> <span class="n">deploy_dir</span> <span class="o">/</span> <span class="s1">&#39;color.txt&#39;</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">color_file</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">color_txt</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Save </span><span class="si">{</span><span class="n">color_file</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">deploy_dir</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">color_file</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">deploy_dir</span> <span class="o">/</span> <span class="s2">&quot;conf.json&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">conf</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">model_img_width</span><span class="o">=</span><span class="n">model_img_width</span><span class="p">,</span> <span class="n">model_img_height</span><span class="o">=</span><span class="n">model_img_height</span><span class="p">,</span> <span class="n">predict_type</span><span class="o">=</span><span class="n">predict_type</span><span class="p">,</span>
+                        <span class="n">model_file</span><span class="o">=</span><span class="n">model_file</span><span class="p">,</span> <span class="n">model_conf_file</span><span class="o">=</span><span class="n">model_conf_file</span><span class="p">,</span> <span class="n">custom_predict_file</span><span class="o">=</span><span class="p">(</span><span class="n">custom_predict_file</span> <span class="k">if</span> <span class="n">custom_predict_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">),</span>
+                        <span class="n">label_file</span><span class="o">=</span><span class="n">label_file</span><span class="p">,</span> <span class="n">color_file</span><span class="o">=</span><span class="n">color_file</span><span class="p">)</span>
+            <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">common</span><span class="o">.</span><span class="n">default_json_enc</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Save conf.json to </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">deploy_dir</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">predict_type</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;mmpretrain_&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span> <span class="o">/</span> <span class="s2">&quot;mmpretrain&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="n">returncode</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;cd </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="si">}</span><span class="s1"> &amp;&amp; git clone https://github.com/open-mmlab/mmpretrain.git&#39;</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">returncode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to git clone mmpretrain.&quot;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">responce</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Failed to git clone mmpretrain.&quot;</span><span class="p">})</span>
+                    <span class="k">return</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">copytree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span> <span class="o">/</span> <span class="s2">&quot;mmpretrain&quot;</span> <span class="o">/</span> <span class="s2">&quot;configs&quot;</span><span class="p">,</span> <span class="n">deploy_dir</span> <span class="o">/</span> <span class="s2">&quot;configs&quot;</span><span class="p">,</span> <span class="n">dirs_exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Copy mmpretrain configs to </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">deploy_dir</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="s1">&#39;configs&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">predict_type</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;mmdet_&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span> <span class="o">/</span> <span class="s2">&quot;mmdetection&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="n">returncode</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;cd </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="si">}</span><span class="s1"> &amp;&amp; git clone https://github.com/open-mmlab/mmdetection.git&#39;</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">returncode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to git clone mmdetection.&quot;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">responce</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Failed to git clone mmdetection.&quot;</span><span class="p">})</span>
+                    <span class="k">return</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">copytree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span> <span class="o">/</span> <span class="s2">&quot;mmdetection&quot;</span> <span class="o">/</span> <span class="s2">&quot;configs&quot;</span><span class="p">,</span> <span class="n">deploy_dir</span> <span class="o">/</span> <span class="s2">&quot;configs&quot;</span><span class="p">,</span> <span class="n">dirs_exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Copy mmdetection configs to </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">deploy_dir</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="s1">&#39;configs&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">responce</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;success&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Save conf.json to </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">deploy_dir</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">})</span>
+        <span class="k">return</span></div>
+
+
+<div class="viewcode-block" id="Server.deploy_list">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.server.Server.deploy_list">[docs]</a>
+    <span class="k">def</span> <span class="nf">deploy_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reskey</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        デプロイされたモデルのリストを取得する</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            reskey (str): レスポンスキー</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: デプロイされたモデルのリスト</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">deploy_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">common</span><span class="o">.</span><span class="n">mkdirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">)</span>
+        <span class="k">for</span> <span class="nb">dir</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="o">.</span><span class="n">iterdir</span><span class="p">():</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">dir</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="nb">dir</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;mmpretrain&#39;</span> <span class="ow">or</span> <span class="nb">dir</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;mmdetection&#39;</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">conf_path</span> <span class="o">=</span> <span class="nb">dir</span> <span class="o">/</span> <span class="s2">&quot;conf.json&quot;</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">conf_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">cf</span><span class="p">:</span>
+                <span class="n">conf</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">cf</span><span class="p">)</span>
+                <span class="n">model_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">conf</span><span class="p">[</span><span class="s2">&quot;model_file&quot;</span><span class="p">])</span>
+                <span class="n">model_conf_file</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">if</span> <span class="s2">&quot;model_conf_file&quot;</span> <span class="ow">in</span> <span class="n">conf</span> <span class="ow">and</span> <span class="n">conf</span><span class="p">[</span><span class="s2">&quot;model_conf_file&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">conf</span><span class="p">[</span><span class="s2">&quot;model_conf_file&quot;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">Path</span><span class="p">(</span><span class="n">conf</span><span class="p">[</span><span class="s2">&quot;model_conf_file&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                    <span class="n">model_conf_file</span> <span class="o">=</span> <span class="s1">&#39;exists&#39;</span>
+                <span class="n">custom_predict_file</span> <span class="o">=</span> <span class="s1">&#39;exists&#39;</span> <span class="k">if</span> <span class="s2">&quot;custom_predict_file&quot;</span> <span class="ow">in</span> <span class="n">conf</span> <span class="ow">and</span> <span class="n">conf</span><span class="p">[</span><span class="s2">&quot;custom_predict_file&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">Path</span><span class="p">(</span><span class="n">conf</span><span class="p">[</span><span class="s2">&quot;custom_predict_file&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="k">else</span> <span class="kc">None</span>
+                <span class="n">label_file</span> <span class="o">=</span> <span class="s1">&#39;exists&#39;</span> <span class="k">if</span> <span class="s2">&quot;label_file&quot;</span> <span class="ow">in</span> <span class="n">conf</span> <span class="ow">and</span> <span class="n">conf</span><span class="p">[</span><span class="s2">&quot;label_file&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">Path</span><span class="p">(</span><span class="n">conf</span><span class="p">[</span><span class="s2">&quot;label_file&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="k">else</span> <span class="kc">None</span>
+                <span class="n">color_file</span> <span class="o">=</span> <span class="s1">&#39;exists&#39;</span> <span class="k">if</span> <span class="s2">&quot;color_file&quot;</span> <span class="ow">in</span> <span class="n">conf</span> <span class="ow">and</span> <span class="n">conf</span><span class="p">[</span><span class="s2">&quot;color_file&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">Path</span><span class="p">(</span><span class="n">conf</span><span class="p">[</span><span class="s2">&quot;color_file&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="k">else</span> <span class="kc">None</span>
+                <span class="n">row</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="nb">dir</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                           <span class="nb">input</span><span class="o">=</span><span class="p">(</span><span class="n">conf</span><span class="p">[</span><span class="s2">&quot;model_img_width&quot;</span><span class="p">],</span> <span class="n">conf</span><span class="p">[</span><span class="s2">&quot;model_img_height&quot;</span><span class="p">]),</span> <span class="n">model_file</span><span class="o">=</span><span class="n">model_file</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">model_conf_file</span><span class="o">=</span><span class="n">model_conf_file</span><span class="p">,</span>
+                           <span class="n">predict_type</span><span class="o">=</span><span class="n">conf</span><span class="p">[</span><span class="s2">&quot;predict_type&quot;</span><span class="p">],</span> <span class="n">custom_predict</span><span class="o">=</span><span class="n">custom_predict_file</span><span class="p">,</span>
+                           <span class="n">label_file</span><span class="o">=</span><span class="n">label_file</span><span class="p">,</span> <span class="n">color_file</span><span class="o">=</span><span class="n">color_file</span><span class="p">,</span>
+                           <span class="n">session</span><span class="o">=</span><span class="nb">dir</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="p">,</span>
+                           <span class="n">mot</span><span class="o">=</span><span class="nb">dir</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sessions</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="p">[</span><span class="nb">dir</span><span class="o">.</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;tracker&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="n">deploy_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">responce</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;success&quot;</span><span class="p">:</span> <span class="n">deploy_list</span><span class="p">})</span></div>
+
+
+<div class="viewcode-block" id="Server.undeploy">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.server.Server.undeploy">[docs]</a>
+    <span class="k">def</span> <span class="nf">undeploy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reskey</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        モデルをアンデプロイする</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            reskey (str): レスポンスキー</span>
+<span class="sd">            name (dict): モデル名</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Name is empty.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">responce</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;warn&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Name is empty.&quot;</span><span class="p">})</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> has already started a session.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">responce</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;warn&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> has already started a session.&quot;</span><span class="p">})</span>
+            <span class="k">return</span>
+        <span class="n">deploy_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span> <span class="o">/</span> <span class="n">name</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">deploy_dir</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> is not deployed.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">responce</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;warn&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> is not deployed.&quot;</span><span class="p">})</span>
+            <span class="k">return</span>
+        <span class="n">common</span><span class="o">.</span><span class="n">rmdirs</span><span class="p">(</span><span class="n">deploy_dir</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">responce</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;success&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Undeployed </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">deploy_dir</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">})</span>
+        <span class="k">return</span></div>
+
+
+<div class="viewcode-block" id="Server.start">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.server.Server.start">[docs]</a>
+    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reskey</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">model_provider</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">use_track</span><span class="p">:</span><span class="nb">bool</span><span class="p">,</span> <span class="n">gpuid</span><span class="p">:</span><span class="nb">int</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        モデルを読み込み、処理が実行できるようにする</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            reskey (str): レスポンスキー</span>
+<span class="sd">            name (str): モデル名</span>
+<span class="sd">            model_provider (str, optional): 推論実行時のモデルプロバイダー。デフォルトは&#39;CPUExecutionProvider&#39;。</span>
+<span class="sd">            use_track (bool): Multi Object Trackerを使用するかどうか, by default False</span>
+<span class="sd">            gpuid (int): GPU ID, by default None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Name is empty.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">responce</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;warn&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Name is empty.&quot;</span><span class="p">})</span>
+            <span class="k">return</span>
+        <span class="n">deploy_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span> <span class="o">/</span> <span class="n">name</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> has already started a session.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">responce</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;warn&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> has already started a session.&quot;</span><span class="p">})</span>
+            <span class="k">return</span>
+        <span class="n">conf_path</span> <span class="o">=</span> <span class="n">deploy_dir</span> <span class="o">/</span> <span class="s2">&quot;conf.json&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">conf_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Conf path </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">conf_path</span><span class="p">)</span><span class="si">}</span><span class="s2"> does not exist&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">responce</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;warn&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Conf path </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">conf_path</span><span class="p">)</span><span class="si">}</span><span class="s2"> does not exist&quot;</span><span class="p">})</span>
+            <span class="k">return</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">conf_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">cf</span><span class="p">:</span>
+            <span class="n">conf</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">cf</span><span class="p">)</span>
+            <span class="n">model_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">conf</span><span class="p">[</span><span class="s2">&quot;model_file&quot;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="s2">&quot;model_conf_file&quot;</span> <span class="ow">in</span> <span class="n">conf</span> <span class="ow">and</span> <span class="n">conf</span><span class="p">[</span><span class="s2">&quot;model_conf_file&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">conf</span><span class="p">[</span><span class="s2">&quot;model_conf_file&quot;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">model_conf_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">conf</span><span class="p">[</span><span class="s2">&quot;model_conf_file&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">model_conf_path</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">model_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Model path </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">model_path</span><span class="p">)</span><span class="si">}</span><span class="s2"> does not exist&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">responce</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;warn&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Model path </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">model_path</span><span class="p">)</span><span class="si">}</span><span class="s2"> does not exist&quot;</span><span class="p">})</span>
+                <span class="k">return</span>
+            <span class="k">if</span> <span class="n">conf</span><span class="p">[</span><span class="s2">&quot;predict_type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Custom&#39;</span><span class="p">:</span>
+                <span class="n">custom_predict_py</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">conf</span><span class="p">[</span><span class="s2">&quot;custom_predict_file&quot;</span><span class="p">])</span> <span class="k">if</span> <span class="n">conf</span><span class="p">[</span><span class="s2">&quot;custom_predict_file&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+                <span class="k">if</span> <span class="n">custom_predict_py</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;predict_type is Custom but custom_predict_py is None.&quot;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">responce</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;warn&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;predict_type is Custom but custom_predict_py is None.&quot;</span><span class="p">})</span>
+                    <span class="k">return</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">custom_predict_py</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;custom_predict_py path </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">custom_predict_py</span><span class="p">)</span><span class="si">}</span><span class="s2"> does not exist&quot;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">responce</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;warn&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;custom_predict_py path </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">custom_predict_py</span><span class="p">)</span><span class="si">}</span><span class="s2"> does not exist&quot;</span><span class="p">})</span>
+                    <span class="k">return</span>
+                <span class="n">predict_obj</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">load_custom_predict</span><span class="p">(</span><span class="n">custom_predict_py</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">predict_obj</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">load_predict</span><span class="p">(</span><span class="n">conf</span><span class="p">[</span><span class="s2">&quot;predict_type&quot;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="s2">&quot;label_file&quot;</span> <span class="ow">in</span> <span class="n">conf</span> <span class="ow">and</span> <span class="n">conf</span><span class="p">[</span><span class="s2">&quot;label_file&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">label_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">conf</span><span class="p">[</span><span class="s2">&quot;label_file&quot;</span><span class="p">])</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">label_file</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;label_file path </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">label_file</span><span class="p">)</span><span class="si">}</span><span class="s2"> does not exist&quot;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">responce</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;warn&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;label_file path </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">label_file</span><span class="p">)</span><span class="si">}</span><span class="s2"> does not exist&quot;</span><span class="p">})</span>
+                    <span class="k">return</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">label_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">labels</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">labels</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="s2">&quot;color_file&quot;</span> <span class="ow">in</span> <span class="n">conf</span> <span class="ow">and</span> <span class="n">conf</span><span class="p">[</span><span class="s2">&quot;color_file&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">color_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">conf</span><span class="p">[</span><span class="s2">&quot;color_file&quot;</span><span class="p">])</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">color_file</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;color_file path </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">color_file</span><span class="p">)</span><span class="si">}</span><span class="s2"> does not exist&quot;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">responce</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;warn&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;color_file path </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">color_file</span><span class="p">)</span><span class="si">}</span><span class="s2"> does not exist&quot;</span><span class="p">})</span>
+                    <span class="k">return</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">color_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">colors</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">colors</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">session</span> <span class="o">=</span> <span class="n">predict_obj</span><span class="o">.</span><span class="n">create_session</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="n">model_path</span><span class="p">,</span> <span class="n">model_conf_path</span><span class="p">,</span> <span class="n">model_provider</span><span class="p">,</span> <span class="n">gpu_id</span><span class="o">=</span><span class="n">gpuid</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+                    <span class="n">session</span><span class="o">=</span><span class="n">session</span><span class="p">,</span>
+                    <span class="n">model_img_width</span><span class="o">=</span><span class="n">conf</span><span class="p">[</span><span class="s2">&quot;model_img_width&quot;</span><span class="p">],</span>
+                    <span class="n">model_img_height</span><span class="o">=</span><span class="n">conf</span><span class="p">[</span><span class="s2">&quot;model_img_height&quot;</span><span class="p">],</span>
+                    <span class="n">predict_obj</span><span class="o">=</span><span class="n">predict_obj</span><span class="p">,</span>
+                    <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span>
+                    <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span>
+                    <span class="n">tracker</span><span class="o">=</span><span class="n">MultiObjectTracker</span><span class="p">(</span><span class="n">dt</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span> <span class="k">if</span> <span class="n">use_track</span> <span class="k">else</span> <span class="kc">None</span>
+                <span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to create session: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">responce</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;warn&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Failed to create session: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">})</span>
+                <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Successful start of </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> session.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">responce</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;success&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Successful start of </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> session.&quot;</span><span class="p">})</span>
+        <span class="k">return</span></div>
+
+    
+<div class="viewcode-block" id="Server.stop">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.server.Server.stop">[docs]</a>
+    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reskey</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        モデルを開放する</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            reskey (str): レスポンスキー</span>
+<span class="sd">            name (dict): モデル名</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Name is empty.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">responce</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;warn&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Name is empty.&quot;</span><span class="p">})</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> has not yet started a session.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">responce</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;warn&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> has not yet started a session.&quot;</span><span class="p">})</span>
+            <span class="k">return</span>
+        <span class="c1">#self.sessions[name][&#39;session&#39;].close()</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Successful stop of </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> session.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">responce</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;success&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Successful stop of </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> session.&quot;</span><span class="p">})</span>
+        <span class="k">return</span></div>
+
+
+<div class="viewcode-block" id="Server.predict">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.server.Server.predict">[docs]</a>
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reskey</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">image</span><span class="p">:</span><span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">,</span> <span class="n">nodraw</span><span class="p">:</span><span class="nb">bool</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        クライアントから送られてきた画像の推論を行う。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            reskey (str): レスポンスキー</span>
+<span class="sd">            name (dict): モデル名</span>
+<span class="sd">            img_npy (np.array): 推論する画像データ</span>
+<span class="sd">            nodraw (bool): 描画フラグ</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Name is empty.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">responce</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;warn&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Name is empty.&quot;</span><span class="p">})</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="n">image</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;img_npy is empty.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">responce</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;warn&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;img_npy is empty.&quot;</span><span class="p">})</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> has not yet started a session.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">responce</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;warn&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> has not yet started a session.&quot;</span><span class="p">})</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="n">nodraw</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">nodraw</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">session</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># 推論を実行</span>
+            <span class="n">predict_obj</span> <span class="o">=</span> <span class="n">session</span><span class="p">[</span><span class="s1">&#39;predict_obj&#39;</span><span class="p">]</span>
+            <span class="n">outputs</span><span class="p">,</span> <span class="n">output_image</span> <span class="o">=</span> <span class="n">predict_obj</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">session</span><span class="p">[</span><span class="s1">&#39;session&#39;</span><span class="p">],</span> <span class="n">session</span><span class="p">[</span><span class="s1">&#39;model_img_width&#39;</span><span class="p">],</span> <span class="n">session</span><span class="p">[</span><span class="s1">&#39;model_img_height&#39;</span><span class="p">],</span> <span class="n">image</span><span class="p">,</span>
+                                                        <span class="n">labels</span><span class="o">=</span><span class="n">session</span><span class="p">[</span><span class="s1">&#39;labels&#39;</span><span class="p">],</span> <span class="n">colors</span><span class="o">=</span><span class="n">session</span><span class="p">[</span><span class="s1">&#39;colors&#39;</span><span class="p">],</span> <span class="n">nodraw</span><span class="o">=</span><span class="n">nodraw</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">session</span><span class="p">[</span><span class="s1">&#39;tracker&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s1">&#39;output_boxes&#39;</span> <span class="ow">in</span> <span class="n">outputs</span> <span class="ow">and</span> <span class="s1">&#39;output_scores&#39;</span> <span class="ow">in</span> <span class="n">outputs</span> <span class="ow">and</span> <span class="s1">&#39;output_classes&#39;</span> <span class="ow">in</span> <span class="n">outputs</span><span class="p">:</span>
+                    <span class="n">detections</span> <span class="o">=</span> <span class="p">[</span><span class="n">Detection</span><span class="p">(</span><span class="n">box</span><span class="p">,</span> <span class="n">score</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span> <span class="k">for</span> <span class="n">box</span><span class="p">,</span> <span class="n">score</span><span class="p">,</span> <span class="bp">cls</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">outputs</span><span class="p">[</span><span class="s1">&#39;output_boxes&#39;</span><span class="p">],</span> <span class="n">outputs</span><span class="p">[</span><span class="s1">&#39;output_scores&#39;</span><span class="p">],</span> <span class="n">outputs</span><span class="p">[</span><span class="s1">&#39;output_classes&#39;</span><span class="p">])]</span>
+                    <span class="n">session</span><span class="p">[</span><span class="s1">&#39;tracker&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">detections</span><span class="o">=</span><span class="n">detections</span><span class="p">)</span>
+                    <span class="n">tracks</span> <span class="o">=</span> <span class="n">session</span><span class="p">[</span><span class="s1">&#39;tracker&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">active_tracks</span><span class="p">()</span>
+                    <span class="n">outputs</span><span class="p">[</span><span class="s1">&#39;output_tracks&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">id</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tracks</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">image</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">image</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">draw_boxes</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">outputs</span><span class="p">[</span><span class="s1">&#39;output_boxes&#39;</span><span class="p">],</span> <span class="n">outputs</span><span class="p">[</span><span class="s1">&#39;output_scores&#39;</span><span class="p">],</span> <span class="n">outputs</span><span class="p">[</span><span class="s1">&#39;output_classes&#39;</span><span class="p">],</span> <span class="n">ids</span><span class="o">=</span><span class="n">outputs</span><span class="p">[</span><span class="s1">&#39;output_tracks&#39;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">output_image</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">output_image_npy</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">img2npy</span><span class="p">(</span><span class="n">output_image</span><span class="p">)</span>
+                <span class="n">output_image_b64</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">npy2b64str</span><span class="p">(</span><span class="n">output_image_npy</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">responce</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;success&quot;</span><span class="p">:</span> <span class="n">outputs</span><span class="p">,</span> <span class="s2">&quot;output_image&quot;</span><span class="p">:</span> <span class="n">output_image_b64</span><span class="p">,</span> <span class="s2">&quot;output_image_shape&quot;</span><span class="p">:</span> <span class="n">output_image_npy</span><span class="o">.</span><span class="n">shape</span><span class="p">})</span>
+                <span class="k">return</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">responce</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;success&quot;</span><span class="p">:</span> <span class="n">outputs</span><span class="p">})</span>
+            <span class="k">return</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to run inference: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">responce</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;warn&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Failed to run inference: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">})</span>
+            <span class="k">return</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright (c) 2023 hamacom2004jp.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

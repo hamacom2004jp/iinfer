@@ -36,7 +36,7 @@ class OnnxDetYoloX(predict.Predict):
             session = rt.InferenceSession(model_path, providers=[model_provider], providers_options=[{'device_id': str(gpu_id)}])
         return session
 
-    def predict(self, session, img_width:int, img_height:int, image:Image, labels:List[str]=None, colors:List[Tuple[int]]=None, nodraw:bool=False):
+    def predict(self, session, img_width:int, img_height:int, image:Image.Image, labels:List[str]=None, colors:List[Tuple[int]]=None, nodraw:bool=False):
         """
         予測を行う関数です。
         predictコマンドやcaptureコマンド実行時に呼び出されます。

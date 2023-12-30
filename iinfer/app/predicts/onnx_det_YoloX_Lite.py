@@ -30,7 +30,7 @@ class OnnxdetYoloXLite(onnx_det_YoloX.OnnxDetYoloX):
         """
         return super().create_session(logger, model_path, model_conf_path, model_provider, gpu_id)
 
-    def predict(self, session, img_width:int, img_height:int, image:Image, labels:List[str]=None, colors:List[Tuple[int]]=None, nodraw:bool=False):
+    def predict(self, session, img_width:int, img_height:int, image:Image.Image, labels:List[str]=None, colors:List[Tuple[int]]=None, nodraw:bool=False):
         """
         予測を行う関数です。
         predictコマンドやcaptureコマンド実行時に呼び出されます。

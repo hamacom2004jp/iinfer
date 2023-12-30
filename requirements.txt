@@ -10,4 +10,7 @@ requests
 tabulate
 twine
 six
+sphinx
+sphinx-conestack-theme
+sphinx_fontawesome
 wheel

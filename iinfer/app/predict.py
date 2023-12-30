@@ -22,7 +22,7 @@ class Predict(object):
         """
         raise NotImplementedError()
 
-    def predict(self, session, img_width:int, img_height:int, image:Image, labels:List[str]=None, colors:List[Tuple[int]]=None, nodraw:bool=False) -> Tuple[Dict[str, Any], Image.Image]:
+    def predict(self, session, img_width:int, img_height:int, image:Image.Image, labels:List[str]=None, colors:List[Tuple[int]]=None, nodraw:bool=False) -> Tuple[Dict[str, Any], Image.Image]:
         """
         予測を行う関数です。
         predictコマンドやcaptureコマンド実行時に呼び出されます。

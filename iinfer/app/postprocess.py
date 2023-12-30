@@ -74,7 +74,7 @@ class Postprocess(object):
         """
         raise NotImplementedError()
 
-    def post_img(self, img_connectstr:str, outputs:Dict[str, Any], output_image:Image):
+    def post_img(self, img_connectstr:str, outputs:Dict[str, Any], output_image:Image.Image):
         """
         output_imageに対して後処理を行う関数です。
         引数のimageはRGBですので、戻り値の出力画像もRGBにしてください。

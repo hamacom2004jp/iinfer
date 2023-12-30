@@ -1,4 +1,4 @@
-from iinfer.app import common, client, postprocess
+from iinfer.app import common, postprocess
 from PIL import Image, ImageDraw
 from typing import Dict, Any, List
 import cv2

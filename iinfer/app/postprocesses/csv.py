@@ -1,10 +1,9 @@
-from iinfer.app import common, client, postprocess
+from iinfer.app import postprocess
 from PIL import Image
 from typing import Dict, List, Any
 import csv
 import io
 import logging
-import requests
 
 class Csv(postprocess.Postprocess):
     def __init__(self, logger:logging.Logger, out_headers:List[str]=None, noheader:bool=False):

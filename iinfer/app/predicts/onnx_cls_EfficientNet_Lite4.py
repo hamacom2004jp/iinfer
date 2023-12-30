@@ -35,7 +35,7 @@ class OnnxClsEfficientNetLite4(predict.Predict):
             session = rt.InferenceSession(model_path, providers=[model_provider], providers_options=[{'device_id': str(gpu_id)}])
         return session
 
-    def predict(self, session, img_width:int, img_height:int, image:Image, labels:List[str]=None, colors:List[Tuple[int]]=None, nodraw:bool=False):
+    def predict(self, session, img_width:int, img_height:int, image:Image.Image, labels:List[str]=None, colors:List[Tuple[int]]=None, nodraw:bool=False):
         """
         予測を行う関数です。
         predictコマンドやcaptureコマンド実行時に呼び出されます。
@@ -74,7 +74,7 @@ class OnnxClsEfficientNetLite4(predict.Predict):
 
         return dict(output_scores=output_scores, output_classes=output_classes), image_obj
 
-    def resize_img(self, image:Image, to_w, to_h):
+    def resize_img(self, image:Image.Image, to_w, to_h):
         '''resize image with unchanged aspect ratio using padding'''
         iw, ih = image.size
         scale = min(to_w/iw, to_h/ih)
@@ -85,7 +85,7 @@ class OnnxClsEfficientNetLite4(predict.Predict):
         new_image.paste(image, ((to_w-nw)//2, (to_h-nh)//2))
         return new_image
 
-    def preprocess_img(self, image:Image, model_img_width:int, model_img_height:int):
+    def preprocess_img(self, image:Image.Image, model_img_width:int, model_img_height:int):
         boxed_image = self.resize_img(image, model_img_width, model_img_height)
         image_data = np.array(boxed_image, dtype='float32')
         image_data /= 255.

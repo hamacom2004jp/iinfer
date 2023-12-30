@@ -36,7 +36,7 @@ class MMDetYoloX(predict.Predict):
         model = init_detector(model_conf_path, str(model_path), device=device) # , cfg_options = {'show': True}
         return model
 
-    def predict(self, model, img_width:int, img_height:int, image:Image, labels:List[str]=None, colors:List[Tuple[int]]=None, nodraw:bool=False):
+    def predict(self, model, img_width:int, img_height:int, image:Image.Image, labels:List[str]=None, colors:List[Tuple[int]]=None, nodraw:bool=False):
         """
         予測を行う関数です。
         predictコマンドやcaptureコマンド実行時に呼び出されます。

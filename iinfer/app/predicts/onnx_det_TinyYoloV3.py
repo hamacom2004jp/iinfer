@@ -31,7 +31,7 @@ class OnnxDetTinyYoloV3(predict.Predict):
         """
         return onnx_det_YoloV3.create_session(model_path, model_conf_path, model_provider, gpu_id)
 
-    def predict(self, session, img_width:int, img_height:int, image:Image, labels:List[str]=None, colors:List[Tuple[int]]=None, nodraw:bool=False):
+    def predict(self, session, img_width:int, img_height:int, image:Image.Image, labels:List[str]=None, colors:List[Tuple[int]]=None, nodraw:bool=False):
         """
         予測を行う関数です。
         predictコマンドやcaptureコマンド実行時に呼び出されます。
@@ -80,7 +80,7 @@ class OnnxDetTinyYoloV3(predict.Predict):
 
         return dict(output_boxes=out_boxes, output_scores=out_scores, output_classes=out_classes, output_labels=output_labels), output_image
 
-    def resize_img(self, image:Image, to_w, to_h):
+    def resize_img(self, image:Image.Image, to_w, to_h):
         '''resize image with unchanged aspect ratio using padding'''
         iw, ih = image.size
         scale = min(to_w/iw, to_h/ih)

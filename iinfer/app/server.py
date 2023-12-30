@@ -453,7 +453,7 @@ class Server(object):
         self.responce(reskey, {"success": f"Successful stop of {name} session."})
         return
 
-    def predict(self, reskey:str, name:str, image: Image, nodraw:bool):
+    def predict(self, reskey:str, name:str, image:Image.Image, nodraw:bool):
         """
         クライアントから送られてきた画像の推論を行う。
 
