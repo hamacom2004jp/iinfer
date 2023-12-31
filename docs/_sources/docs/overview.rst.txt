@@ -50,6 +50,10 @@ iinferを使用するには、次のコマンドを実行します:
 
 1. サーバーの起動（Windowsの場合）:
 
+  - Windowsの場合はWSL2を使用します。
+  - WSL2上にdockerを導入する方法は :ref:`こちら<install_wsl2_docker>` を参照してください。
+  - 下記のコマンドを実行すると、WSL2上のdockerにRedisサーバーコンテナをインストールし起動します。
+
   .. code-block:: bat
 
     REM Redisサーバーコンテナの起動
@@ -147,4 +151,58 @@ iinferを使用するには、次のコマンドを実行します:
   .. code-block:: python
 
     pathlib.Path(HOME_DIR) / '.iinfer'
+
+
+.. _install_wsl2_docker:
+
+【参考】WSL2上にdocker導入する方法
+==================================
+
+WSL2上にdockerを導入する手順を説明します。
+
+1. Ubuntuイメージインストール（cmdプロンプトで実行 : ubuntuユーザーを作成する）
+
+    .. code-block:: bat
+
+        wsl --install -d Ubuntu-20.04
+
+2. Ubuntu初期設定（bash上で実行）
+
+    .. code-block:: bash
+
+        cd /etc/apt
+        sudo sed -i.bak -e "s/http:\/\/archive\.ubuntu\.com/http:\/\/jp\.archive\.ubuntu\.com/g" sources.list
+        sudo apt update
+        sudo apt install -y language-pack-ja manpages-ja manpages-ja-dev
+        sudo update-locale LANG=ja_JP.UTF-8
+
+3. Dockerインストール（bash上で実行）
+
+    .. code-block:: bash
+
+        sudo apt install -y apt-transport-https ca-certificates curl software-properties-common
+        cd ~/
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+        sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
+        sudo apt update
+        apt-cache policy docker-ce
+        sudo apt install -y docker-ce docker-compose
+        sudo usermod -aG docker ubuntu
+        exit
+
+4. Dockerインストール済みWSL2イメージ生成（cmdプロンプトで実行）
+
+    .. code-block:: bat
+
+        wsl --shutdown
+        wsl --export Ubuntu-20.04 Ubuntu_wsl2_docker-20.04.tar
+        wsl --unregister Ubuntu-20.04
+        mkdir Ubuntu_docker-20.04
+        wsl --import Ubuntu_docker-20.04 Ubuntu_docker-20.04 Ubuntu_wsl2_docker-20.04.tar --version 2
+
+5. Dockerインストール済みWSL2イメージ生成（cmdプロンプトで実行）
+
+    .. code-block:: bat
+
+        wsl -d Ubuntu_docker-20.04 -u ubuntu
 

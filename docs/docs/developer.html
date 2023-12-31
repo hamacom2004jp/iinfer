@@ -53,7 +53,6 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">開発者向け情報</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#id2">プロジェクトのインストール方法</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#id3">モジュールのコミット方法</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#wsl2docker">【参考】WSL2上にdocker導入する方法</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#pypl">【参考】pyplにアップするための手順</a></li>
 </ul>
 </li>
@@ -160,63 +159,6 @@ python setup.py bdist_wheel
 </div></blockquote>
 </li>
 <li><p>プルリクエストを作成してください.</p></li>
-</ol>
-</section>
-<section id="wsl2docker">
-<h2>【参考】WSL2上にdocker導入する方法<a class="headerlink" href="#wsl2docker" title="Link to this heading"></a></h2>
-<p>WSL2上にdockerを導入する手順を説明します。</p>
-<ol class="arabic">
-<li><p>Ubuntuイメージインストール（cmdプロンプトで実行 : ubuntuユーザーを作成する）</p>
-<blockquote>
-<div><div class="highlight-bat notranslate"><div class="highlight"><pre><span></span>wsl --install -d Ubuntu-20.04
-</pre></div>
-</div>
-</div></blockquote>
-</li>
-<li><p>Ubuntu初期設定（bash上で実行）</p>
-<blockquote>
-<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>/etc/apt
-sudo<span class="w"> </span>sed<span class="w"> </span>-i.bak<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;s/http:\/\/archive\.ubuntu\.com/http:\/\/jp\.archive\.ubuntu\.com/g&quot;</span><span class="w"> </span>sources.list
-sudo<span class="w"> </span>apt<span class="w"> </span>update
-sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>language-pack-ja<span class="w"> </span>manpages-ja<span class="w"> </span>manpages-ja-dev
-sudo<span class="w"> </span>update-locale<span class="w"> </span><span class="nv">LANG</span><span class="o">=</span>ja_JP.UTF-8
-</pre></div>
-</div>
-</div></blockquote>
-</li>
-<li><p>Dockerインストール（bash上で実行）</p>
-<blockquote>
-<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>apt-transport-https<span class="w"> </span>ca-certificates<span class="w"> </span>curl<span class="w"> </span>software-properties-common
-<span class="nb">cd</span><span class="w"> </span>~/
-curl<span class="w"> </span>-fsSL<span class="w"> </span>https://download.docker.com/linux/ubuntu/gpg<span class="w"> </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>apt-key<span class="w"> </span>add<span class="w"> </span>-
-sudo<span class="w"> </span>add-apt-repository<span class="w"> </span><span class="s2">&quot;deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable&quot;</span>
-sudo<span class="w"> </span>apt<span class="w"> </span>update
-apt-cache<span class="w"> </span>policy<span class="w"> </span>docker-ce
-sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>docker-ce<span class="w"> </span>docker-compose
-sudo<span class="w"> </span>usermod<span class="w"> </span>-aG<span class="w"> </span>docker<span class="w"> </span>ubuntu
-<span class="nb">exit</span>
-</pre></div>
-</div>
-</div></blockquote>
-</li>
-<li><p>Dockerインストール済みWSL2イメージ生成（cmdプロンプトで実行）</p>
-<blockquote>
-<div><div class="highlight-bat notranslate"><div class="highlight"><pre><span></span>wsl --shutdown
-wsl --export Ubuntu-20.04 Ubuntu_wsl2_docker-20.04.tar
-wsl --unregister Ubuntu-20.04
-<span class="k">mkdir</span> Ubuntu_docker-20.04
-wsl --import Ubuntu_docker-20.04 Ubuntu_docker-20.04 Ubuntu_wsl2_docker-20.04.tar --version 2
-</pre></div>
-</div>
-</div></blockquote>
-</li>
-<li><p>Dockerインストール済みWSL2イメージ生成（cmdプロンプトで実行）</p>
-<blockquote>
-<div><div class="highlight-bat notranslate"><div class="highlight"><pre><span></span>wsl -u ubuntu -d Ubuntu_docker-20.04
-</pre></div>
-</div>
-</div></blockquote>
-</li>
 </ol>
 </section>
 <section id="pypl">
