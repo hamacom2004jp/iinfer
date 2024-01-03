@@ -1,4 +1,5 @@
 argcomplete
+eel
 motpy
 opencv-python
 Pillow
@@ -11,6 +12,6 @@ tabulate
 twine
 six
 sphinx
-sphinx-conestack-theme
+sphinx-rtd-theme
 sphinx_fontawesome
 wheel

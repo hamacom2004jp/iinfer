@@ -9,6 +9,7 @@ import base64
 import importlib.util
 import inspect
 import json
+import os
 import logging
 import logging.config
 import numpy as np
@@ -23,6 +24,7 @@ import time
 import yaml
 
 APP_ID = 'iinfer'
+HOME_DIR = Path(os.path.expanduser("~"))
 
 def load_config(mode:str) -> Tuple[logging.Logger, dict]:
     """
@@ -35,7 +37,7 @@ def load_config(mode:str) -> Tuple[logging.Logger, dict]:
         logger (logging.Logger): ロガー
         config (dict): 設定
     """
-    log_config = yaml.safe_load(resource_string(APP_ID, "logconf.yml"))
+    log_config = yaml.safe_load(resource_string(APP_ID, f"logconf_{mode}.yml"))
     logging.config.dictConfig(log_config)
     logger = logging.getLogger(mode)
     config = yaml.safe_load(resource_string(APP_ID, "config.yml"))
@@ -368,6 +370,9 @@ def npy2imgfile(npy, output_image_file:Path=None, image_type:str='jpeg') -> byte
     Args:
         npy ([type]): ndarray
         output_image_file (Path): 保存先の画像ファイルパス
+
+    Returns:
+        bytes: 画像のバイト列
     """
     image = Image.fromarray(npy)
     img_byte = img2byte(image, format=image_type)
@@ -375,6 +380,18 @@ def npy2imgfile(npy, output_image_file:Path=None, image_type:str='jpeg') -> byte
         with open(output_image_file, 'wb') as f:
             f.write(img_byte)
     return img_byte
+
+def bytes2b64str(img:bytes) -> str:
+    """
+    画像のバイト列をBase64エンコードします。
+
+    Args:
+        img (bytes): 画像のバイト列
+
+    Returns:
+        str: Base64エンコードされた文字列
+    """
+    return base64.b64encode(img).decode('utf-8')
 
 def bgr2rgb(npy:np.ndarray) -> np.ndarray:
     """

@@ -308,11 +308,15 @@ class Client(object):
                     res_list = []
                     for line in f:
                         capture_data = line.split(',')
-                        img = capture_data[0]
-                        h = int(capture_data[1])
-                        w = int(capture_data[2])
-                        c = int(capture_data[3])
-                        img_npy = common.b64str2npy(img, shape=(h, w, c) if c > 0 else (h, w))
+                        t = capture_data[0]
+                        img = capture_data[1]
+                        h = int(capture_data[2])
+                        w = int(capture_data[3])
+                        c = int(capture_data[4])
+                        if t == 'capture':
+                            img_npy = common.b64str2npy(img, shape=(h, w, c) if c > 0 else (h, w))
+                        else:
+                            img_npy = common.imgbytes2npy(common.b64str2bytes(img))
                         res_json = self.predict(name, image=img_npy, output_image_file=output_image_file, output_preview=output_preview, nodraw=nodraw, timeout=timeout)
                         res_list.append(res_json)
                     if len(res_list) <= 0:
@@ -329,11 +333,15 @@ class Client(object):
             elif image_type == 'capture':
                 capture_data = image.split(',')
                 self.logger.info(f"capture_data={capture_data[1:]}")
-                img = capture_data[0]
-                h = int(capture_data[1])
-                w = int(capture_data[2])
-                c = int(capture_data[3])
-                img_npy = common.b64str2npy(img, shape=(h, w, c) if c > 0 else (h, w))
+                t = capture_data[0]
+                img = capture_data[1]
+                h = int(capture_data[2])
+                w = int(capture_data[3])
+                c = int(capture_data[4])
+                if t == 'capture':
+                    img_npy = common.b64str2npy(img, shape=(h, w, c) if c > 0 else (h, w))
+                else:
+                    img_npy = common.imgbytes2npy(common.b64str2bytes(img))
             elif image_type == 'jpeg' or image_type == 'png' or image_type == 'bmp':
                 img_npy = common.imgbytes2npy(image)
             else:
@@ -360,17 +368,20 @@ class Client(object):
                     pass
         return res_json
 
-    def capture(self, capture_device = 0, capture_frame_width:int = None, capture_frame_height:int = None, capture_fps:int = 1000, output_preview:bool=False):
+    def capture(self, capture_device='0', image_type:str='capture', capture_frame_width:int=None, capture_frame_height:int=None, capture_fps:int=1000, output_preview:bool=False):
         """
         ビデオをキャプチャしてその結果を出力する
 
         Args:
             capture_device (int or str): キャプチャするディバイス、ビデオデバイスのID, ビデオファイルのパス。rtspのURL. by default 0
+            image_type (str, optional): 画像の形式. Defaults to 'capture'.
             capture_frame_width (int): キャプチャするビデオのフレーム幅, by default None
             capture_frame_height (int): キャプチャするビデオのフレーム高さ, by default None
             capture_fps (int): キャプチャするビデオのフレームレート, by default 10
             output_preview (bool, optional): 予測結果の画像をプレビューするかどうか. Defaults to False.
         """
+        if capture_device.isdecimal():
+            capture_device = int(capture_device)
         cap = cv2.VideoCapture(capture_device)
         if capture_frame_width is not None:
             cap.set(cv2.CAP_PROP_FRAME_WIDTH, capture_frame_width)
@@ -390,7 +401,13 @@ class Client(object):
                         img_npy = common.bgr2rgb(img_npy)
                         cv2.imshow('preview', img_npy)
                         cv2.waitKey(1)
-                    yield common.npy2b64str(img_npy), img_npy.shape[0], img_npy.shape[1], img_npy.shape[2] if len(img_npy.shape) > 2 else -1
+                    img_b64 = None
+                    if image_type == 'capture' or image_type is None:
+                        image_type = 'capture'
+                        img_b64 = common.npy2b64str(img_npy)
+                    else:
+                        img_b64 = common.bytes2b64str(common.npy2imgfile(img_npy, image_type=image_type))
+                    yield image_type, img_b64, img_npy.shape[0], img_npy.shape[1], img_npy.shape[2] if len(img_npy.shape) > 2 else -1
                 else:
                     self.logger.error(f"Capture failed. devide_id={capture_device}", stack_info=True)
                     break
@@ -401,6 +418,10 @@ class Client(object):
         except KeyboardInterrupt:
             self.logger.info("KeyboardInterrupt", exc_info=True)
         finally:
+            try:
+                cv2.destroyWindow('preview')
+            except:
+                pass
             cap.release()
 
     def capture_predict(self, name:str, output_image_file:Path = None, timeout:int = 60,

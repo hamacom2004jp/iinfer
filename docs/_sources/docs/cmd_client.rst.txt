@@ -78,14 +78,7 @@ clientモードのコマンド一覧です。
 クライアント(推論タイプ一覧) : `iinfer -m client -c predict_type_list <Option>`
 ================================================================================
 
-.. csv-table::
-    :widths: 20, 10, 70
-    :header-rows: 1
-
-    "Option","Required","Description"
-    "--host <IPアドレス又はホスト名>","","Redisサーバーのサービスホストを指定する"
-    "--port <ポート番号>","","Redisサーバーのサービスポートを指定する"
-    "--password <パスワード>","","Redisサーバーのアクセスパスワード(任意)を指定する。省略時は `password` を使用する"
+推論タイプ一覧を出力します。オプションの指定はありません。
 
 クライアント(AIモデルの停止) : `iinfer -m client -c stop <Option>`
 ==============================================================================
@@ -128,7 +121,7 @@ clientモードのコマンド一覧です。
 
 .. code-block:: bat
 
-   iinfer -m client -c capture <Option> "," iinfer -m client -c predict --stdin --image_type capture <Option>
+   iinfer -m client -c capture <Option> | iinfer -m client -c predict --stdin --image_type capture <Option>
 
 .. csv-table::
     :widths: 20, 10, 70
@@ -136,6 +129,7 @@ clientモードのコマンド一覧です。
 
     "Option","Required","Description"
     "--capture_device <ディバイス>","","キャプチャーディバイスを指定する。 `cv2.VideoCapture` の第一引数に渡される値。"
+    "--image_type <出力する画像タイプ>","","出力する画像のタイプを指定する。指定可能な画像タイプは `bmp` , `png` , `jpeg` , `capture` "
     "--capture_frame_width <キャプチャーサイズ(横px)>","","キャプチャーする画像の横px。 `cv2.VideoCapture` オブジェクトの `cv2.CAP_PROP_FRAME_WIDTH` オプションに指定する値。"
     "--capture_frame_height <キャプチャーサイズ(縦px)>","","キャプチャーする画像の縦px。 `cv2.VideoCapture` オブジェクトの `cv2.CAP_PROP_FRAME_HEIGHT` オプションに指定する値。"
     "--capture_fps <キャプチャーFPS>","","キャプチャーする画像のFPS。キャプチャーが指定した値より高速な場合に残り時間分をsleepする"

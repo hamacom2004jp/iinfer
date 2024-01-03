@@ -1,6 +1,7 @@
 from iinfer import version
 from iinfer.app import common
 from iinfer.app import client
+from iinfer.app import gui
 from iinfer.app import install
 from iinfer.app import postprocess
 from iinfer.app import redis
@@ -18,11 +19,10 @@ import sys
 import time
 
 
-def main():
+def main(args_list:list=None):
     """
     コマンドライン引数を処理し、サーバーまたはクライアントを起動し、コマンドを実行する。
     """
-    HOME_DIR = os.path.expanduser("~")
     parser = argparse.ArgumentParser(prog='iinfer', description='This application generates modules to set up the application system.')
     parser.add_argument('--version', help='show version infomation.', action='store_true')
     parser.add_argument('--host', help='Setting the redis server host.', default=os.environ.get('REDIS_HOST', 'localhost'))
@@ -31,14 +31,14 @@ def main():
     parser.add_argument('-u', '--useopt', help=f'Use options file.')
     parser.add_argument('-s', '--saveopt', help=f'save options file. with --useopt option.', action='store_true')
     parser.add_argument('-f', '--format', help='Setting the cmd format.', action='store_true')
-    parser.add_argument('-m', '--mode', help='Setting the boot mode.', choices=['redis', 'install', 'server', 'client', 'postprocess'])
-    parser.add_argument('--data', help='Setting the data directory.', default=Path(HOME_DIR) / ".iinfer")
+    parser.add_argument('-m', '--mode', help='Setting the boot mode.', choices=['redis', 'install', 'server', 'client', 'postprocess', 'gui'])
+    parser.add_argument('--data', help='Setting the data directory.', default=common.HOME_DIR / ".iinfer")
     parser.add_argument('-n', '--name', help='Setting the cmd name.')
     parser.add_argument('--timeout', help='Setting the cmd timeout.', type=int, default=60)
     parser.add_argument('-c', '--cmd', help='Setting the cmd type.',
                         choices=['redis', 'server', 'onnx', 'mmdet', 'mmcls', 'mmpretrain', # install mode
                                  'docker_run', 'docker_stop', # redis mode
-                                 'start', 'stop', # server and client mode
+                                 'start', 'stop', # server or client or gui mode
                                  'deploy', 'deploy_list', 'undeploy', 'predict', 'predict_type_list', 'capture', # client mode
                                  'det_filter', 'det_jadge', 'cls_jadge', 'csv', 'httpreq', # postprocess mode
                                 ])
@@ -65,7 +65,7 @@ def main():
     parser.add_argument('--image_type', help='Setting the cmd predict image type.', choices=['bmp', 'png', 'jpeg', 'capture'], default='jpeg')
     parser.add_argument('--wsl_name', help='WSL distribution name.')
     parser.add_argument('--wsl_user', help='WSL distribution user.')
-    parser.add_argument('-d', '--capture_device', help='Setting the capture input device. device id, video file, rtsp url.', default=0)
+    parser.add_argument('-d', '--capture_device', help='Setting the capture input device. device id, video file, rtsp url.', default='0')
     parser.add_argument('--capture_frame_width', help='Setting the capture input frame width.', type=int, default=None)
     parser.add_argument('--capture_frame_height', help='Setting the capture input frame height.', type=int, default=None)
     parser.add_argument('--capture_fps', help='Setting the capture input fps.', type=int, default=1000)
@@ -94,7 +94,10 @@ def main():
     parser.add_argument('--ext_labels', help='Setting the postprocess ext_labels.', type=str, action='append')
 
     argcomplete.autocomplete(parser)
-    args = parser.parse_args()
+    if args_list is not None:
+        args = parser.parse_args(args=args_list)
+    else:
+        args = parser.parse_args()
     args_dict = vars(args)
     opt = common.loadopt(args.useopt)
     host = common.getopt(opt, 'host', preval=args_dict, withset=True)
@@ -163,7 +166,7 @@ def main():
     if args.saveopt:
         if args.useopt is None:
             common.print_format({"warn":f"Please specify the --useopt option."}, format, tm)
-            exit(1)
+            return 1
         common.saveopt(opt, args.useopt)
 
     if args.version:
@@ -172,13 +175,13 @@ def main():
                         f'License: MIT License <https://opensource.org/license/mit/>\n'
                         f'This is free software: you are free to change and redistribute it.\n'
                         f'There is NO WARRANTY, to the extent permitted by law.', False, tm)
-        exit(0)
+        return 0
     elif mode == 'server':
         logger, _ = common.load_config(mode)
         if cmd == 'start':
             if data is None:
                 common.print_format({"warn":f"Please specify the --data option."}, format, tm)
-                exit(1)
+                return 1
             sv = server.Server(Path(data), logger, redis_host=host, redis_port=port, redis_password=password)
             sv.start_server()
         elif cmd == 'stop':
@@ -186,7 +189,17 @@ def main():
             ret = cl.stop_server(timeout=timeout)
             common.print_format(ret, format, tm)
             if 'success' not in ret:
-                exit(1)
+                return 1
+        else:
+            common.print_format({"warn":f"Unkown command."}, format, tm)
+
+    elif mode == 'gui':
+        logger, _ = common.load_config(mode)
+        if cmd == 'start':
+            web = gui.Web(logger)
+            web.start()
+            common.print_format({"success":"eel web complate."}, format, tm)
+            return 0
         else:
             common.print_format({"warn":f"Unkown command."}, format, tm)
 
@@ -204,31 +217,31 @@ def main():
                             label_file=label_file, color_file=color_file, overwrite=overwrite, timeout=timeout)
             common.print_format(ret, format, tm)
             if 'success' not in ret:
-                exit(1)
+                return 1
 
         elif cmd == 'deploy_list':
             ret = cl.deploy_list(timeout=timeout)
             common.print_format(ret, format, tm)
             if 'success' not in ret:
-                exit(1)
+                return 1
 
         elif cmd == 'undeploy':
             ret = cl.undeploy(name, timeout=timeout)
             common.print_format(ret, format, tm)
             if 'success' not in ret:
-                exit(1)
+                return 1
 
         elif cmd == 'start':
             ret = cl.start(name, model_provider=model_provider, use_track=use_track, gpuid=gpuid, timeout=timeout)
             common.print_format(ret, format, tm)
             if 'success' not in ret:
-                exit(1)
+                return 1
 
         elif cmd == 'stop':
             ret = cl.stop(name, timeout=timeout)
             common.print_format(ret, format, tm)
             if 'success' not in ret:
-                exit(1)
+                return 1
 
         elif cmd == 'predict':
             if input_file is not None:
@@ -241,7 +254,7 @@ def main():
             elif stdin:
                 if image_type is None:
                     common.print_format({"warn":f"Please specify the --image_type option."}, format, tm)
-                    exit(1)
+                    return 1
                 if image_type == 'capture':
                     for line in sys.stdin:
                         ret = cl.predict(name, image=line, image_type=image_type, output_image_file=output_file, output_preview=output_preview, nodraw=nodraw, timeout=timeout)
@@ -253,7 +266,7 @@ def main():
                     tm = time.time()
             else:
                 common.print_format({"warn":f"Image file or stdin is empty."}, format, tm)
-                exit(1)
+                return 1
 
         elif cmd == 'predict_type_list':
             type_list = [dict(predict_type=key, site=val['site'], image_width=val['image_width'], image_height=val['image_height'], use_model_conf=val['use_model_conf']) for key,val in common.BASE_MODELS.items()]
@@ -270,10 +283,10 @@ def main():
 
         elif cmd == 'capture':
             count = 0
-            for b64,h,w,c in cl.capture(capture_device=capture_device,
+            for t,b64,h,w,c in cl.capture(capture_device=capture_device, image_type=image_type,
                                  capture_frame_width=capture_frame_width, capture_frame_height=capture_frame_height, capture_fps=capture_fps,
                                  output_preview=output_preview):
-                common.print_format(b64+f",{h},{w},{c}", False, tm)
+                common.print_format(f"{t},"+b64+f",{h},{w},{c}", False, tm)
                 tm = time.time()
                 count += 1
                 if capture_count > 0 and count >= capture_count:
@@ -281,7 +294,7 @@ def main():
 
         else:
             common.print_format({"warn":f"Unkown command."}, format, tm)
-            exit(1)
+            return 1
 
     elif mode == 'postprocess':
         logger, _ = common.load_config(mode)
@@ -302,7 +315,7 @@ def main():
                 _to_proc(sys.stdin, proc, json_connectstr, img_connectstr, timeout, format, tm)
             else:
                 common.print_format({"warn":f"Image file or stdin is empty."}, format, tm)
-                exit(1)
+                return 1
         elif cmd == 'det_jadge':
             proc = det_jadge.DetJadge(logger, ok_score_th=ok_score_th, ok_classes=ok_classes, ok_labels=ok_labels,
                                       ng_score_th=ng_score_th, ng_classes=ng_classes, ng_labels=ng_labels,
@@ -315,7 +328,7 @@ def main():
                 _to_proc(sys.stdin, proc, json_connectstr, img_connectstr, timeout, format, tm)
             else:
                 common.print_format({"warn":f"Image file or stdin is empty."}, format, tm)
-                exit(1)
+                return 1
         elif cmd == 'cls_jadge':
             proc = cls_jadge.ClaJadge(logger, ok_score_th=ok_score_th, ok_classes=ok_classes, ok_labels=ok_labels,
                                       ng_score_th=ng_score_th, ng_classes=ng_classes, ng_labels=ng_labels,
@@ -328,7 +341,7 @@ def main():
                 _to_proc(sys.stdin, proc, json_connectstr, img_connectstr, timeout, format, tm)
             else:
                 common.print_format({"warn":f"Image file or stdin is empty."}, format, tm)
-                exit(1)
+                return 1
         elif cmd == 'csv':
             proc = csv.Csv(logger, out_headers=out_headers, noheader=noheader)
             if input_file is not None:
@@ -338,7 +351,7 @@ def main():
                 _to_proc(sys.stdin, proc, json_connectstr, img_connectstr, timeout, False, tm)
             else:
                 common.print_format({"warn":f"Image file or stdin is empty."}, format, tm)
-                exit(1)
+                return 1
         elif cmd == 'httpreq':
             proc = httpreq.Httpreq(logger, fileup_name=fileup_name)
             if input_file is not None:
@@ -348,10 +361,10 @@ def main():
                 _to_proc(sys.stdin, proc, json_connectstr, img_connectstr, timeout, format, tm)
             else:
                 common.print_format({"warn":f"Image file or stdin is empty."}, format, tm)
-                exit(1)
+                return 1
         else:
             common.print_format({"warn":f"Unkown command."}, format, tm)
-            exit(1)
+            return 1
 
     elif mode == 'redis':
         logger, _ = common.load_config(mode)
@@ -366,7 +379,7 @@ def main():
 
         else:
             common.print_format({"warn":f"Unkown command."}, format, tm)
-            exit(1)
+            return 1
 
     elif mode == 'install':
         logger, _ = common.load_config(mode)
@@ -375,46 +388,46 @@ def main():
             ret = inst.redis()
             common.print_format(ret, format, tm)
             if 'success' not in ret:
-                exit(1)
+                return 1
 
         elif cmd == 'server':
             ret = inst.server()
             common.print_format(ret, format, tm)
             if 'success' not in ret:
-                exit(1)
+                return 1
 
         elif cmd == 'onnx':
             ret = inst.onnx()
             common.print_format(ret, format, tm)
             if 'success' not in ret:
-                exit(1)
+                return 1
 
         elif cmd == 'mmdet':
             if data is None:
                 common.print_format({"warn":f"Please specify the --data option."}, format, tm)
-                exit(1)
+                return 1
             ret = inst.mmdet(Path(data))
             common.print_format(ret, format, tm)
             if 'success' not in ret:
-                exit(1)
+                return 1
 
         elif cmd == 'mmcls':
             ret = inst.mmcls()
             common.print_format(ret, format, tm)
             if 'success' not in ret:
-                exit(1)
+                return 1
 
         elif cmd == 'mmpretrain':
             if data is None:
                 common.print_format({"warn":f"Please specify the --data option."}, format, tm)
-                exit(1)
+                return 1
             ret = inst.mmpretrain(Path(data))
             common.print_format(ret, format, tm)
             if 'success' not in ret:
-                exit(1)
+                return 1
 
     else:
         common.print_format({"warn":f"Unkown mode."}, format, tm)
-        exit(1)
+        return 1
 
-    exit(0)
+    return 0

@@ -47,7 +47,7 @@ class Install(object):
             text = text.replace('${VERSION}', version.__version__)
             fp.write(text)
         user = getpass.getuser()
-        cmd = f"docker build -t hamacom/iinfer:latest --build-arg MKUSER={user} -f Dockerfile ."
+        cmd = f"docker build -t hamacom/iinfer:{version.__version__} --build-arg MKUSER={user} -f Dockerfile ."
 
         if platform.system() == 'Linux':
             returncode, _ = common.cmd(f"{cmd}", self.logger, True)
