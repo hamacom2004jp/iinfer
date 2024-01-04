@@ -10,8 +10,10 @@ import numpy as np
 def test_01_01_load_config():
     logger, _ = common.load_config("client")
     assert logger.name == 'client'
-    logger, _ = common.load_config("capture")
-    assert logger.name == 'capture'
+    logger, _ = common.load_config("gui")
+    assert logger.name == 'gui'
+    logger, _ = common.load_config("postprocess")
+    assert logger.name == 'postprocess'
     logger, _ = common.load_config("server")
     assert logger.name == 'server'
     logger, _ = common.load_config("redis")
