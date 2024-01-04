@@ -36,6 +36,14 @@ iinfer.app.common module
    :undoc-members:
    :show-inheritance:
 
+iinfer.app.gui module
+---------------------
+
+.. automodule:: iinfer.app.gui
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 iinfer.app.install module
 -------------------------
 

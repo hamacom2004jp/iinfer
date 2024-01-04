@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>iinfer.app package &mdash; iinfer 2023/12/29 documentation</title>
+  <title>iinfer.app package &mdash; iinfer 2024/01/04 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -16,7 +16,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=e370950d"></script>
+        <script src="../_static/documentation_options.js?v=ea944936"></script>
         <script src="../_static/doctools.js?v=888ff710"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -201,27 +201,6 @@
 <li><p><strong>capture_frame_width</strong> (<em>int</em>) -- キャプチャするビデオのフレーム幅, by default None</p></li>
 <li><p><strong>capture_frame_height</strong> (<em>int</em>) -- キャプチャするビデオのフレーム高さ, by default None</p></li>
 <li><p><strong>capture_fps</strong> (<em>int</em>) -- キャプチャするビデオのフレームレート, by default 10</p></li>
-<li><p><strong>output_preview</strong> (<em>bool</em><em>, </em><em>optional</em>) -- 予測結果の画像をプレビューするかどうか. Defaults to False.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="iinfer.app.client.Client.capture_predict">
-<span class="sig-name descname"><span class="pre">capture_predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_image_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">60</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capture_device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capture_frame_width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capture_frame_height</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capture_fps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capture_output_fps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_preview</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/client.html#Client.capture_predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.client.Client.capture_predict" title="Link to this definition"></a></dt>
-<dd><p>ビデオをキャプチャしてその結果をRedisサーバーに送信し、推論結果を取得する</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>name</strong> (<em>str</em>) -- モデル名</p></li>
-<li><p><strong>output_image_file</strong> (<em>Path</em><em>, </em><em>optional</em>) -- 予測結果の画像ファイルのパス. Defaults to None.</p></li>
-<li><p><strong>timeout</strong> (<em>int</em><em>, </em><em>optional</em>) -- タイムアウト時間. Defaults to 60.</p></li>
-<li><p><strong>capture_device</strong> (<em>int</em><em> or </em><em>str</em>) -- キャプチャするディバイス、ビデオデバイスのID, ビデオファイルのパス。rtspのURL. by default 0</p></li>
-<li><p><strong>capture_frame_width</strong> (<em>int</em>) -- キャプチャするビデオのフレーム幅, by default None</p></li>
-<li><p><strong>capture_frame_height</strong> (<em>int</em>) -- キャプチャするビデオのフレーム高さ, by default None</p></li>
-<li><p><strong>capture_fps</strong> (<em>int</em>) -- キャプチャするビデオのフレームレート, by default None</p></li>
-<li><p><strong>capture_output_fps</strong> (<em>int</em>) -- キャプチャするビデオのフレームレート, by default 30</p></li>
 <li><p><strong>output_preview</strong> (<em>bool</em><em>, </em><em>optional</em>) -- 予測結果の画像をプレビューするかどうか. Defaults to False.</p></li>
 </ul>
 </dd>
@@ -907,6 +886,25 @@ output_image_fileが省略された場合は保存されません</p>
 </dd></dl>
 
 </section>
+<section id="module-iinfer.app.gui">
+<span id="iinfer-app-gui-module"></span><h2>iinfer.app.gui module<a class="headerlink" href="#module-iinfer.app.gui" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="iinfer.app.gui.Web">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">iinfer.app.gui.</span></span><span class="sig-name descname"><span class="pre">Web</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/gui.html#Web"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.gui.Web" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.gui.Web.start">
+<span class="sig-name descname"><span class="pre">start</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1080</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">700</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">web_host</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'localhost'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">web_port</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">8080</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/gui.html#Web.start"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.gui.Web.start" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.gui.Web.stop">
+<span class="sig-name descname"><span class="pre">stop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">route</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">websockets</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/gui.html#Web.stop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.gui.Web.stop" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
 <section id="module-iinfer.app.install">
 <span id="iinfer-app-install-module"></span><h2>iinfer.app.install module<a class="headerlink" href="#module-iinfer.app.install" title="Link to this heading"></a></h2>
 <dl class="py class">
@@ -1272,7 +1270,7 @@ return dict(output_boxes=final_boxes, output_scores=final_scores, output_classes
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright Copyright (c) 2023 hamacom2004jp.</p>
+    <p>&#169; Copyright Copyright (c) 2024 hamacom2004jp.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

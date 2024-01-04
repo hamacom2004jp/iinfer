@@ -171,7 +171,7 @@ def main(args_list:list=None):
 
     if args.version:
         common.print_format(f'iinfer (Visual Prediction Application) {version.__version__}\n'
-                        f'Copyright (c) 2023 hamacom2004jp <https://github.com/hamacom2004jp/iinfer>\n'
+                        f'{version.__copyright__}\n'
                         f'License: MIT License <https://opensource.org/license/mit/>\n'
                         f'This is free software: you are free to change and redistribute it.\n'
                         f'There is NO WARRANTY, to the extent permitted by law.', False, tm)
@@ -196,7 +196,10 @@ def main(args_list:list=None):
     elif mode == 'gui':
         logger, _ = common.load_config(mode)
         if cmd == 'start':
-            web = gui.Web(logger)
+            if data is None:
+                common.print_format({"warn":f"Please specify the --data option."}, format, tm)
+                return 1
+            web = gui.Web(logger, Path(data))
             web.start()
             common.print_format({"success":"eel web complate."}, format, tm)
             return 0
@@ -209,7 +212,7 @@ def main(args_list:list=None):
         if cmd == 'deploy':
             model_file = Path(model_file) if model_file is not None else None
             if model_conf_file is not None:
-                model_conf_file = [Path(f) for f in model_conf_file]
+                model_conf_file = [Path(f) for f in model_conf_file if f is not None and f != '']
             custom_predict_py = Path(custom_predict_py) if custom_predict_py is not None else None
             label_file = Path(label_file) if label_file is not None else None
             color_file = Path(color_file) if color_file is not None else None
@@ -303,8 +306,11 @@ def main(args_list:list=None):
                 line = line.rstrip()
                 if line == "":
                     continue
-                ret = proc.postprocess(json_connectstr, img_connectstr, line, timeout=timeout)
-                common.print_format(ret, format, tm)
+                try:
+                    ret = proc.postprocess(json_connectstr, img_connectstr, line, timeout=timeout)
+                    common.print_format(ret, format, tm)
+                except Exception as e:
+                    common.print_format({"warn":f"Invalid input. {e}"}, format, tm)
                 tm = time.time()
         if cmd == 'det_filter':
             proc = det_filter.DetFilter(logger, score_th=score_th, width_th=width_th, height_th=height_th, classes=classes, labels=labels, nodraw=nodraw, output_preview=output_preview)
@@ -317,10 +323,14 @@ def main(args_list:list=None):
                 common.print_format({"warn":f"Image file or stdin is empty."}, format, tm)
                 return 1
         elif cmd == 'det_jadge':
-            proc = det_jadge.DetJadge(logger, ok_score_th=ok_score_th, ok_classes=ok_classes, ok_labels=ok_labels,
-                                      ng_score_th=ng_score_th, ng_classes=ng_classes, ng_labels=ng_labels,
-                                      ext_score_th=ext_score_th, ext_classes=ext_classes, ext_labels=ext_labels,
-                                      nodraw=nodraw, output_preview=output_preview)
+            try:
+                proc = det_jadge.DetJadge(logger, ok_score_th=ok_score_th, ok_classes=ok_classes, ok_labels=ok_labels,
+                                        ng_score_th=ng_score_th, ng_classes=ng_classes, ng_labels=ng_labels,
+                                        ext_score_th=ext_score_th, ext_classes=ext_classes, ext_labels=ext_labels,
+                                        nodraw=nodraw, output_preview=output_preview)
+            except Exception as e:
+                common.print_format({"warn":f"Invalid options. {e}"}, format, tm)
+                return 1
             if input_file is not None:
                 with open(input_file, 'r', encoding="UTF-8") as f:
                     _to_proc(f, proc, json_connectstr, img_connectstr, timeout, format, tm)

@@ -1,3 +1,4 @@
+import datetime
 import os
 import sphinx_rtd_theme
 import sphinx_fontawesome
@@ -12,10 +13,11 @@ sys.path.insert(0, os.path.abspath('..'))
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
+dt_now = datetime.datetime.now()
 project = f'iinfer'
-copyright = 'Copyright (c) 2023 hamacom2004jp'
+copyright = f'Copyright (c) {dt_now.strftime("%Y")} hamacom2004jp'
 author = 'hamacom2004jp'
-release = f'2023/12/29'
+release = dt_now.strftime("%Y/%m/%d")
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>iinfer.app.client &mdash; iinfer 2023/12/29 documentation</title>
+  <title>iinfer.app.client &mdash; iinfer 2024/01/04 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -15,7 +15,7 @@
   
         <script src="../../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=e370950d"></script>
+        <script src="../../../_static/documentation_options.js?v=ea944936"></script>
         <script src="../../../_static/doctools.js?v=888ff710"></script>
         <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -470,6 +470,11 @@
                     <span class="n">cv2</span><span class="o">.</span><span class="n">waitKey</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
                 <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
                     <span class="k">pass</span>
+                <span class="k">finally</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">cv2</span><span class="o">.</span><span class="n">destroyWindow</span><span class="p">(</span><span class="s1">&#39;preview&#39;</span><span class="p">)</span>
+                    <span class="k">except</span><span class="p">:</span>
+                        <span class="k">pass</span>
         <span class="k">return</span> <span class="n">res_json</span></div>
 
 
@@ -530,61 +535,6 @@
             <span class="k">except</span><span class="p">:</span>
                 <span class="k">pass</span>
             <span class="n">cap</span><span class="o">.</span><span class="n">release</span><span class="p">()</span></div>
-
-
-<div class="viewcode-block" id="Client.capture_predict">
-<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.client.Client.capture_predict">[docs]</a>
-    <span class="k">def</span> <span class="nf">capture_predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">output_image_file</span><span class="p">:</span><span class="n">Path</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="mi">60</span><span class="p">,</span>
-              <span class="n">capture_device</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">capture_frame_width</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">capture_frame_height</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">capture_fps</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">capture_output_fps</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
-              <span class="n">output_preview</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        ビデオをキャプチャしてその結果をRedisサーバーに送信し、推論結果を取得する</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            name (str): モデル名</span>
-<span class="sd">            output_image_file (Path, optional): 予測結果の画像ファイルのパス. Defaults to None.</span>
-<span class="sd">            timeout (int, optional): タイムアウト時間. Defaults to 60.</span>
-<span class="sd">            capture_device (int or str): キャプチャするディバイス、ビデオデバイスのID, ビデオファイルのパス。rtspのURL. by default 0</span>
-<span class="sd">            capture_frame_width (int): キャプチャするビデオのフレーム幅, by default None</span>
-<span class="sd">            capture_frame_height (int): キャプチャするビデオのフレーム高さ, by default None</span>
-<span class="sd">            capture_fps (int): キャプチャするビデオのフレームレート, by default None</span>
-<span class="sd">            capture_output_fps (int): キャプチャするビデオのフレームレート, by default 30</span>
-<span class="sd">            output_preview (bool, optional): 予測結果の画像をプレビューするかどうか. Defaults to False.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">cap</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">VideoCapture</span><span class="p">(</span><span class="n">capture_device</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">capture_frame_width</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">cap</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">CAP_PROP_FRAME_WIDTH</span><span class="p">,</span> <span class="n">capture_frame_width</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">capture_frame_height</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">cap</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">CAP_PROP_FRAME_HEIGHT</span><span class="p">,</span> <span class="n">capture_frame_height</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">capture_fps</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">cap</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">CAP_PROP_FPS</span><span class="p">,</span> <span class="n">capture_fps</span><span class="p">)</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">interval</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">capture_output_fps</span><span class="p">)</span>
-            <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-                <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
-                <span class="n">ret</span><span class="p">,</span> <span class="n">frame</span> <span class="o">=</span> <span class="n">cap</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-                <span class="k">if</span> <span class="n">ret</span><span class="p">:</span>
-                    <span class="n">frame</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">bgr2rgb</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
-                    <span class="n">res_json</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">image</span><span class="o">=</span><span class="n">frame</span><span class="p">,</span> <span class="n">output_image_file</span><span class="o">=</span><span class="n">output_image_file</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="s2">&quot;output_image&quot;</span> <span class="ow">in</span> <span class="n">res_json</span> <span class="ow">and</span> <span class="s2">&quot;output_image_shape&quot;</span> <span class="ow">in</span> <span class="n">res_json</span><span class="p">:</span>
-                        <span class="n">img_npy</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">b64str2npy</span><span class="p">(</span><span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;output_image&quot;</span><span class="p">],</span> <span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;output_image_shape&quot;</span><span class="p">])</span>
-                        <span class="k">if</span> <span class="n">output_preview</span><span class="p">:</span>
-                            <span class="c1"># RGB画像をBGR画像に変換</span>
-                            <span class="n">img_npy</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">bgr2rgb</span><span class="p">(</span><span class="n">img_npy</span><span class="p">)</span>
-                            <span class="n">cv2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="s1">&#39;preview&#39;</span><span class="p">,</span> <span class="n">img_npy</span><span class="p">)</span>
-                            <span class="n">cv2</span><span class="o">.</span><span class="n">waitKey</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-                    <span class="k">yield</span> <span class="n">res_json</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Capture failed. devide_id=</span><span class="si">{</span><span class="n">capture_device</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">stack_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-                    <span class="k">break</span>
-                <span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
-                <span class="k">if</span> <span class="n">interval</span> <span class="o">-</span> <span class="p">(</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">interval</span> <span class="o">-</span> <span class="p">(</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">))</span>
-
-        <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;KeyboardInterrupt&quot;</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="k">finally</span><span class="p">:</span>
-            <span class="n">cap</span><span class="o">.</span><span class="n">release</span><span class="p">()</span></div>
 </div>
 
 </pre></div>
@@ -596,7 +546,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright Copyright (c) 2023 hamacom2004jp.</p>
+    <p>&#169; Copyright Copyright (c) 2024 hamacom2004jp.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

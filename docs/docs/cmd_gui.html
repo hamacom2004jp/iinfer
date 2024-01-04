@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>コマンドリファレンス（redisモード） &mdash; iinfer 2024/01/04 documentation</title>
+  <title>コマンドリファレンス（guiモード） &mdash; iinfer 2024/01/04 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -22,8 +22,8 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="コマンドリファレンス（serverモード）" href="cmd_server.html" />
-    <link rel="prev" title="コマンドリファレンス（installモード）" href="cmd_install.html" /> 
+    <link rel="next" title="コマンドリファレンス（postprocessモード）" href="cmd_postprocess.html" />
+    <link rel="prev" title="コマンドリファレンス（clientモード）" href="cmd_client.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -50,14 +50,13 @@
 <li class="toctree-l1 current"><a class="reference internal" href="command.html">コマンドリファレンス</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="cmd_common.html">共通オプション</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_install.html">インストール</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Redis</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#redis-iinfer-m-redis-c-docker-run-option">Redisサーバー起動 : <cite>iinfer -m redis -c docker_run &lt;Option&gt;</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#redis-iinfer-m-redis-c-docker-stop-option">Redisサーバー停止 : <cite>iinfer -m redis -c docker_stop &lt;Option&gt;</cite></a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_redis.html">Redis</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_server.html">推論サーバー</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_client.html">クライアント</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_gui.html">GUI</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">GUI</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#iinfer-m-gui-c-start-option">管理画面起動 : <cite>iinfer -m gui -c start &lt;Option&gt;</cite></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_postprocess.html">後処理</a></li>
 </ul>
 </li>
@@ -83,9 +82,9 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="command.html">コマンドリファレンス</a></li>
-      <li class="breadcrumb-item active">コマンドリファレンス（redisモード）</li>
+      <li class="breadcrumb-item active">コマンドリファレンス（guiモード）</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/docs/cmd_redis.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/docs/cmd_gui.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -93,16 +92,13 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="redis">
-<h1>コマンドリファレンス（redisモード）<a class="headerlink" href="#redis" title="Link to this heading"></a></h1>
+  <section id="gui">
+<h1>コマンドリファレンス（guiモード）<a class="headerlink" href="#gui" title="Link to this heading"></a></h1>
 <ul class="simple">
-<li><p>redisモードのコマンド一覧です。</p></li>
+<li><p>GUIモードのコマンド一覧です。</p></li>
 </ul>
-<section id="redis-iinfer-m-redis-c-docker-run-option">
-<h2>Redisサーバー起動 : <cite>iinfer -m redis -c docker_run &lt;Option&gt;</cite><a class="headerlink" href="#redis-iinfer-m-redis-c-docker-run-option" title="Link to this heading"></a></h2>
-<ul class="simple">
-<li><p>installモードで <cite>iinfer -m install -c server</cite> を実行している場合は、 <cite>docker-compose up -d</cite> を使用してください。</p></li>
-</ul>
+<section id="iinfer-m-gui-c-start-option">
+<h2>管理画面起動 : <cite>iinfer -m gui -c start &lt;Option&gt;</cite><a class="headerlink" href="#iinfer-m-gui-c-start-option" title="Link to this heading"></a></h2>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20.0%" />
@@ -116,50 +112,9 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>--port &lt;ポート番号&gt;</p></td>
+<tr class="row-even"><td><p>--data &lt;データディレクトリ&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのサービスポート(任意)を指定します。</p></td>
-</tr>
-<tr class="row-odd"><td><p>--password &lt;パスワード&gt;</p></td>
-<td></td>
-<td><p>Redisサーバーのアクセスパスワード(任意)を指定する。省略時は`password`を使用します。</p></td>
-</tr>
-<tr class="row-even"><td><p>--wsl_name &lt;ディストリビューション名&gt;</p></td>
-<td><p>Windowsの場合は〇</p></td>
-<td><p>Windowsの場合はWSLのディストリビューションの名前を指定します。</p></td>
-</tr>
-<tr class="row-odd"><td><p>--wsl_user &lt;user名&gt;</p></td>
-<td><p>Windowsの場合は〇</p></td>
-<td><p>Windowsの場合はWSL内のユーザー名を指定します。</p></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="redis-iinfer-m-redis-c-docker-stop-option">
-<h2>Redisサーバー停止 : <cite>iinfer -m redis -c docker_stop &lt;Option&gt;</cite><a class="headerlink" href="#redis-iinfer-m-redis-c-docker-stop-option" title="Link to this heading"></a></h2>
-<ul class="simple">
-<li><p>installモードで <cite>iinfer -m install -c server</cite> を実行している場合は、 <cite>docker-compose down</cite> を使用してください。</p></li>
-</ul>
-<table class="docutils align-default">
-<colgroup>
-<col style="width: 20.0%" />
-<col style="width: 10.0%" />
-<col style="width: 70.0%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>Option</p></th>
-<th class="head"><p>Required</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>--wsl_name &lt;ディストリビューション名&gt;</p></td>
-<td><p>Windowsの場合は〇</p></td>
-<td><p>Windowsの場合はWSLのディストリビューションの名前を指定します。</p></td>
-</tr>
-<tr class="row-odd"><td><p>--wsl_user &lt;user名&gt;</p></td>
-<td><p>Windowsの場合は〇</p></td>
-<td><p>Windowsの場合はWSL内のユーザー名を指定します。</p></td>
+<td><p>省略した時は <cite>$HONE/.iinfer</cite> を使用します。</p></td>
 </tr>
 </tbody>
 </table>
@@ -170,8 +125,8 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="cmd_install.html" class="btn btn-neutral float-left" title="コマンドリファレンス（installモード）" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="cmd_server.html" class="btn btn-neutral float-right" title="コマンドリファレンス（serverモード）" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="cmd_client.html" class="btn btn-neutral float-left" title="コマンドリファレンス（clientモード）" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cmd_postprocess.html" class="btn btn-neutral float-right" title="コマンドリファレンス（postprocessモード）" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

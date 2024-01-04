@@ -521,10 +521,11 @@ def draw_boxes(image:Image.Image, boxes:List[List[float]], scores:List[float], c
             color = colors[i] if colors is not None and len(colors) > i else make_color(str(int(cl)))
             label = labels[i] if labels is not None and len(labels) > i else None
         if not nodraw:
-            draw.rectangle(((x1, y1), (x2, y2)), outline=color)
-            if label is not None:
-                draw.rectangle(((x1, y1), (x2, y1+10)), outline=color, fill=color)
-                draw.text((x1, y1), label, tuple([int(255-c) for c in color]))
+            if x2 - x1 > 0 and y2 - y1 > 0:
+                draw.rectangle(((x1, y1), (x2, y2)), outline=color)
+                if label is not None:
+                    draw.rectangle(((x1, y1), (x2, y1+10)), outline=color, fill=color)
+                    draw.text((x1, y1), label, tuple([int(255-c) for c in color]))
         output_labels.append(label)
 
     return image, output_labels
