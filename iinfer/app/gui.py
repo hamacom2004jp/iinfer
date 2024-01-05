@@ -3,6 +3,7 @@ from iinfer.app import common
 from pathlib import Path
 import datetime
 import glob
+import iinfer
 import io
 import json
 import logging
@@ -15,9 +16,10 @@ import threading
 class Web(object):
     def __init__(self, logger:logging.Logger, data:Path):
         import eel
-        eel.init("iinfer/web")
+        eel.init(str(Path(iinfer.__file__).parent / "web"))
         self.logger = logger
         self.data = data
+        common.mkdirs(self.data)
 
     def start(self, width:int=1080, height:int=700, web_host:str="localhost", web_port:int=8080):
         import eel
@@ -147,7 +149,7 @@ class Web(object):
                         dict(opt="host", type="str", default="localhost", required=True, multi=False, hide=True, choise=None),
                         dict(opt="port", type="int", default=6379, required=True, multi=False, hide=True, choise=None),
                         dict(opt="password", type="str", default="password", required=True, multi=False, hide=True, choise=None),
-                        dict(opt="data", type="file", default=str(Path(common.HOME_DIR) / ".iinfer"), required=False, multi=False, hide=False, choise=None),
+                        dict(opt="data", type="file", default=None, required=False, multi=False, hide=False, choise=None),
                         dict(opt="stdout_save", type="file", default="", required=False, multi=False, hide=True, choise=None),
                         dict(opt="stdout_log", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False])
                     ]
@@ -270,7 +272,7 @@ class Web(object):
                     ]
                 elif cmd == "server":
                     return [
-                        dict(opt="data", type="file", default=str(Path(common.HOME_DIR) / ".iinfer"), required=False, multi=False, hide=False, choise=None),
+                        dict(opt="data", type="file", default=None, required=False, multi=False, hide=False, choise=None),
                         dict(opt="stdout_save", type="file", default="", required=False, multi=False, hide=True, choise=None),
                         dict(opt="stdout_log", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False])
                     ]
@@ -288,24 +290,24 @@ class Web(object):
 
         @eel.expose
         def list_cmd():
-            paths = glob.glob(str(common.HOME_DIR / ".iinfer" / "cmd-*.json"))
+            paths = glob.glob(str(self.data / "cmd-*.json"))
             ret = [common.loadopt(path) for path in paths]
             return ret
 
         @eel.expose
         def save_cmd(title, opt):
-            opt_path = common.HOME_DIR / ".iinfer" / f"cmd-{title}.json"
+            opt_path = self.data / f"cmd-{title}.json"
             self.logger.info(f"save_cmd: opt_path={opt_path}, opt={opt}")
             common.saveopt(opt, opt_path)
 
         @eel.expose
         def load_cmd(title):
-            opt_path = common.HOME_DIR / ".iinfer" / f"cmd-{title}.json"
+            opt_path = self.data / f"cmd-{title}.json"
             return common.loadopt(opt_path)
 
         @eel.expose
         def del_cmd(title):
-            opt_path = common.HOME_DIR / ".iinfer" / f"cmd-{title}.json"
+            opt_path = self.data / ".iinfer" / f"cmd-{title}.json"
             self.logger.info(f"del_cmd: opt_path={opt_path}")
             opt_path.unlink()
 
@@ -406,7 +408,7 @@ class Web(object):
 
         @eel.expose
         def list_pipe():
-            paths = glob.glob(str(common.HOME_DIR / ".iinfer" / "pipe-*.json"))
+            paths = glob.glob(str(self.data / "pipe-*.json"))
             return [common.loadopt(path) for path in paths]
 
         eel.js_console_modal_log_func('== console log start ==\n')
