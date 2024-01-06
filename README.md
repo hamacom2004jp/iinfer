@@ -5,7 +5,7 @@ onnx又はmmlabフォーマットの重みファイルを実行するCLIアプ�
 
 ## iinderの動作イメージ
 
-![iinderの動作イメージ](docs_src/static/orverview.drawio.png)
+![iinderの動作イメージ](https://github.com/hamacom2004jp/iinfer/raw/main/docs_src/static/orverview.drawio.png)
 
 1. **iinfer client** は **imageファイル** や **camera** から画像を取得し、 **推論結果 predict.json** を出力します。
 2. **iinfer server** は推論を行うサーバーです。 **iinfer client** からの要求に応えて、推論結果を **iinfer client** に返します。
@@ -20,6 +20,7 @@ onnx又はmmlabフォーマットの重みファイルを実行するCLIアプ�
 1. pipを使用してインストールします:
 
 ```bash
+pip install --upgrade pip
 pip install iinfer
 ```
 

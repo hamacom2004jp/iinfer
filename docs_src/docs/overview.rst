@@ -28,6 +28,7 @@ iinderの動作イメージ
 
   .. code-block:: bash
 
+      pip install --upgrade pip
       pip install iinfer
 
 2. コマンドラインオプションを補完するときは次のコマンドを実行します。（Ubuntuの場合のみ）:
