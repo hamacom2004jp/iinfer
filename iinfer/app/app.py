@@ -20,6 +20,9 @@ import time
 
 
 def main(args_list:list=None):
+    _main(args_list)
+
+def _main(args_list:list=None):
     """
     コマンドライン引数を処理し、サーバーまたはクライアントを起動し、コマンドを実行する。
     """
