@@ -33,6 +33,7 @@
             //"args": ["-m","postprocess","-c","det_filter","--labels","person","-i","pred.json","-f","-P"],
             //"args": ["-m","install","-c","server"],
             "args": ["-m","gui","-c","start","-f"],
+            //"args": ["-u","C:\\Users\\yoshihiro\\.iinfer\\cmd-deploy.json"],
             "module": "iinfer",
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",

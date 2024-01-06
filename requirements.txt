@@ -1,4 +1,5 @@
 argcomplete
+collectlicense
 eel
 motpy
 opencv-python

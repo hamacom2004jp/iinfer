@@ -15,6 +15,7 @@ RUN chown -R ${MKUSER}. /home/${MKUSER}/.iinfer
 
 ENV REDIS_HOST=redis
 ENV REDIS_PORT=6379
-ENV PASSWORD=password
+ENV REDIS_PASSWORD=password
+ENV SVNAME=server
 
-CMD iinfer -m server -c start --host ${REDIS_HOST} --port ${REDIS_PORT} --password ${PASSWORD}
+CMD iinfer -m server -c start --host ${REDIS_HOST} --port ${REDIS_PORT} --password ${REDIS_PASSWORD} --svname ${SVNAME}

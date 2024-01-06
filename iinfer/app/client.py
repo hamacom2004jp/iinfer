@@ -11,7 +11,7 @@ import time
 
 
 class Client(object):
-    def __init__(self, logger: logging.Logger, redis_host: str = "localhost", redis_port: int = 6379, redis_password: str = None):
+    def __init__(self, logger:logging.Logger, redis_host:str = "localhost", redis_port:int = 6379, redis_password:str = None, svname:str = 'server'):
         """
         Redisサーバーとの通信を行うクラス
 
@@ -20,16 +20,17 @@ class Client(object):
             redis_host (str, optional): Redisサーバーのホスト名. Defaults to "localhost".
             redis_port (int, optional): Redisサーバーのポート番号. Defaults to 6379.
             redis_password (str, optional): Redisサーバーのパスワード. Defaults to None.
+            svname (str, optional): 推論サーバーのサービス名. Defaults to 'server'.
         """
         self.logger = logger
         self.redis_host = redis_host
         self.redis_port = redis_port
         self.password = redis_password
+        if svname is None or svname == "":
+            raise Exception("svname is empty.")
+        self.svname = f"sv-{svname}"
+        self.hbname = f"hb-{svname}"
         self.redis_cli = redis.Redis(host=self.redis_host, port=self.redis_port, db=0, password=redis_password)
-
-    def __enter__(self):
-        self.check_server()
-        return self
 
     def __exit__(self, a, b, c):
         pass
@@ -42,6 +43,10 @@ class Client(object):
             self.terminate_server()
             self.logger.error(f"fail to ping redis-server")
             raise Exception("fail to ping redis-server")
+        found = self.redis_cli.keys(self.hbname)
+        if len(found) <= 0:
+            self.logger.error(f"Server not found. svname={self.svname.split('-')[1]}")
+            raise Exception(f"Server Not found. svname={self.svname.split('-')[1]}")
 
     def _proc(self, key, cmd:str, params:List[str], timeout:int = 60):
         """
@@ -56,10 +61,15 @@ class Client(object):
         Returns:
             dict: Redisサーバーからの応答
         """
-        reskey = common.random_string()
-        self.redis_cli.rpush(key, f"{cmd} {reskey} {' '.join([str(p) for p in params])}")
-        res = self.redis_cli.blpop([reskey], timeout=timeout)
-        return self._response(reskey, res)
+        try:
+            self.check_server()
+            reskey = common.random_string()
+            self.redis_cli.rpush(key, f"{cmd} {reskey} {' '.join([str(p) for p in params])}")
+            res = self.redis_cli.blpop([reskey], timeout=timeout)
+            return self._response(reskey, res)
+        except Exception as e:
+            self.logger.error(f"fail to execute command. cmd={cmd}, params={params}, msg={e}", exc_info=True)
+            return {"error": f"fail to execute command. cmd={cmd}, params={params}, msg={e}"}
 
     def _response(self, reskey:str, res_msg:List[str]):
         """
@@ -180,7 +190,7 @@ class Client(object):
         else:
             model_conf_bytes_b64 = None
             model_conf_file_name = None
-        res_json = self._proc('server', 'deploy', [name, str(model_img_width), str(model_img_height), predict_type,
+        res_json = self._proc(self.svname, 'deploy', [name, str(model_img_width), str(model_img_height), predict_type,
                                                    model_file.name, model_bytes_b64, model_conf_file_name, model_conf_bytes_b64, custom_predict_py_b64,
                                                    label_file_b64, color_file_b64, overwrite], timeout=timeout)
         return res_json
@@ -195,7 +205,7 @@ class Client(object):
         if self.password is None or self.password == "":
             self.logger.error(f"password is empty.")
             return {"error": f"password is empty."}
-        res_json = self._proc('server', 'deploy_list', [], timeout=timeout)
+        res_json = self._proc(self.svname, 'deploy_list', [], timeout=timeout)
         return res_json
 
     def undeploy(self, name:str, timeout:int = 60):
@@ -215,7 +225,7 @@ class Client(object):
         if name is None or name == "":
             self.logger.error(f"name is empty.")
             return {"error": f"name is empty."}
-        res_json = self._proc('server', 'undeploy', [name], timeout=timeout)
+        res_json = self._proc(self.svname, 'undeploy', [name], timeout=timeout)
         return res_json
 
     def start(self, name:str, model_provider:str = 'CPUExecutionProvider', use_track:bool=False, gpuid:int=None, timeout:int = 60):
@@ -241,7 +251,7 @@ class Client(object):
         if model_provider is None or model_provider == "":
             self.logger.error(f"model_provider is empty.")
             return {"error": f"model_provider is empty."}
-        res_json = self._proc('server', 'start', [name, model_provider, str(use_track), str(gpuid)], timeout=timeout)
+        res_json = self._proc(self.svname, 'start', [name, model_provider, str(use_track), str(gpuid)], timeout=timeout)
         return res_json
 
     def stop(self, name:str, timeout:int = 60):
@@ -261,12 +271,12 @@ class Client(object):
         if name is None or name == "":
             self.logger.error(f"name is empty.")
             return {"error": f"name is empty."}
-        res_json = self._proc('server', 'stop', [name], timeout=timeout)
+        res_json = self._proc(self.svname, 'stop', [name], timeout=timeout)
         return res_json
 
 
     def stop_server(self, timeout:int = 60):
-        res_json = self._proc('server', 'stop_server', [], timeout=timeout)
+        res_json = self._proc(self.svname, 'stop_server', [], timeout=timeout)
         return res_json
 
     def predict(self, name:str, image = None, image_file:Path = None, image_type:str = 'jpeg', output_image_file:Path = None, output_preview:bool=False, nodraw:bool=False, timeout:int = 60):
@@ -351,7 +361,7 @@ class Client(object):
         npy_b64 = common.npy2b64str(img_npy)
         #img_npy2 = np.frombuffer(base64.b64decode(npy_b64), dtype='uint8').reshape(img_npy.shape)
 
-        res_json = self._proc('server', 'predict', [name, npy_b64, str(nodraw), str(img_npy.shape[0]), str(img_npy.shape[1]), str(img_npy.shape[2] if len(img_npy.shape) > 2 else '')], timeout=timeout)
+        res_json = self._proc(self.svname, 'predict', [name, npy_b64, str(nodraw), str(img_npy.shape[0]), str(img_npy.shape[1]), str(img_npy.shape[2] if len(img_npy.shape) > 2 else '')], timeout=timeout)
         if "output_image" in res_json and "output_image_shape" in res_json:
             #byteio = BytesIO(base64.b64decode(res_json["output_image"]))
             #img_npy = np.load(byteio)

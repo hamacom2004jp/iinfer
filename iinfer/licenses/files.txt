@@ -1,0 +1,130 @@
+Author	License	Name	URL	Version	File
+Armin Ronacher	BSD License	Babel	https://babel.pocoo.org/	2.14.0	iinfer\licenses\LICENSE.Babel.2.14.0(BSD License).txt
+Python Eel Organisation	MIT License	Eel	https://github.com/python-eel/Eel	0.16.0	iinfer\licenses\LICENSE.Eel.0.16.0(MIT License).txt
+Armin Ronacher	BSD License	Jinja2	https://palletsprojects.com/p/jinja/	3.1.2	iinfer\licenses\LICENSE.Jinja2.3.1.2(BSD License).txt
+Manfred Stienstra, Yuri Takhteyev	BSD License	Markdown	https://Python-Markdown.github.io/	3.5.1	iinfer\licenses\LICENSE.Markdown.3.5.1(BSD License).txt
+UNKNOWN	BSD License	MarkupSafe	https://palletsprojects.com/p/markupsafe/	2.1.3	iinfer\licenses\LICENSE.MarkupSafe.2.1.3(BSD License).txt
+Jeffrey A. Clark (Alex)	Historical Permission Notice and Disclaimer (HPND)	Pillow	https://python-pillow.org	10.1.0	iinfer\licenses\LICENSE.Pillow.10.1.0(Historical Permission Notice and Disclaimer (HPND)).txt
+Kirill Simonov	MIT License	PyYAML	https://pyyaml.org/	6.0.1	iinfer\licenses\LICENSE.PyYAML.6.0.1(MIT License).txt
+Georg Brandl <georg@python.org>	BSD License	Pygments	https://pygments.org	2.17.2	iinfer\licenses\LICENSE.Pygments.2.17.2(BSD License).txt
+Georg Brandl <georg@python.org>	BSD License	Sphinx	https://www.sphinx-doc.org/	7.2.6	iinfer\licenses\LICENSE.Sphinx.7.2.6(BSD License).txt
+Mats Julian Olsen	MIT License	addict	https://github.com/mewwts/addict	2.4.0	iinfer\licenses\LICENSE.addict.2.4.0(MIT License).txt
+Jeff Forcier	BSD License	alabaster	https://alabaster.readthedocs.io	0.7.13	iinfer\licenses\LICENSE.alabaster.0.7.13(BSD License).txt
+Alibaba Cloud	Apache Software License	aliyun-python-sdk-core	https://github.com/aliyun/aliyun-openapi-python-sdk	2.14.0	iinfer\licenses\LICENSE.aliyun-python-sdk-core.2.14.0(Apache Software License).txt
+Aliyun	Apache Software License	aliyun-python-sdk-kms	http://develop.aliyun.com/sdk/python	2.16.2	iinfer\licenses\LICENSE.aliyun-python-sdk-kms.2.16.2(Apache Software License).txt
+Andrey Kislyuk	Apache Software License	argcomplete	https://github.com/kislyuk/argcomplete	3.2.1	iinfer\licenses\LICENSE.argcomplete.3.2.1(Apache Software License).txt
+Marcel Hellkamp	MIT License	bottle	http://bottlepy.org/	0.12.25	iinfer\licenses\LICENSE.bottle.0.12.25(MIT License).txt
+Zach Kelling	MIT License	bottle-websocket	https://github.com/zeekay/bottle-websocket	0.2.9	iinfer\licenses\LICENSE.bottle-websocket.0.2.9(MIT License).txt
+Kenneth Reitz	Mozilla Public License 2.0 (MPL 2.0)	certifi	https://github.com/certifi/python-certifi	2023.11.17	iinfer\licenses\LICENSE.certifi.2023.11.17(Mozilla Public License 2.0 (MPL 2.0)).txt
+Armin Rigo, Maciej Fijalkowski	MIT License	cffi	http://cffi.readthedocs.org	1.16.0	iinfer\licenses\LICENSE.cffi.1.16.0(MIT License).txt
+Ahmed TAHRI	MIT License	charset-normalizer	https://github.com/Ousret/charset_normalizer	3.3.2	iinfer\licenses\LICENSE.charset-normalizer.3.3.2(MIT License).txt
+UNKNOWN	BSD License	click	https://palletsprojects.com/p/click/	8.1.7	iinfer\licenses\LICENSE.click.8.1.7(BSD License).txt
+Jonathan Hartley <tartley@tartley.com>	BSD License	colorama	https://github.com/tartley/colorama	0.4.6	iinfer\licenses\LICENSE.colorama.0.4.6(BSD License).txt
+Peter Odding	MIT License	coloredlogs	https://coloredlogs.readthedocs.io	15.0.1	iinfer\licenses\LICENSE.coloredlogs.15.0.1(MIT License).txt
+Ian Thomas <ianthomas23@gmail.com>	BSD License	contourpy	https://github.com/contourpy/contourpy	1.2.0	iinfer\licenses\LICENSE.contourpy.1.2.0(BSD License).txt
+Ray Buvel	MIT License	crcmod	http://crcmod.sourceforge.net/	1.7	iinfer\licenses\LICENSE.crcmod.1.7(MIT License).txt
+The Python Cryptographic Authority and individual contributors <cryptography-dev@python.org>	Apache Software License; BSD License	cryptography	https://github.com/pyca/cryptography	41.0.7	iinfer\licenses\LICENSE.cryptography.41.0.7(Apache Software License; BSD License).txt
+Thomas A Caswell <matplotlib-users@python.org>	BSD License	cycler	https://matplotlib.org/cycler/	0.12.1	iinfer\licenses\LICENSE.cycler.0.12.1(BSD License).txt
+David Goodger	BSD License; GNU General Public License (GPL); Public Domain; Python Software Foundation License	docutils	https://docutils.sourceforge.io/	0.20.1	iinfer\licenses\LICENSE.docutils.0.20.1(BSD License; GNU General Public License (GPL); Public Domain; Python Software Foundation License).txt
+Alex Rogozhnikov	MIT License	einops	https://github.com/arogozhnikov/einops	0.7.0	iinfer\licenses\LICENSE.einops.0.7.0(MIT License).txt
+UNKNOWN	The Unlicense (Unlicense)	filelock	https://github.com/tox-dev/py-filelock	3.13.1	iinfer\licenses\LICENSE.filelock.3.13.1(The Unlicense (Unlicense)).txt
+Roger Labbe	MIT License	filterpy	https://github.com/rlabbe/filterpy	1.4.5	iinfer\licenses\LICENSE.filterpy.1.4.5(MIT License).txt
+Derek Bailey	Apache Software License	flatbuffers	https://google.github.io/flatbuffers/	23.5.26	iinfer\licenses\LICENSE.flatbuffers.23.5.26(Apache Software License).txt
+Just van Rossum	MIT License	fonttools	http://github.com/fonttools/fonttools	4.47.0	iinfer\licenses\LICENSE.fonttools.4.47.0(MIT License).txt
+UNKNOWN	BSD License	fsspec	https://github.com/fsspec/filesystem_spec	2023.12.2	iinfer\licenses\LICENSE.fsspec.2023.12.2(BSD License).txt
+Ed Schofield	MIT License	future	https://python-future.org	0.18.3	iinfer\licenses\LICENSE.future.0.18.3(MIT License).txt
+Denis Bilenko	MIT License	gevent	http://www.gevent.org/	23.9.1	iinfer\licenses\LICENSE.gevent.23.9.1(MIT License).txt
+Jeffrey Gelens	Copyright 2011-2017 Jeffrey Gelens <jeffrey@noppo.pro>	gevent-websocket	https://www.gitlab.com/noppo/gevent-websocket	0.10.1	iinfer\licenses\LICENSE.gevent-websocket.0.10.1(Copyright 2011-2017 Jeffrey Gelens jeffrey@noppo.pro).txt
+Alexey Borzenkov	MIT License	greenlet	https://greenlet.readthedocs.io/	3.0.3	iinfer\licenses\LICENSE.greenlet.3.0.3(MIT License).txt
+Peter Odding	MIT License	humanfriendly	https://humanfriendly.readthedocs.io	10.0	iinfer\licenses\LICENSE.humanfriendly.10.0(MIT License).txt
+Kim Davies <kim+pypi@gumleaf.org>	BSD License	idna	https://github.com/kjd/idna	3.6	iinfer\licenses\LICENSE.idna.3.6(BSD License).txt
+Yoshiki Shibukawa	MIT License	imagesize	https://github.com/shibukawa/imagesize_py	1.4.1	iinfer\licenses\LICENSE.imagesize.1.4.1(MIT License).txt
+Jason R. Coombs	Apache Software License	importlib-metadata	https://github.com/python/importlib_metadata	7.0.1	iinfer\licenses\LICENSE.importlib-metadata.7.0.1(Apache Software License).txt
+Ronny Pfannschmidt <opensource@ronnypfannschmidt.de>, Holger Krekel <holger.krekel@gmail.com>	MIT License	iniconfig	https://github.com/pytest-dev/iniconfig	2.0.0	iinfer\licenses\LICENSE.iniconfig.2.0.0(MIT License).txt
+Jason R. Coombs	MIT License	jaraco.classes	https://github.com/jaraco/jaraco.classes	3.3.0	iinfer\licenses\LICENSE.jaraco.classes.3.3.0(MIT License).txt
+James Saryerwinnie	MIT License	jmespath	https://github.com/jmespath/jmespath.py	0.10.0	iinfer\licenses\LICENSE.jmespath.0.10.0(MIT License).txt
+Kang Zhang	MIT License	keyring	https://github.com/jaraco/keyring	24.3.0	iinfer\licenses\LICENSE.keyring.24.3.0(MIT License).txt
+The Nucleic Development Team <sccolbert@gmail.com>	BSD License	kiwisolver	https://github.com/nucleic/kiwi	1.4.5	iinfer\licenses\LICENSE.kiwisolver.1.4.5(BSD License).txt
+Chris Sewell <chrisj_sewell@hotmail.com>	MIT License	markdown-it-py	https://github.com/executablebooks/markdown-it-py	3.0.0	iinfer\licenses\LICENSE.markdown-it-py.3.0.0(MIT License).txt
+Jacob Svensson	MIT License	mat4py	https://github.com/nephics/mat4py/	0.6.0	iinfer\licenses\LICENSE.mat4py.0.6.0(MIT License).txt
+John D. Hunter, Michael Droettboom	Python Software Foundation License	matplotlib	https://matplotlib.org	3.8.2	iinfer\licenses\LICENSE.matplotlib.3.8.2(Python Software Foundation License).txt
+Taneli Hukkinen <hukkin@users.noreply.github.com>	MIT License	mdurl	https://github.com/executablebooks/mdurl	0.1.2	iinfer\licenses\LICENSE.mdurl.0.1.2(MIT License).txt
+MMCV Contributors	Apache Software License	mmcv	https://github.com/open-mmlab/mmcv	2.1.0	iinfer\licenses\LICENSE.mmcv.2.1.0(Apache Software License).txt
+MMDetection Contributors	Apache Software License	mmdet	https://github.com/open-mmlab/mmdetection	3.2.0	iinfer\licenses\LICENSE.mmdet.3.2.0(Apache Software License).txt
+MMEngine Authors	Apache Software License	mmengine	https://github.com/open-mmlab/mmengine	0.10.2	iinfer\licenses\LICENSE.mmengine.0.10.2(Apache Software License).txt
+MMPretrain Contributors	Apache Software License	mmpretrain	https://github.com/open-mmlab/mmpretrain	1.2.0	iinfer\licenses\LICENSE.mmpretrain.1.2.0(Apache Software License).txt
+Robert Stojnic	MIT	model-index	https://github.com/paperswithcode/model-index	0.1.11	iinfer\licenses\LICENSE.model-index.0.1.11(MIT).txt
+Robert Stojnic	MIT	modelindex	https://github.com/paperswithcode/modelindex-alias	0.0.2	iinfer\licenses\LICENSE.modelindex.0.0.2(MIT).txt
+Erik Rose <erikrose@grinchcentral.com>	MIT License	more-itertools	https://github.com/more-itertools/more-itertools	10.1.0	iinfer\licenses\LICENSE.more-itertools.10.1.0(MIT License).txt
+Wiktor Muron	MIT License	motpy	https://github.com/wmuron/motpy.git	0.0.10	iinfer\licenses\LICENSE.motpy.0.0.10(MIT License).txt
+Fredrik Johansson	BSD License	mpmath	http://mpmath.org/	1.3.0	iinfer\licenses\LICENSE.mpmath.1.3.0(BSD License).txt
+Aric Hagberg <hagberg@lanl.gov>	BSD License	networkx	https://networkx.org/	3.2.1	iinfer\licenses\LICENSE.networkx.3.2.1(BSD License).txt
+messense <messense@icloud.com>	MIT	nh3	UNKNOWN	0.2.15	iinfer\licenses\LICENSE.nh3.0.2.15(MIT).txt
+Travis E. Oliphant et al.	BSD License	numpy	https://numpy.org	1.26.2	iinfer\licenses\LICENSE.numpy.1.26.2(BSD License).txt
+Microsoft Corporation	MIT License	onnxruntime	https://onnxruntime.ai	1.16.3	iinfer\licenses\LICENSE.onnxruntime.1.16.3(MIT License).txt
+UNKNOWN	Apache Software License	opencv-python	https://github.com/opencv/opencv-python	4.9.0.80	iinfer\licenses\LICENSE.opencv-python.4.9.0.80(Apache Software License).txt
+OpenDataLab	MIT License	opendatalab	https://github.com/opendatalab/opendatalab-python-sdk	0.0.10	iinfer\licenses\LICENSE.opendatalab.0.0.10(MIT License).txt
+MIM Authors	UNKNOWN	openmim	https://github.com/open-mmlab/mim	0.3.9	iinfer\licenses\LICENSE.openmim.0.3.9(UNKNOWN).txt
+Openxlab Contributors	Apache License 2.0	openxlab	https://github.com/xxx/xxxx	0.0.32	iinfer\licenses\LICENSE.openxlab.0.0.32(Apache License 2.0).txt
+Elia Robyn Lake <gh@arborelia.net>	MIT License	ordered-set	UNKNOWN	4.1.0	iinfer\licenses\LICENSE.ordered-set.4.1.0(MIT License).txt
+UNKNOWN	MIT License	oss2	http://oss.aliyun.com	2.17.0	iinfer\licenses\LICENSE.oss2.2.17.0(MIT License).txt
+Donald Stufft <donald@stufft.io>	Apache Software License; BSD License	packaging	https://github.com/pypa/packaging	23.2	iinfer\licenses\LICENSE.packaging.23.2(Apache Software License; BSD License).txt
+The Pandas Development Team <pandas-dev@python.org>	BSD License	pandas	https://pandas.pydata.org	2.1.4	iinfer\licenses\LICENSE.pandas.2.1.4(BSD License).txt
+The pip developers	MIT License	pip	https://pip.pypa.io/	23.2.1	iinfer\licenses\LICENSE.pip.23.2.1(MIT License).txt
+Tres Seaver, Agendaless Consulting	MIT License	pkginfo	https://code.launchpad.net/~tseaver/pkginfo/trunk	1.9.6	iinfer\licenses\LICENSE.pkginfo.1.9.6(MIT License).txt
+UNKNOWN	MIT License	platformdirs	https://github.com/platformdirs/platformdirs	4.1.0	iinfer\licenses\LICENSE.platformdirs.4.1.0(MIT License).txt
+Holger Krekel	MIT License	pluggy	https://github.com/pytest-dev/pluggy	1.3.0	iinfer\licenses\LICENSE.pluggy.1.3.0(MIT License).txt
+Luke Maurits <luke@maurits.id.au>	BSD License	prettytable	https://github.com/jazzband/prettytable	3.9.0	iinfer\licenses\LICENSE.prettytable.3.9.0(BSD License).txt
+protobuf@googlegroups.com	3-Clause BSD License	protobuf	https://developers.google.com/protocol-buffers/	4.25.1	iinfer\licenses\LICENSE.protobuf.4.25.1(3-Clause BSD License).txt
+UNKNOWN	FreeBSD	pycocotools	https://github.com/ppwwyyxx/cocoapi	2.0.7	iinfer\licenses\LICENSE.pycocotools.2.0.7(FreeBSD).txt
+Eli Bendersky	BSD License	pycparser	https://github.com/eliben/pycparser	2.21	iinfer\licenses\LICENSE.pycparser.2.21(BSD License).txt
+Helder Eijs	Apache Software License; BSD License; Public Domain	pycryptodome	https://www.pycryptodome.org	3.19.1	iinfer\licenses\LICENSE.pycryptodome.3.19.1(Apache Software License; BSD License; Public Domain).txt
+Paul McGuire <ptmcg.gm+pyparsing@gmail.com>	MIT License	pyparsing	https://github.com/pyparsing/pyparsing/	3.1.1	iinfer\licenses\LICENSE.pyparsing.3.1.1(MIT License).txt
+Bassem Girgis	BSD License	pyreadline3	https://pypi.python.org/pypi/pyreadline3/	3.4.1	iinfer\licenses\LICENSE.pyreadline3.3.4.1(BSD License).txt
+Holger Krekel, Bruno Oliveira, Ronny Pfannschmidt, Floris Bruynooghe, Brianna Laugher, Florian Bruhin and others	MIT License	pytest	https://docs.pytest.org/en/latest/	7.4.4	iinfer\licenses\LICENSE.pytest.7.4.4(MIT License).txt
+mrbean-bremen	MIT License	pytest-order	https://github.com/pytest-dev/pytest-order	1.2.0	iinfer\licenses\LICENSE.pytest-order.1.2.0(MIT License).txt
+Gustavo Niemeyer	Apache Software License; BSD License	python-dateutil	https://github.com/dateutil/dateutil	2.8.2	iinfer\licenses\LICENSE.python-dateutil.2.8.2(Apache Software License; BSD License).txt
+Stuart Bishop	MIT License	pytz	http://pythonhosted.org/pytz	2023.3.post1	iinfer\licenses\LICENSE.pytz.2023.3.post1(MIT License).txt
+Mark Hammond (et al)	Python Software Foundation License	pywin32	https://github.com/mhammond/pywin32	306	iinfer\licenses\LICENSE.pywin32.306(Python Software Foundation License).txt
+Enthought Inc.	BSD-3-Clause	pywin32-ctypes	https://github.com/enthought/pywin32-ctypes	0.2.2	iinfer\licenses\LICENSE.pywin32-ctypes.0.2.2(BSD-3-Clause).txt
+The Python Packaging Authority <admin@mail.pypi.org>	Apache Software License	readme-renderer	UNKNOWN	42.0	iinfer\licenses\LICENSE.readme-renderer.42.0(Apache Software License).txt
+Redis Inc.	MIT License	redis	https://github.com/redis/redis-py	5.0.1	iinfer\licenses\LICENSE.redis.5.0.1(MIT License).txt
+Matthew Barnett	Apache Software License	regex	https://github.com/mrabarnett/mrab-regex	2023.12.25	iinfer\licenses\LICENSE.regex.2023.12.25(Apache Software License).txt
+Kenneth Reitz	Apache Software License	requests	https://requests.readthedocs.io	2.28.2	iinfer\licenses\LICENSE.requests.2.28.2(Apache Software License).txt
+Ian Cordasco, Cory Benfield	Apache Software License	requests-toolbelt	https://toolbelt.readthedocs.io/	1.0.0	iinfer\licenses\LICENSE.requests-toolbelt.1.0.0(Apache Software License).txt
+Ian Stapleton Cordasco	Apache Software License	rfc3986	http://rfc3986.readthedocs.io	2.0.0	iinfer\licenses\LICENSE.rfc3986.2.0.0(Apache Software License).txt
+Will McGugan	MIT License	rich	https://github.com/Textualize/rich	13.4.2	iinfer\licenses\LICENSE.rich.13.4.2(MIT License).txt
+UNKNOWN	BSD License	scipy	https://scipy.org/	1.11.4	iinfer\licenses\LICENSE.scipy.1.11.4(BSD License).txt
+Python Packaging Authority	MIT License	setuptools	https://github.com/pypa/setuptools	60.2.0	iinfer\licenses\LICENSE.setuptools.60.2.0(MIT License).txt
+Sean Gillies	BSD License	shapely	https://github.com/shapely/shapely	2.0.2	iinfer\licenses\LICENSE.shapely.2.0.2(BSD License).txt
+Benjamin Peterson	MIT License	six	https://github.com/benjaminp/six	1.16.0	iinfer\licenses\LICENSE.six.1.16.0(MIT License).txt
+Snowball Developers	BSD License	snowballstemmer	https://github.com/snowballstem/snowball	2.2.0	iinfer\licenses\LICENSE.snowballstemmer.2.2.0(BSD License).txt
+Cone Contributors	BSD License	sphinx-conestack-theme	https://github.com/conestack/sphinx-conestack-theme	1.0b3	iinfer\licenses\LICENSE.sphinx-conestack-theme.1.0b3(BSD License).txt
+Frﾃｩdﾃｩric Aoustin	GNU General Public License v2 (GPLv2)	sphinx-fontawesome	https://github.com/fraoustin/sphinx_fontawesome	0.0.6	iinfer\licenses\LICENSE.sphinx-fontawesome.0.0.6(GNU General Public License v2 (GPLv2)).txt
+Dave Snider, Read the Docs, Inc. & contributors	MIT License	sphinx-rtd-theme	https://github.com/readthedocs/sphinx_rtd_theme	2.0.0	iinfer\licenses\LICENSE.sphinx-rtd-theme.2.0.0(MIT License).txt
+Georg Brandl <georg@python.org>	BSD License	sphinxcontrib-applehelp	https://www.sphinx-doc.org/	1.0.7	iinfer\licenses\LICENSE.sphinxcontrib-applehelp.1.0.7(BSD License).txt
+Georg Brandl <georg@python.org>	BSD License	sphinxcontrib-devhelp	https://www.sphinx-doc.org/	1.0.5	iinfer\licenses\LICENSE.sphinxcontrib-devhelp.1.0.5(BSD License).txt
+Georg Brandl <georg@python.org>	BSD License	sphinxcontrib-htmlhelp	https://www.sphinx-doc.org/	2.0.4	iinfer\licenses\LICENSE.sphinxcontrib-htmlhelp.2.0.4(BSD License).txt
+Adam Turner	BSD License	sphinxcontrib-jquery	https://github.com/sphinx-contrib/jquery/	4.1	iinfer\licenses\LICENSE.sphinxcontrib-jquery.4.1(BSD License).txt
+Georg Brandl	BSD License	sphinxcontrib-jsmath	http://sphinx-doc.org/	1.0.1	iinfer\licenses\LICENSE.sphinxcontrib-jsmath.1.0.1(BSD License).txt
+Georg Brandl <georg@python.org>	BSD License	sphinxcontrib-qthelp	https://www.sphinx-doc.org/	1.0.6	iinfer\licenses\LICENSE.sphinxcontrib-qthelp.1.0.6(BSD License).txt
+Georg Brandl <georg@python.org>	BSD License	sphinxcontrib-serializinghtml	https://www.sphinx-doc.org/	1.1.9	iinfer\licenses\LICENSE.sphinxcontrib-serializinghtml.1.1.9(BSD License).txt
+SymPy development team	BSD License	sympy	https://sympy.org	1.12	iinfer\licenses\LICENSE.sympy.1.12(BSD License).txt
+Sergey Astanin <s.astanin@gmail.com>	MIT License	tabulate	https://github.com/astanin/python-tabulate	0.9.0	iinfer\licenses\LICENSE.tabulate.0.9.0(MIT License).txt
+Konstantin Lepa <konstantin.lepa@gmail.com>	MIT License	termcolor	https://github.com/termcolor/termcolor	2.4.0	iinfer\licenses\LICENSE.termcolor.2.4.0(MIT License).txt
+Robpol86	MIT License	terminaltables	https://github.com/matthewdeanmartin/terminaltables	3.1.10	iinfer\licenses\LICENSE.terminaltables.3.1.10(MIT License).txt
+Taneli Hukkinen <hukkin@users.noreply.github.com>	MIT License	tomli	https://github.com/hukkin/tomli	2.0.1	iinfer\licenses\LICENSE.tomli.2.0.1(MIT License).txt
+PyTorch Team	BSD License	torch	https://pytorch.org/	2.1.2	iinfer\licenses\LICENSE.torch.2.1.2(BSD License).txt
+PyTorch Core Team	BSD	torchvision	https://github.com/pytorch/vision	0.16.2	iinfer\licenses\LICENSE.torchvision.0.16.2(BSD).txt
+UNKNOWN	MIT License; Mozilla Public License 2.0 (MPL 2.0)	tqdm	https://tqdm.github.io	4.65.2	iinfer\licenses\LICENSE.tqdm.4.65.2(MIT License; Mozilla Public License 2.0 (MPL 2.0)).txt
+Donald Stufft and individual contributors	Apache Software License	twine	https://twine.readthedocs.io/	4.0.2	iinfer\licenses\LICENSE.twine.4.0.2(Apache Software License).txt
+"Guido van Rossum, Jukka Lehtosalo, Łukasz Langa, Michael Lee" <levkivskyi@gmail.com>	Python Software Foundation License	typing_extensions	https://github.com/python/typing_extensions	4.9.0	iinfer\licenses\LICENSE.typing_extensions.4.9.0(Python Software Foundation License).txt
+Python Software Foundation	Apache Software License	tzdata	https://github.com/python/tzdata	2023.4	iinfer\licenses\LICENSE.tzdata.2023.4(Apache Software License).txt
+Andrey Petrov	MIT License	urllib3	https://urllib3.readthedocs.io/	1.26.18	iinfer\licenses\LICENSE.urllib3.1.26.18(MIT License).txt
+Jeff Quast	MIT License	wcwidth	https://github.com/jquast/wcwidth	0.2.13	iinfer\licenses\LICENSE.wcwidth.0.2.13(MIT License).txt
+Daniel Holth <dholth@fastmail.fm>	MIT License	wheel	https://github.com/pypa/wheel	0.42.0	iinfer\licenses\LICENSE.wheel.0.42.0(MIT License).txt
+Daniel Roy Greenfeld	BSD License	whichcraft	https://github.com/pydanny/whichcraft	0.6.1	iinfer\licenses\LICENSE.whichcraft.0.6.1(BSD License).txt
+Google Inc.	Apache Software License	yapf	https://github.com/google/yapf/blob/main/CHANGELOG.md	0.40.2	iinfer\licenses\LICENSE.yapf.0.40.2(Apache Software License).txt
+Jason R. Coombs	MIT License	zipp	https://github.com/jaraco/zipp	3.17.0	iinfer\licenses\LICENSE.zipp.3.17.0(MIT License).txt
+Zope Foundation and Contributors	Zope Public License	zope.event	https://github.com/zopefoundation/zope.event	5.0	iinfer\licenses\LICENSE.zope.event.5.0(Zope Public License).txt
+Zope Foundation and Contributors	Zope Public License	zope.interface	https://github.com/zopefoundation/zope.interface	6.1	iinfer\licenses\LICENSE.zope.interface.6.1(Zope Public License).txt

@@ -41,12 +41,12 @@
                         </ul>
                     </li>
                     
-                    <li class="nav-item dropdown d-none">
+                    <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="aboutMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             About
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="aboutMenuLink">
-                            <li><a class="dropdown-item" href="#">Setting</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="$('#versions_modal').modal('show');">Versions</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -276,6 +276,54 @@
             </form>
         </div>
     </div>
+    <!-- versionsモーダル -->
+    <div id="versions_modal" class="modal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <form id="console_form" class="modal-content novalidate">
+                <div class="modal-header">
+                    <h5 class="modal-title">Versions</h5>
+                    <button type="button" class="btn btn_window_stack">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-window-stack" viewBox="0 0 16 16">
+                            <path d="M4.5 6a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1ZM6 6a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1Zm2-.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0Z"/>
+                            <path d="M12 1a2 2 0 0 1 2 2 2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2 2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h10ZM2 12V5a2 2 0 0 1 2-2h9a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1Zm1-4v5a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V8H3Zm12-1V5a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v2h12Z"/>
+                        </svg>
+                    </button>
+                    <button type="button" class="btn btn_window">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-window" viewBox="0 0 16 16">
+                            <path d="M2.5 4a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1zm2-.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zm1 .5a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>
+                            <path d="M2 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2H2zm13 2v2H1V3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1zM2 14a1 1 0 0 1-1-1V6h14v7a1 1 0 0 1-1 1H2z"/>
+                        </svg>
+                    </button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="margin-left: 0px;"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="versions_iinfer-tab" data-bs-toggle="tab" data-bs-target="#versions_iinfer" type="button" role="tab" aria-controls="versions_iinfer" aria-selected="true">
+                                iinfer
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="versions_used-tab" data-bs-toggle="tab" data-bs-target="#versions_used" type="button" role="tab" aria-controls="versions_used" aria-selected="false">
+                                Used software
+                            </button>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="versions_iinfer" role="tabpanel" aria-labelledby="versions_iinfer-tab">
+                            versions_iinfer
+                        </div>
+                        <div class="tab-pane fade" id="versions_used" role="tabpanel" aria-labelledby="versions_used-tab">
+                            versions_used
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
     <!-- ローディングマスク -->
     <div id="loading" class="position-absolute top-0 start-0 w-100 h-100 d-none" style="background:rgba(0, 0, 0, 0.3);z-index:10000;">
         <div class="text-center position-absolute top-50 start-50 w-100 translate-middle">
@@ -285,9 +333,7 @@
         </div>
     </div>
     <!-- フッター -->
-    <footer class="bg-dark fixed-bottom text-center text-white p-2">
-        Copyright (c) 2024 hamacom2004jp
-    </footer>
+    <footer class="bg-dark fixed-bottom text-center text-white p-2 copyright"></footer>
 </body>
 <script type="text/javascript" src="assets/bootstrap/bootstrap.bundle.min.5.0.2.js"></script>
 <script type="text/javascript" src="assets/jquery/jquery.min.3.2.0.js"></script>
@@ -296,6 +342,12 @@
 <script type="text/javascript" src="assets/tree-menu/js/tree-menu.js"></script>
 <script type="text/javascript">
 $(function(){
+    // copyright情報取得
+    copyright_func = async function(){
+        copyright = await eel.copyright()();
+        $('.copyright').text(copyright);
+    };
+    copyright_func();
     // 保存済みコマンドファイル一覧の取得
     list_cmd_func = async function(){
         $('#cmd_items').html('');
@@ -812,11 +864,53 @@ $(function(){
             // TODO
         };
     });
+    $('#versions_modal').on('shown.bs.modal	', function(){
+        // iinferのバージョン情報取得
+        versions_iinfer_func = async function(){
+            versions_iinfer = await eel.versions_iinfer()();
+            $('#versions_iinfer').html('');
+            $.each(versions_iinfer, function(i, v){
+                v = v.replace(/<([^>]+)>/g, '<a href="$1" target="_blank">$1</a>');
+                div = $('<div class="d-block"></div>');
+                $('#versions_iinfer').append(div);
+                if(i==0) {
+                    div.addClass('m-3');
+                    div.append('<h4>' + v + '</h4>');
+                } else {
+                    div.addClass('ms-5 me-5');
+                    div.append('<h6>' + v + '</h6>');
+                }
+            });
+        };
+        versions_iinfer_func();
+        // usedのバージョン情報取得
+        versions_used_func = async function(){
+            versions_used = await eel.versions_used()();
+            $('#versions_used').html('');
+            div = $('<div class="overflow-auto" style="height:calc(100vh - 260px);"></div>');
+            table = $('<table class="table table-bordered table-hover table-sm"></table>');
+            table_head = $('<thead class="table-dark bg-dark"></thead>');
+            table_body = $('<tbody></tbody>');
+            table.append(table_head);
+            table.append(table_body);
+            div.append(table);
+            $('#versions_used').append(div);
+            $.each(versions_used, function(i, row){
+                tr = $('<tr></tr>');
+                $.each(row, function(j, cel){
+                    td = $('<td></td>').text(cel);
+                    tr.append(td);
+                });
+                if(i==0) table_head.append(tr);
+                else table_body.append(tr);
+            });
+        };
+        versions_used_func();
+    })
 
     // modal setting
-    $('#cmd_modal').draggable({cursor:"move",cancel:".modal-body"});
-    $('#result_modal').draggable({cursor:"move",cancel:".modal-body"});
-    $('#filer_modal').draggable({cursor:"move",cancel:".modal-body, .filer_address"});
+    $('.modal-dialog').draggable({cursor:"move",cancel:".modal-body"});
+    $('#filer_modal .modal-dialog').draggable({cursor:"move",cancel:".modal-body, .filer_address"});
     $('.btn_window_stack').click(function(){
         $('.btn_window_stack').css('margin-left', '0px').hide();
         $('.btn_window').css('margin-left', 'auto').show();

@@ -1,3 +1,4 @@
+from iinfer import version
 from iinfer.app import app
 from iinfer.app import common
 from pathlib import Path
@@ -52,6 +53,7 @@ class Web(object):
                         dict(opt="host", type="str", default="localhost", required=True, multi=False, hide=True, choise=None),
                         dict(opt="port", type="int", default=6379, required=True, multi=False, hide=True, choise=None),
                         dict(opt="password", type="str", default="password", required=True, multi=False, hide=True, choise=None),
+                        dict(opt="svname", type="str", default="server", required=True, multi=False, hide=True, choise=None),
                         dict(opt="name", type="str", default="", required=True, multi=False, hide=False, choise=None),
                         dict(opt="model_file", type="file", default="", required=True, multi=False, hide=False, choise=None),
                         dict(opt="model_conf_file", type="file", default="", required=False, multi=True, hide=False, choise=None),
@@ -71,6 +73,7 @@ class Web(object):
                         dict(opt="host", type="str", default="localhost", required=True, multi=False, hide=True, choise=None),
                         dict(opt="port", type="int", default=6379, required=True, multi=False, hide=True, choise=None),
                         dict(opt="password", type="str", default="password", required=True, multi=False, hide=True, choise=None),
+                        dict(opt="svname", type="str", default="server", required=True, multi=False, hide=True, choise=None),
                         dict(opt="timeout", type="int", default="15", required=False, multi=False, hide=True, choise=None),
                         dict(opt="stdout_save", type="file", default="", required=False, multi=False, hide=True, choise=None),
                         dict(opt="stdout_log", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False])
@@ -80,6 +83,7 @@ class Web(object):
                         dict(opt="host", type="str", default="localhost", required=True, multi=False, hide=True, choise=None),
                         dict(opt="port", type="int", default=6379, required=True, multi=False, hide=True, choise=None),
                         dict(opt="password", type="str", default="password", required=True, multi=False, hide=True, choise=None),
+                        dict(opt="svname", type="str", default="server", required=True, multi=False, hide=True, choise=None),
                         dict(opt="name", type="str", default="", required=True, multi=False, hide=False, choise=None),
                         dict(opt="timeout", type="int", default="15", required=False, multi=False, hide=True, choise=None),
                         dict(opt="stdout_save", type="file", default="", required=False, multi=False, hide=True, choise=None),
@@ -90,6 +94,7 @@ class Web(object):
                         dict(opt="host", type="str", default="localhost", required=True, multi=False, hide=True, choise=None),
                         dict(opt="port", type="int", default=6379, required=True, multi=False, hide=True, choise=None),
                         dict(opt="password", type="str", default="password", required=True, multi=False, hide=True, choise=None),
+                        dict(opt="svname", type="str", default="server", required=True, multi=False, hide=True, choise=None),
                         dict(opt="name", type="str", default="", required=True, multi=False, hide=False, choise=None),
                         dict(opt="model_provider", type="str", default="CPUExecutionProvider", required=False, multi=False, hide=True,
                              choise=['CPUExecutionProvider', 'CUDAExecutionProvider', 'TensorrtExecutionProvider']),
@@ -109,6 +114,7 @@ class Web(object):
                         dict(opt="host", type="str", default="localhost", required=True, multi=False, hide=True, choise=None),
                         dict(opt="port", type="int", default=6379, required=True, multi=False, hide=True, choise=None),
                         dict(opt="password", type="str", default="password", required=True, multi=False, hide=True, choise=None),
+                        dict(opt="svname", type="str", default="server", required=True, multi=False, hide=True, choise=None),
                         dict(opt="name", type="str", default="", required=True, multi=False, hide=False, choise=None),
                         dict(opt="timeout", type="int", default="15", required=False, multi=False, hide=True, choise=None),
                         dict(opt="stdout_save", type="file", default="", required=False, multi=False, hide=True, choise=None),
@@ -119,6 +125,7 @@ class Web(object):
                         dict(opt="host", type="str", default="localhost", required=True, multi=False, hide=True, choise=None),
                         dict(opt="port", type="int", default=6379, required=True, multi=False, hide=True, choise=None),
                         dict(opt="password", type="str", default="password", required=True, multi=False, hide=True, choise=None),
+                        dict(opt="svname", type="str", default="server", required=True, multi=False, hide=True, choise=None),
                         dict(opt="name", type="str", default="", required=True, multi=False, hide=False, choise=None),
                         dict(opt="input_file", type="file", default="", required=False, multi=False, hide=False, choise=None),
                         dict(opt="stdin", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False]),
@@ -149,6 +156,7 @@ class Web(object):
                         dict(opt="host", type="str", default="localhost", required=True, multi=False, hide=True, choise=None),
                         dict(opt="port", type="int", default=6379, required=True, multi=False, hide=True, choise=None),
                         dict(opt="password", type="str", default="password", required=True, multi=False, hide=True, choise=None),
+                        dict(opt="svname", type="str", default="server", required=True, multi=False, hide=True, choise=None),
                         dict(opt="data", type="file", default=None, required=False, multi=False, hide=False, choise=None),
                         dict(opt="stdout_save", type="file", default="", required=False, multi=False, hide=True, choise=None),
                         dict(opt="stdout_log", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False])
@@ -158,6 +166,7 @@ class Web(object):
                         dict(opt="host", type="str", default="localhost", required=True, multi=False, hide=True, choise=None),
                         dict(opt="port", type="int", default=6379, required=True, multi=False, hide=True, choise=None),
                         dict(opt="password", type="str", default="password", required=True, multi=False, hide=True, choise=None),
+                        dict(opt="svname", type="str", default="server", required=True, multi=False, hide=True, choise=None),
                         dict(opt="timeout", type="int", default="15", required=False, multi=False, hide=True, choise=None),
                         dict(opt="stdout_save", type="file", default="", required=False, multi=False, hide=True, choise=None),
                         dict(opt="stdout_log", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False])
@@ -307,7 +316,7 @@ class Web(object):
 
         @eel.expose
         def del_cmd(title):
-            opt_path = self.data / ".iinfer" / f"cmd-{title}.json"
+            opt_path = self.data / f"cmd-{title}.json"
             self.logger.info(f"del_cmd: opt_path={opt_path}")
             opt_path.unlink()
 
@@ -410,6 +419,23 @@ class Web(object):
         def list_pipe():
             paths = glob.glob(str(self.data / "pipe-*.json"))
             return [common.loadopt(path) for path in paths]
+
+        @eel.expose
+        def copyright():
+            return version.__copyright__
+
+        @eel.expose
+        def versions_iinfer():
+            return version.__description__.split('\n')
+
+        @eel.expose
+        def versions_used():
+            with open(Path(iinfer.__file__).parent / 'licenses' / 'files.txt', 'r', encoding='utf-8') as f:
+                ret = []
+                for i, line in enumerate(f.readlines()):
+                    parts = line.strip().split('\t')
+                    ret.append(parts)
+            return ret
 
         eel.js_console_modal_log_func('== console log start ==\n')
         eel.start("main.html", size=(width, height), block=True, port=web_port, host=web_host, close_callback=self.stop)

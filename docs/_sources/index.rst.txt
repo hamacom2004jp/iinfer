@@ -1,7 +1,7 @@
 .. -*- coding: utf-8 -*-
 
 #######################################
-iinfer (Visual Prediction Application)
+iinfer (Image Inference Application)
 #######################################
 
 - onnx又はmmlabフォーマットのAIモデルファイルを実行するCLIアプリケーションです。

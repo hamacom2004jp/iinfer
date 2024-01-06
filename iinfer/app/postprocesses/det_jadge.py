@@ -46,12 +46,30 @@ class DetJadge(postprocess.Postprocess):
         self.nodraw = nodraw
         self.output_preview = output_preview
 
-    def post_json(self, json_connectstr,  outputs:Dict[str, Any]):
+    def create_session(self, json_connectstr:str, img_connectstr:str, text_connectstr:str):
+        """
+        後処理のセッションを作成する関数です。
+        ここで後処理準備を完了するようにしてください。
+        戻り値の後処理セッションの型は問いません。
+
+        Args:
+            json_connectstr (str): 推論結果後処理のセッション確立に必要な接続文字列
+            img_connectstr (str): 可視化画像後処理のセッション確立に必要な接続文字列
+            text_connectstr (str): テキストデータ処理のセッション確立に必要な接続文字列
+
+        Returns:
+            推論結果後処理のセッション
+            可視化画像後処理のセッション
+            テキストデータ処理のセッション
+        """
+        return 'json_connectstr', 'img_connectstr', None
+
+    def post_json(self, json_session, outputs:Dict[str, Any]):
         """
         outputsに対して後処理を行う関数です。
 
         Args:
-            json_connectstr (str): 使用しないパラメーター
+            json_session (任意): JSONセッション
             outputs (Dict[str, Any]): 推論結果
 
         Returns:
@@ -92,13 +110,13 @@ class DetJadge(postprocess.Postprocess):
 
         return data
 
-    def post_img(self, img_connectstr:str, outputs:Dict[str, Any], output_image:Image.Image):
+    def post_img(self, img_session, outputs:Dict[str, Any], output_image:Image.Image):
         """
         output_imageに対して後処理を行う関数です。
         引数のimageはRGBですので、戻り値の出力画像もRGBにしてください。
 
         Args:
-            img_connectstr (str): 可視化画像の後処理に必要な接続文字列
+            img_session (任意): 画像セッション
             outputs (Dict[str, Any]): 後処理結果
             output_image (Image): 入力画像（RGB配列であること）
 

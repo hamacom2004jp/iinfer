@@ -13,7 +13,7 @@ import time
 
 
 class Server(object):
-    def __init__(self, data_dir: Path, logger: logging.Logger, redis_host: str = "localhost", redis_port: int = 6379, redis_password: str = None):
+    def __init__(self, data_dir: Path, logger: logging.Logger, redis_host: str = "localhost", redis_port: int = 6379, redis_password: str = None, svname: str = 'server'):
         """
         Redisサーバーに接続し、クライアントからのコマンドを受信し実行する
 
@@ -23,12 +23,15 @@ class Server(object):
             redis_host (str): Redisホスト名, by default "localhost"
             redis_port (int): Redisポート番号, by default 6379
             redis_password (str): Redisパスワード, by default None
+            svname (str, optional): 推論サーバーのサービス名. by default 'server'
         """
         self.data_dir = data_dir
         self.logger = logger
         self.redis_host = redis_host
         self.redis_port = redis_port
         self.redis_password = redis_password
+        self.svname = f"sv-{svname}"
+        self.hbname = f"hb-{svname}"
         self.redis_cli = None
         self.sessions = {}
         self.is_running = False
@@ -53,12 +56,31 @@ class Server(object):
             self.is_running = False
             self.logger.error(f"fail to ping server. {e}")
 
+    def _clean_server(self):
+        """
+        Redisサーバーに残っている停止済みのサーバーキーを削除する
+        """
+        hblist = self.redis_cli.keys("hb-*")
+        for hb in hblist:
+            v = self.redis_cli.get(hb)
+            if v is None:
+                continue
+            tm = float(v)
+            if time.time() - tm > 10:
+                self.redis_cli.delete(hb)
+
     def _run_server(self):
-        self.logger.info(f"start server")
+        self.logger.info(f"start server. svname={self.svname}")
+        ltime = time.time()
         while self.is_running:
             try:
                 # ブロッキングリストから要素を取り出す
-                result = self.redis_cli.blpop('server', timeout=1)
+                ctime = time.time()
+                self.redis_cli.set(self.hbname, str(ctime))
+                result = self.redis_cli.blpop(self.svname, timeout=1)
+                if ctime - ltime > 10:
+                    self._clean_server()
+                    ltime = ctime
                 if result is None or len(result) <= 0:
                     time.sleep(1)
                     continue
@@ -113,7 +135,7 @@ class Server(object):
                     self.predict(msg[1], msg[2], image, nodraw)
                 elif msg[0] == 'stop_server':
                     self.is_running = False
-                    self.responce(msg[1], {"success": f"Successful stop server."})
+                    self.responce(msg[1], {"success": f"Successful stop server. svname={self.svname}"})
                     break
                 else:
                     self.logger.warn(f"Unknown command {msg}")

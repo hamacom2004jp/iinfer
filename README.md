@@ -1,11 +1,11 @@
-# iinfer (Visual Prediction Application)
+# iinfer (Image Inference Application)
 
-onnx又はmmlabフォーマットの重みファイルを実行するCLIアプリケーションです。
+onnx又はmmlabフォーマットのAIモデルファイルを実行するアプリケーションです。
 ドキュメントは[こちら](https://hamacom2004jp.github.io/iinfer/)。
 
-## iinderの動作イメージ
+## iinferの動作イメージ
 
-![iinderの動作イメージ](https://github.com/hamacom2004jp/iinfer/raw/main/docs_src/static/orverview.drawio.png)
+![iinferの動作イメージ](https://github.com/hamacom2004jp/iinfer/raw/main/docs_src/static/orverview.drawio.png)
 
 1. **iinfer client** は **imageファイル** や **camera** から画像を取得し、 **推論結果 predict.json** を出力します。
 2. **iinfer server** は推論を行うサーバーです。 **iinfer client** からの要求に応えて、推論結果を **iinfer client** に返します。
@@ -136,4 +136,4 @@ iinfer -m redis -c docker_stop -f \
 
 ## Lisence
 
-This project is licensed under the MIT License, see the LICENSE.txt file for details
+This project is licensed under the MIT License, see the LICENSE file for details

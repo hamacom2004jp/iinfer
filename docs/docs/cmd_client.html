@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>コマンドリファレンス（clientモード） &mdash; iinfer 2024/01/06 documentation</title>
+  <title>コマンドリファレンス（clientモード） &mdash; iinfer 2024/01/07 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -16,7 +16,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=79144745"></script>
+        <script src="../_static/documentation_options.js?v=dd6cc35c"></script>
         <script src="../_static/doctools.js?v=888ff710"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -129,47 +129,51 @@
 <td></td>
 <td><p>Redisサーバーのアクセスパスワード(任意)を指定する。省略時は <cite>password</cite> を使用する</p></td>
 </tr>
-<tr class="row-odd"><td><p>-n,--name &lt;登録名&gt;</p></td>
+<tr class="row-odd"><td><p>--svname &lt;推論サービス名&gt;</p></td>
+<td></td>
+<td><p>推論サーバーのサービス名を指定する。省略時は <cite>server</cite> を使用する</p></td>
+</tr>
+<tr class="row-even"><td><p>-n,--name &lt;登録名&gt;</p></td>
 <td><p>〇</p></td>
 <td><p>AIモデルの登録名(任意)を指定する</p></td>
 </tr>
-<tr class="row-even"><td><p>--model_file &lt;モデルファイル&gt;</p></td>
+<tr class="row-odd"><td><p>--model_file &lt;モデルファイル&gt;</p></td>
 <td><p>〇</p></td>
 <td><p>学習済みのモデルファイルを指定する</p></td>
 </tr>
-<tr class="row-odd"><td><p>--model_conf_file &lt;モデル設定ファイル&gt;</p></td>
+<tr class="row-even"><td><p>--model_conf_file &lt;モデル設定ファイル&gt;</p></td>
 <td></td>
 <td><p>mmlabの場合はモデル設定ファイルを指定する。複数指定可能ですが、最初に指定したファイルが <cite>start</cite> 時に使用されます。</p></td>
 </tr>
-<tr class="row-even"><td><p>--model_img_width &lt;モデルのINPUTサイズ(横px)&gt;</p></td>
+<tr class="row-odd"><td><p>--model_img_width &lt;モデルのINPUTサイズ(横px)&gt;</p></td>
 <td></td>
 <td><p>AIモデルのINPUTサイズ(横px)を指定する</p></td>
 </tr>
-<tr class="row-odd"><td><p>--model_img_height &lt;モデルのINPUTサイズ(縦px)&gt;</p></td>
+<tr class="row-even"><td><p>--model_img_height &lt;モデルのINPUTサイズ(縦px)&gt;</p></td>
 <td></td>
 <td><p>AIモデルのINPUTサイズ(縦px)を指定する</p></td>
 </tr>
-<tr class="row-even"><td><p>--predict_type &lt;推論タイプ&gt;</p></td>
+<tr class="row-odd"><td><p>--predict_type &lt;推論タイプ&gt;</p></td>
 <td><p>〇</p></td>
 <td><p>AIモデルの推論タイプを指定する。 <a class="reference internal" href="#predict-type-list"><span class="std std-ref">参照</span></a></p></td>
 </tr>
-<tr class="row-odd"><td><p>--custom_predict_py &lt;カスタム推論pyファイル&gt;</p></td>
+<tr class="row-even"><td><p>--custom_predict_py &lt;カスタム推論pyファイル&gt;</p></td>
 <td></td>
 <td><p>独自の推論タイプを作成するときに指定。この時は <cite>--predict_type Custom</cite> を指定</p></td>
 </tr>
-<tr class="row-even"><td><p>--label_file &lt;ラベルファイル&gt;</p></td>
+<tr class="row-odd"><td><p>--label_file &lt;ラベルファイル&gt;</p></td>
 <td></td>
 <td><p>推論結果のクラスラベルファイルを指定。改行区切りでラベル名(行indexがクラスと一致する)を指定したファイル。</p></td>
 </tr>
-<tr class="row-odd"><td><p>--color_file &lt;色ファイル&gt;</p></td>
+<tr class="row-even"><td><p>--color_file &lt;色ファイル&gt;</p></td>
 <td></td>
 <td><p>推論結果の可視化画像の色ファイルを指定。改行区切りで色(行indexがクラスと一致する)を指定したファイル。</p></td>
 </tr>
-<tr class="row-even"><td><p>--overwrite</p></td>
+<tr class="row-odd"><td><p>--overwrite</p></td>
 <td></td>
 <td><p>デプロイ済みであっても上書きする</p></td>
 </tr>
-<tr class="row-odd"><td><p>--timeout &lt;タイムアウト&gt;</p></td>
+<tr class="row-even"><td><p>--timeout &lt;タイムアウト&gt;</p></td>
 <td></td>
 <td><p>サーバーの応答が返ってくるまでの最大待ち時間</p></td>
 </tr>
@@ -203,7 +207,11 @@
 <td></td>
 <td><p>Redisサーバーのアクセスパスワード(任意)を指定する。省略時は <cite>password</cite> を使用する</p></td>
 </tr>
-<tr class="row-odd"><td><p>--timeout &lt;タイムアウト&gt;</p></td>
+<tr class="row-odd"><td><p>--svname &lt;推論サービス名&gt;</p></td>
+<td></td>
+<td><p>推論サーバーのサービス名を指定する。省略時は <cite>server</cite> を使用する</p></td>
+</tr>
+<tr class="row-even"><td><p>--timeout &lt;タイムアウト&gt;</p></td>
 <td></td>
 <td><p>サーバーの応答が返ってくるまでの最大待ち時間</p></td>
 </tr>
@@ -237,11 +245,15 @@
 <td></td>
 <td><p>Redisサーバーのアクセスパスワード(任意)を指定する。省略時は <cite>password</cite> を使用する</p></td>
 </tr>
-<tr class="row-odd"><td><p>-n,--name &lt;登録名&gt;</p></td>
+<tr class="row-odd"><td><p>--svname &lt;推論サービス名&gt;</p></td>
+<td></td>
+<td><p>推論サーバーのサービス名を指定する。省略時は <cite>server</cite> を使用する</p></td>
+</tr>
+<tr class="row-even"><td><p>-n,--name &lt;登録名&gt;</p></td>
 <td><p>〇</p></td>
 <td><p>AIモデルの登録名を指定する</p></td>
 </tr>
-<tr class="row-even"><td><p>--timeout &lt;タイムアウト&gt;</p></td>
+<tr class="row-odd"><td><p>--timeout &lt;タイムアウト&gt;</p></td>
 <td></td>
 <td><p>サーバーの応答が返ってくるまでの最大待ち時間</p></td>
 </tr>
@@ -275,23 +287,27 @@
 <td></td>
 <td><p>Redisサーバーのアクセスパスワード(任意)を指定する。省略時は <cite>password</cite> を使用する</p></td>
 </tr>
-<tr class="row-odd"><td><p>-n,--name &lt;登録名&gt;</p></td>
+<tr class="row-odd"><td><p>--svname &lt;推論サービス名&gt;</p></td>
+<td></td>
+<td><p>推論サーバーのサービス名を指定する。省略時は <cite>server</cite> を使用する</p></td>
+</tr>
+<tr class="row-even"><td><p>-n,--name &lt;登録名&gt;</p></td>
 <td><p>〇</p></td>
 <td><p>AIモデルの登録名を指定する</p></td>
 </tr>
-<tr class="row-even"><td><p>--model_provider &lt;モデルプロバイダー&gt;</p></td>
+<tr class="row-odd"><td><p>--model_provider &lt;モデルプロバイダー&gt;</p></td>
 <td></td>
 <td><p>ONNX形式のモデルファイルの場合に指定可能。指定可能なプロバイダーは <cite>CPUExecutionProvider</cite> , <cite>CUDAExecutionProvider</cite> , <cite>TensorrtExecutionProvider</cite></p></td>
 </tr>
-<tr class="row-odd"><td><p>--use_track</p></td>
+<tr class="row-even"><td><p>--use_track</p></td>
 <td></td>
 <td><p>ObjectDetectionタスクの場合に指定可能。motpyを使ってトラッキングID付与を行う</p></td>
 </tr>
-<tr class="row-even"><td><p>--gpuid &lt;GPUのid&gt;</p></td>
+<tr class="row-odd"><td><p>--gpuid &lt;GPUのid&gt;</p></td>
 <td></td>
 <td><p>GPUのディバイスIDを指定する。 <cite>--model_provider</cite> でGPUを使用するプロバイダーを指定した時に使用可能</p></td>
 </tr>
-<tr class="row-odd"><td><p>--timeout &lt;タイムアウト&gt;</p></td>
+<tr class="row-even"><td><p>--timeout &lt;タイムアウト&gt;</p></td>
 <td></td>
 <td><p>サーバーの応答が返ってくるまでの最大待ち時間</p></td>
 </tr>
@@ -329,11 +345,15 @@
 <td></td>
 <td><p>Redisサーバーのアクセスパスワード(任意)を指定する。省略時は <cite>password</cite> を使用する</p></td>
 </tr>
-<tr class="row-odd"><td><p>-n,--name &lt;登録名&gt;</p></td>
+<tr class="row-odd"><td><p>--svname &lt;推論サービス名&gt;</p></td>
+<td></td>
+<td><p>推論サーバーのサービス名を指定する。省略時は <cite>server</cite> を使用する</p></td>
+</tr>
+<tr class="row-even"><td><p>-n,--name &lt;登録名&gt;</p></td>
 <td><p>〇</p></td>
 <td><p>AIモデルの登録名を指定する</p></td>
 </tr>
-<tr class="row-even"><td><p>--timeout &lt;タイムアウト&gt;</p></td>
+<tr class="row-odd"><td><p>--timeout &lt;タイムアウト&gt;</p></td>
 <td></td>
 <td><p>サーバーの応答が返ってくるまでの最大待ち時間</p></td>
 </tr>
@@ -367,35 +387,39 @@
 <td></td>
 <td><p>Redisサーバーのアクセスパスワード(任意)を指定する。省略時は <cite>password</cite> を使用する</p></td>
 </tr>
-<tr class="row-odd"><td><p>-n,--name &lt;登録名&gt;</p></td>
+<tr class="row-odd"><td><p>--svname &lt;推論サービス名&gt;</p></td>
+<td></td>
+<td><p>推論サーバーのサービス名を指定する。省略時は <cite>server</cite> を使用する</p></td>
+</tr>
+<tr class="row-even"><td><p>-n,--name &lt;登録名&gt;</p></td>
 <td><p>〇</p></td>
 <td><p>AIモデルの登録名を指定する</p></td>
 </tr>
-<tr class="row-even"><td><p>-i,--input_file &lt;推論対象の画像ファイル&gt;</p></td>
+<tr class="row-odd"><td><p>-i,--input_file &lt;推論対象の画像ファイル&gt;</p></td>
 <td></td>
 <td><p>推論させる画像をファイルで指定する</p></td>
 </tr>
-<tr class="row-odd"><td><p>--stdin</p></td>
+<tr class="row-even"><td><p>--stdin</p></td>
 <td></td>
 <td><p>推論させる画像を標準入力から読み込む</p></td>
 </tr>
-<tr class="row-even"><td><p>--nodraw</p></td>
+<tr class="row-odd"><td><p>--nodraw</p></td>
 <td></td>
 <td><p>推論結果画像にbbox等の描き込みを行わない</p></td>
 </tr>
-<tr class="row-odd"><td><p>--image_type &lt;推論対象の画像タイプ&gt;</p></td>
+<tr class="row-even"><td><p>--image_type &lt;推論対象の画像タイプ&gt;</p></td>
 <td></td>
 <td><p>推論させる画像のタイプを指定する。指定可能な画像タイプは <cite>bmp</cite> , <cite>png</cite> , <cite>jpeg</cite> , <cite>capture</cite></p></td>
 </tr>
-<tr class="row-even"><td><p>-o,--output_file &lt;推論結果画像の保存先ファイル&gt;</p></td>
+<tr class="row-odd"><td><p>-o,--output_file &lt;推論結果画像の保存先ファイル&gt;</p></td>
 <td><p>--stdinを指定した時〇</p></td>
 <td><p>推論結果画像の保存先ファイルを指定する</p></td>
 </tr>
-<tr class="row-odd"><td><p>-P,--output_preview</p></td>
+<tr class="row-even"><td><p>-P,--output_preview</p></td>
 <td></td>
 <td><p>推論結果画像を <cite>cv2.imshow</cite> で表示する</p></td>
 </tr>
-<tr class="row-even"><td><p>--timeout &lt;タイムアウト&gt;</p></td>
+<tr class="row-odd"><td><p>--timeout &lt;タイムアウト&gt;</p></td>
 <td></td>
 <td><p>サーバーの応答が返ってくるまでの最大待ち時間</p></td>
 </tr>
@@ -465,7 +489,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright Copyright (c) 2024 hamacom2004jp.</p>
+    <p>&#169; Copyright Copyright (c) 2023-2024 hamacom2004jp All Rights Reserved..</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

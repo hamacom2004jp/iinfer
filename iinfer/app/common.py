@@ -193,7 +193,7 @@ def load_custom_predict(custom_predict_py:Path) -> predict.Predict:
         custom_predict_py (Path): カスタム予測オブジェクトのパス
 
     Returns:
-        iinder.app.predict.Predict: 予測オブジェクト
+        iinfer.app.predict.Predict: 予測オブジェクト
     """
     spec = importlib.util.spec_from_file_location("predict", custom_predict_py)
     module = importlib.util.module_from_spec(spec)

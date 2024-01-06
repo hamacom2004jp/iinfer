@@ -2,11 +2,11 @@ from iinfer import version
 from setuptools import setup
 
 
-DESCRIPTION = 'iinfer: Perform inference using an image AI model in onnx format.'
+DESCRIPTION = 'iinfer: An application that executes AI model files in onnx or mmlab format.'
 NAME = 'iinfer'
 AUTHOR = 'hamacom2004jp'
 AUTHOR_EMAIL = 'hamacom2004jp@gmail.com'
-URL = 'https://github.com/hamacom2004jp/iinfer'
+URL = version.__srcurl__
 LICENSE = 'MIT'
 DOWNLOAD_URL = URL
 VERSION = version.__version__
@@ -46,13 +46,14 @@ with open('README.md', 'r', encoding='utf-8') as fp:
     readme = fp.read()
 LONG_DESCRIPTION = readme
 LONG_DESCRIPTION_CONTENT_TYPE = 'text/markdown'
-RESORCE_TEXT_FILES = dict(iinfer=['*.yml', 'docker/*', 'datasets/**', 'web/**'])
+RESORCE_TEXT_FILES = dict(iinfer=['*.yml', 'docker/*', 'datasets/**', 'licenses/**', 'web/**'])
 setup(
     name=NAME,
     version=VERSION,
     description=DESCRIPTION,
     long_description=LONG_DESCRIPTION,
     long_description_content_type=LONG_DESCRIPTION_CONTENT_TYPE,
+    python_requires=PYTHON_REQUIRES,
     author=AUTHOR,
     author_email=AUTHOR_EMAIL,
     maintainer=AUTHOR,
