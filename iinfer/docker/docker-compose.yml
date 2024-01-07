@@ -18,10 +18,10 @@ services:
     container_name: iinfer_server
     environment:
       TZ: Asia/Tokyo
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-      REDIS_PASSWORD: password
-      SVNAME: server
+      REDIS_HOST: ${REDIS_HOST:-redis}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-password}
+      SVNAME: ${SVNAME:-server}
     networks:
       - backend
     user: ${USER}

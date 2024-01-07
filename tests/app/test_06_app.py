@@ -158,14 +158,15 @@ def test_08_01_client_capture(capfd):
 @pytest.mark.run(order=9)
 def test_09_01_client_predict(capfd):
     cmd = f"-m client -c predict --svname server1 -n onnx_det_YoloX_Lite --output_preview " \
-          f"-i tests/dog.jpg --image_type jpeg".split(' ')
+          f"-i cap.csv --image_type capture".split(' ')
     _, result = app.main(args_list=cmd)
     out, err = capfd.readouterr()
     with open('onnx_det_YoloX_Lite.json', 'w', encoding='utf-8') as f:
         f.write(out)
-    assert 'success' in result.keys()
-    del result["output_image"]
-    print(result)
+    for r in result:
+        assert 'success' in r.keys()
+        del r["output_image"]
+        print(r)
 
 @pytest.mark.run(order=9)
 def test_09_02_client_predict(capfd):
@@ -175,9 +176,10 @@ def test_09_02_client_predict(capfd):
     out, err = capfd.readouterr()
     with open('mmdet_det_YoloX_Lite.json', 'w', encoding='utf-8') as f:
         f.write(out)
-    assert 'success' in result[0].keys()
-    del result["output_image"]
-    print(result)
+    for r in result:
+        assert 'success' in r.keys()
+        del r["output_image"]
+        print(r)
 
 @pytest.mark.run(order=9)
 def test_09_03_client_predict(capfd):
@@ -209,7 +211,7 @@ def test_10_01_postprocess_det_filter(capfd):
           f"--score_th 0.01 --width_th 1 --height_th 1".split(' ')
     _, result = app.main(args_list=cmd)
     out, err = capfd.readouterr()
-    print(out)
+    print(result)
     assert 'success' in result.keys()
 
 @pytest.mark.run(order=10)
@@ -218,7 +220,7 @@ def test_10_02_postprocess_det_filter(capfd):
           f"--score_th 0.01 --width_th 1 --height_th 1".split(' ')
     _, result = app.main(args_list=cmd)
     out, err = capfd.readouterr()
-    print(out)
+    print(result)
     assert 'success' in result.keys()
 
 @pytest.mark.run(order=10)
@@ -227,7 +229,7 @@ def _test_10_03_postprocess_det_filter(capfd):
           f"--score_th 0.01".split(' ')
     _, result = app.main(args_list=cmd)
     out, err = capfd.readouterr()
-    print(out)
+    print(result)
     assert 'success' in result.keys()
 
 @pytest.mark.run(order=10)
@@ -236,7 +238,7 @@ def _test_10_04_postprocess_det_filter(capfd):
           f"--score_th 0.01".split(' ')
     _, result = app.main(args_list=cmd)
     out, err = capfd.readouterr()
-    print(out)
+    print(result)
     assert 'success' in result.keys()
 
 @pytest.mark.run(order=11)
@@ -246,8 +248,7 @@ def test_11_01_postprocess_det_jadge(capfd):
           f"--ng_score_th 0.8 --ng_labels truck --ng_labels bicycle " \
           f"--ext_score_th 0.3 --ext_labels car --ext_labels pottedplant".split(' ')
     _, result = app.main(args_list=cmd)
-    out, err = capfd.readouterr()
-    print(out)
+    print(result)
     assert 'success' in result.keys()
 
 @pytest.mark.run(order=11)
@@ -257,8 +258,7 @@ def test_11_02_postprocess_det_jadge(capfd):
           f"--ng_score_th 0.8 --ng_classes 7 --ng_classes 1 " \
           f"--ext_score_th 0.3 --ext_labels 2 --ext_labels pottedplant".split(' ')
     _, result = app.main(args_list=cmd)
-    out, err = capfd.readouterr()
-    print(out)
+    print(result)
     assert 'success' in result.keys()
 
 @pytest.mark.run(order=11)

@@ -12,6 +12,7 @@ import os
 import re
 import sys
 import threading
+import traceback
 
 
 class Web(object):
@@ -35,7 +36,7 @@ class Web(object):
             if mode == "client":
                 return ['', 'deploy', 'start', 'stop', 'predict', 'deploy_list', 'undeploy', 'predict_type_list', 'capture']
             elif mode == "server":
-                return ['', 'start', 'stop']
+                return ['', 'start', 'stop', 'list']
             elif mode == "postprocess":
                 return ['', 'det_filter', 'det_jadge', 'cls_jadge', 'csv', 'httpreq']
             elif mode == "redis":
@@ -167,6 +168,15 @@ class Web(object):
                         dict(opt="port", type="int", default=6379, required=True, multi=False, hide=True, choise=None),
                         dict(opt="password", type="str", default="password", required=True, multi=False, hide=True, choise=None),
                         dict(opt="svname", type="str", default="server", required=True, multi=False, hide=True, choise=None),
+                        dict(opt="timeout", type="int", default="15", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="stdout_save", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="stdout_log", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False])
+                    ]
+                elif cmd == "list":
+                    return [
+                        dict(opt="host", type="str", default="localhost", required=True, multi=False, hide=True, choise=None),
+                        dict(opt="port", type="int", default=6379, required=True, multi=False, hide=True, choise=None),
+                        dict(opt="password", type="str", default="password", required=True, multi=False, hide=True, choise=None),
                         dict(opt="timeout", type="int", default="15", required=False, multi=False, hide=True, choise=None),
                         dict(opt="stdout_save", type="file", default="", required=False, multi=False, hide=True, choise=None),
                         dict(opt="stdout_log", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False])
@@ -350,9 +360,12 @@ class Web(object):
             opt_list = mk_opt_list(opt)
             old_stdout = sys.stdout
             sys.stdout = captured_output = io.StringIO()
-            app.main(opt_list)
+            try:
+                app.main(opt_list)
+                output = captured_output.getvalue()
+            except Exception as e:
+                output = list(traceback.TracebackException.from_exception(e).format())
             sys.stdout = old_stdout
-            output = captured_output.getvalue()
             if 'stdout_save' in opt and opt['stdout_save'] != '':
                 with open(opt['stdout_save'], ('w' if type(output)==str else 'wb')) as f:
                     f.write(output)

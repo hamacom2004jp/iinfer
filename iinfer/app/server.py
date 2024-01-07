@@ -13,6 +13,9 @@ import time
 
 
 class Server(object):
+    RESP_SCCESS = 0
+    RESP_WARN = 1
+    RESP_ERROR = 2
     def __init__(self, data_dir: Path, logger: logging.Logger, redis_host: str = "localhost", redis_port: int = 6379, redis_password: str = None, svname: str = 'server'):
         """
         Redisサーバーに接続し、クライアントからのコマンドを受信し実行する
@@ -56,27 +59,70 @@ class Server(object):
             self.is_running = False
             self.logger.error(f"fail to ping server. {e}")
 
+    def list_server(self):
+        """
+        起動しているサーバーリストを取得する
+
+        Returns:
+            List[str]: サーバーのリスト
+        """
+        self.redis_cli = redis.Redis(host=self.redis_host, port=self.redis_port, db=0, password=self.redis_password)
+        hblist = self.redis_cli.keys("hb-*")
+        svlist = []
+        for hb in hblist:
+            svname = hb.decode().replace("hb-", "")
+            recive_cnt = -1
+            sccess_cnt = -1
+            warn_cnt = -1
+            error_cnt = -1
+            try:
+                if self.redis_cli.hexists(hb, 'recive_cnt'):
+                    recive_cnt = int(self.redis_cli.hget(hb, 'recive_cnt').decode())
+                if self.redis_cli.hexists(hb, 'sccess_cnt'):
+                    sccess_cnt = int(self.redis_cli.hget(hb, 'sccess_cnt').decode())
+                if self.redis_cli.hexists(hb, 'sccess_cnt'):
+                    warn_cnt = int(self.redis_cli.hget(hb, 'warn_cnt').decode())
+                if self.redis_cli.hexists(hb, 'sccess_cnt'):
+                    error_cnt = int(self.redis_cli.hget(hb, 'error_cnt').decode())
+            except redis.exceptions.ResponseError:
+                self.logger.warn(f"Failed to get ctime. {hb}", exc_info=True)
+            svlist.append(dict(svname=svname, recive_cnt=recive_cnt, sccess_cnt=sccess_cnt, warn_cnt=warn_cnt, error_cnt=error_cnt))
+        return {"success": svlist}
+
     def _clean_server(self):
         """
         Redisサーバーに残っている停止済みのサーバーキーを削除する
         """
         hblist = self.redis_cli.keys("hb-*")
         for hb in hblist:
-            v = self.redis_cli.get(hb)
-            if v is None:
+            try:
+                v = self.redis_cli.hget(hb, 'ctime')
+                if v is None:
+                    continue
+            except redis.exceptions.ResponseError:
+                self.logger.warn(f"Failed to get ctime. {hb}", exc_info=True)
                 continue
             tm = float(v)
             if time.time() - tm > 10:
                 self.redis_cli.delete(hb)
+                self.redis_cli.delete(hb.decode().replace("hb-", "sv-"))
 
     def _run_server(self):
         self.logger.info(f"start server. svname={self.svname}")
         ltime = time.time()
+        recive_cnt = 0
+        sccess_cnt = 0
+        warn_cnt = 0
+        error_cnt = 0
+        self.redis_cli.hset(self.hbname, 'recive_cnt', str(recive_cnt))
+        self.redis_cli.hset(self.hbname, 'sccess_cnt', str(sccess_cnt))
+        self.redis_cli.hset(self.hbname, 'warn_cnt', str(warn_cnt))
+        self.redis_cli.hset(self.hbname, 'error_cnt', str(error_cnt))
         while self.is_running:
             try:
                 # ブロッキングリストから要素を取り出す
                 ctime = time.time()
-                self.redis_cli.set(self.hbname, str(ctime))
+                self.redis_cli.hset(self.hbname, 'ctime', str(ctime))
                 result = self.redis_cli.blpop(self.svname, timeout=1)
                 if ctime - ltime > 10:
                     self._clean_server()
@@ -88,6 +134,10 @@ class Server(object):
                 if len(msg) <= 0:
                     time.sleep(1)
                     continue
+                st = None
+                recive_cnt += 1
+                self.redis_cli.hset(self.hbname, 'recive_cnt', str(recive_cnt))
+
                 if msg[0] == 'deploy':
                     model_onnx = base64.b64decode(msg[7])
                     if msg[8] == 'None':
@@ -115,15 +165,15 @@ class Server(object):
                     else:   
                         overwrite = False
 
-                    self.deploy(msg[1], msg[2], int(msg[3]), int(msg[4]), msg[5], msg[6], model_onnx, model_conf_file, model_conf_bin, custom_predict_py, label_txt, color_txt, overwrite)
+                    st = self.deploy(msg[1], msg[2], int(msg[3]), int(msg[4]), msg[5], msg[6], model_onnx, model_conf_file, model_conf_bin, custom_predict_py, label_txt, color_txt, overwrite)
                 elif msg[0] == 'deploy_list':
-                    self.deploy_list(msg[1])
+                    st = self.deploy_list(msg[1])
                 elif msg[0] == 'undeploy':
-                    self.undeploy(msg[1], msg[2])
+                    st = self.undeploy(msg[1], msg[2])
                 elif msg[0] == 'start':
-                    self.start(msg[1], msg[2], msg[3], (True if msg[4]=='True' else False), (None if msg[5]=='None' else msg[5]))
+                    st = self.start(msg[1], msg[2], msg[3], (True if msg[4]=='True' else False), (None if msg[5]=='None' else msg[5]))
                 elif msg[0] == 'stop':
-                    self.stop(msg[1], msg[2])
+                    st = self.stop(msg[1], msg[2])
                 elif msg[0] == 'predict':
                     #byteio = BytesIO(base64.b64decode(msg[3]))
                     #img_npy = np.load(byteio)
@@ -132,13 +182,24 @@ class Server(object):
                     if len(msg) > 7: shape.append(int(msg[7]))
                     img_npy = common.b64str2npy(msg[3], shape)
                     image = common.npy2img(img_npy)
-                    self.predict(msg[1], msg[2], image, nodraw)
+                    st = self.predict(msg[1], msg[2], image, nodraw)
                 elif msg[0] == 'stop_server':
                     self.is_running = False
                     self.responce(msg[1], {"success": f"Successful stop server. svname={self.svname}"})
                     break
                 else:
                     self.logger.warn(f"Unknown command {msg}")
+                    st = self.RESP_WARN
+
+                if st==self.RESP_SCCESS:
+                    sccess_cnt += 1
+                    self.redis_cli.hset(self.hbname, 'sccess_cnt', str(sccess_cnt))
+                elif st==self.RESP_WARN:
+                    warn_cnt += 1
+                    self.redis_cli.hset(self.hbname, 'warn_cnt', str(warn_cnt))
+                elif st==self.RESP_ERROR:
+                    error_cnt += 1
+                    self.redis_cli.hset(self.hbname, 'error_cnt', str(error_cnt))
             except redis.exceptions.TimeoutError:
                 pass
             except redis.exceptions.ConnectionError as e:
@@ -148,7 +209,13 @@ class Server(object):
             except KeyboardInterrupt as e:
                 self.is_running = False
                 break
-        self.logger.info(f"stop server")
+            except Exception as e:
+                self.logger.error(f"Unknown error occurred. {e}", exc_info=True)
+                self.is_running = False
+                break
+        self.redis_cli.delete(self.svname)
+        self.redis_cli.delete(self.hbname)
+        self.logger.info(f"stop server. svname={self.svname}")
 
     def terminate_server(self):
         """
@@ -207,34 +274,34 @@ class Server(object):
         if name is None or name == "":
             self.logger.warn(f"Name is empty.")
             self.responce(reskey, {"warn": f"Name is empty."})
-            return
+            return self.RESP_WARN
         if model_img_width is None or model_img_width <= 0:
             self.logger.warn(f"Image width is invalid.")
             self.responce(reskey, {"warn": f"Image width is invalid."})
-            return
+            return self.RESP_WARN
         if model_img_height is None or model_img_height <= 0:
             self.logger.warn(f"Image height is invalid.")
             self.responce(reskey, {"warn": f"Image height is invalid."})
-            return
+            return self.RESP_WARN
 
         deploy_dir = self.data_dir / name
         if name in self.sessions:
             self.logger.warn(f"{name} has already started a session.")
             self.responce(reskey, {"warn": f"{name} has already started a session."})
-            return
+            return self.RESP_WARN
         if not overwrite and deploy_dir.exists():
             self.logger.warn(f"Could not be deployed. '{deploy_dir}' already exists")
             self.responce(reskey, {"warn": f"Could not be deployed. '{deploy_dir}' already exists"})
-            return
+            return self.RESP_WARN
 
         if predict_type not in common.BASE_MODELS:
             self.logger.warn(f"Incorrect predict_type. '{predict_type}'")
             self.responce(reskey, {"warn": f"Incorrect predict_type. '{predict_type}'"})
-            return
+            return self.RESP_WARN
         if common.BASE_MODELS[predict_type]['use_model_conf']==True and model_conf_file is None:
             self.logger.warn(f"model_conf_file is None.")
             self.responce(reskey, {"warn": f"model_conf_file is None."})
-            return
+            return self.RESP_WARN
 
         common.mkdirs(deploy_dir)
         model_file = deploy_dir / model_file
@@ -244,11 +311,11 @@ class Server(object):
         if model_conf_file is not None and model_conf_bin is None:
             self.logger.warn(f"model_conf_file is not None but model_conf_bin is None.")
             self.responce(reskey, {"warn": f"model_conf_file is not None but model_conf_bin is None."})
-            return
+            return self.RESP_WARN
         if model_conf_file is None and model_conf_bin is not None:
             self.logger.warn(f"model_conf_file is None but model_conf_bin is not None.")
             self.responce(reskey, {"warn": f"model_conf_file is None but model_conf_bin is not None."})
-            return
+            return self.RESP_WARN
         if model_conf_file is not None:
             model_conf_file = [deploy_dir / cf for cf in model_conf_file]
             for i, cf in enumerate(model_conf_file):
@@ -288,7 +355,7 @@ class Server(object):
                 if returncode != 0:
                     self.logger.error(f"Failed to git clone mmpretrain.")
                     self.responce(reskey, {"error": f"Failed to git clone mmpretrain."})
-                    return
+                    return self.RESP_ERROR
             shutil.copytree(self.data_dir / "mmpretrain" / "configs", deploy_dir / "configs", dirs_exist_ok=True)
             self.logger.info(f"Copy mmpretrain configs to {str(deploy_dir / 'configs')}")
         elif predict_type.startswith('mmdet_'):
@@ -297,12 +364,12 @@ class Server(object):
                 if returncode != 0:
                     self.logger.error(f"Failed to git clone mmdetection.")
                     self.responce(reskey, {"error": f"Failed to git clone mmdetection."})
-                    return
+                    return self.RESP_ERROR
             shutil.copytree(self.data_dir / "mmdetection" / "configs", deploy_dir / "configs", dirs_exist_ok=True)
             self.logger.info(f"Copy mmdetection configs to {str(deploy_dir / 'configs')}")
 
         self.responce(reskey, {"success": f"Save conf.json to {str(deploy_dir)}"})
-        return
+        return self.RESP_SCCESS
 
     def deploy_list(self, reskey:str):
         """
@@ -339,6 +406,7 @@ class Server(object):
                            mot=dir.name in self.sessions and self.sessions[dir.name]['tracker'] is not None)
                 deploy_list.append(row)
         self.responce(reskey, {"success": deploy_list})
+        return self.RESP_SCCESS
 
     def undeploy(self, reskey:str, name:str):
         """
@@ -351,19 +419,19 @@ class Server(object):
         if name is None or name == "":
             self.logger.warn(f"Name is empty.")
             self.responce(reskey, {"warn": f"Name is empty."})
-            return
+            return self.RESP_WARN
         if name in self.sessions:
             self.logger.warn(f"{name} has already started a session.")
             self.responce(reskey, {"warn": f"{name} has already started a session."})
-            return
+            return self.RESP_WARN
         deploy_dir = self.data_dir / name
         if not deploy_dir.exists():
             self.logger.warn(f"{name} is not deployed.")
             self.responce(reskey, {"warn": f"{name} is not deployed."})
-            return
+            return self.RESP_WARN
         common.rmdirs(deploy_dir)
         self.responce(reskey, {"success": f"Undeployed {name}. {str(deploy_dir)}"})
-        return
+        return self.RESP_SCCESS
 
     def start(self, reskey:str, name:str, model_provider:str, use_track:bool, gpuid:int):
         """
@@ -379,17 +447,17 @@ class Server(object):
         if name is None or name == "":
             self.logger.warn(f"Name is empty.")
             self.responce(reskey, {"warn": f"Name is empty."})
-            return
+            return self.RESP_WARN
         deploy_dir = self.data_dir / name
         if name in self.sessions:
             self.logger.warn(f"{name} has already started a session.")
             self.responce(reskey, {"warn": f"{name} has already started a session."})
-            return
+            return self.RESP_WARN
         conf_path = deploy_dir / "conf.json"
         if not conf_path.exists():
             self.logger.warn(f"Conf path {str(conf_path)} does not exist")
             self.responce(reskey, {"warn": f"Conf path {str(conf_path)} does not exist"})
-            return
+            return self.RESP_WARN
         with open(conf_path, "r") as cf:
             conf = json.load(cf)
             model_path = Path(conf["model_file"])
@@ -400,17 +468,17 @@ class Server(object):
             if not model_path.exists():
                 self.logger.warn(f"Model path {str(model_path)} does not exist")
                 self.responce(reskey, {"warn": f"Model path {str(model_path)} does not exist"})
-                return
+                return self.RESP_WARN
             if conf["predict_type"] == 'Custom':
                 custom_predict_py = Path(conf["custom_predict_file"]) if conf["custom_predict_file"] is not None else None
                 if custom_predict_py is None:
                     self.logger.warn(f"predict_type is Custom but custom_predict_py is None.")
                     self.responce(reskey, {"warn": f"predict_type is Custom but custom_predict_py is None."})
-                    return
+                    return self.RESP_WARN
                 if not custom_predict_py.exists():
                     self.logger.warn(f"custom_predict_py path {str(custom_predict_py)} does not exist")
                     self.responce(reskey, {"warn": f"custom_predict_py path {str(custom_predict_py)} does not exist"})
-                    return
+                    return self.RESP_WARN
                 predict_obj = common.load_custom_predict(custom_predict_py)
             else:
                 predict_obj = common.load_predict(conf["predict_type"])
@@ -419,7 +487,7 @@ class Server(object):
                 if not label_file.exists():
                     self.logger.warn(f"label_file path {str(label_file)} does not exist")
                     self.responce(reskey, {"warn": f"label_file path {str(label_file)} does not exist"})
-                    return
+                    return self.RESP_WARN
                 with open(label_file, "r") as f:
                     labels = f.read().splitlines()
             else:
@@ -429,7 +497,7 @@ class Server(object):
                 if not color_file.exists():
                     self.logger.warn(f"color_file path {str(color_file)} does not exist")
                     self.responce(reskey, {"warn": f"color_file path {str(color_file)} does not exist"})
-                    return
+                    return self.RESP_WARN
                 with open(color_file, "r") as f:
                     colors = f.read().splitlines()
             else:
@@ -448,10 +516,10 @@ class Server(object):
             except Exception as e:
                 self.logger.warn(f"Failed to create session: {e}", exc_info=True)
                 self.responce(reskey, {"warn": f"Failed to create session: {e}"})
-                return
+                return self.RESP_WARN
         self.logger.info(f"Successful start of {name} session.")
         self.responce(reskey, {"success": f"Successful start of {name} session."})
-        return
+        return self.RESP_SCCESS
     
     def stop(self, reskey:str, name:str):
         """
@@ -464,16 +532,16 @@ class Server(object):
         if name is None or name == "":
             self.logger.warn(f"Name is empty.")
             self.responce(reskey, {"warn": f"Name is empty."})
-            return
+            return self.RESP_WARN
         if name not in self.sessions:
             self.logger.warn(f"{name} has not yet started a session.")
             self.responce(reskey, {"warn": f"{name} has not yet started a session."})
-            return
+            return self.RESP_WARN
         #self.sessions[name]['session'].close()
         del self.sessions[name]
         self.logger.info(f"Successful stop of {name} session.")
         self.responce(reskey, {"success": f"Successful stop of {name} session."})
-        return
+        return self.RESP_SCCESS
 
     def predict(self, reskey:str, name:str, image:Image.Image, nodraw:bool):
         """
@@ -488,15 +556,15 @@ class Server(object):
         if name is None or name == "":
             self.logger.warn(f"Name is empty.")
             self.responce(reskey, {"warn": f"Name is empty."})
-            return
+            return self.RESP_WARN
         if image is None:
             self.logger.warn(f"img_npy is empty.")
             self.responce(reskey, {"warn": f"img_npy is empty."})
-            return
+            return self.RESP_WARN
         if name not in self.sessions:
             self.logger.warn(f"{name} has not yet started a session.")
             self.responce(reskey, {"warn": f"{name} has not yet started a session."})
-            return
+            return self.RESP_WARN
         if nodraw is None:
             nodraw = False
         session = self.sessions[name]
@@ -517,10 +585,10 @@ class Server(object):
                 output_image_npy = common.img2npy(output_image)
                 output_image_b64 = common.npy2b64str(output_image_npy)
                 self.responce(reskey, {"success": outputs, "output_image": output_image_b64, "output_image_shape": output_image_npy.shape})
-                return
+                return self.RESP_SCCESS
             self.responce(reskey, {"success": outputs})
-            return
+            return self.RESP_SCCESS
         except Exception as e:
             self.logger.warn(f"Failed to run inference: {e}", exc_info=True)
             self.responce(reskey, {"warn": f"Failed to run inference: {e}"})
-            return
+            return self.RESP_WARN

@@ -20,7 +20,7 @@ import time
 
 
 def main(args_list:list=None):
-    _main(args_list)
+    return _main(args_list)
 
 def _main(args_list:list=None):
     """
@@ -43,6 +43,7 @@ def _main(args_list:list=None):
                         choices=['redis', 'server', 'onnx', 'mmdet', 'mmcls', 'mmpretrain', # install mode
                                  'docker_run', 'docker_stop', # redis mode
                                  'start', 'stop', # server or client or gui mode
+                                 'list' , # server mode
                                  'deploy', 'deploy_list', 'undeploy', 'predict', 'predict_type_list', 'capture', # client mode
                                  'det_filter', 'det_jadge', 'cls_jadge', 'csv', 'httpreq', # postprocess mode
                                 ])
@@ -202,6 +203,12 @@ def _main(args_list:list=None):
                 return 1, msg
             cl = client.Client(logger, redis_host=host, redis_port=port, redis_password=password, svname=svname)
             ret = cl.stop_server(timeout=timeout)
+            common.print_format(ret, format, tm)
+            if 'success' not in ret:
+                return 1, ret
+        elif cmd == 'list':
+            sv = server.Server(Path(data), logger, redis_host=host, redis_port=port, redis_password=password, svname='server') # list取得なのでデフォルトのsvnameを指定
+            ret = sv.list_server()
             common.print_format(ret, format, tm)
             if 'success' not in ret:
                 return 1, ret
