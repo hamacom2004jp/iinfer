@@ -20,7 +20,7 @@ import time
 
 
 def main(args_list:list=None):
-    return _main(args_list)
+    return _main(args_list)[0]
 
 def _main(args_list:list=None):
     """
@@ -40,7 +40,7 @@ def _main(args_list:list=None):
     parser.add_argument('-n', '--name', help='Setting the cmd name.')
     parser.add_argument('--timeout', help='Setting the cmd timeout.', type=int, default=60)
     parser.add_argument('-c', '--cmd', help='Setting the cmd type.',
-                        choices=['redis', 'server', 'onnx', 'mmdet', 'mmcls', 'mmpretrain', # install mode
+                        choices=['redis', 'server', 'onnx', 'mmdet', 'mmcls', 'mmpretrain', 'mmrotate', # install mode
                                  'docker_run', 'docker_stop', # redis mode
                                  'start', 'stop', # server or client or gui mode
                                  'list' , # server mode
@@ -98,6 +98,13 @@ def _main(args_list:list=None):
     parser.add_argument('--ext_score_th', help='Setting the postprocess ext_score_th.', type=float, default=None)
     parser.add_argument('--ext_classes', help='Setting the postprocess ext_classes.', type=int, action='append')
     parser.add_argument('--ext_labels', help='Setting the postprocess ext_labels.', type=str, action='append')
+
+    parser.add_argument('--install_iinfer', help='Setting the install server install_iinfer.', type=str, default='iinfer')
+    parser.add_argument('--install_onnx', help='Setting the install server install_onnx.', action='store_true')
+    parser.add_argument('--install_mmdet', help='Setting the install server install_mmdet.', action='store_true')
+    parser.add_argument('--install_mmcls', help='Setting the install server install_mmcls.', action='store_true')
+    parser.add_argument('--install_mmpretrain', help='Setting the install server install_mmpretrain.', action='store_true')
+    parser.add_argument('--install_mmrotate', help='Setting the install server install_mmrotate.', action='store_true')
 
     argcomplete.autocomplete(parser)
     if args_list is not None:
@@ -168,6 +175,13 @@ def _main(args_list:list=None):
     ext_score_th = common.getopt(opt, 'ext_score_th', preval=args_dict, withset=True)
     ext_classes = common.getopt(opt, 'ext_classes', preval=args_dict, withset=True)
     ext_labels = common.getopt(opt, 'ext_labels', preval=args_dict, withset=True)
+
+    install_iinfer = common.getopt(opt, 'install_iinfer', preval=args_dict, withset=True)
+    install_onnx = common.getopt(opt, 'install_onnx', preval=args_dict, withset=True)
+    install_mmdet = common.getopt(opt, 'install_mmdet', preval=args_dict, withset=True)
+    install_mmcls = common.getopt(opt, 'install_mmcls', preval=args_dict, withset=True)
+    install_mmpretrain = common.getopt(opt, 'install_mmpretrain', preval=args_dict, withset=True)
+    install_mmrotate = common.getopt(opt, 'install_mmrotate', preval=args_dict, withset=True)
 
     tm = time.time()
     ret = {"success":f"Start command. {args}"}
@@ -455,7 +469,18 @@ def _main(args_list:list=None):
                 return 1, ret
 
         elif cmd == 'server':
-            ret = inst.server()
+            install_set = not (install_onnx or install_mmdet or install_mmcls or install_mmpretrain or install_mmrotate)
+            onnx = install_set
+            mmdet = install_set
+            mmcls = False
+            mmpretrain = install_set
+            mmrotate = install_set
+            onnx = install_onnx if install_onnx else onnx
+            mmdet = install_mmdet if install_mmdet else mmdet
+            mmcls = install_mmcls if install_mmcls else mmcls
+            mmpretrain = install_mmpretrain if install_mmpretrain else mmpretrain
+            mmrotate = install_mmrotate if install_mmrotate else mmrotate
+            ret = inst.server(install_iinfer, install_onnx=onnx, install_mmdet=mmdet, install_mmcls=mmcls, install_mmpretrain=mmpretrain, install_mmrotate=mmrotate)
             common.print_format(ret, format, tm)
             if 'success' not in ret:
                 return 1, ret

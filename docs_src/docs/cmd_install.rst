@@ -48,3 +48,12 @@
 
     "Option","Required","Description"
     "--data <データディレクトリ>","","省略した時は `$HONE/.iinfer` を使用します。"
+    "--install_iinfer <iinferモジュール名>","","省略した時は `iinfer` を使用します。 `iinfer==0.4.16` といった指定も可能です。"
+    "--install_onnx","","指定すると `onnxruntime` をインストールします。※1"
+    "--install_mmdet","","指定すると `mmdetection` をインストールします。※1"
+    "--install_mmcls","","指定すると `mmclassification` をインストールします。※1,2"
+    "--install_mmpretrain","","指定すると `mmpretrain` をインストールします。※1"
+    "--install_mmrotate","","指定すると `mmrotate` をインストールします。※1"
+
+- ※1 : これらのオプションを何れも指定しない場合、 `--install_mmcls` 以外すべてをインストールします。
+- ※2 : `mmclassification` と `mmpretrain` はバージョンによって共存できない場合があります。

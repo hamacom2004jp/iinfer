@@ -36,18 +36,26 @@ class Install(object):
         else:
             return {"warn":f"Unsupported platform."}
 
-    def server(self):
+    def server(self, install_iinfer:str='iinfer', install_onnx:bool=True, install_mmdet:bool=True, install_mmcls:bool=False, install_mmpretrain:bool=True, install_mmrotate:bool=True):
         if platform.system() == 'Windows':
             return {"warn": f"Build server command is Unsupported in windows platform."}
         from importlib.resources import read_text
+        user = getpass.getuser()
         with open('Dockerfile', 'w', encoding='utf-8') as fp:
-            fp.write(read_text(f'{common.APP_ID}.docker', 'Dockerfile'))
+            text = read_text(f'{common.APP_ID}.docker', 'Dockerfile')
+            text = text.replace('${MKUSER}', user)
+            text = text.replace('${INSTALL_IINFER}', install_iinfer)
+            text = text.replace('#{INSTALL_ONNX}', f'RUN iinfer -m install -c onnx --data /home/{user}/.iinfer' if install_onnx else '')
+            text = text.replace('#{INSTALL_MMDET}', f'RUN iinfer -m install -c mmdet --data /home/{user}/.iinfer' if install_mmdet else '')
+            text = text.replace('#{INSTALL_MMCLS}', f'RUN iinfer -m install -c mmcls --data /home/{user}/.iinfer' if install_mmcls else '')
+            text = text.replace('#{INSTALL_MMPRETRAIN}', f'RUN iinfer -m install -c mmpretrain --data /home/{user}/.iinfer' if install_mmpretrain else '')
+            text = text.replace('#{INSTALL_MMROTATE}', f'RUN iinfer -m install -c mmrotate --data /home/{user}/.iinfer' if install_mmrotate else '')
+            fp.write(text)
         with open('docker-compose.yml', 'w', encoding='utf-8') as fp:
             text = read_text(f'{common.APP_ID}.docker', 'docker-compose.yml')
             text = text.replace('${VERSION}', version.__version__)
             fp.write(text)
-        user = getpass.getuser()
-        cmd = f"docker build -t hamacom/iinfer:{version.__version__} --build-arg MKUSER={user} -f Dockerfile ."
+        cmd = f'docker build -t hamacom/iinfer:{version.__version__} -f Dockerfile .'
 
         if platform.system() == 'Linux':
             returncode, _ = common.cmd(f"{cmd}", self.logger, True)
@@ -89,6 +97,29 @@ class Install(object):
         if srcdir.exists():
             return {"success": f"Please remove '{srcdir / 'mmdetection'}' manually."}
         return {"success": f"Success to install mmdet."}
+
+    def mmrotate(self, data_dir: Path):
+        returncode, _ = common.cmd(f'git clone https://github.com/open-mmlab/mmrotate.git', logger=self.logger)
+        if returncode != 0:
+            self.logger.error(f"Failed to git clone mmrotate.")
+            return {"error": f"Failed to git clone mmrotate."}
+        srcdir = Path('.') / 'mmrotate'
+        shutil.copytree(srcdir, data_dir / 'mmrotate', dirs_exist_ok=True)
+        shutil.rmtree(srcdir, ignore_errors=True)
+
+        returncode, _ = common.cmd('pip install torch torchvision openmim', logger=self.logger)
+        if returncode != 0:
+            self.logger.error(f"Failed to install torch.")
+            return {"error": f"Failed to install torch."}
+
+        returncode, _ = common.cmd('mim install mmengine mmcv mmdet mmrotate', logger=self.logger)
+        if returncode != 0:
+            self.logger.error(f"Failed to install mmrotate.")
+            return {"error": f"Failed to install mmrotate."}
+
+        if srcdir.exists():
+            return {"success": f"Please remove '{srcdir / 'mmrotate'}' manually."}
+        return {"success": f"Success to install mmrotate."}
 
     def mmcls(self):
         returncode, _ = common.cmd('pip install torch torchvision openmim', logger=self.logger)

@@ -29,7 +29,7 @@
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="fileMenuLink">
                             <li><a class="dropdown-item" href="#" onclick="$('.cmd_add').click();">New Command</a></li>
-                            <li><a class="dropdown-item" href="#">New Pipeline</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="$('.pipe_add').click();">New Pipeline</a></li>
                         </ul>
                     </li>
                     <li class="nav-item dropdown">
@@ -84,18 +84,22 @@
         <div id="pipe_items" class="row">
         </div>
         <div class="d-none">
-            <div id="pipe_add" class="col-4">
-                <div class="card card-hover pipe_card">
-                    <div class="card-body">
-                        <h4 class="card-title text-center">[ + ]</h5>
+            <div id="pipe_add">
+                <div class="col-4 p-1">
+                    <div class="card card-hover pipe_card pipe_add">
+                        <div class="card-body">
+                            <h4 class="card-title text-center">[ + ]</h5>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div id="pipe_template" class="col-4 d-none">
-                <div class="card card-hover pipe_card">
-                    <div class="card-body">
-                        <h5 class="pipe_title card-title">Pipeline title</h5>
-                        <p class="card-subtitle mb-2 text-muted"><span class="pipe_desc"></span></p>
+            <div id="pipe_template">
+                <div class="col-4 p-1">
+                    <div class="card card-hover pipe_card">
+                        <div class="card-body">
+                            <h5 class="pipe_title card-title">Pipeline title</h5>
+                            <p class="card-subtitle mb-2 text-muted"><span class="pipe_desc"></span></p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -125,30 +129,30 @@
                     <div class="row row_content_common">
                         <div class="col-12 mb-3">
                             <div class="input-group">
-                                <label class="input-group-text text-decoration-underline" for="title">
+                                <label class="input-group-text text-decoration-underline">
                                     <span class="text-danger">*</span>
                                     title
                                 </label>
-                                <input id="title" name="title" type="text" class="form-control" param_data_type="str" param_data_multi="false" required>
+                                <input name="title" type="text" class="form-control" param_data_type="str" param_data_multi="false" required>
                             </div>
                         </div>
                         <div class="col-6 mb-3">
                             <div class="input-group">
-                                <label class="input-group-text text-decoration-underline" for="mode">
+                                <label class="input-group-text text-decoration-underline">
                                     <span class="text-danger">*</span>
                                     mode
                                 </label>
-                                <select id="mode" name="mode" class="form-select form-select" param_data_type="str" param_data_multi="false" required>
+                                <select name="mode" class="form-select form-select" param_data_type="str" param_data_multi="false" required>
                                 </select>
                             </div>
                         </div>
                         <div class="col-6 mb-3">
                             <div class="input-group">
-                                <span class="input-group-text text-decoration-underline" for="cmd">
+                                <span class="input-group-text text-decoration-underline">
                                     <span class="text-danger">*</span>
                                     cmd
                                 </span>
-                                <select id="cmd" name="cmd" class="form-select form-select" param_data_type="str" param_data_multi="false" required>
+                                <select name="cmd" class="form-select form-select" param_data_type="str" param_data_multi="false" required>
                                 </select>
                             </div>
                         </div>
@@ -156,7 +160,7 @@
                     <div class="row d-none row_content_template_str">
                         <div class="col-6 mb-3">
                             <div class="input-group">
-                                <label class="input-group-text row_content_template_title" for="title">title</label>
+                                <label class="input-group-text row_content_template_title">title</label>
                                 <input type="text" class="form-control row_content_template_input">
                             </div>
                         </div>
@@ -164,7 +168,7 @@
                     <div class="row d-none row_content_template_choice">
                         <div class="col-6 mb-3">
                             <div class="input-group">
-                                <label class="input-group-text row_content_template_title" for="title">title</label>
+                                <label class="input-group-text row_content_template_title">title</label>
                                 <select class="form-select form-select row_content_template_select">
                                 </select>
                             </div>
@@ -179,6 +183,79 @@
                     <button id="cmd_save" type="button" class="btn btn-success">Save</button>
                     <button id="cmd_del" type="button" class="btn btn-danger">Delete</button>
                     <button id="cmd_exec" type="button" class="btn btn-primary">Execute</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- パイプラインモーダル -->
+    <div id="pipe_modal" class="modal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <form id="pipe_form" class="modal-content novalidate">
+                <div class="modal-header">
+                    <h5 class="modal-title">Modal title</h5>
+                    <button type="button" class="btn btn_window_stack">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-window-stack" viewBox="0 0 16 16">
+                            <path d="M4.5 6a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1ZM6 6a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1Zm2-.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0Z"/>
+                            <path d="M12 1a2 2 0 0 1 2 2 2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2 2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h10ZM2 12V5a2 2 0 0 1 2-2h9a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1Zm1-4v5a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V8H3Zm12-1V5a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v2h12Z"/>
+                        </svg>
+                    </button>
+                    <button type="button" class="btn btn_window">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-window" viewBox="0 0 16 16">
+                            <path d="M2.5 4a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1zm2-.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zm1 .5a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>
+                            <path d="M2 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2H2zm13 2v2H1V3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1zM2 14a1 1 0 0 1-1-1V6h14v7a1 1 0 0 1-1 1H2z"/>
+                        </svg>
+                    </button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="margin-left: 0px;"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row row_content_common">
+                        <div class="col-6 mb-3">
+                            <div class="input-group">
+                                <label class="input-group-text text-decoration-underline">
+                                    <span class="text-danger">*</span>
+                                    title
+                                </label>
+                                <input name="title" type="text" class="form-control" param_data_type="str" param_data_multi="false" required>
+                            </div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="input-group">
+                                <label class="input-group-text text-decoration-underline">
+                                    description
+                                </label>
+                                <input name="description" type="text" class="form-control" param_data_type="str" param_data_multi="false"/>
+                            </div>
+                        </div>
+                        <div class="col-12 mb-3">
+                            <ol class="list-group list-group-numbered row_content"></ol>
+                        </div>
+                    </div>
+                    <div class="row d-none cmd_select_template">
+                        <li class="list-group-item d-flex justify-content-between align-items-start cmd_select_item">
+                            <div class="input-group ms-2">
+                                <select name="pipe_cmd" class="form-select form-select d-inline-block" param_data_type="str" param_data_multi="true">
+                                </select>
+                                <button type="button" class="btn btn-danger del_buton">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                                        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                                        <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                                    </svg>
+                                </button>
+                                <button type="button" class="btn btn-success add_buton">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                                        <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </li>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button id="pipe_raw" type="button" class="btn btn-secondary">Raw</button>
+                    <button id="pipe_save" type="button" class="btn btn-success">Save</button>
+                    <button id="pipe_del" type="button" class="btn btn-danger">Delete</button>
+                    <button id="pipe_exec" type="button" class="btn btn-primary">Execute</button>
                 </div>
             </form>
         </div>
@@ -373,22 +450,23 @@ $(function(){
         // コマンドカードクリック時の処理（モーダルダイアログを開く）
         cmd_card_func = async function(){
             py_get_mode_opt = await eel.get_mode_opt()();
-            $('#mode').html(mkopt(py_get_mode_opt));
+            cmd_modal = $('#cmd_modal');
+            cmd_modal.find('[name="mode"]').html(mkopt(py_get_mode_opt));
             // モード変更時の処理（モードに対するコマンド一覧を取得）
             mode_change = async function(){
-                mode = $('#mode').val();
+                mode = cmd_modal.find('[name="mode"]').val();
                 py_get_cmd_opt = await eel.get_cmd_opt(mode)();
-                $('#cmd').html(mkopt(py_get_cmd_opt));
+                cmd_modal.find('[name="cmd"]').html(mkopt(py_get_cmd_opt));
             }
-            $('#mode').off('change');
-            $('#mode').change(mode_change);
-            $('.is-invalid, .is-valid').removeClass('is-invalid').removeClass('is-valid');
-            row_content = $('.row_content');
+            cmd_modal.find('[name="mode"]').off('change');
+            cmd_modal.find('[name="mode"]').change(mode_change);
+            cmd_modal.find('.is-invalid, .is-valid').removeClass('is-invalid').removeClass('is-valid');
+            row_content = cmd_modal.find('.row_content');
             row_content.html('');
             // コマンド変更時の処理（コマンドに対するオプション一覧を取得）
             cmd_change = async function(){
-                mode = $('#mode').val();
-                cmd = $('#cmd').val();
+                mode = cmd_modal.find('[name="mode"]').val();
+                cmd = cmd_modal.find('[name="cmd"]').val();
                 py_get_opt_opt = await eel.get_opt_opt(mode, cmd)();
                 row_content.html('');
                 // オプション一覧をフォームに追加
@@ -396,7 +474,7 @@ $(function(){
                     //dict(opt="host", type="str", default="localhost", required=True, multi=False, hide=True, choise=None),
                     target_name = row['opt'];
                     if(!row['choise']) {
-                        elem = $($('.row_content_template_str').html());
+                        elem = $(cmd_modal.find('.row_content_template_str').html());
                         if (next_elem) next_elem.after(elem);
                         else row_content.append(elem);
                         input_elem = elem.find('.row_content_template_input');
@@ -404,7 +482,7 @@ $(function(){
                         input_elem.val(row['default']);
                     }
                     else {
-                        elem = $($('.row_content_template_choice').html());
+                        elem = $(cmd_modal.find('.row_content_template_choice').html());
                         if (next_elem) next_elem.after(elem);
                         else row_content.append(elem);
                         input_elem = elem.find('.row_content_template_select');
@@ -413,9 +491,9 @@ $(function(){
                         input_elem.val(""+row['default']);
                     }
                     index = 0;
-                    if ($('[name="'+target_name+'"]').length > 0) {
+                    if (cmd_modal.find('[name="'+target_name+'"]').length > 0) {
                         index = 0;
-                        $.each($('[name="'+target_name+'"][param_data_index]'), function(i, val) {
+                        $.each(cmd_modal.find('[name="'+target_name+'"][param_data_index]'), function(i, val) {
                             v = Number($(val).attr('param_data_index'));
                             if (index <= v) index = v + 1;
                         });
@@ -452,7 +530,7 @@ $(function(){
                         }
                         btn_a.click(mk_func(row, input_elem.parent().parent()));
                         // 2個目以降は削除ボタンを追加
-                        if ($('[name="'+target_name+'"]').length > 1) {
+                        if (cmd_modal.find('[name="'+target_name+'"]').length > 1) {
                             mk_func = function(del_elem){
                                 // del_elemの値を残すためにクロージャーにする
                                 return function(){del_elem.remove();}
@@ -489,11 +567,10 @@ $(function(){
                     row_content.append(show_link);
                 }
             }
-            $('.row_content').find('is-invalid, is-valid').removeClass('is-invalid').removeClass('is-valid');
-            $('#cmd').off('change');
-            $('#cmd').change(cmd_change);
+            //row_content.find('is-invalid, is-valid').removeClass('is-invalid').removeClass('is-valid');
+            cmd_modal.find('[name="cmd"]').off('change');
+            cmd_modal.find('[name="cmd"]').change(cmd_change);
             modal_title = $(this).find('.cmd_title').text();
-            cmd_modal = $('#cmd_modal');
             if(modal_title != '') {
                 // コマンドファイルの読み込み
                 py_load_cmd = await eel.load_cmd(modal_title)();
@@ -541,12 +618,15 @@ $(function(){
         $('.cmd_card').click(cmd_card_func);
         $('#cmd_save').off('click');
         // コマンドフォームからパラメータを取得
-        get_param = function() {
+        get_param = function(modal_elem) {
+            modal_elem.find('.is-invalid, .is-valid').removeClass('is-invalid').removeClass('is-valid');
             var opt = {};
-            var title = $('#title').val();
-            opt["mode"] = $('#mode').val();
-            opt["cmd"] = $('#cmd').val();
-            opt["title"] = $('#title').val();
+            var title = modal_elem.find('[name="title"]').val();
+            opt["mode"] = modal_elem.find('[name="mode"]').val();
+            opt["cmd"] = modal_elem.find('[name="cmd"]').val();
+            if(!opt["mode"]) delete opt["mode"];
+            if(!opt["cmd"]) delete opt["cmd"];
+            opt["title"] = title;
             isFloat = function(i){
                 try {
                     n = Number(i);
@@ -564,7 +644,7 @@ $(function(){
                 }
             }
             // フォームの入力値をチェック（不正な値があればフォームに`is-invalid`クラスを付加する）
-            $('.row_content, .row_content_common').find('input, select').each(function(i, elem){
+            modal_elem.find('.row_content, .row_content_common').find('input, select').each(function(i, elem){
                 data_name = $(elem).attr('name');
                 data_val = $(elem).val();
                 data_type = $(elem).attr('param_data_type');
@@ -617,128 +697,64 @@ $(function(){
         }
         // コマンドファイルの保存
         $('#cmd_save').click(async function(){
-            var [title, opt] = get_param();
-            if ($('.row_content, .row_content_common').find('.is-invalid').length > 0) {
+            cmd_modal = $('#cmd_modal');
+            var [title, opt] = get_param(cmd_modal);
+            if (cmd_modal.find('.row_content, .row_content_common').find('.is-invalid').length > 0) {
                 return;
             }
+            $('#loading').removeClass('d-none');
             await eel.save_cmd(title, opt)();
             await list_cmd_func();
             $('.cmd_card').click(cmd_card_func);
             if (window.confirm('save success. close this window?')) {
-                $('#cmd_modal').modal('hide');
+                cmd_modal.modal('hide');
             }
+            $('#loading').addClass('d-none');
         });
         // コマンドファイルの削除
         $('#cmd_del').off('click');
         $('#cmd_del').click(async function(){
-            var title = $('#title').val();
+            cmd_modal = $('#cmd_modal');
+            var title = cmd_modal.find('[name="title"]').val();
+            $('#loading').removeClass('d-none');
             if (window.confirm('delete "' + title + '"?')) {
                 await eel.del_cmd(title)();
-                $('#cmd_modal').modal('hide');
+                cmd_modal.modal('hide');
                 await list_cmd_func();
                 $('.cmd_card').click(cmd_card_func);
             }
+            $('#loading').addClass('d-none');
         });
         // コマンドファイルの実行
         $('#cmd_exec').off('click');
         $('#cmd_exec').click(async function(){
-            var [title, opt] = get_param();
-            if ($('.row_content').find('.is-invalid').length > 0) {
+            cmd_modal = $('#cmd_modal');
+            var [title, opt] = get_param(cmd_modal);
+            if (cmd_modal.find('.row_content').find('.is-invalid').length > 0) {
                 return;
             }
+            $('#loading').removeClass('d-none');
             // コマンドの実行
             eel.exec_cmd(title, opt)().then(function(result){
-                // 実行結果をモーダルダイアログに表示
-                $('#cmd_modal').modal('hide');
-                result_modal = $('#result_modal');
-                result_modal.find('.modal-title').text(title);
-                result_modal.find('.modal-body').html('');
-                table = $('<table class="table table-bordered table-hover table-sm"></table>');
-                table_head = $('<thead class="table-dark bg-dark"></thead>');
-                table_body = $('<tbody></tbody>');
-                table.append(table_head);
-                table.append(table_body);
-                result_modal.find('.modal-body').append(table);
-                // list型の結果をテーブルに変換
-                list2table = function(data, table_head, table_body){
-                    $.each(data, function(i, row){
-                        tr = $('<tr></tr>');
-                        $.each(row, function(key, val){
-                            if(i==0) {
-                                table_head.append($('<th scope="col">' + key + '</th>'));
-                            }
-                            tr.append($('<td>' + val + '</td>'));
-                        });
-                        table_body.append(tr);
-                    });
-                }
-                // dict型の結果をテーブルに変換
-                dict2table = function(data, table_head, table_body){
-                    tr = $('<tr></tr>');
-                    $.each(data, function(key, val){
-                        table_head.append($('<th scope="col">' + key + '</th>'));
-                        tr.append($('<td>' + val + '</td>'));
-                    });
-                    table_body.append(tr);
-                }
-                // 結果をテーブルに変換
-                if(result['success'] && Array.isArray(result['success'])){
-                    list2table(result['success'], table_head, table_body);
-                }
-                else if(result['success'] && typeof result['success'] == "object"){
-                    dict2table(result['success'], table_head, table_body);
-                }
-                else if(Array.isArray(result)){
-                    list2table(result, table_head, table_body);
-                }
-                else if(typeof result === "string" || result instanceof String){
-                    $('#result_modal').find('.modal-body').html(result);
-                }
-                else {
-                    dict2table(result, table_head, table_body);
-                }
-                result_modal.modal('show');
+                cmd_modal.modal('hide');
+                view_result_func(title, result);
                 $('#loading').addClass('d-none');
             });
-            $('#loading').removeClass('d-none');
         });
         // RAW表示の実行
         $('#cmd_raw').off('click');
         $('#cmd_raw').click(async function(){
-            var [title, opt] = get_param();
-            if ($('.row_content').find('.is-invalid').length > 0) {
+            cmd_modal = $('#cmd_modal');
+            var [title, opt] = get_param(cmd_modal);
+            if (cmd_modal.find('.row_content').find('.is-invalid').length > 0) {
                 return;
             }
+            $('#loading').removeClass('d-none');
             // コマンドの実行
             eel.raw_cmd(title, opt)().then(function(result){
-                // 実行結果をモーダルダイアログに表示
-                result_modal = $('#result_modal');
-                result_modal.find('.modal-title').text(title);
-                result_modal.find('.modal-body').html('');
-                table = $('<table class="table table-bordered table-hover table-sm"></table>');
-                table_head = $('<thead class="table-dark bg-dark"></thead>');
-                table_body = $('<tbody></tbody>');
-                table.append(table_head);
-                table.append(table_body);
-                result_modal.find('.modal-body').append(table);
-                // list型の結果をテーブルに変換
-                list2table = function(data, table_head, table_body){
-                    $.each(data, function(i, row){
-                        tr = $('<tr></tr>');
-                        $.each(row, function(key, val){
-                            if(i==0) {
-                                table_head.append($('<th scope="col">' + key + '</th>'));
-                            }
-                            tr.append($('<td>' + val + '</td>'));
-                        });
-                        table_body.append(tr);
-                    });
-                }
-                list2table(result, table_head, table_body);
-                result_modal.modal('show');
+                view_raw_func(title, result);
                 $('#loading').addClass('d-none');
             });
-            $('#loading').removeClass('d-none');
         });
     });
     // ファイラーモーダル
@@ -749,8 +765,8 @@ $(function(){
         filer_modal.find('.tree-menu').css('height', 'calc(100vh - 180px)');
         filer_modal.find('.file-list').css('height', 'calc(100vh - 180px)');
         //filer_modal.find('.tree-menu').resizable({ghost:true});
-        $('.filer_address_bot').off('click');
-        $('.filer_address_bot').click(async function(){
+        filer_modal.find('.filer_address_bot').off('click');
+        filer_modal.find('.filer_address_bot').click(async function(){
             current_path = filer_modal.find('.filer_address').val();
             key = current_path.replace(/[\s\:\\\/\,\.\#\$\%\^\&\!\@\*\(\)\{\}\[\]\'\"\`]/g, '_');
             current_node = $('#'+key);
@@ -796,14 +812,14 @@ $(function(){
             if (py_list_tree_keys.length > 0) {
                 node = py_list_tree[py_list_tree_keys[py_list_tree_keys.length-1]];
                 table = $('<table class="table table-bordered table-hover table-sm"></table>');
-                $('.file-list').html('');
-                $('.file-list').append(table);
+                filer_modal.find('.file-list').html('');
+                filer_modal.find('.file-list').append(table);
                 table_head = $('<thead class="table-dark bg-dark"></thead>');
                 table_head.append($('<tr><th scope="col">-</th><th scope="col">name</th><th scope="col">size</th><th scope="col">last</th></tr>'));
                 table.append(table_head);
                 table_body = $('<tbody></tbody>');
                 table.append(table_body);
-                $('.filer_address').val(node['path']);
+                filer_modal.find('.filer_address').val(node['path']);
                 if(node['children']) {
                     mk_func = function(target_id, current_node, current_path){
                         // nodeの値を残すためにクロージャーにする
@@ -846,14 +862,111 @@ $(function(){
         await reload_tree(target_id, filer_modal.find('.tree-menu'), current_path, filer_modal.find('.file-list'));
         filer_modal.modal('show');
     };
+    // 実行結果をモーダルダイアログに表示
+    view_result_func = function(title, result){
+        result_modal = $('#result_modal');
+        result_modal.find('.modal-title').text(title);
+        result_modal.find('.modal-body').html('');
+        mk_table_func = function() {
+            table = $('<table class="table table-bordered table-hover table-sm"></table>');
+            table_head = $('<thead class="table-dark bg-dark"></thead>');
+            table_body = $('<tbody></tbody>');
+            table.append(table_head);
+            table.append(table_body);
+            return table;
+        }
+        result_modal.find('.modal-body').append(mk_table_func());
+        // list型の結果をテーブルに変換
+        list2table = function(data, table_head, table_body){
+            $.each(data, function(i, row){
+                tr = $('<tr></tr>');
+                table_body.append(tr);
+                $.each(row, function(key, val){
+                    if(i==0) {
+                        table_head.append($('<th scope="col">' + key + '</th>'));
+                    }
+                    if(val && val['success'] && Array.isArray(val['success'])){
+                        tbl = mk_table_func()
+                        td = $('<td></td>');
+                        td.append(tbl);
+                        tr.append(td);
+                        list2table(val['success'], tbl.find('thead'), tbl.find('tbody'));
+                    }
+                    else if(val && val['success'] && typeof val['success'] == "object"){
+                        tbl = mk_table_func()
+                        td = $('<td></td>');
+                        td.append(tbl);
+                        tr.append(td);
+                        dict2table(val['success'], tbl.find('thead'), tbl.find('tbody'));
+                    }
+                    else{
+                        tr.append($('<td>' + val + '</td>'));
+                    }
+                });
+            });
+        }
+        // dict型の結果をテーブルに変換
+        dict2table = function(data, table_head, table_body){
+            tr = $('<tr></tr>');
+            $.each(data, function(key, val){
+                table_head.append($('<th scope="col">' + key + '</th>'));
+                tr.append($('<td>' + val + '</td>'));
+            });
+            table_body.append(tr);
+        }
+        // 結果をテーブルに変換
+        if(result['success'] && Array.isArray(result['success'])){
+            list2table(result['success'], table_head, table_body);
+        }
+        else if(result['success'] && typeof result['success'] == "object"){
+            dict2table(result['success'], table_head, table_body);
+        }
+        else if(Array.isArray(result)){
+            list2table(result, table_head, table_body);
+        }
+        else if(typeof result === "string" || result instanceof String){
+            $('#result_modal').find('.modal-body').html(result);
+        }
+        else {
+            dict2table(result, table_head, table_body);
+        }
+        result_modal.modal('show');
+    }
+    // RAW結果をモーダルダイアログに表示
+    view_raw_func = function(title, result){
+        result_modal = $('#result_modal');
+        result_modal.find('.modal-title').text(title);
+        result_modal.find('.modal-body').html('');
+        table = $('<table class="table table-bordered table-hover table-sm"></table>');
+        table_head = $('<thead class="table-dark bg-dark"></thead>');
+        table_body = $('<tbody></tbody>');
+        table.append(table_head);
+        table.append(table_body);
+        result_modal.find('.modal-body').append(table);
+        // list型の結果をテーブルに変換
+        list2table = function(data, table_head, table_body){
+            $.each(data, function(i, row){
+                tr = $('<tr></tr>');
+                $.each(row, function(key, val){
+                    if(i==0) {
+                        table_head.append($('<th scope="col">' + key + '</th>'));
+                    }
+                    tr.append($('<td>' + val + '</td>'));
+                });
+                table_body.append(tr);
+            });
+        }
+        list2table(result, table_head, table_body);
+        result_modal.modal('show');
+    }
     // 保存済みパイプラインファイル一覧の取得
     list_pipe_func = async function(){
         $('#pipe_items').html('');
         py_list_pipe = await eel.list_pipe()();
         $.each(py_list_pipe, function(i, row){
             elem = $($('#pipe_template').html());
-            elem.find('.pip_title').text(row['title']);
-            elem.find('.pipe_desc').text(row['desc']);
+            elem.find('.pipe_title').text(row['title']);
+            elem.find('.pipe_desc').text(row['description']);
             $('#pipe_items').append(elem);
         });
         $('#pipe_items').append($($('#pipe_add').html()));
@@ -861,8 +974,138 @@ $(function(){
     list_pipe_func().then(function(){
         // パイプラインカードクリック時の処理（モーダルダイアログを開く）
         pipe_card_func = async function(){
-            // TODO
-        };
+            pipe_modal = $('#pipe_modal');
+            pipe_modal.find('.is-invalid, .is-valid').removeClass('is-invalid').removeClass('is-valid');
+            row_content = pipe_modal.find('.row_content');
+            row_content.html('');
+            modal_title = $(this).find('.pipe_title').text();
+            cmd_select_template_func = function(add_buton, py_list_cmd) {
+                cmd_select_template = $(pipe_modal.find('.cmd_select_template').html());
+                row_content = pipe_modal.find('.row_content');
+                if(row_content.find('.cmd_select_item').length > 0) {
+                    add_buton.parents('.cmd_select_item').after(cmd_select_template);
+                } else {
+                    row_content.append(cmd_select_template);
+                    cmd_select_template.find('[name="pipe_cmd"]').attr('required', true);
+                    cmd_select_template.find('.del_buton').hide();
+                }
+                pipe_cmd_select = cmd_select_template.find('[name="pipe_cmd"]');
+                pipe_cmd_select.append('<option></option>');
+                $.each(py_list_cmd, function(i, cmd){
+                    option = $('<option></option>');
+                    pipe_cmd_select.append(option);
+                    option.attr('value', cmd['title']);
+                    option.text(cmd['title']+'(mode='+cmd['mode']+', cmd='+cmd['cmd']+')');
+                });
+                cmd_select_template.find('.add_buton').click(function(e){
+                    cmd_select_template_func($(this), py_list_cmd);
+                });
+                cmd_select_template.find('.del_buton').click(function(e){
+                    $(this).parents('.cmd_select_item').remove();
+                });
+                return cmd_select_template;
+            }
+            if(modal_title != '') {
+                // パイプラインファイルの読み込み
+                py_list_cmd = await eel.list_cmd()();
+                cmd_select = cmd_select_template_func($(this), py_list_cmd)
+                py_load_pipe = await eel.load_pipe(modal_title)();
+                $.each(py_load_pipe, function(key, val){
+                    if (typeof val === 'boolean') {
+                        val = val.toString();
+                    }
+                    // フォームに値をセット
+                    if(Array.isArray(val)){
+                        $.each(val, function(i, v){
+                            e = pipe_modal.find('[name="' + key + '"]').parent().find('.add_buton')[i];
+                            $(e).click();
+                        });
+                        pipe_modal.find('[name="' + key + '"]').each(function(i, e){
+                            $(e).val(val[i]);
+                        });
+                    } else {
+                        pipe_modal.find('[name="' + key + '"]').val(val);
+                    }
+                });
+                $('#cmd_del').show();
+                pipe_modal.find('[name="title"]').attr('readonly', true);
+            } else {
+                // 新規パイプラインファイルの作成
+                modal_title = 'New Pipeline';
+                $('#cmd_del').hide();
+                pipe_modal.find('[name="title"]').val('');
+                pipe_modal.find('[name="title"]').attr('readonly', false);
+                pipe_modal.find('[name="description"]').val('');
+                py_list_cmd = await eel.list_cmd()();
+                cmd_select = cmd_select_template_func($(this), py_list_cmd)
+            }
+            pipe_modal.find('.modal-title').text('Pipeline : ' + modal_title);
+            pipe_modal.modal('show');
+        }
+        $('.pipe_card').off('click');
+        $('.pipe_card').click(pipe_card_func);
+        $('#pipe_save').off('click');
+        // パイプラインファイルの保存
+        $('#pipe_save').click(async function(){
+            pipe_modal = $('#pipe_modal');
+            var [title, opt] = get_param(pipe_modal);
+            if (pipe_modal.find('.row_content, .row_content_common').find('.is-invalid').length > 0) {
+                return;
+            }
+            $('#loading').removeClass('d-none');
+            await eel.save_pipe(title, opt)();
+            await list_pipe_func();
+            $('.pipe_card').click(pipe_card_func);
+            if (window.confirm('save success. close this window?')) {
+                pipe_modal.modal('hide');
+            }
+            $('#loading').addClass('d-none');
+        });
+        // パイプラインファイルの削除
+        $('#pipe_del').off('click');
+        $('#pipe_del').click(async function(){
+            pipe_modal = $('#pipe_modal');
+            var title = pipe_modal.find('[name="title"]').val();
+            $('#loading').removeClass('d-none');
+            if (window.confirm('delete "' + title + '"?')) {
+                await eel.del_pipe(title)();
+                pipe_modal.modal('hide');
+                await list_pipe_func();
+                $('.pipe_card').click(pipe_card_func);
+            }
+            $('#loading').addClass('d-none');
+        });
+        // パイプラインファイルの実行
+        $('#pipe_exec').off('click');
+        $('#pipe_exec').click(async function(){
+            pipe_modal = $('#pipe_modal');
+            var [title, opt] = get_param(pipe_modal);
+            if (pipe_modal.find('.row_content').find('.is-invalid').length > 0) {
+                return;
+            }
+            $('#loading').removeClass('d-none');
+            // コマンドの実行
+            eel.exec_pipe(title, opt)().then(function(result){
+                pipe_modal.modal('hide');
+                view_result_func(title, result);
+                $('#loading').addClass('d-none');
+            });
+        });
+        // RAW表示の実行
+        $('#pipe_raw').off('click');
+        $('#pipe_raw').click(async function(){
+            pipe_modal = $('#pipe_modal');
+            var [title, opt] = get_param(pipe_modal);
+            if (pipe_modal.find('.row_content').find('.is-invalid').length > 0) {
+                return;
+            }
+            $('#loading').removeClass('d-none');
+            // コマンドの実行
+            eel.raw_pipe(title, opt)().then(function(result){
+                view_raw_func(title, result);
+                $('#loading').addClass('d-none');
+            });
+        });
     });
     $('#versions_modal').on('shown.bs.modal	', function(){
         // iinferのバージョン情報取得

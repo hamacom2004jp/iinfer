@@ -42,7 +42,7 @@ class Web(object):
             elif mode == "redis":
                 return ['', 'docker_run', 'docker_stop']
             elif mode == "install":
-                return ['', 'redis', 'server', 'onnx', 'mmdet', 'mmcls', 'mmpretrain']
+                return ['', 'redis', 'server', 'onnx', 'mmdet', 'mmcls', 'mmpretrain', 'mmrotate']
             else:
                 return ['Please select mode.']
 
@@ -282,6 +282,21 @@ class Web(object):
                         dict(opt="stdout_save", type="file", default="", required=False, multi=False, hide=True, choise=None),
                         dict(opt="stdout_log", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False])
                     ]
+                elif cmd == "mmcls":
+                    return [
+                        dict(opt="stdout_save", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="stdout_log", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False])
+                    ]
+                elif cmd == "mmpretrain":
+                    return [
+                        dict(opt="stdout_save", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="stdout_log", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False])
+                    ]
+                elif cmd == "mmrotate":
+                    return [
+                        dict(opt="stdout_save", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="stdout_log", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False])
+                    ]
                 elif cmd == "redis":
                     return [
                         dict(opt="wsl_name", type="str", default="", required=False, multi=False, hide=True, choise=None),
@@ -292,6 +307,12 @@ class Web(object):
                 elif cmd == "server":
                     return [
                         dict(opt="data", type="file", default=None, required=False, multi=False, hide=False, choise=None),
+                        dict(opt="install_iinfer", type="str", default='iinfer', required=False, multi=False, hide=True, choise=None),
+                        dict(opt="install_onnx", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False]),
+                        dict(opt="install_mmdet", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False]),
+                        dict(opt="install_mmcls", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False]),
+                        dict(opt="install_mmpretrain", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False]),
+                        dict(opt="install_mmrotate", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False]),
                         dict(opt="stdout_save", type="file", default="", required=False, multi=False, hide=True, choise=None),
                         dict(opt="stdout_log", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False])
                     ]
@@ -367,7 +388,7 @@ class Web(object):
                 output = list(traceback.TracebackException.from_exception(e).format())
             sys.stdout = old_stdout
             if 'stdout_save' in opt and opt['stdout_save'] != '':
-                with open(opt['stdout_save'], ('w' if type(output)==str else 'wb')) as f:
+                with open(opt['stdout_save'], ('a' if type(output)==str else 'wb')) as f:
                     f.write(output)
             if 'stdout_log' in opt and opt['stdout_log']:
                 eel.js_console_modal_log_func(output)
@@ -432,6 +453,45 @@ class Web(object):
         def list_pipe():
             paths = glob.glob(str(self.data / "pipe-*.json"))
             return [common.loadopt(path) for path in paths]
+
+        @eel.expose
+        def exec_pipe(title, opt):
+            self.logger.info(f"exec_pipe: title={title}, opt={opt}")
+            pipe_outputs = []
+            for i, cmd_title in enumerate(opt['pipe_cmd']):
+                cmd_opt = load_cmd(cmd_title)
+                cmd_output = exec_cmd(cmd_title, cmd_opt)
+                pipe_outputs.append(dict(no=i, title=cmd_title, output=cmd_output))
+            return pipe_outputs
+
+        @eel.expose
+        def raw_pipe(title, opt):
+            self.logger.info(f"raw_pipe: title={title}, opt={opt}")
+            pipe_outputs = []
+            for i, cmd_title in enumerate(opt['pipe_cmd']):
+                cmd_opt = load_cmd(cmd_title)
+                cmd_output = raw_cmd(cmd_title, cmd_opt)
+                cmdline = cmd_output[0]['raw']
+                optjson = cmd_output[1]['raw']
+                pipe_outputs.append(dict(no=i, title=cmd_title, cmdline=cmdline, optjson=optjson))
+            return pipe_outputs
+
+        @eel.expose
+        def save_pipe(title, opt):
+            opt_path = self.data / f"pipe-{title}.json"
+            self.logger.info(f"save_pipe: opt_path={opt_path}, opt={opt}")
+            common.saveopt(opt, opt_path)
+
+        @eel.expose
+        def del_pipe(title):
+            opt_path = self.data / f"pipe-{title}.json"
+            self.logger.info(f"del_pipe: opt_path={opt_path}")
+            opt_path.unlink()
+
+        @eel.expose
+        def load_pipe(title):
+            opt_path = self.data / f"pipe-{title}.json"
+            return common.loadopt(opt_path)
 
         @eel.expose
         def copyright():
