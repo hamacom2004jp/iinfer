@@ -517,6 +517,21 @@ def _main(args_list:list=None):
             if 'success' not in ret:
                 return 1, ret
 
+        elif cmd == 'mmrotate':
+            if data is None:
+                msg = {"warn":f"Please specify the --data option."}
+                common.print_format(msg, format, tm)
+                return 1, msg
+            ret = inst.mmrotate(Path(data))
+            common.print_format(ret, format, tm)
+            if 'success' not in ret:
+                return 1, ret
+
+        else:
+            msg = {"warn":f"Unkown command."}
+            common.print_format(msg, format, tm)
+            return 1, msg
+
     else:
         msg = {"warn":f"Unkown mode."}
         common.print_format(msg, format, tm)
