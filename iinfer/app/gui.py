@@ -382,7 +382,7 @@ class Web(object):
             old_stdout = sys.stdout
             sys.stdout = captured_output = io.StringIO()
             try:
-                app.main(opt_list)
+                app._main(opt_list)
                 output = captured_output.getvalue()
             except Exception as e:
                 output = list(traceback.TracebackException.from_exception(e).format())
@@ -393,7 +393,18 @@ class Web(object):
             if 'stdout_log' in opt and opt['stdout_log']:
                 eel.js_console_modal_log_func(output)
             try:
-                return json.loads(output)
+                def to_json(o):
+                    res_json = json.loads(o)
+                    if 'output_image' in res_json and 'output_image_shape' in res_json:
+                        img_npy = common.b64str2npy(res_json["output_image"], res_json["output_image_shape"])
+                        img_bytes = common.npy2imgfile(img_npy, image_type='png')
+                        res_json["output_image"] = common.bytes2b64str(img_bytes)
+                    return res_json
+                try:
+                    ret = [to_json(o) for o in output.split('\n') if o.strip() != '']
+                except:
+                    ret = to_json(output)
+                return ret
             except:
                 return output
             """

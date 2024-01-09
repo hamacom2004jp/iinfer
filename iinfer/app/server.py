@@ -386,7 +386,7 @@ class Server(object):
         for dir in self.data_dir.iterdir():
             if not dir.is_dir():
                 continue
-            if dir.name == 'mmpretrain' or dir.name == 'mmdetection':
+            if dir.name == 'mmpretrain' or dir.name == 'mmdetection' or dir.name == 'mmrotate':
                 continue
             conf_path = dir / "conf.json"
             with open(conf_path, "r") as cf:

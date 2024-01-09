@@ -3,6 +3,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="assets/bootstrap/bootstrap.min.5.0.2.css">
+    <link rel="stylesheet" href="assets/lightbox2/css/lightbox.min.css">
     <link rel="stylesheet" href="assets/tree-menu/css/tree-menu.css">
     <script type="text/javascript" src="/eel.js"></script>
     <title>iinfer</title>
@@ -417,6 +418,7 @@
 <script type="text/javascript" src="assets/jquery-ui/jquery-ui.min.js"></script>
 <script type="text/javascript" src="assets/jquery-resizable/jquery-resizable.min.js"></script>
 <script type="text/javascript" src="assets/tree-menu/js/tree-menu.js"></script>
+<script type="text/javascript" src="assets/lightbox2/js/lightbox.min.js"></script>
 <script type="text/javascript">
 $(function(){
     // copyright情報取得
@@ -879,6 +881,10 @@ $(function(){
         // list型の結果をテーブルに変換
         list2table = function(data, table_head, table_body){
             $.each(data, function(i, row){
+                if(row['success'] && typeof row['success'] == "object"){
+                    dict2table(row['success'], i==0?table_head:null, table_body, row['output_image']);
+                    return;
+                }
                 tr = $('<tr></tr>');
                 table_body.append(tr);
                 $.each(row, function(key, val){
@@ -899,6 +905,13 @@ $(function(){
                         tr.append(td);
                         dict2table(val['success'], tbl.find('thead'), tbl.find('tbody'));
                     }
+                    else if(val && Array.isArray(val)){
+                        tbl = mk_table_func()
+                        td = $('<td></td>');
+                        td.append(tbl);
+                        tr.append(td);
+                        list2table(val, tbl.find('thead'), tbl.find('tbody'));
+                    }
                     else{
                         tr.append($('<td>' + val + '</td>'));
                     }
@@ -906,10 +919,17 @@ $(function(){
             });
         }
         // dict型の結果をテーブルに変換
-        dict2table = function(data, table_head, table_body){
+        dict2table = function(data, table_head, table_body, output_image){
             tr = $('<tr></tr>');
+            if(output_image){
+                if(table_head)table_head.append($('<th scope="col">output_image</th>'));
+                img = $('<img class="img-thumbnail">').attr('src', 'data:image/png;base64,' + output_image);
+                img.css('width','100px').css('height','auto');
+                anchor = $('<a href="data:image/jpeg;base64,' + output_image + '" data-lightbox="output_image"></a>').append(img);
+                tr.append($('<td></td>').append(anchor));
+            }
             $.each(data, function(key, val){
-                table_head.append($('<th scope="col">' + key + '</th>'));
+                if(table_head)table_head.append($('<th scope="col">' + key + '</th>'));
                 tr.append($('<td>' + val + '</td>'));
             });
             table_body.append(tr);
@@ -919,7 +939,7 @@ $(function(){
             list2table(result['success'], table_head, table_body);
         }
         else if(result['success'] && typeof result['success'] == "object"){
-            dict2table(result['success'], table_head, table_body);
+            dict2table(result['success'], table_head, table_body, result['output_image']);
         }
         else if(Array.isArray(result)){
             list2table(result, table_head, table_body);
