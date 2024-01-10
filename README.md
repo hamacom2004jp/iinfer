@@ -22,117 +22,87 @@ onnx又はmmlabフォーマットのAIモデルファイルを実行するアプ
 ```bash
 pip install --upgrade pip
 pip install iinfer
+eval "$(register-python-argcomplete iinfer)" # Ubuntuの場合コマンドラインオプションを補完できるようにします。
 ```
 
-2. コマンドラインオプションを補完するときは次のコマンドを実行します。（Ubuntuの場合のみ）:
+2. コンテナをインストールして起動します。:
+   ※docker及びdocker-composeを別途インストールしておく必要があります。
 
 ```bash
-eval "$(register-python-argcomplete iinfer)"
-```
-
-3. サーバーコンテナをインストールする場合は次のコマンドを実行します。（Ubuntuの場合のみ）:
-
-```bash
+cd ~/
 iinfer -m install -c server
 docker-compose -f up -d
 ```
+
+※インストールを実行したフォルダに `docker-compose.yml` が作成されます。
 
 ## iinferの使用方法
 
 iinferを使用するには、次のコマンドを実行します:
 
-1. サーバーの起動（Windowsの場合）:
+1. guiモードで利用する場合:
 
-```bat
-REM Redisサーバーコンテナの起動
-iinfer -m redis -c docker_run -f \
-                              --wsl_name <WSLのディストリビューションの名前> \
-                              --wsl_user <WSLのLinux内のDockerが使えるユーザー>
-
-REM 推論処理を実行するサーバープロセスの起動
-iinfer -m server -c start -f
-```
-
-2. サーバーの起動（Ubuntuの場合）:
+![guiモードのイメージ](https://github.com/hamacom2004jp/iinfer/raw/main/docs_src/static/ss/00242_cmd_predict.jpg)
 
 ```bash
-# Redisサーバーコンテナと推論処理を実行するサーバープロセスの起動
-docker-compose up -d
+iinfer -m gui -c start
 ```
 
-3. AIモデルのデプロイ:
+2. コマンドモードで利用する場合
 
-```bash
-# 画像AIモデルのデプロイ
-# 推論タイプはモデルのAIタスクやアルゴリズムに合わせて指定する。指定可能なキーワードは"iinfer -m client -c predict_type_list"コマンド参照。
-iinfer -m client -c deploy -n <任意のモデル名> -f \
-                            --model_img_width <モデルのINPUTサイズ(横幅)> \
-                            --model_img_height <モデルのINPUTサイズ(縦幅)> \
-                            --model_file <モデルファイル> \
-                            --model_conf_file <モデル設定ファイル> \
-                            --predict_type <推論タイプ> \
-                            --label_file <ラベルファイル>
+    1. AIモデルのデプロイ:
 
-# デプロイされている画像AIモデルの一覧
-iinfer -m client -c deploy_list -f
-```
+    ```bash
+    # 画像AIモデルのデプロイ
+    # 推論タイプはモデルのAIタスクやアルゴリズムに合わせて指定する。指定可能なキーワードは"iinfer -m client -c predict_type_list"コマンド参照。
+    iinfer -m client -c deploy -n <任意のモデル名> -f \
+                               --model_file <モデルファイル> \
+                               --model_conf_file <モデル設定ファイル> \
+                               --predict_type <推論タイプ> \
+                               --label_file <ラベルファイル>
 
-4. AIモデルのセッションを開始:
+    # デプロイされている画像AIモデルの一覧
+    iinfer -m client -c deploy_list -f
+    ```
 
-```bash
-# 画像AIモデルを起動させて推論可能な状態に(セッションを確保)する
-# use_trackを指定するとObjectDetectionタスクの結果に対して、MOT（Multi Object Tracking）を実行しトラッキングIDを出力する。
-iinfer -m client -c start -n <モデル名> -f \
-                          --use_track
-```
+    2. AIモデルのセッションを開始:
 
-5. 推論を実行:
+    ```bash
 
-```bash
-# 推論を実行する
-# output_previewを指定するとimshowで推論結果画像を表示する（GUI必要）
-iinfer -m client -c predict -n <モデル名> -f \
-                            -i <推論させる画像ファイル> \
-                            -o <推論結果の画像ファイル> \
-                            --output_preview
+    # 画像AIモデルを起動させて推論可能な状態に(セッションを確保)する
+    # use_trackを指定するとObjectDetectionタスクの結果に対して、MOT（Multi Object Tracking）を実行しトラッキングIDを出力する。
+    iinfer -m client -c start -n <モデル名> -f \
+                              --use_track
+    ```
 
-# カメラキャプチャー画像を元に推論を実行し、クラススコアが0.8以上の物体のみを検出する
-# --stdin --image_type capture で標準入力のキャプチャー画像を推論する
-iinfer -m client -c capture | \
-iinfer -m client -c predict -n <モデル名> \
-                            --stdin \
-                            --image_type capture \
-                            --nodraw | \
-iinfer -m postprocess -c det_filter -f -P \
-                            --stdin \
-                            --score_th 0.8
-```
+   3. 推論を実行:
 
-6. AIモデルのセッションを開放:
+    ```bash
+    # 推論を実行する
+    # output_previewを指定するとimshowで推論結果画像を表示する（GUI必要）
+    iinfer -m client -c predict -n <モデル名> -f \
+                                -i <推論させる画像ファイル> \
+                                -o <推論結果の画像ファイル> \
+                                --output_preview
 
-```bash
-# 画像AIモデルを停止させてセッションを開放
-iinfer -m client -c stop -n <モデル名> -f
-```
+    # カメラキャプチャー画像を元に推論を実行し、クラススコアが0.8以上の物体のみを検出する
+    # --stdin --image_type capture で標準入力のキャプチャー画像を推論する
+    iinfer -m client -c capture | \
+    iinfer -m client -c predict -n <モデル名> \
+                                --stdin \
+                                --image_type capture \
+                                --nodraw | \
+    iinfer -m postprocess -c det_filter -f -P \
+                                --stdin \
+                                --score_th 0.8
+    ```
 
-7. サーバーの停止（Ubuntuの場合）:
+    4. AIモデルのセッションを開放:
 
-```bash
-# Redisサーバーコンテナと推論処理を実行するサーバープロセスの停止
-docker-compose down
-```
-
-8. サーバーの停止（Windowsの場合）:
-
-```bat
-REM 推論処理を実行するサーバープロセスの停止
-iinfer -m server -c stop -f
-
-REM Redisサーバーコンテナの停止
-iinfer -m redis -c docker_stop -f \
-                                --wsl_name <WSLのディストリビューションの名前> \
-                                --wsl_user <WSLのLinux内のDockerが使えるユーザー>
-```
+    ```bash
+    # 画像AIモデルを停止させてセッションを開放
+    iinfer -m client -c stop -n <モデル名> -f
+    ```
 
 ## Lisence
 

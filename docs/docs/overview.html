@@ -22,7 +22,7 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="コマンドリファレンス" href="command.html" />
+    <link rel="next" title="GUIモード" href="gui.html" />
     <link rel="prev" title="iinfer (Image Inference Application)" href="../index.html" /> 
 </head>
 
@@ -54,6 +54,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#wsl2docker">【参考】WSL2上にdocker導入する方法</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="gui.html">GUIモード</a></li>
 <li class="toctree-l1"><a class="reference internal" href="command.html">コマンドリファレンス</a></li>
 <li class="toctree-l1"><a class="reference internal" href="models.html">動作確認済みモデル</a></li>
 <li class="toctree-l1"><a class="reference internal" href="customize.html">カスタマイズ</a></li>
@@ -112,67 +113,80 @@
 <blockquote>
 <div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>pip
 pip<span class="w"> </span>install<span class="w"> </span>iinfer
+<span class="nb">eval</span><span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span>register-python-argcomplete<span class="w"> </span>iinfer<span class="k">)</span><span class="s2">&quot;</span><span class="w"> </span><span class="c1"># Ubuntuの場合コマンドラインオプションを補完できるようにします。</span>
 </pre></div>
 </div>
 </div></blockquote>
 <ol class="arabic simple" start="2">
-<li><p>コマンドラインオプションを補完するときは次のコマンドを実行します。（Ubuntuの場合のみ）:</p></li>
+<li><p>Ubuntuでサーバーを立てるの場合、コンテナをインストールして起動します。:
+※docker及びdocker-composeを別途インストールしておく必要があります。</p></li>
 </ol>
 <blockquote>
-<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">eval</span><span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span>register-python-argcomplete<span class="w"> </span>iinfer<span class="k">)</span><span class="s2">&quot;</span>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>~/
+iinfer<span class="w"> </span>-m<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>server
+docker-compose<span class="w"> </span>-f<span class="w"> </span>up<span class="w"> </span>-d
+</pre></div>
+</div>
+<p>※インストールを実行したフォルダに <cite>docker-compose.yml</cite> が作成されます。</p>
+</div></blockquote>
+<ol class="arabic simple" start="3">
+<li><p>Windowsでサーバーを立てる場合、WSL2上のdockerにサーバーをインストールして起動します。:
+※WSL2上にdockerを導入する方法は <a class="reference internal" href="#install-wsl2-docker"><span class="std std-ref">こちら</span></a> を参照してください。</p></li>
+</ol>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>WSL2のイメージを起動させます。</p></li>
+</ol>
+<blockquote>
+<div><div class="highlight-bat notranslate"><div class="highlight"><pre><span></span>wsl -d <span class="p">&lt;</span>WSLイメージ名<span class="p">&gt;</span> -u {WSLユーザー名}
+</pre></div>
+</div>
+</div></blockquote>
+<ol class="arabic simple" start="2">
+<li><p>WSL2のUbunntu上にiinferをインストールします。</p></li>
+</ol>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>pip
+pip<span class="w"> </span>install<span class="w"> </span>iinfer
+<span class="nb">eval</span><span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span>register-python-argcomplete<span class="w"> </span>iinfer<span class="k">)</span><span class="s2">&quot;</span>
 </pre></div>
 </div>
 </div></blockquote>
 <ol class="arabic simple" start="3">
-<li><p>サーバーコンテナをインストールする場合は次のコマンドを実行します。（Ubuntuの場合のみ）:</p></li>
+<li><p>コンテナをインストールして起動します。:</p></li>
 </ol>
 <blockquote>
-<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>iinfer<span class="w"> </span>-m<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>server
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>~/
+iinfer<span class="w"> </span>-m<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>server
 docker-compose<span class="w"> </span>-f<span class="w"> </span>up<span class="w"> </span>-d
 </pre></div>
 </div>
+<p>※インストールを実行したフォルダに <cite>docker-compose.yml</cite> が作成されます。</p>
+</div></blockquote>
 </div></blockquote>
 </section>
 <section id="id3">
 <h2>iinferの使用方法<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
 <p>iinferを使用するには、次のコマンドを実行します:</p>
 <ol class="arabic simple">
-<li><p>サーバーの起動（Windowsの場合）:</p></li>
+<li><p>guiモードで利用する場合:</p></li>
 </ol>
 <blockquote>
-<div><ul class="simple">
-<li><p>Windowsの場合はWSL2を使用します。</p></li>
-<li><p>WSL2上にdockerを導入する方法は <a class="reference internal" href="#install-wsl2-docker"><span class="std std-ref">こちら</span></a> を参照してください。</p></li>
-<li><p>下記のコマンドを実行すると、WSL2上のdockerにRedisサーバーコンテナをインストールし起動します。</p></li>
-</ul>
-<div class="highlight-bat notranslate"><div class="highlight"><pre><span></span><span class="c1">REM Redisサーバーコンテナの起動</span>
-iinfer -m redis -c docker_run -f \
-                              --wsl_name <span class="p">&lt;</span>WSLのディストリビューションの名前<span class="p">&gt;</span> \
-                              --wsl_user <span class="p">&lt;</span>WSLのLinux内のDockerが使えるユーザー&gt;
-
-<span class="c1">REM 推論処理を実行するサーバープロセスの起動</span>
-iinfer -m server -c start -f
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>iinfer<span class="w"> </span>-m<span class="w"> </span>gui<span class="w"> </span>-c<span class="w"> </span>start
 </pre></div>
 </div>
 </div></blockquote>
 <ol class="arabic simple" start="2">
-<li><p>サーバーの起動（Ubuntuの場合）:</p></li>
+<li><p>コマンドモードで利用する場合</p></li>
 </ol>
 <blockquote>
-<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Redisサーバーコンテナと推論処理を実行するサーバープロセスの起動</span>
-docker-compose<span class="w"> </span>up<span class="w"> </span>-d
-</pre></div>
-</div>
-</div></blockquote>
-<ol class="arabic simple" start="3">
+<div><ol class="arabic simple">
 <li><p>AIモデルのデプロイ:</p></li>
 </ol>
 <blockquote>
 <div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># 画像AIモデルのデプロイ</span>
 <span class="c1"># 推論タイプはモデルのAIタスクやアルゴリズムに合わせて指定する。指定可能なキーワードは&quot;iinfer -m client -c predict_type_list&quot;コマンド参照。</span>
 iinfer<span class="w"> </span>-m<span class="w"> </span>client<span class="w"> </span>-c<span class="w"> </span>deploy<span class="w"> </span>-n<span class="w"> </span>&lt;任意のモデル名&gt;<span class="w"> </span>-f<span class="w"> </span><span class="se">\</span>
-<span class="w">                            </span>--model_img_width<span class="w"> </span>&lt;モデルのINPUTサイズ<span class="o">(</span>横幅<span class="o">)</span>&gt;<span class="w"> </span><span class="se">\</span>
-<span class="w">                            </span>--model_img_height<span class="w"> </span>&lt;モデルのINPUTサイズ<span class="o">(</span>縦幅<span class="o">)</span>&gt;<span class="w"> </span><span class="se">\</span>
 <span class="w">                            </span>--model_file<span class="w"> </span>&lt;モデルファイル&gt;<span class="w"> </span><span class="se">\</span>
 <span class="w">                            </span>--model_conf_file<span class="w"> </span>&lt;モデル設定ファイル&gt;<span class="w"> </span><span class="se">\</span>
 <span class="w">                            </span>--predict_type<span class="w"> </span>&lt;推論タイプ&gt;<span class="w"> </span><span class="se">\</span>
@@ -183,7 +197,7 @@ iinfer<span class="w"> </span>-m<span class="w"> </span>client<span class="w"> <
 </pre></div>
 </div>
 </div></blockquote>
-<ol class="arabic simple" start="4">
+<ol class="arabic simple" start="2">
 <li><p>AIモデルのセッションを開始:</p></li>
 </ol>
 <blockquote>
@@ -194,7 +208,7 @@ iinfer<span class="w"> </span>-m<span class="w"> </span>client<span class="w"> <
 </pre></div>
 </div>
 </div></blockquote>
-<ol class="arabic simple" start="5">
+<ol class="arabic simple" start="3">
 <li><p>推論を実行:</p></li>
 </ol>
 <blockquote>
@@ -218,7 +232,7 @@ iinfer<span class="w"> </span>-m<span class="w"> </span>postprocess<span class="
 </pre></div>
 </div>
 </div></blockquote>
-<ol class="arabic simple" start="6">
+<ol class="arabic simple" start="4">
 <li><p>AIモデルのセッションを開放:</p></li>
 </ol>
 <blockquote>
@@ -227,28 +241,6 @@ iinfer<span class="w"> </span>-m<span class="w"> </span>client<span class="w"> <
 </pre></div>
 </div>
 </div></blockquote>
-<ol class="arabic simple" start="7">
-<li><p>サーバーの停止（Ubuntuの場合）:</p></li>
-</ol>
-<blockquote>
-<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Redisサーバーコンテナと推論処理を実行するサーバープロセスの停止</span>
-docker-compose<span class="w"> </span>down
-</pre></div>
-</div>
-</div></blockquote>
-<ol class="arabic simple" start="8">
-<li><p>サーバーの停止（Windowsの場合）:</p></li>
-</ol>
-<blockquote>
-<div><div class="highlight-bat notranslate"><div class="highlight"><pre><span></span><span class="c1">REM 推論処理を実行するサーバープロセスの停止</span>
-iinfer -m server -c stop -f
-
-<span class="c1">REM Redisサーバーコンテナの停止</span>
-iinfer -m redis -c docker_stop -f \
-                                --wsl_name <span class="p">&lt;</span>WSLのディストリビューションの名前<span class="p">&gt;</span> \
-                                --wsl_user <span class="p">&lt;</span>WSLのLinux内のDockerが使えるユーザー&gt;
-</pre></div>
-</div>
 </div></blockquote>
 </section>
 <section id="id4">
@@ -323,7 +315,7 @@ wsl --import Ubuntu_docker-20.04 Ubuntu_docker-20.04 Ubuntu_wsl2_docker-20.04.ta
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="../index.html" class="btn btn-neutral float-left" title="iinfer (Image Inference Application)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="command.html" class="btn btn-neutral float-right" title="コマンドリファレンス" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="gui.html" class="btn btn-neutral float-right" title="GUIモード" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

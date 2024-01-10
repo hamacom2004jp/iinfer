@@ -11,6 +11,7 @@ iinfer (Image Inference Application)
    :maxdepth: 2
 
    iinferの概要 <docs/overview.rst>
+   GUIモード <docs/gui.rst>
    コマンドリファレンス <docs/command.rst>
    動作確認済みモデル <docs/models.rst>
    カスタマイズ <docs/customize.rst>

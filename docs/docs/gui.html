@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="jp" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GUIモード &mdash; iinfer 2024/01/10 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=722a83d5"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="コマンドリファレンス" href="command.html" />
+    <link rel="prev" title="iinferの概要" href="overview.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            iinfer
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">iinferの概要</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">GUIモード</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#id1">GUIモードのチュートリアル</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id2">メイン画面</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id3">コマンド画面</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id5">パイプライン画面</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="command.html">コマンドリファレンス</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">動作確認済みモデル</a></li>
+<li class="toctree-l1"><a class="reference internal" href="customize.html">カスタマイズ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developer.html">開発者向け情報</a></li>
+<li class="toctree-l1"><a class="reference internal" href="errors.html">よくあるエラー</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">ライセンス</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">iinfer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">GUIモード</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/docs/gui.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="gui">
+<h1>GUIモード<a class="headerlink" href="#gui" title="Link to this heading"></a></h1>
+<ul class="simple">
+<li><p>iinferのGUIモードを使用することで、AIモデルを簡単に実行することが出来ます。</p></li>
+<li><p>iinferのコマンドを、後で簡単に実行できるように、登録しておくことが出来ます。</p></li>
+<li><p>登録しおいたコマンドは、一連の処理をパイプライン処理として登録することが出来ます。</p></li>
+<li><p>GUIモードは <cite>iinfer -m gui -c start</cite> コマンドで起動出来ます。</p></li>
+</ul>
+<section id="id1">
+<h2>GUIモードのチュートリアル<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<section id="id2">
+<h3>メイン画面<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<img alt="../_images/00100_main.jpg" src="../_images/00100_main.jpg" />
+<ol class="arabic simple">
+<li><p>起動直後の画面です。</p></li>
+<li><p><strong>Commands</strong> では、iinferのコマンドを任意のオプションで登録できます。</p></li>
+<li><p><strong>Pipeline</strong> では、 <strong>Commands</strong> で設定したコマンドを、順に実行させるような登録が出来ます。</p></li>
+</ol>
+</section>
+<section id="id3">
+<h3>コマンド画面<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<img alt="../_images/00200_cmd.jpg" src="../_images/00200_cmd.jpg" />
+<ol class="arabic simple">
+<li><p><strong>Commands</strong> の <strong>[ + ]</strong> ボタンを押すと、新しいコマンドを設定する画面を表示します。</p></li>
+<li><p><strong>title</strong> には、コマンドのタイトルを設定します。このタイトルは、登録したコマンドを一意に識別するのに使用します。</p></li>
+</ol>
+<img alt="../_images/00210_cmd_deploy.jpg" src="../_images/00210_cmd_deploy.jpg" />
+<ol class="arabic simple">
+<li><p><strong>mode</strong> には、iinferオプションのモードを設定します。</p></li>
+</ol>
+<img alt="../_images/00211_cmd_deploy.jpg" src="../_images/00211_cmd_deploy.jpg" />
+<ol class="arabic simple">
+<li><p><strong>command</strong> には、iinferオプションのコマンドを設定します。</p></li>
+<li><p>ここでは、AIモデルのデプロイを行う <strong>deploy</strong> コマンドを設定しています。</p></li>
+</ol>
+<img alt="../_images/00212_cmd_deploy.jpg" src="../_images/00212_cmd_deploy.jpg" />
+<ol class="arabic simple">
+<li><p><strong>command</strong> を選択すると、使用可能なオプションの入力フォームが表示されます。</p></li>
+<li><p>各オプションの説明は、 <a class="reference external" href="https://hamacom2004jp.github.io/iinfer/docs/command.html">コマンドリファレンス</a> を参照してください。</p></li>
+<li><p><strong>[ + ]</strong> ボタンを押すと、オプションの入力フォームを追加できます。</p></li>
+<li><p><strong>file</strong> ボタンを押すと、ファイル選択ダイアログが表示され、ファイルを選択できます。</p></li>
+<li><p><strong>ごみばこ</strong> ボタンを押すと、オプションの入力フォームを削除できます。</p></li>
+<li><p><strong>[ advanced options ]</strong> を押すと、非表示にしているオプションの入力フォームを表示します。</p></li>
+<li><p><strong>Raw</strong> ボタンを押すと、入力したオプションを、コマンドラインオプションの表記でどうなるか確認できます。</p></li>
+<li><p><strong>Save</strong> ボタンを押すと、コマンドを登録します。</p></li>
+<li><p><strong>Execute</strong> ボタンを押すと、コマンドを実行します。</p></li>
+</ol>
+<img alt="../_images/00214_cmd_deploy.jpg" src="../_images/00214_cmd_deploy.jpg" />
+<ol class="arabic simple">
+<li><p>コマンド実行した結果です。</p></li>
+<li><p><strong>deploy</strong> コマンドを実行したので、処理が成功したことが表示されました。</p></li>
+</ol>
+<img alt="../_images/00220_cmd_deploy_list.jpg" src="../_images/00220_cmd_deploy_list.jpg" />
+<ol class="arabic simple">
+<li><p>登録されているAIモデル一覧を表示する <strong>deploy_list</strong> コマンドを登録して実行します。</p></li>
+</ol>
+<img alt="../_images/00221_cmd_deploy_list.jpg" src="../_images/00221_cmd_deploy_list.jpg" />
+<ol class="arabic simple">
+<li><p>登録したAIモデルが表示されました。</p></li>
+</ol>
+<img alt="../_images/00230_cmd_start.jpg" src="../_images/00230_cmd_start.jpg" />
+<ol class="arabic simple">
+<li><p>登録したAIモデルのセッションを開始する <strong>start</strong> コマンドを登録して実行します。</p></li>
+</ol>
+<img alt="../_images/00231_cmd_start.jpg" src="../_images/00231_cmd_start.jpg" />
+<ol class="arabic simple">
+<li><p>AIモデルのセッションが開始できました。</p></li>
+</ol>
+<img alt="../_images/00240_cmd_predict.jpg" src="../_images/00240_cmd_predict.jpg" />
+<ol class="arabic simple">
+<li><p>セッションを使用して、推論を実行する <strong>predict</strong> コマンドを登録して実行します。</p></li>
+</ol>
+<img alt="../_images/00241_cmd_predict.jpg" src="../_images/00241_cmd_predict.jpg" />
+<ol class="arabic simple">
+<li><p>推論が成功すると、推論結果が表示されます。</p></li>
+<li><p>サムネイルをクリックすると、拡大表示します。</p></li>
+</ol>
+<img alt="../_images/00242_cmd_predict.jpg" src="../_images/00242_cmd_predict.jpg" />
+<ol class="arabic simple">
+<li><p>可視化画像を生成するオプションが有効な場合、このように推論結果が可視化されます。</p></li>
+</ol>
+<img alt="../_images/00243_cmd_predict.jpg" src="../_images/00243_cmd_predict.jpg" />
+<ol class="arabic simple">
+<li><p>可視化画像のオプションは <strong>nodraw</strong> が <strong>False</strong> の場合に有効です。</p></li>
+<li><p>ここでは、後処理の設定のために、 <strong>nodraw</strong> を <strong>True</strong> にしました。</p></li>
+</ol>
+<img alt="../_images/00250_cmd_det_filter.jpg" src="../_images/00250_cmd_det_filter.jpg" />
+<ol class="arabic simple">
+<li><p>後処理の <strong>det_filter</strong> コマンドを登録して実行します。</p></li>
+<li><p>ここでは、クラススコアが <strong>0.9</strong> 以上の <strong>dog</strong> のみを検出するように設定しました。</p></li>
+</ol>
+<img alt="../_images/00251_cmd_det_filter.jpg" src="../_images/00251_cmd_det_filter.jpg" />
+<ol class="arabic simple">
+<li><p>後処理が成功すると、結果が表示されます。</p></li>
+<li><p>サムネイルをクリックすると、拡大表示します。</p></li>
+</ol>
+<img alt="../_images/00252_cmd_det_filter.jpg" src="../_images/00252_cmd_det_filter.jpg" />
+<ol class="arabic simple">
+<li><p><strong>dog</strong> だけが検出されていることが確認できます。</p></li>
+</ol>
+<img alt="../_images/00260_cmd_stop.jpg" src="../_images/00260_cmd_stop.jpg" />
+<ol class="arabic simple">
+<li><p>一旦セッションを終了する <strong>stop</strong> コマンドを登録して実行します。</p></li>
+</ol>
+</section>
+<section id="id5">
+<h3>パイプライン画面<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<img alt="../_images/00300_pipe.jpg" src="../_images/00300_pipe.jpg" />
+<ol class="arabic simple">
+<li><p><strong>Pipeline</strong> の <strong>[ + ]</strong> ボタンを押すと、新しいパイプラインを設定する画面を表示します。</p></li>
+<li><p><strong>title</strong> には、パイプラインのタイトルを設定します。このタイトルは、登録したパイプラインを一意に識別するのに使用します。</p></li>
+<li><p><strong>descliption</strong> には、パイプラインの説明を設定します。</p></li>
+</ol>
+<img alt="../_images/00310_pipe.jpg" src="../_images/00310_pipe.jpg" />
+<ol class="arabic simple">
+<li><p>最初に実行するコマンドを選択します。</p></li>
+<li><p>ここでは、 <strong>start</strong> コマンドを選択しました。</p></li>
+<li><p>続けて <strong>[ + ]</strong> ボタンを押すと、次に実行するコマンドを選択できます。</p></li>
+</ol>
+<img alt="../_images/00311_pipe.jpg" src="../_images/00311_pipe.jpg" />
+<ol class="arabic simple">
+<li><p>startから推論して後処理してstopするパイプラインを設定しました。</p></li>
+<li><p><strong>Execute</strong> で実行してみます。</p></li>
+</ol>
+<img alt="../_images/00312_pipe.jpg" src="../_images/00312_pipe.jpg" />
+<ol class="arabic simple">
+<li><p>パイプラインで設定したコマンドを順に実行した結果が表示されます。</p></li>
+<li><p>guiモードでのパイプライン設定は、各コマンドのファイル入出力オプションを使用して、パイプラインを流れるデータを設定することになります。</p></li>
+<li><p>コマンドラインモードでは、標準入出力をパイプ「|」でつないでいくことで、パイプライン構成することが出来ます。</p></li>
+</ol>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="overview.html" class="btn btn-neutral float-left" title="iinferの概要" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="command.html" class="btn btn-neutral float-right" title="コマンドリファレンス" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright (c) 2023-2024 hamacom2004jp All Rights Reserved..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

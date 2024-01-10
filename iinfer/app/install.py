@@ -49,7 +49,7 @@ class Install(object):
             text = text.replace('#{INSTALL_MMDET}', f'RUN iinfer -m install -c mmdet --data /home/{user}/.iinfer' if install_mmdet else '')
             text = text.replace('#{INSTALL_MMCLS}', f'RUN iinfer -m install -c mmcls --data /home/{user}/.iinfer' if install_mmcls else '')
             text = text.replace('#{INSTALL_MMPRETRAIN}', f'RUN iinfer -m install -c mmpretrain --data /home/{user}/.iinfer' if install_mmpretrain else '')
-            text = text.replace('#{INSTALL_MMROTATE}', f'RUN iinfer -m install -c mmrotate --data /home/{user}/.iinfer' if install_mmrotate else '')
+            text = text.replace('#{INSTALL_MMROTATE}', f'RUN iinfer -m install -c install_mmrotate --data /home/{user}/.iinfer' if install_mmrotate else '')
             fp.write(text)
         with open('docker-compose.yml', 'w', encoding='utf-8') as fp:
             text = read_text(f'{common.APP_ID}.docker', 'docker-compose.yml')
