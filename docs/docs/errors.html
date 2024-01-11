@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>よくあるエラー &mdash; iinfer 2024/01/10 documentation</title>
+  <title>よくあるエラー &mdash; iinfer 2024/01/11 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -16,7 +16,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=722a83d5"></script>
+        <script src="../_static/documentation_options.js?v=d65207cc"></script>
         <script src="../_static/doctools.js?v=888ff710"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -110,10 +110,20 @@
 <td><p>現在のディレクトリにmmpretrainが既に存在したり、データディレクトリ「~/.iinfer/」にmmpretrainが存在する</p></td>
 <td><p>mmpretrainのディレクトリを削除</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>iinfer -m install -c &lt;mm系&gt;</cite></p></td>
+<tr class="row-odd"><td><p><cite>iinfer -m install -c mmrotate</cite></p></td>
+<td><p>shutil.Error ...</p></td>
+<td><p>現在のディレクトリにmmrotateが既に存在したり、データディレクトリ「~/.iinfer/」にmmrotateが存在する</p></td>
+<td><p>mmrotateのディレクトリを削除</p></td>
+</tr>
+<tr class="row-even"><td><p><cite>iinfer -m install -c &lt;mm系&gt;</cite></p></td>
 <td><p>Failed to uninstall mmcv</p></td>
 <td><p>mmdet又はmmpretrainのモデルが起動中</p></td>
 <td><p><cite>iinfer -m server</cite> で起動したサーバープロセスを停止</p></td>
+</tr>
+<tr class="row-odd"><td><p><cite>iinfer -m install -c &lt;mm系&gt;</cite></p></td>
+<td><p>fatal: unable to access '<a class="reference external" href="https://github.com/open-mmlab/mmpretrain.git/">https://github.com/open-mmlab/mmpretrain.git/</a>': Could not resolve host: github.com</p></td>
+<td><p><a href="#id2"><span class="problematic" id="id3">`</span></a>ping github.com`コマンドなどで名前解決できるか確認。できたら <a href="#id4"><span class="problematic" id="id5">`</span></a>iinfer -m install -c &lt;mm系&gt;`を再実行</p></td>
+<td></td>
 </tr>
 <tr class="row-even"><td><p><cite>iinfer -m client -c start -n &lt;model_name&gt;</cite></p></td>
 <td><p>Failed to create session: No module named 'mmdet'</p></td>
@@ -124,6 +134,11 @@
 <td><p>Failed to create session: No module named 'mmpretrain'</p></td>
 <td><p>mmpretrainがインストールされていません</p></td>
 <td><p><cite>iinfer -m install -c mmpretrain</cite></p></td>
+</tr>
+<tr class="row-even"><td><p><cite>iinfer -m client -c start -n &lt;model_name&gt;</cite></p></td>
+<td><p>Failed to create session: No module named 'mmrotate'</p></td>
+<td><p>mmrotateがインストールされていません</p></td>
+<td><p><cite>iinfer -m install -c mmrotate</cite></p></td>
 </tr>
 </tbody>
 </table>
