@@ -14,7 +14,7 @@ services:
     restart: always
 
   iinfer_server:
-    image: hamacom/iinfer:${VERSION}
+    image: hamacom/iinfer:${VERSION}${TAG_NAME}
     container_name: iinfer_server
     environment:
       TZ: Asia/Tokyo

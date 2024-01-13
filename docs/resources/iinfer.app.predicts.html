@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>iinfer.app.predicts package &mdash; iinfer 2024/01/11 documentation</title>
+  <title>iinfer.app.predicts package &mdash; iinfer 2024/01/13 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -16,7 +16,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=d65207cc"></script>
+        <script src="../_static/documentation_options.js?v=45d209bf"></script>
         <script src="../_static/doctools.js?v=888ff710"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -321,6 +321,155 @@ return dict(output_boxes=final_boxes, output_scores=final_scores, output_classes
 <dt class="sig sig-object py" id="iinfer.app.predicts.mmpretrain_cls_swin_Lite.MMPretrainClsSwinLite">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">iinfer.app.predicts.mmpretrain_cls_swin_Lite.</span></span><span class="sig-name descname"><span class="pre">MMPretrainClsSwinLite</span></span><a class="reference internal" href="../_modules/iinfer/app/predicts/mmpretrain_cls_swin_Lite.html#MMPretrainClsSwinLite"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.mmpretrain_cls_swin_Lite.MMPretrainClsSwinLite" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#iinfer.app.predicts.mmpretrain_cls_swin.MMPretrainClsSwin" title="iinfer.app.predicts.mmpretrain_cls_swin.MMPretrainClsSwin"><code class="xref py py-class docutils literal notranslate"><span class="pre">MMPretrainClsSwin</span></code></a></p>
+</dd></dl>
+
+</section>
+<section id="module-iinfer.app.predicts.mmrotate_det_ReDet">
+<span id="iinfer-app-predicts-mmrotate-det-redet-module"></span><h2>iinfer.app.predicts.mmrotate_det_ReDet module<a class="headerlink" href="#module-iinfer.app.predicts.mmrotate_det_ReDet" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="iinfer.app.predicts.mmrotate_det_ReDet.MMRotateReDet">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">iinfer.app.predicts.mmrotate_det_ReDet.</span></span><span class="sig-name descname"><span class="pre">MMRotateReDet</span></span><a class="reference internal" href="../_modules/iinfer/app/predicts/mmrotate_det_ReDet.html#MMRotateReDet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.mmrotate_det_ReDet.MMRotateReDet" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="iinfer.app.html#iinfer.app.predict.Predict" title="iinfer.app.predict.Predict"><code class="xref py py-class docutils literal notranslate"><span class="pre">Predict</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.predicts.mmrotate_det_ReDet.MMRotateReDet.create_session">
+<span class="sig-name descname"><span class="pre">create_session</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_conf_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_provider</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gpu_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/mmrotate_det_ReDet.html#MMRotateReDet.create_session"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.mmrotate_det_ReDet.MMRotateReDet.create_session" title="Link to this definition"></a></dt>
+<dd><p>推論セッションを作成する関数です。
+startコマンド実行時に呼び出されます。
+この関数内でAIモデルのロードを行い、推論準備を完了するようにしてください。
+戻り値の推論セッションの型は問いません。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>logger</strong> (<em>logging.Logger</em>) -- ロガー</p></li>
+<li><p><strong>model_path</strong> (<em>Path</em>) -- モデルファイルのパス</p></li>
+<li><p><strong>model_conf_path</strong> (<em>Path</em>) -- モデル設定ファイルのパス</p></li>
+<li><p><strong>gpu_id</strong> (<em>int</em><em>, </em><em>optional</em>) -- GPU ID. Defaults to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>推論セッション</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.predicts.mmrotate_det_ReDet.MMRotateReDet.multiclass_nms">
+<span class="sig-name descname"><span class="pre">multiclass_nms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">boxes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nms_thr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">score_thr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/mmrotate_det_ReDet.html#MMRotateReDet.multiclass_nms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.mmrotate_det_ReDet.MMRotateReDet.multiclass_nms" title="Link to this definition"></a></dt>
+<dd><p>多クラスのNon-Maximum Suppression（NMS）を実行し、結果を返す関数です。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>boxes</strong> (<em>numpy.ndarray</em>) -- バウンディングボックスの座標情報が格納された配列</p></li>
+<li><p><strong>scores</strong> (<em>numpy.ndarray</em>) -- 各バウンディングボックスのクラススコアが格納された配列</p></li>
+<li><p><strong>nms_thr</strong> (<em>float</em>) -- NMSの閾値</p></li>
+<li><p><strong>score_thr</strong> (<em>float</em>) -- スコアの閾値</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>NMSを実行した結果のバウンディングボックスとスコアの配列</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.predicts.mmrotate_det_ReDet.MMRotateReDet.nms">
+<span class="sig-name descname"><span class="pre">nms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">boxes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nms_thr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/mmrotate_det_ReDet.html#MMRotateReDet.nms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.mmrotate_det_ReDet.MMRotateReDet.nms" title="Link to this definition"></a></dt>
+<dd><p>Non-Maximum Suppression (NMS)を実行し、重複するボックスを削除します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>boxes</strong> (<em>numpy.ndarray</em>) -- ボックスの座標情報を含む2次元配列。</p></li>
+<li><p><strong>scores</strong> (<em>numpy.ndarray</em>) -- ボックスのスコアを含む1次元配列。</p></li>
+<li><p><strong>nms_thr</strong> (<em>float</em>) -- NMSの閾値。</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>NMSを通過したボックスのインデックスのリスト。</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>keep (list)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.predicts.mmrotate_det_ReDet.MMRotateReDet.postprocess">
+<span class="sig-name descname"><span class="pre">postprocess</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">outputs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p6</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/mmrotate_det_ReDet.html#MMRotateReDet.postprocess"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.mmrotate_det_ReDet.MMRotateReDet.postprocess" title="Link to this definition"></a></dt>
+<dd><p>推論結果を後処理する関数です。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>outputs</strong> (<em>numpy.ndarray</em>) -- 推論結果の配列</p></li>
+<li><p><strong>img_size</strong> (<em>tuple</em>) -- 入力画像のサイズ (height, width)</p></li>
+<li><p><strong>p6</strong> (<em>bool</em><em>, </em><em>optional</em>) -- P6モードのフラグ (デフォルトはFalse)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>後処理された推論結果の配列</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.predicts.mmrotate_det_ReDet.MMRotateReDet.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_height</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodraw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/mmrotate_det_ReDet.html#MMRotateReDet.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.mmrotate_det_ReDet.MMRotateReDet.predict" title="Link to this definition"></a></dt>
+<dd><p>予測を行う関数です。
+predictコマンドやcaptureコマンド実行時に呼び出されます。
+引数のimageはRGBですので、戻り値の出力画像もRGBにしてください。
+戻り値の推論結果のdictは、通常推論結果項目ごとに値(list)を設定します。
+例）Image Classification（EfficientNet_Lite4）の場合
+return dict(output_scores=output_scores, output_classes=output_classes), image_obj
+例）Object Detection（YoloX）の場合
+return dict(output_boxes=final_boxes, output_scores=final_scores, output_classes=final_cls_inds), output_image</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> -- 推論セッション</p></li>
+<li><p><strong>img_width</strong> (<em>int</em>) -- モデルのINPUTサイズ（画像の幅）</p></li>
+<li><p><strong>img_height</strong> (<em>int</em>) -- モデルのINPUTサイズ（画像の高さ）</p></li>
+<li><p><strong>image</strong> (<em>Image</em>) -- 入力画像（RGB配列であること）</p></li>
+<li><p><strong>labels</strong> (<em>List</em><em>[</em><em>str</em><em>]</em><em>, </em><em>optional</em>) -- クラスラベルのリスト. Defaults to None.</p></li>
+<li><p><strong>colors</strong> (<em>List</em><em>[</em><em>Tuple</em><em>[</em><em>int</em><em>]</em><em>]</em><em>, </em><em>optional</em>) -- ボックスの色のリスト. Defaults to None.</p></li>
+<li><p><strong>nodraw</strong> (<em>bool</em><em>, </em><em>optional</em>) -- 描画フラグ. Defaults to False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>予測結果と出力画像(RGB)のタプル</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[Dict[str, Any], Image]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.predicts.mmrotate_det_ReDet.MMRotateReDet.preprocess">
+<span class="sig-name descname"><span class="pre">preprocess</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">swap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(2,</span> <span class="pre">0,</span> <span class="pre">1)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/mmrotate_det_ReDet.html#MMRotateReDet.preprocess"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.mmrotate_det_ReDet.MMRotateReDet.preprocess" title="Link to this definition"></a></dt>
+<dd><p>画像を前処理する関数です。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>img</strong> (<em>numpy.ndarray</em>) -- 入力画像（BGR）</p></li>
+<li><p><strong>input_size</strong> (<em>tuple</em>) -- リサイズ後の画像サイズ</p></li>
+<li><p><strong>swap</strong> (<em>tuple</em><em>, </em><em>optional</em>) -- チャンネルの順番を変更するためのタプル (デフォルト値: (2, 0, 1))</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>前処理された画像
+float: リサイズ倍率</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </section>

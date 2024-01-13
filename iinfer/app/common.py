@@ -46,6 +46,16 @@ def load_config(mode:str) -> Tuple[logging.Logger, dict]:
 def default_json_enc(o) -> str:
     if isinstance(o, Path):
         return str(o)
+    if isinstance(o, np.ndarray):
+        return o.tolist()
+    if isinstance(o, np.float32):
+        return float(o)
+    if isinstance(o, np.int64):
+        return int(o)
+    if isinstance(o, np.intc):
+        return int(o)
+    if isinstance(o, Path):
+        return str(o)
     raise TypeError(f"Type {type(o)} not serializable")
 
 def saveopt(opt:dict, opt_path:Path) -> None:
@@ -143,7 +153,7 @@ def random_string(size:int=16):
     """
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=size))
 
-def print_format(data:dict, format:bool, tm:float, stdout:bool=True, tablefmt:str='github'):
+def print_format(data:dict, format:bool, tm:float, output_json:str=None, output_json_append:bool=False, stdout:bool=True, tablefmt:str='github'):
     """
     データを指定されたフォーマットで出力します。
 
@@ -151,6 +161,10 @@ def print_format(data:dict, format:bool, tm:float, stdout:bool=True, tablefmt:st
         data (dict): 出力するデータ
         format (bool): フォーマットするかどうか
         tm (float): 処理時間
+        output_json (str, optional): JSON形式で出力するファイルパス. Defaults to None.
+        output_json_append (bool, optional): JSON形式で出力するファイルパス. Defaults to False.
+        stdout (bool, optional): 標準出力に出力するかどうか. Defaults to True.
+        tablefmt (str, optional): テーブルのフォーマット. Defaults to 'github'.
     Returns:
         str: 生成された文字列
     """
@@ -173,7 +187,7 @@ def print_format(data:dict, format:bool, tm:float, stdout:bool=True, tablefmt:st
     else:
         try:
             if type(data) == dict:
-                txt = json.dumps(data, ensure_ascii=False)
+                txt = json.dumps(data, default=default_json_enc, ensure_ascii=False)
             else:
                 txt = data
         except:
@@ -183,6 +197,13 @@ def print_format(data:dict, format:bool, tm:float, stdout:bool=True, tablefmt:st
                 print(txt)
             except BrokenPipeError:
                 pass
+    if output_json is not None:
+        try:
+            with open(output_json, 'a' if output_json_append else 'w', encoding='utf-8') as f:
+                json.dump(data, f, default=default_json_enc, ensure_ascii=False)
+                print('', file=f)
+        except Exception as e:
+            pass
     return txt
 
 def load_custom_predict(custom_predict_py:Path) -> predict.Predict:

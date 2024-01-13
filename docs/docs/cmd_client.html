@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>コマンドリファレンス（clientモード） &mdash; iinfer 2024/01/11 documentation</title>
+  <title>コマンドリファレンス（clientモード） &mdash; iinfer 2024/01/13 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -16,7 +16,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=d65207cc"></script>
+        <script src="../_static/documentation_options.js?v=45d209bf"></script>
         <script src="../_static/doctools.js?v=888ff710"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -410,10 +410,10 @@
 </tr>
 <tr class="row-even"><td><p>--image_type &lt;推論対象の画像タイプ&gt;</p></td>
 <td></td>
-<td><p>推論させる画像のタイプを指定する。指定可能な画像タイプは <cite>bmp</cite> , <cite>png</cite> , <cite>jpeg</cite> , <cite>capture</cite></p></td>
+<td><p>推論させる画像のタイプを指定する。指定可能な画像タイプは <cite>bmp</cite> , <cite>png</cite> , <cite>jpeg</cite> , <cite>capture</cite> , <cite>output_json</cite></p></td>
 </tr>
-<tr class="row-odd"><td><p>-o,--output_file &lt;推論結果画像の保存先ファイル&gt;</p></td>
-<td><p>--stdinを指定した時〇</p></td>
+<tr class="row-odd"><td><p>-output_image &lt;推論結果画像の保存先ファイル&gt;</p></td>
+<td></td>
 <td><p>推論結果画像の保存先ファイルを指定する</p></td>
 </tr>
 <tr class="row-even"><td><p>-P,--output_preview</p></td>
@@ -473,6 +473,14 @@
 <tr class="row-even"><td><p>--output_preview</p></td>
 <td></td>
 <td><p>推論結果画像を <cite>cv2.imshow</cite> で表示する</p></td>
+</tr>
+<tr class="row-odd"><td><p>-o, -output_json &lt;処理結果jsonの保存先ファイル&gt;</p></td>
+<td></td>
+<td><p>このオプションは使用できません</p></td>
+</tr>
+<tr class="row-even"><td><p>-a, -output_json_append</p></td>
+<td></td>
+<td><p>このオプションは使用できません</p></td>
 </tr>
 </tbody>
 </table>

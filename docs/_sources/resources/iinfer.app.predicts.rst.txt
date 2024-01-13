@@ -36,6 +36,14 @@ iinfer.app.predicts.mmpretrain\_cls\_swin\_Lite module
    :undoc-members:
    :show-inheritance:
 
+iinfer.app.predicts.mmrotate\_det\_ReDet module
+-----------------------------------------------
+
+.. automodule:: iinfer.app.predicts.mmrotate_det_ReDet
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 iinfer.app.predicts.onnx\_cls\_EfficientNet\_Lite4 module
 ---------------------------------------------------------
 

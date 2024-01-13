@@ -80,6 +80,8 @@
     "--stdin","`--input_file` を指定しない場合〇","後処理させる推論結果を標準入力から読み込みます。"
     "--out_headers","","出力するヘッダーを指定します。複数指定できます。"
     "--noheader","","ヘッダー行の出力を行いません。"
+    "-o, -output_json <処理結果jsonの保存先ファイル>","","このオプションは使用できません"
+    "-a, -output_json_append","","このオプションは使用できません"
     "-f,--format","","このコマンドではこのオプションは無視されます。"
 
 後処理(HTTPリクエストの実行) : `iinfer -m postprocess -c httpreq <Option>`
@@ -95,3 +97,5 @@
     "--json_connectstr <URL>","〇","推論結果のJSONのPOST先URLを指定します。"
     "--img_connectstr <URL>","","推論結果の画像のPOST先URLを指定します。"
     "--fileup_name <パラメータ名>","","推論結果の画像をPOSTするときのパラメータ名を指定します。省略すると `file` が使用されます。"
+    "-o, -output_json <処理結果jsonの保存先ファイル>","","このオプションは使用できません"
+    "-a, -output_json_append","","このオプションは使用できません"

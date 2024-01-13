@@ -881,8 +881,14 @@ $(function(){
         // list型の結果をテーブルに変換
         list2table = function(data, table_head, table_body){
             $.each(data, function(i, row){
-                if(row['success'] && typeof row['success'] == "object"){
+                if(row['success'] && typeof row['success'] == "object" && !Array.isArray(row['success'])){
                     dict2table(row['success'], i==0?table_head:null, table_body, row['output_image']);
+                    return;
+                }
+                if(typeof row == 'string' || row instanceof String){
+                    tr = $('<tr></tr>');
+                    table_body.append(tr);
+                    tr.append($('<td>' + row + '</td>'));
                     return;
                 }
                 tr = $('<tr></tr>');
@@ -905,7 +911,7 @@ $(function(){
                         tr.append(td);
                         dict2table(val['success'], tbl.find('thead'), tbl.find('tbody'));
                     }
-                    else if(val && Array.isArray(val)){
+                    else if(val && Array.isArray(val) && val.length > 0 && typeof val[0] == "object"){
                         tbl = mk_table_func()
                         td = $('<td></td>');
                         td.append(tbl);

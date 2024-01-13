@@ -63,11 +63,13 @@ def _main(args_list:list=None):
                         choices=['CPUExecutionProvider','CUDAExecutionProvider','TensorrtExecutionProvider'], default='CPUExecutionProvider')
     parser.add_argument('--gpuid', help='Setting the cmd start gpuid.', type=int, default=None)
     parser.add_argument('-i', '--input_file', help='Setting the cmd input file.', default=None)
-    parser.add_argument('-o', '--output_file', help='Setting the cmd output file.', default=None)
+    parser.add_argument('--output_image', help='Setting the cmd output image file.', default=None)
+    parser.add_argument('-o', '--output_json', help='Setting the cmd output json file.', default=None)
+    parser.add_argument('-a', '--output_json_append', help='Setting append the cmd output json file.', action='store_true')
     parser.add_argument('-P', '--output_preview', help='Setting the output preview.', action='store_true')
     parser.add_argument('--stdin', help='Setting the cmd stdin.', action='store_true')
     parser.add_argument('--nodraw', help='Setting the cmd predict nodraw.', action='store_true')
-    parser.add_argument('--image_type', help='Setting the cmd predict image type.', choices=['bmp', 'png', 'jpeg', 'capture'], default='jpeg')
+    parser.add_argument('--image_type', help='Setting the cmd predict image type.', choices=['bmp', 'png', 'jpeg', 'capture', 'output_json'], default='jpeg')
     parser.add_argument('--wsl_name', help='WSL distribution name.')
     parser.add_argument('--wsl_user', help='WSL distribution user.')
     parser.add_argument('-d', '--capture_device', help='Setting the capture input device. device id, video file, rtsp url.', default='0')
@@ -105,6 +107,7 @@ def _main(args_list:list=None):
     parser.add_argument('--install_mmcls', help='Setting the install server install_mmcls.', action='store_true')
     parser.add_argument('--install_mmpretrain', help='Setting the install server install_mmpretrain.', action='store_true')
     parser.add_argument('--install_mmrotate', help='Setting the install server install_mmrotate.', action='store_true')
+    parser.add_argument('--install_tag', help='Setting the install server install_tag.', type=str, default=None)
 
     argcomplete.autocomplete(parser)
     if args_list is not None:
@@ -136,7 +139,9 @@ def _main(args_list:list=None):
     model_provider = common.getopt(opt, 'model_provider', preval=args_dict, withset=True)
     gpuid = common.getopt(opt, 'gpuid', preval=args_dict, withset=True)
     input_file = common.getopt(opt, 'input_file', preval=args_dict, withset=True)
-    output_file = common.getopt(opt, 'output_file', preval=args_dict, withset=True)
+    output_image = common.getopt(opt, 'output_image', preval=args_dict, withset=True)
+    output_json = common.getopt(opt, 'output_json', preval=args_dict, withset=True)
+    output_json_append = common.getopt(opt, 'output_json_append', preval=args_dict, withset=True)
     output_preview = common.getopt(opt, 'output_preview', preval=args_dict, withset=True)
     stdin = common.getopt(opt, 'stdin', preval=args_dict, withset=True)
     nodraw = common.getopt(opt, 'nodraw', preval=args_dict, withset=True)
@@ -182,6 +187,7 @@ def _main(args_list:list=None):
     install_mmcls = common.getopt(opt, 'install_mmcls', preval=args_dict, withset=True)
     install_mmpretrain = common.getopt(opt, 'install_mmpretrain', preval=args_dict, withset=True)
     install_mmrotate = common.getopt(opt, 'install_mmrotate', preval=args_dict, withset=True)
+    install_tag = common.getopt(opt, 'install_tag', preval=args_dict, withset=True)
 
     tm = time.time()
     ret = {"success":f"Start command. {args}"}
@@ -189,46 +195,46 @@ def _main(args_list:list=None):
     if args.saveopt:
         if args.useopt is None:
             msg = {"warn":f"Please specify the --useopt option."}
-            common.print_format(msg, format, tm)
+            common.print_format(msg, format, tm, output_json, output_json_append)
             return 1, msg
         common.saveopt(opt, args.useopt)
         ret = {"success":f"Save options file. {args.useopt}"}
 
     if args.version:
-        common.print_format(version.__description__, False, tm)
+        common.print_format(version.__description__, False, tm, None, False)
         return 0, version.__description__
     elif mode == 'server':
         logger, _ = common.load_config(mode)
         if cmd == 'start':
             if data is None:
                 msg = {"warn":f"Please specify the --data option."}
-                common.print_format(msg, format, tm)
+                common.print_format(msg, format, tm, output_json, output_json_append)
                 return 1, msg
             if svname is None:
                 msg = {"warn":f"Please specify the --svname option."}
-                common.print_format(msg, format, tm)
+                common.print_format(msg, format, tm, output_json, output_json_append)
                 return 1, msg
             sv = server.Server(Path(data), logger, redis_host=host, redis_port=port, redis_password=password, svname=svname)
             sv.start_server()
         elif cmd == 'stop':
             if svname is None:
                 msg = {"warn":f"Please specify the --svname option."}
-                common.print_format(msg, format, tm)
+                common.print_format(msg, format, tm, output_json, output_json_append)
                 return 1, msg
             cl = client.Client(logger, redis_host=host, redis_port=port, redis_password=password, svname=svname)
             ret = cl.stop_server(timeout=timeout)
-            common.print_format(ret, format, tm)
+            common.print_format(msg, format, tm, output_json, output_json_append)
             if 'success' not in ret:
                 return 1, ret
         elif cmd == 'list':
             sv = server.Server(Path(data), logger, redis_host=host, redis_port=port, redis_password=password, svname='server') # list取得なのでデフォルトのsvnameを指定
             ret = sv.list_server()
-            common.print_format(ret, format, tm)
+            common.print_format(msg, format, tm, output_json, output_json_append)
             if 'success' not in ret:
                 return 1, ret
         else:
             msg = {"warn":f"Unkown command."}
-            common.print_format(msg, format, tm)
+            common.print_format(msg, format, tm, output_json, output_json_append)
             return 1, msg
 
     elif mode == 'gui':
@@ -236,23 +242,23 @@ def _main(args_list:list=None):
         if cmd == 'start':
             if data is None:
                 msg = {"warn":f"Please specify the --data option."}
-                common.print_format(msg, format, tm)
+                common.print_format(msg, format, tm, output_json, output_json_append)
                 return 1, msg
             web = gui.Web(logger, Path(data))
             web.start()
             msg = {"success":"eel web complate."}
-            common.print_format(msg, format, tm)
+            common.print_format(msg, format, tm, output_json, output_json_append)
             return 0, msg
         else:
             msg = {"warn":f"Unkown command."}
-            common.print_format(msg, format, tm)
+            common.print_format(msg, format, tm, output_json, output_json_append)
             return 1, msg
 
     elif mode == 'client':
         logger, _ = common.load_config(mode)
         if svname is None:
             msg = {"warn":f"Please specify the --svname option."}
-            common.print_format(msg, format, tm)
+            common.print_format(msg, format, tm, output_json, output_json_append)
             return 1, msg
         cl = client.Client(logger, redis_host=host, redis_port=port, redis_password=password, svname=svname)
         if cmd == 'deploy':
@@ -264,74 +270,69 @@ def _main(args_list:list=None):
             color_file = Path(color_file) if color_file is not None else None
             ret = cl.deploy(name, model_img_width, model_img_height, model_file, model_conf_file, predict_type, custom_predict_py,
                             label_file=label_file, color_file=color_file, overwrite=overwrite, timeout=timeout)
-            common.print_format(ret, format, tm)
+            common.print_format(ret, format, tm, output_json, output_json_append)
             if 'success' not in ret:
                 return 1, ret
 
         elif cmd == 'deploy_list':
             ret = cl.deploy_list(timeout=timeout)
-            common.print_format(ret, format, tm)
+            common.print_format(ret, format, tm, output_json, output_json_append)
             if 'success' not in ret:
                 return 1, ret
 
         elif cmd == 'undeploy':
             ret = cl.undeploy(name, timeout=timeout)
-            common.print_format(ret, format, tm)
+            common.print_format(ret, format, tm, output_json, output_json_append)
             if 'success' not in ret:
                 return 1, ret
 
         elif cmd == 'start':
             ret = cl.start(name, model_provider=model_provider, use_track=use_track, gpuid=gpuid, timeout=timeout)
-            common.print_format(ret, format, tm)
+            common.print_format(ret, format, tm, output_json, output_json_append)
             if 'success' not in ret:
                 return 1, ret
 
         elif cmd == 'stop':
             ret = cl.stop(name, timeout=timeout)
-            common.print_format(ret, format, tm)
+            common.print_format(ret, format, tm, output_json, output_json_append)
             if 'success' not in ret:
                 return 1, ret
 
         elif cmd == 'predict':
             if input_file is not None:
-                ret = cl.predict(name, image_file=Path(input_file), image_type=image_type, output_image_file=output_file, output_preview=output_preview, nodraw=nodraw, timeout=timeout)
+                ret = cl.predict(name, image_file=Path(input_file), image_type=image_type, output_image_file=output_image, output_preview=output_preview, nodraw=nodraw, timeout=timeout)
                 if type(ret) is list:
                     for r in ret:
-                        common.print_format(r, format, tm)
+                        common.print_format(r, format, tm, output_json, output_json_append)
+                        tm = time.time()
+                        output_json_append = True
                 else:
-                    common.print_format(ret, format, tm)
+                    common.print_format(ret, format, tm, output_json, output_json_append)
             elif stdin:
                 if image_type is None:
                     msg = {"warn":f"Please specify the --image_type option."}
-                    common.print_format(msg, format, tm)
+                    common.print_format(msg, format, tm, output_json, output_json_append)
                     return 1, msg
                 if image_type == 'capture':
                     for line in sys.stdin:
-                        ret = cl.predict(name, image=line, image_type=image_type, output_image_file=output_file, output_preview=output_preview, nodraw=nodraw, timeout=timeout)
-                        common.print_format(ret, format, tm)
+                        ret = cl.predict(name, image=line, image_type=image_type, output_image_file=output_image, output_preview=output_preview, nodraw=nodraw, timeout=timeout)
+                        common.print_format(ret, format, tm, output_json, output_json_append)
                         tm = time.time()
+                        output_json_append = True
                 else:
-                    ret = cl.predict(name, image=sys.stdin.buffer.read(), image_type=image_type, output_image_file=output_file, output_preview=output_preview, nodraw=nodraw, timeout=timeout)
-                    common.print_format(ret, format, tm)
+                    ret = cl.predict(name, image=sys.stdin.buffer.read(), image_type=image_type, output_image_file=output_image, output_preview=output_preview, nodraw=nodraw, timeout=timeout)
+                    common.print_format(ret, format, tm, output_json, output_json_append)
                     tm = time.time()
             else:
                 msg = {"warn":f"Image file or stdin is empty."}
-                common.print_format(msg, format, tm)
+                common.print_format(msg, format, tm, output_json, output_json_append)
                 return 1, msg
 
         elif cmd == 'predict_type_list':
             type_list = [dict(predict_type=key, site=val['site'], image_width=val['image_width'], image_height=val['image_height'], use_model_conf=val['use_model_conf']) for key,val in common.BASE_MODELS.items()]
             type_list.append(dict(predict_type='Custom', site='Custom', image_width=None, image_height=None))
-            common.print_format(type_list, format, tm)
             ret = type_list
-
-        #elif cmd == 'capture_predict':
-        #    for ret in cl.capture_predict(name, output_image_file=output_image_file, timeout=timeout,
-        #                         capture_device=capture_device, capture_frame_width=capture_frame_width, capture_frame_height=capture_frame_height,
-        #                         capture_fps=capture_fps, capture_output_fps=capture_output_fps,
-        #                         output_preview=output_preview):
-        #        common.print_format(ret, format, tm)
-        #        tm = time.time()
+            common.print_format(ret, format, tm, output_json, output_json_append)
 
         elif cmd == 'capture':
             count = 0
@@ -339,7 +340,7 @@ def _main(args_list:list=None):
                                  capture_frame_width=capture_frame_width, capture_frame_height=capture_frame_height, capture_fps=capture_fps,
                                  output_preview=output_preview):
                 ret = f"{t},"+b64+f",{h},{w},{c}"
-                common.print_format(ret, False, tm)
+                common.print_format(ret, False, tm, None, False)
                 tm = time.time()
                 count += 1
                 if capture_count > 0 and count >= capture_count:
@@ -347,37 +348,39 @@ def _main(args_list:list=None):
 
         else:
             msg = {"warn":f"Unkown command."}
-            common.print_format(msg, format, tm)
+            common.print_format(msg, format, tm, output_json, output_json_append)
             return 1, msg
 
     elif mode == 'postprocess':
         logger, _ = common.load_config(mode)
-        def _to_proc(f, proc:postprocess.Postprocess, json_connectstr, img_connectstr, text_connectstr, timeout, format, tm):
-            for line in f:
+        def _to_proc(f, proc:postprocess.Postprocess, json_connectstr, img_connectstr, text_connectstr, timeout, format, tm, output_json, output_json_append):
+            lines = f.readlines()
+            for line in lines:
                 line = line.rstrip()
                 if line == "":
                     continue
                 try:
                     json_session, img_session, text_session = proc.create_session(json_connectstr, img_connectstr, text_connectstr)
                     ret = proc.postprocess(json_session, img_session, text_session, line, timeout=timeout)
-                    common.print_format(ret, format, tm)
+                    common.print_format(ret, format, tm, output_json, output_json_append)
                 except Exception as e:
                     msg = {"warn":f"Invalid input. {e}"}
-                    common.print_format(msg, format, tm)
+                    common.print_format(msg, format, tm, output_json, output_json_append)
                     ret = msg
                 tm = time.time()
+                output_json_append = True
             return ret
 
         if cmd == 'det_filter':
             proc = det_filter.DetFilter(logger, score_th=score_th, width_th=width_th, height_th=height_th, classes=classes, labels=labels, nodraw=nodraw, output_preview=output_preview)
             if input_file is not None:
                 with open(input_file, 'r', encoding="UTF-8") as f:
-                    ret = _to_proc(f, proc, json_connectstr, img_connectstr, None, timeout, format, tm)
+                    ret = _to_proc(f, proc, json_connectstr, img_connectstr, None, timeout, format, tm, output_json, output_json_append)
             elif stdin:
-                ret = _to_proc(sys.stdin, proc, json_connectstr, img_connectstr, None, timeout, format, tm)
+                ret = _to_proc(sys.stdin, proc, json_connectstr, img_connectstr, None, timeout, format, tm, output_json, output_json_append)
             else:
                 msg = {"warn":f"Image file or stdin is empty."}
-                common.print_format(msg, format, tm)
+                common.print_format(msg, format, tm, output_json, output_json_append)
                 return 1, msg
 
         elif cmd == 'det_jadge':
@@ -388,16 +391,16 @@ def _main(args_list:list=None):
                                         nodraw=nodraw, output_preview=output_preview)
             except Exception as e:
                 msg = {"warn":f"Invalid options. {e}"}
-                common.print_format(msg, format, tm)
+                common.print_format(msg, format, tm, output_json, output_json_append)
                 return 1, msg
             if input_file is not None:
                 with open(input_file, 'r', encoding="UTF-8") as f:
-                    ret = _to_proc(f, proc, json_connectstr, img_connectstr, None, timeout, format, tm)
+                    ret = _to_proc(f, proc, json_connectstr, img_connectstr, None, timeout, format, tm, output_json, output_json_append)
             elif stdin:
-                ret = _to_proc(sys.stdin, proc, json_connectstr, img_connectstr, None, timeout, format, tm)
+                ret = _to_proc(sys.stdin, proc, json_connectstr, img_connectstr, None, timeout, format, tm, output_json, output_json_append)
             else:
                 msg = {"warn":f"Image file or stdin is empty."}
-                common.print_format(msg, format, tm)
+                common.print_format(msg, format, tm, output_json, output_json_append)
                 return 1, msg
 
         elif cmd == 'cls_jadge':
@@ -407,40 +410,40 @@ def _main(args_list:list=None):
                                       nodraw=nodraw, output_preview=output_preview)
             if input_file is not None:
                 with open(input_file, 'r', encoding="UTF-8") as f:
-                    ret = _to_proc(f, proc, json_connectstr, img_connectstr, None, timeout, format, tm)
+                    ret = _to_proc(f, proc, json_connectstr, img_connectstr, None, timeout, format, tm, output_json, output_json_append)
             elif stdin:
-                ret = _to_proc(sys.stdin, proc, json_connectstr, img_connectstr, None, timeout, format, tm)
+                ret = _to_proc(sys.stdin, proc, json_connectstr, img_connectstr, None, timeout, format, tm, output_json, output_json_append)
             else:
                 msg = {"warn":f"Image file or stdin is empty."}
-                common.print_format(msg, format, tm)
+                common.print_format(msg, format, tm, output_json, output_json_append)
                 return 1, msg
 
         elif cmd == 'csv':
             proc = csv.Csv(logger, out_headers=out_headers, noheader=noheader)
             if input_file is not None:
                 with open(input_file, 'r') as f:
-                    ret = _to_proc(f, proc, json_connectstr, img_connectstr, None, timeout, False, tm)
+                    ret = _to_proc(f, proc, json_connectstr, img_connectstr, None, timeout, False, tm, None, False)
             elif stdin:
-                ret = _to_proc(sys.stdin, proc, json_connectstr, img_connectstr, None, timeout, False, tm)
+                ret = _to_proc(sys.stdin, proc, json_connectstr, img_connectstr, None, timeout, False, tm, None, False)
             else:
                 msg = {"warn":f"Image file or stdin is empty."}
-                common.print_format(msg, format, tm)
+                common.print_format(msg, format, tm, output_json, output_json_append)
                 return 1, msg
 
         elif cmd == 'httpreq':
             proc = httpreq.Httpreq(logger, fileup_name=fileup_name)
             if input_file is not None:
                 with open(input_file, 'r') as f:
-                    ret = _to_proc(f, proc, json_connectstr, img_connectstr, text_connectstr, timeout, format, tm)
+                    ret = _to_proc(f, proc, json_connectstr, img_connectstr, text_connectstr, timeout, format, tm, None, False)
             elif stdin:
-                ret = _to_proc(sys.stdin, proc, json_connectstr, img_connectstr, text_connectstr, timeout, format, tm)
+                ret = _to_proc(sys.stdin, proc, json_connectstr, img_connectstr, text_connectstr, timeout, format, tm, None, False)
             else:
                 msg = {"warn":f"Image file or stdin is empty."}
-                common.print_format(msg, format, tm)
+                common.print_format(msg, format, tm, output_json, output_json_append)
                 return 1, msg
         else:
             msg = {"warn":f"Unkown command."}
-            common.print_format(msg, format, tm)
+            common.print_format(msg, format, tm, output_json, output_json_append)
             return 1, msg
 
     elif mode == 'redis':
@@ -448,15 +451,15 @@ def _main(args_list:list=None):
         rd = redis.Redis(logger=logger, wsl_name=wsl_name, wsl_user=wsl_user)
         if cmd == 'docker_run':
             ret = rd.docker_run(port, password)
-            common.print_format(ret, format, tm)
+            common.print_format(ret, format, tm, output_json, output_json_append)
 
         elif cmd == 'docker_stop':
             ret = rd.docker_stop()
-            common.print_format(ret, format, tm)
+            common.print_format(ret, format, tm, output_json, output_json_append)
 
         else:
             msg = {"warn":f"Unkown command."}
-            common.print_format(msg, format, tm)
+            common.print_format(msg, format, tm, output_json, output_json_append)
             return 1, msg
 
     elif mode == 'install':
@@ -464,7 +467,7 @@ def _main(args_list:list=None):
         inst = install.Install(logger=logger)
         if cmd == 'redis':
             ret = inst.redis()
-            common.print_format(ret, format, tm)
+            common.print_format(ret, format, tm, output_json, output_json_append)
             if 'success' not in ret:
                 return 1, ret
 
@@ -480,61 +483,61 @@ def _main(args_list:list=None):
             mmcls = install_mmcls if install_mmcls else mmcls
             mmpretrain = install_mmpretrain if install_mmpretrain else mmpretrain
             mmrotate = install_mmrotate if install_mmrotate else mmrotate
-            ret = inst.server(install_iinfer, install_onnx=onnx, install_mmdet=mmdet, install_mmcls=mmcls, install_mmpretrain=mmpretrain, install_mmrotate=mmrotate)
-            common.print_format(ret, format, tm)
+            ret = inst.server(install_iinfer, install_onnx=onnx, install_mmdet=mmdet, install_mmcls=mmcls, install_mmpretrain=mmpretrain, install_mmrotate=mmrotate, install_tag=install_tag)
+            common.print_format(ret, format, tm, output_json, output_json_append)
             if 'success' not in ret:
                 return 1, ret
 
         elif cmd == 'onnx':
             ret = inst.onnx()
-            common.print_format(ret, format, tm)
+            common.print_format(ret, format, tm, output_json, output_json_append)
             if 'success' not in ret:
                 return 1, ret
 
         elif cmd == 'mmdet':
             if data is None:
                 msg = {"warn":f"Please specify the --data option."}
-                common.print_format(msg, format, tm)
+                common.print_format(msg, format, tm, output_json, output_json_append)
                 return 1, msg
             ret = inst.mmdet(Path(data))
-            common.print_format(ret, format, tm)
+            common.print_format(ret, format, tm, output_json, output_json_append)
             if 'success' not in ret:
                 return 1, ret
 
         elif cmd == 'mmcls':
             ret = inst.mmcls()
-            common.print_format(ret, format, tm)
+            common.print_format(ret, format, tm, output_json, output_json_append)
             if 'success' not in ret:
                 return 1, ret
 
         elif cmd == 'mmpretrain':
             if data is None:
                 msg = {"warn":f"Please specify the --data option."}
-                common.print_format(msg, format, tm)
+                common.print_format(msg, format, tm, output_json, output_json_append)
                 return 1, msg
             ret = inst.mmpretrain(Path(data))
-            common.print_format(ret, format, tm)
+            common.print_format(ret, format, tm, output_json, output_json_append)
             if 'success' not in ret:
                 return 1, ret
 
         elif cmd == 'mmrotate':
             if data is None:
                 msg = {"warn":f"Please specify the --data option."}
-                common.print_format(msg, format, tm)
+                common.print_format(msg, format, tm, output_json, output_json_append)
                 return 1, msg
             ret = inst.mmrotate(Path(data))
-            common.print_format(ret, format, tm)
+            common.print_format(ret, format, tm, output_json, output_json_append)
             if 'success' not in ret:
                 return 1, ret
 
         else:
             msg = {"warn":f"Unkown command."}
-            common.print_format(msg, format, tm)
+            common.print_format(msg, format, tm, output_json, output_json_append)
             return 1, msg
 
     else:
         msg = {"warn":f"Unkown mode."}
-        common.print_format(msg, format, tm)
+        common.print_format(msg, format, tm, output_json, output_json_append)
         return 1, msg
 
     return 0, ret

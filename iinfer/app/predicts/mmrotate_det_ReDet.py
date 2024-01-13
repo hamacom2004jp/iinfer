@@ -7,12 +7,12 @@ import logging
 import numpy as np
 
 
-SITE = 'https://github.com/open-mmlab/mmdetection/tree/main/configs/yolox'
-IMAGE_WIDTH = 640
-IMAGE_HEIGHT = 640
+SITE = 'https://github.com/open-mmlab/mmrotate/tree/main/configs/redet'
+IMAGE_WIDTH = 1024
+IMAGE_HEIGHT = 1024
 USE_MODEL_CONF = True
 
-class MMDetYoloX(predict.Predict):
+class MMRotateReDet(predict.Predict):
     def create_session(self, logger:logging.Logger, model_path:Path, model_conf_path:Path, model_provider:str, gpu_id:int=None):
         """
         推論セッションを作成する関数です。
@@ -30,6 +30,7 @@ class MMDetYoloX(predict.Predict):
             推論セッション
         """
         from mmdet.apis import init_detector
+        import mmrotate
         import torch
         gpu = f'cuda:{gpu_id}' if gpu_id is not None else 'gpu'
         device = torch.device(gpu if torch.cuda.is_available() else 'cpu')
@@ -75,6 +76,25 @@ class MMDetYoloX(predict.Predict):
         clses = result.pred_instances.labels.numpy().tolist()
         output_image, output_labels = common.draw_boxes(image, boxes, scores, clses, labels=labels, colors=colors, nodraw=nodraw)
         return dict(output_boxes=boxes, output_scores=scores, output_classes=clses, output_labels=output_labels), output_image
+        """
+        predictions = self.postprocess(output[0], input_shape)[0]
+        boxes = predictions[:, :4]
+        scores = predictions[:, 4:5] * predictions[:, 5:]
+        boxes_xyxy = np.ones_like(boxes)
+        boxes_xyxy[:, 0] = boxes[:, 0] - boxes[:, 2]/2.
+        boxes_xyxy[:, 1] = boxes[:, 1] - boxes[:, 3]/2.
+        boxes_xyxy[:, 2] = boxes[:, 0] + boxes[:, 2]/2.
+        boxes_xyxy[:, 3] = boxes[:, 1] + boxes[:, 3]/2.
+        boxes_xyxy /= ratio
+
+        dets = self.multiclass_nms(boxes_xyxy, scores, nms_thr=0.45, score_thr=0.1)
+        if dets is not None:
+            final_boxes, final_scores, final_cls_inds = dets[:, :4], dets[:, 4], dets[:, 5]
+            final_boxes = [[row[1],row[0],row[3],row[2]] for row in final_boxes]
+            output_image = common.draw_boxes(image, final_boxes, final_scores, final_cls_inds, labels=labels, colors=colors)
+
+            return dict(output_boxes=final_boxes, output_scores=final_scores, output_classes=final_cls_inds), output_image
+        """
 
     def preprocess(self, img, input_size, swap=(2, 0, 1)):
         """

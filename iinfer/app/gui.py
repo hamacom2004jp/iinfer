@@ -66,7 +66,8 @@ class Web(object):
                         dict(opt="color_file", type="file", default="", required=False, multi=False, hide=True, choise=None),
                         dict(opt="overwrite", type="bool", default=True, required=False, multi=False, hide=False, choise=[True, False]),
                         dict(opt="timeout", type="int", default="15", required=False, multi=False, hide=True, choise=None),
-                        dict(opt="stdout_save", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json_append", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False]),
                         dict(opt="stdout_log", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False])
                     ]
                 elif cmd == "deploy_list":
@@ -76,7 +77,8 @@ class Web(object):
                         dict(opt="password", type="str", default="password", required=True, multi=False, hide=True, choise=None),
                         dict(opt="svname", type="str", default="server", required=True, multi=False, hide=True, choise=None),
                         dict(opt="timeout", type="int", default="15", required=False, multi=False, hide=True, choise=None),
-                        dict(opt="stdout_save", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json_append", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False]),
                         dict(opt="stdout_log", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False])
                     ]
                 elif cmd == "undeploy":
@@ -87,7 +89,8 @@ class Web(object):
                         dict(opt="svname", type="str", default="server", required=True, multi=False, hide=True, choise=None),
                         dict(opt="name", type="str", default="", required=True, multi=False, hide=False, choise=None),
                         dict(opt="timeout", type="int", default="15", required=False, multi=False, hide=True, choise=None),
-                        dict(opt="stdout_save", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json_append", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False]),
                         dict(opt="stdout_log", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False])
                     ]
                 elif cmd == "start":
@@ -102,12 +105,14 @@ class Web(object):
                         dict(opt="use_track", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False]),
                         dict(opt="gpuid", type="str", default="", required=False, multi=False, hide=True, choise=None),
                         dict(opt="timeout", type="int", default="60", required=False, multi=False, hide=True, choise=None),
-                        dict(opt="stdout_save", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json_append", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False]),
                         dict(opt="stdout_log", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False])
                     ]
                 elif cmd == "predict_type_list":
                     return [
-                        dict(opt="stdout_save", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json_append", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False]),
                         dict(opt="stdout_log", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False])
                     ]
                 elif cmd == "stop":
@@ -118,7 +123,8 @@ class Web(object):
                         dict(opt="svname", type="str", default="server", required=True, multi=False, hide=True, choise=None),
                         dict(opt="name", type="str", default="", required=True, multi=False, hide=False, choise=None),
                         dict(opt="timeout", type="int", default="15", required=False, multi=False, hide=True, choise=None),
-                        dict(opt="stdout_save", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json_append", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False]),
                         dict(opt="stdout_log", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False])
                     ]
                 elif cmd == "predict":
@@ -131,11 +137,12 @@ class Web(object):
                         dict(opt="input_file", type="file", default="", required=False, multi=False, hide=False, choise=None),
                         dict(opt="stdin", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False]),
                         dict(opt="nodraw", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False]),
-                        dict(opt="image_type", type="str", default="jpeg", required=True, multi=False, hide=False, choise=['bmp', 'png', 'jpeg', 'capture']),
-                        dict(opt="output_file", type="file", default="", required=False, multi=False, hide=False, choise=None),
+                        dict(opt="image_type", type="str", default="jpeg", required=True, multi=False, hide=False, choise=['bmp', 'png', 'jpeg', 'capture', 'output_json']),
+                        dict(opt="output_image", type="file", default="", required=False, multi=False, hide=False, choise=None),
                         dict(opt="output_preview", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False]),
                         dict(opt="timeout", type="int", default="15", required=False, multi=False, hide=True, choise=None),
-                        dict(opt="stdout_save", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json_append", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False]),
                         dict(opt="stdout_log", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False])
                     ]
                 elif cmd == "capture":
@@ -147,7 +154,6 @@ class Web(object):
                         dict(opt="capture_fps", type="int", default=5, required=False, multi=False, hide=True, choise=None),
                         dict(opt="capture_count", type="int", default=5, required=False, multi=False, hide=False, choise=None),
                         dict(opt="output_preview", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False]),
-                        dict(opt="stdout_save", type="file", default="", required=False, multi=False, hide=True, choise=None),
                         dict(opt="stdout_log", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False])
                     ]
                 return []
@@ -159,7 +165,8 @@ class Web(object):
                         dict(opt="password", type="str", default="password", required=True, multi=False, hide=True, choise=None),
                         dict(opt="svname", type="str", default="server", required=True, multi=False, hide=True, choise=None),
                         dict(opt="data", type="file", default=None, required=False, multi=False, hide=False, choise=None),
-                        dict(opt="stdout_save", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json_append", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False]),
                         dict(opt="stdout_log", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False])
                     ]
                 elif cmd == "stop":
@@ -169,7 +176,8 @@ class Web(object):
                         dict(opt="password", type="str", default="password", required=True, multi=False, hide=True, choise=None),
                         dict(opt="svname", type="str", default="server", required=True, multi=False, hide=True, choise=None),
                         dict(opt="timeout", type="int", default="15", required=False, multi=False, hide=True, choise=None),
-                        dict(opt="stdout_save", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json_append", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False]),
                         dict(opt="stdout_log", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False])
                     ]
                 elif cmd == "list":
@@ -178,7 +186,8 @@ class Web(object):
                         dict(opt="port", type="int", default=6379, required=True, multi=False, hide=True, choise=None),
                         dict(opt="password", type="str", default="password", required=True, multi=False, hide=True, choise=None),
                         dict(opt="timeout", type="int", default="15", required=False, multi=False, hide=True, choise=None),
-                        dict(opt="stdout_save", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json_append", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False]),
                         dict(opt="stdout_log", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False])
                     ]
                 return []
@@ -194,7 +203,8 @@ class Web(object):
                         dict(opt="labels", type="str", default="", required=False, multi=True, hide=False, choise=None),
                         dict(opt="nodraw", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False]),
                         dict(opt="output_preview", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False]),
-                        dict(opt="stdout_save", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json_append", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False]),
                         dict(opt="stdout_log", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False])
                     ]
                 elif cmd == "det_jadge":
@@ -212,7 +222,8 @@ class Web(object):
                         dict(opt="ext_labels", type="str", default="", required=False, multi=True, hide=False, choise=None),
                         dict(opt="nodraw", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False]),
                         dict(opt="output_preview", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False]),
-                        dict(opt="stdout_save", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json_append", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False]),
                         dict(opt="stdout_log", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False])
                     ]
                 elif cmd == "cls_jadge":
@@ -230,7 +241,8 @@ class Web(object):
                         dict(opt="ext_labels", type="str", default="", required=False, multi=True, hide=False, choise=None),
                         dict(opt="nodraw", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False]),
                         dict(opt="output_preview", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False]),
-                        dict(opt="stdout_save", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json_append", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False]),
                         dict(opt="stdout_log", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False])
                     ]
                 elif cmd == "csv":
@@ -239,7 +251,6 @@ class Web(object):
                         dict(opt="stdin", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False]),
                         dict(opt="out_headers", type="str", default=False, required=False, multi=True, hide=False, choise=None),
                         dict(opt="noheader", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False]),
-                        dict(opt="stdout_save", type="file", default="", required=False, multi=False, hide=True, choise=None),
                         dict(opt="stdout_log", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False])
                     ]
                 elif cmd == "httpreq":
@@ -249,7 +260,6 @@ class Web(object):
                         dict(opt="json_connectstr", type="str", default="", required=True, multi=False, hide=False, choise=None),
                         dict(opt="img_connectstr", type="str", default="", required=False, multi=False, hide=False, choise=None),
                         dict(opt="fileup_name", type="str", default="file", required=True, multi=False, hide=False, choise=None),
-                        dict(opt="stdout_save", type="file", default="", required=False, multi=False, hide=True, choise=None),
                         dict(opt="stdout_log", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False])
                     ]
                 return []
@@ -260,48 +270,56 @@ class Web(object):
                         dict(opt="password", type="str", default="password", required=True, multi=False, hide=True, choise=None),
                         dict(opt="wsl_name", type="str", default="", required=False, multi=False, hide=True, choise=None),
                         dict(opt="wsl_user", type="str", default="ubuntu", required=False, multi=False, hide=True, choise=None),
-                        dict(opt="stdout_save", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json_append", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False]),
                         dict(opt="stdout_log", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False])
                     ]
                 elif cmd == "docker_stop":
                     return [
                         dict(opt="wsl_name", type="str", default="", required=False, multi=False, hide=True, choise=None),
                         dict(opt="wsl_user", type="str", default="ubuntu", required=False, multi=False, hide=True, choise=None),
-                        dict(opt="stdout_save", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json_append", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False]),
                         dict(opt="stdout_log", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False])
                     ]
                 return []
             elif mode == "install":
                 if cmd == "onnx":
                     return [
-                        dict(opt="stdout_save", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json_append", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False]),
                         dict(opt="stdout_log", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False])
                     ]
                 elif cmd == "mmdet":
                     return [
-                        dict(opt="stdout_save", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json_append", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False]),
                         dict(opt="stdout_log", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False])
                     ]
                 elif cmd == "mmcls":
                     return [
-                        dict(opt="stdout_save", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json_append", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False]),
                         dict(opt="stdout_log", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False])
                     ]
                 elif cmd == "mmpretrain":
                     return [
-                        dict(opt="stdout_save", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json_append", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False]),
                         dict(opt="stdout_log", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False])
                     ]
                 elif cmd == "mmrotate":
                     return [
-                        dict(opt="stdout_save", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json_append", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False]),
                         dict(opt="stdout_log", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False])
                     ]
                 elif cmd == "redis":
                     return [
                         dict(opt="wsl_name", type="str", default="", required=False, multi=False, hide=True, choise=None),
                         dict(opt="wsl_user", type="str", default="ubuntu", required=False, multi=False, hide=True, choise=None),
-                        dict(opt="stdout_save", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json_append", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False]),
                         dict(opt="stdout_log", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False])
                     ]
                 elif cmd == "server":
@@ -313,7 +331,8 @@ class Web(object):
                         dict(opt="install_mmcls", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False]),
                         dict(opt="install_mmpretrain", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False]),
                         dict(opt="install_mmrotate", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False]),
-                        dict(opt="stdout_save", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json_append", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False]),
                         dict(opt="stdout_log", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False])
                     ]
                 return []
@@ -355,7 +374,7 @@ class Web(object):
             opt_schema = get_opt_opt(opt['mode'], opt['cmd'])
             opt_list = ['-m', opt['mode'], '-c', opt['cmd']]
             for key, val in opt.items():
-                if key in ['stdout_save', 'stdout_log']:
+                if key in ['stdout_log']:
                     continue
                 schema = [schema for schema in opt_schema if schema['opt'] == key]
                 if len(schema) == 0 or val == '':
@@ -385,11 +404,8 @@ class Web(object):
                 app._main(opt_list)
                 output = captured_output.getvalue()
             except Exception as e:
-                output = list(traceback.TracebackException.from_exception(e).format())
+                output = dict(warn=f'<pre>{traceback.format_exc()}</pre>')
             sys.stdout = old_stdout
-            if 'stdout_save' in opt and opt['stdout_save'] != '':
-                with open(opt['stdout_save'], ('a' if type(output)==str else 'wb')) as f:
-                    f.write(output)
             if 'stdout_log' in opt and opt['stdout_log']:
                 eel.js_console_modal_log_func(output)
             try:
@@ -435,7 +451,7 @@ class Web(object):
             self.logger.info(f"raw_cmd: title={title}, opt={opt}")
             opt_list = mk_opt_list(opt)
             return [dict(type='cmdline',raw=' '.join(['iinfer']+opt_list)),
-                    dict(type='optjson',raw=json.dumps(opt))]
+                    dict(type='optjson',raw=json.dumps(opt, default=common.default_json_enc))]
 
         @eel.expose
         def list_tree(current_path):

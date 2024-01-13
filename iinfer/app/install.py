@@ -36,7 +36,8 @@ class Install(object):
         else:
             return {"warn":f"Unsupported platform."}
 
-    def server(self, install_iinfer:str='iinfer', install_onnx:bool=True, install_mmdet:bool=True, install_mmcls:bool=False, install_mmpretrain:bool=True, install_mmrotate:bool=True):
+    def server(self, install_iinfer:str='iinfer', install_onnx:bool=True, install_mmdet:bool=True, install_mmcls:bool=False, install_mmpretrain:bool=True, install_mmrotate:bool=False,
+               install_tag:str=None):
         if platform.system() == 'Windows':
             return {"warn": f"Build server command is Unsupported in windows platform."}
         from importlib.resources import read_text
@@ -51,11 +52,13 @@ class Install(object):
             text = text.replace('#{INSTALL_MMPRETRAIN}', f'RUN iinfer -m install -c mmpretrain --data /home/{user}/.iinfer' if install_mmpretrain else '')
             text = text.replace('#{INSTALL_MMROTATE}', f'RUN iinfer -m install -c mmrotate --data /home/{user}/.iinfer' if install_mmrotate else '')
             fp.write(text)
-        with open('docker-compose.yml', 'w', encoding='utf-8') as fp:
+        install_tag = f"_{install_tag}" if install_tag is not None else ''
+        with open(f'docker-compose{install_tag}.yml', 'w', encoding='utf-8') as fp:
             text = read_text(f'{common.APP_ID}.docker', 'docker-compose.yml')
             text = text.replace('${VERSION}', version.__version__)
+            text = text.replace('${TAG_NAME}', install_tag)
             fp.write(text)
-        cmd = f'docker build -t hamacom/iinfer:{version.__version__} -f Dockerfile .'
+        cmd = f'docker build -t hamacom/iinfer:{version.__version__}{install_tag} -f Dockerfile .'
 
         if platform.system() == 'Linux':
             returncode, _ = common.cmd(f"{cmd}", self.logger, True)
@@ -63,7 +66,7 @@ class Install(object):
             if returncode != 0:
                 self.logger.error(f"Failed to install iinfer-server.")
                 return {"error": f"Failed to install iinfer-server."}
-            return {"success": f"Success to install iinfer-server. and docker-compose.yml is copied."}
+            return {"success": f"Success to install iinfer-server. and docker-compose{install_tag}.yml is copied."}
 
         else:
             return {"warn":f"Unsupported platform."}

@@ -226,19 +226,6 @@ class Server(object):
             self.redis_cli = None
         self.logger.info(f"terminate server.")
 
-    def _json_enc(self, o):
-        if isinstance(o, np.ndarray):
-            return o.tolist()
-        if isinstance(o, np.float32):
-            return float(o)
-        if isinstance(o, np.int64):
-            return int(o)
-        if isinstance(o, np.intc):
-            return int(o)
-        if isinstance(o, Path):
-            return str(o)
-        raise TypeError(f"Type {type(o)} not serializable")
-    
     def responce(self, reskey:str, result:dict):
         """
         処理結果をクライアントに返す
@@ -247,7 +234,7 @@ class Server(object):
             reskey (str): レスポンスキー
             result (dict): レスポンスデータ
         """
-        self.redis_cli.rpush(reskey, json.dumps(result, default=self._json_enc))
+        self.redis_cli.rpush(reskey, json.dumps(result, default=common.default_json_enc))
         
 
     def deploy(self, reskey:str, name:str, model_img_width:int, model_img_height:int, predict_type:str,
@@ -367,6 +354,15 @@ class Server(object):
                     return self.RESP_ERROR
             shutil.copytree(self.data_dir / "mmdetection" / "configs", deploy_dir / "configs", dirs_exist_ok=True)
             self.logger.info(f"Copy mmdetection configs to {str(deploy_dir / 'configs')}")
+        elif predict_type.startswith('mmrotate_'):
+            if not (self.data_dir / "mmrotate").exists():
+                returncode, _ = common.cmd(f'cd {self.data_dir} && git clone https://github.com/open-mmlab/mmrotate.git', logger=self.logger)
+                if returncode != 0:
+                    self.logger.error(f"Failed to git clone mmrotate.")
+                    self.responce(reskey, {"error": f"Failed to git clone mmrotate."})
+                    return self.RESP_ERROR
+            shutil.copytree(self.data_dir / "mmrotate" / "configs", deploy_dir / "configs", dirs_exist_ok=True)
+            self.logger.info(f"Copy mmrotate configs to {str(deploy_dir / 'configs')}")
 
         self.responce(reskey, {"success": f"Save conf.json to {str(deploy_dir)}"})
         return self.RESP_SCCESS

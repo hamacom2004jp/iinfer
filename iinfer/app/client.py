@@ -334,6 +334,22 @@ class Client(object):
                     elif len(res_list) == 1:
                         return res_list[0]
                     return res_list
+            elif image_type == 'output_json':
+                with open(image_file, "r", encoding='utf-8') as f:
+                    res_list = []
+                    for line in f:
+                        res_json = json.loads(line)
+                        if not ("output_image" in res_json and "output_image_shape" in res_json):
+                            self.logger.warn(f"image_file data is invalid. Not found output_image or output_image_shape key.")
+                            continue
+                        img_npy = common.b64str2npy(res_json["output_image"], shape=res_json["output_image_shape"])
+                        res_json = self.predict(name, image=img_npy, output_image_file=output_image_file, output_preview=output_preview, nodraw=nodraw, timeout=timeout)
+                        res_list.append(res_json)
+                    if len(res_list) <= 0:
+                        return {"warn": f"output_json file is no data."}
+                    elif len(res_list) == 1:
+                        return res_list[0]
+                    return res_list
             else:
                 self.logger.error(f"image_type is invalid. {image_type}.")
                 return {"error": f"image_type is invalid. {image_type}."}
@@ -352,6 +368,12 @@ class Client(object):
                     img_npy = common.b64str2npy(img, shape=(h, w, c) if c > 0 else (h, w))
                 else:
                     img_npy = common.imgbytes2npy(common.b64str2bytes(img))
+            elif image_type == 'output_json':
+                res_json = json.loads(image)
+                if not ("output_image" in res_json and "output_image_shape" in res_json):
+                    self.logger.error(f"image_file data is invalid. Not found output_image or output_image_shape key.")
+                    return {"error": f"image_file data is invalid. Not found output_image or output_image_shape key."}
+                img_npy = common.b64str2npy(res_json["output_image"], shape=res_json["output_image_shape"])
             elif image_type == 'jpeg' or image_type == 'png' or image_type == 'bmp':
                 img_npy = common.imgbytes2npy(image)
             else:

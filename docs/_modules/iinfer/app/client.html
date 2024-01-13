@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>iinfer.app.client &mdash; iinfer 2024/01/11 documentation</title>
+  <title>iinfer.app.client &mdash; iinfer 2024/01/13 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -15,7 +15,7 @@
   
         <script src="../../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=d65207cc"></script>
+        <script src="../../../_static/documentation_options.js?v=45d209bf"></script>
         <script src="../../../_static/doctools.js?v=888ff710"></script>
         <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -439,6 +439,22 @@
                     <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">res_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
                         <span class="k">return</span> <span class="n">res_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
                     <span class="k">return</span> <span class="n">res_list</span>
+            <span class="k">elif</span> <span class="n">image_type</span> <span class="o">==</span> <span class="s1">&#39;output_json&#39;</span><span class="p">:</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">image_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">res_list</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+                        <span class="n">res_json</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="s2">&quot;output_image&quot;</span> <span class="ow">in</span> <span class="n">res_json</span> <span class="ow">and</span> <span class="s2">&quot;output_image_shape&quot;</span> <span class="ow">in</span> <span class="n">res_json</span><span class="p">):</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;image_file data is invalid. Not found output_image or output_image_shape key.&quot;</span><span class="p">)</span>
+                            <span class="k">continue</span>
+                        <span class="n">img_npy</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">b64str2npy</span><span class="p">(</span><span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;output_image&quot;</span><span class="p">],</span> <span class="n">shape</span><span class="o">=</span><span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;output_image_shape&quot;</span><span class="p">])</span>
+                        <span class="n">res_json</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">image</span><span class="o">=</span><span class="n">img_npy</span><span class="p">,</span> <span class="n">output_image_file</span><span class="o">=</span><span class="n">output_image_file</span><span class="p">,</span> <span class="n">output_preview</span><span class="o">=</span><span class="n">output_preview</span><span class="p">,</span> <span class="n">nodraw</span><span class="o">=</span><span class="n">nodraw</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+                        <span class="n">res_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res_json</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">res_list</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;warn&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;output_json file is no data.&quot;</span><span class="p">}</span>
+                    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">res_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="n">res_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="k">return</span> <span class="n">res_list</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;image_type is invalid. </span><span class="si">{</span><span class="n">image_type</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
                 <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;image_type is invalid. </span><span class="si">{</span><span class="n">image_type</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">}</span>
@@ -457,6 +473,12 @@
                     <span class="n">img_npy</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">b64str2npy</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span> <span class="k">if</span> <span class="n">c</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">))</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">img_npy</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">imgbytes2npy</span><span class="p">(</span><span class="n">common</span><span class="o">.</span><span class="n">b64str2bytes</span><span class="p">(</span><span class="n">img</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="n">image_type</span> <span class="o">==</span> <span class="s1">&#39;output_json&#39;</span><span class="p">:</span>
+                <span class="n">res_json</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="s2">&quot;output_image&quot;</span> <span class="ow">in</span> <span class="n">res_json</span> <span class="ow">and</span> <span class="s2">&quot;output_image_shape&quot;</span> <span class="ow">in</span> <span class="n">res_json</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;image_file data is invalid. Not found output_image or output_image_shape key.&quot;</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;image_file data is invalid. Not found output_image or output_image_shape key.&quot;</span><span class="p">}</span>
+                <span class="n">img_npy</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">b64str2npy</span><span class="p">(</span><span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;output_image&quot;</span><span class="p">],</span> <span class="n">shape</span><span class="o">=</span><span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;output_image_shape&quot;</span><span class="p">])</span>
             <span class="k">elif</span> <span class="n">image_type</span> <span class="o">==</span> <span class="s1">&#39;jpeg&#39;</span> <span class="ow">or</span> <span class="n">image_type</span> <span class="o">==</span> <span class="s1">&#39;png&#39;</span> <span class="ow">or</span> <span class="n">image_type</span> <span class="o">==</span> <span class="s1">&#39;bmp&#39;</span><span class="p">:</span>
                 <span class="n">img_npy</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">imgbytes2npy</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
