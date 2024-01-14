@@ -35,15 +35,16 @@ class Csv(postprocess.Postprocess):
             可視化画像後処理のセッション
             テキストデータ処理のセッション
         """
-        return 'json_connectstr', 'img_connectstr', None
+        return 'json_connectstr', None, None
 
-    def post_json(self, json_session, outputs:Dict[str, Any]):
+    def post_json(self, json_session, outputs:Dict[str, Any], output_image:Image.Image):
         """
         outputsに対して後処理を行う関数です。
 
         Args:
             json_session (任意): JSONセッション
             outputs (Dict[str, Any]): 推論結果
+            output_image (Image.Image): 入力画像（RGB配列であること）
 
         Returns:
             Dict[str, Any]: 後処理結果
@@ -101,18 +102,3 @@ class Csv(postprocess.Postprocess):
 
         self.noheader = True
         return result
-
-    def post_img(self, img_session, outputs:Dict[str, Any], output_image:Image.Image):
-        """
-        output_imageに対して後処理を行う関数です。
-        引数のimageはRGBですので、戻り値の出力画像もRGBにしてください。
-
-        Args:
-            img_session (任意): 画像セッション
-            outputs (Dict[str, Any]): 後処理結果
-            output_image (Image): 入力画像（RGB配列であること）
-
-        Returns:
-            Image: 後処理結果
-        """
-        return output_image

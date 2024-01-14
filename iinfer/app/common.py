@@ -424,7 +424,7 @@ def bgr2rgb(npy:np.ndarray) -> np.ndarray:
     Returns:
         np.ndarray: RGBのndarray
     """
-    return npy[..., ::-1]
+    return npy[..., ::-1].copy()
 
 
 def imgbytes2npy(img:bytes, dtype:str='uint8') -> np.ndarray:

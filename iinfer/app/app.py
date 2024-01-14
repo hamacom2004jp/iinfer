@@ -7,6 +7,7 @@ from iinfer.app import postprocess
 from iinfer.app import redis
 from iinfer.app import server
 from iinfer.app.postprocesses import csv
+from iinfer.app.postprocesses import det_clip
 from iinfer.app.postprocesses import det_filter
 from iinfer.app.postprocesses import det_jadge
 from iinfer.app.postprocesses import cls_jadge
@@ -45,7 +46,7 @@ def _main(args_list:list=None):
                                  'start', 'stop', # server or client or gui mode
                                  'list' , # server mode
                                  'deploy', 'deploy_list', 'undeploy', 'predict', 'predict_type_list', 'capture', # client mode
-                                 'det_filter', 'det_jadge', 'cls_jadge', 'csv', 'httpreq', # postprocess mode
+                                 'det_filter', 'det_jadge', 'det_clip', 'cls_jadge', 'csv', 'httpreq', # postprocess mode
                                 ])
     parser.add_argument('-T','--use_track', help='Setting the multi object tracking enable for Object Detection.', action='store_true')
     parser.add_argument('--model_img_width', help='Setting the cmd deploy model_img_width.', type=int)
@@ -85,6 +86,9 @@ def _main(args_list:list=None):
 
     parser.add_argument('--out_headers', help='Setting the csv cmd out_headers in postprocess.', type=str, action='append')
     parser.add_argument('--noheader', help='Setting the csv cmd noheader in postprocess.', action='store_true')
+    parser.add_argument('--output_csv', help='Setting the output_csv in postprocess.', type=str, default=None)
+
+    parser.add_argument('--clip_margin', help='Setting the postprocess clip_margin.', type=int, default=0)
 
     parser.add_argument('--score_th', help='Setting the postprocess score_th.', type=float, default=0.0)
     parser.add_argument('--width_th', help='Setting the postprocess width_th.', type=int, default=0)
@@ -164,6 +168,9 @@ def _main(args_list:list=None):
 
     out_headers = common.getopt(opt, 'out_headers', preval=args_dict, withset=True)
     noheader = common.getopt(opt, 'noheader', preval=args_dict, withset=True)
+    output_csv = common.getopt(opt, 'output_csv', preval=args_dict, withset=True)
+
+    clip_margin = common.getopt(opt, 'clip_margin', preval=args_dict, withset=True)
 
     score_th = common.getopt(opt, 'score_th', preval=args_dict, withset=True)
     width_th = common.getopt(opt, 'width_th', preval=args_dict, withset=True)
@@ -336,11 +343,16 @@ def _main(args_list:list=None):
 
         elif cmd == 'capture':
             count = 0
-            for t,b64,h,w,c in cl.capture(capture_device=capture_device, image_type=image_type,
+            append = False
+            for t,b64,h,w,c,fn in cl.capture(capture_device=capture_device, image_type=image_type,
                                  capture_frame_width=capture_frame_width, capture_frame_height=capture_frame_height, capture_fps=capture_fps,
                                  output_preview=output_preview):
-                ret = f"{t},"+b64+f",{h},{w},{c}"
-                common.print_format(ret, False, tm, None, False)
+                ret = f"{t},"+b64+f",{h},{w},{c},{fn}"
+                if output_csv is not None:
+                    with open(output_csv, 'a' if append else 'w', encoding="utf-8") as f:
+                        print(ret, file=f)
+                        append = True
+                else: common.print_format(ret, False, tm, None, False)
                 tm = time.time()
                 count += 1
                 if capture_count > 0 and count >= capture_count:
@@ -353,7 +365,7 @@ def _main(args_list:list=None):
 
     elif mode == 'postprocess':
         logger, _ = common.load_config(mode)
-        def _to_proc(f, proc:postprocess.Postprocess, json_connectstr, img_connectstr, text_connectstr, timeout, format, tm, output_json, output_json_append):
+        def _to_proc(f, proc:postprocess.Postprocess, json_connectstr, img_connectstr, text_connectstr, timeout, format, tm, output_json, output_json_append, output_csv=None):
             lines = f.readlines()
             for line in lines:
                 line = line.rstrip()
@@ -362,7 +374,11 @@ def _main(args_list:list=None):
                 try:
                     json_session, img_session, text_session = proc.create_session(json_connectstr, img_connectstr, text_connectstr)
                     ret = proc.postprocess(json_session, img_session, text_session, line, timeout=timeout)
-                    common.print_format(ret, format, tm, output_json, output_json_append)
+                    if output_csv is not None:
+                        with open(output_csv, 'a' if output_json_append else 'w', encoding="utf-8") as f:
+                            txt = common.print_format(ret, format, tm, output_json, output_json_append, stdout=False)
+                            print(txt.strip(), file=f)
+                    else: common.print_format(ret, format, tm, output_json, output_json_append)
                 except Exception as e:
                     msg = {"warn":f"Invalid input. {e}"}
                     common.print_format(msg, format, tm, output_json, output_json_append)
@@ -418,16 +434,28 @@ def _main(args_list:list=None):
                 common.print_format(msg, format, tm, output_json, output_json_append)
                 return 1, msg
 
+        elif cmd == 'det_clip':
+            proc = det_clip.DetClip(logger, image_type=image_type, clip_margin=clip_margin)
+            if input_file is not None:
+                with open(input_file, 'r') as f:
+                    ret = _to_proc(f, proc, json_connectstr, img_connectstr, None, timeout, False, tm, None, False, output_csv=output_csv)
+            elif stdin:
+                ret = _to_proc(sys.stdin, proc, json_connectstr, img_connectstr, None, timeout, False, tm, None, False, output_csv=output_csv)
+            else:
+                msg = {"warn":f"Image file or stdin is empty."}
+                common.print_format(msg, format, tm, None, False)
+                return 1, msg
+
         elif cmd == 'csv':
             proc = csv.Csv(logger, out_headers=out_headers, noheader=noheader)
             if input_file is not None:
                 with open(input_file, 'r') as f:
-                    ret = _to_proc(f, proc, json_connectstr, img_connectstr, None, timeout, False, tm, None, False)
+                    ret = _to_proc(f, proc, json_connectstr, img_connectstr, None, timeout, False, tm, None, False, output_csv=output_csv)
             elif stdin:
-                ret = _to_proc(sys.stdin, proc, json_connectstr, img_connectstr, None, timeout, False, tm, None, False)
+                ret = _to_proc(sys.stdin, proc, json_connectstr, img_connectstr, None, timeout, False, tm, None, False, output_csv=output_csv)
             else:
                 msg = {"warn":f"Image file or stdin is empty."}
-                common.print_format(msg, format, tm, output_json, output_json_append)
+                common.print_format(msg, format, tm, None, False)
                 return 1, msg
 
         elif cmd == 'httpreq':

@@ -47,13 +47,14 @@ class DetFilter(postprocess.Postprocess):
         """
         return 'json_connectstr', 'img_connectstr', None
 
-    def post_json(self, json_session, outputs:Dict[str, Any]):
+    def post_json(self, json_session, outputs:Dict[str, Any], output_image:Image.Image):
         """
         outputsに対して後処理を行う関数です。
 
         Args:
             json_session (任意): JSONセッション
             outputs (Dict[str, Any]): 推論結果
+            output_image (Image.Image): 入力画像（RGB配列であること）
 
         Returns:
             Dict[str, Any]: 後処理結果
@@ -97,20 +98,20 @@ class DetFilter(postprocess.Postprocess):
             data['output_tracks'] = output_tracks
         return data
 
-    def post_img(self, img_session, outputs:Dict[str, Any], output_image:Image.Image):
+    def post_img(self, img_session, result:Dict[str, Any], output_image:Image.Image):
         """
         output_imageに対して後処理を行う関数です。
         引数のimageはRGBですので、戻り値の出力画像もRGBにしてください。
 
         Args:
             img_session (任意): 画像セッション
-            outputs (Dict[str, Any]): 後処理結果
-            output_image (Image): 入力画像（RGB配列であること）
+            result (Dict[str, Any]): 後処理結果
+            output_image (Image.Image): 入力画像（RGB配列であること）
 
         Returns:
             Image: 後処理結果
         """
-        data = outputs['success']
+        data = result
         output_labels = data["output_labels"] if "output_labels" in data else None
         output_tracks = data["output_tracks"] if "output_tracks" in data else None
         image, output_labels = common.draw_boxes(output_image, data["output_boxes"], data["output_scores"], data["output_classes"],

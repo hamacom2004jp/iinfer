@@ -179,10 +179,11 @@ class Server(object):
                     #img_npy = np.load(byteio)
                     nodraw = True if msg[4] == 'True' else False
                     shape = [int(msg[5]), int(msg[6])]
-                    if len(msg) > 7: shape.append(int(msg[7]))
+                    if int(msg[7]) > 0: shape.append(int(msg[7]))
+                    output_image_name = msg[8]
                     img_npy = common.b64str2npy(msg[3], shape)
                     image = common.npy2img(img_npy)
-                    st = self.predict(msg[1], msg[2], image, nodraw)
+                    st = self.predict(msg[1], msg[2], image, output_image_name, nodraw)
                 elif msg[0] == 'stop_server':
                     self.is_running = False
                     self.responce(msg[1], {"success": f"Successful stop server. svname={self.svname}"})
@@ -539,14 +540,15 @@ class Server(object):
         self.responce(reskey, {"success": f"Successful stop of {name} session."})
         return self.RESP_SCCESS
 
-    def predict(self, reskey:str, name:str, image:Image.Image, nodraw:bool):
+    def predict(self, reskey:str, name:str, image:Image.Image, output_image_name:str, nodraw:bool):
         """
         クライアントから送られてきた画像の推論を行う。
 
         Args:
             reskey (str): レスポンスキー
             name (dict): モデル名
-            img_npy (np.array): 推論する画像データ
+            image (np.array): 推論する画像データ
+            output_image_name (str): 出力画像のファイル名
             nodraw (bool): 描画フラグ
         """
         if name is None or name == "":
@@ -569,6 +571,7 @@ class Server(object):
             predict_obj = session['predict_obj']
             outputs, output_image = predict_obj.predict(session['session'], session['model_img_width'], session['model_img_height'], image,
                                                         labels=session['labels'], colors=session['colors'], nodraw=nodraw)
+            outputs['image_name'] = output_image_name
             if session['tracker'] is not None:
                 if 'output_boxes' in outputs and 'output_scores' in outputs and 'output_classes' in outputs:
                     detections = [Detection(box, score, cls) for box, score, cls in zip(outputs['output_boxes'], outputs['output_scores'], outputs['output_classes'])]
@@ -580,7 +583,7 @@ class Server(object):
             if output_image is not None:
                 output_image_npy = common.img2npy(output_image)
                 output_image_b64 = common.npy2b64str(output_image_npy)
-                self.responce(reskey, {"success": outputs, "output_image": output_image_b64, "output_image_shape": output_image_npy.shape})
+                self.responce(reskey, {"success": outputs, "output_image": output_image_b64, "output_image_shape": output_image_npy.shape, "output_image_name": output_image_name})
                 return self.RESP_SCCESS
             self.responce(reskey, {"success": outputs})
             return self.RESP_SCCESS

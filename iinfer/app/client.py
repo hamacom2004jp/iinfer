@@ -3,6 +3,7 @@ from iinfer.app import common
 from typing import List
 import base64
 import cv2
+import datetime
 import logging
 import json
 import numpy as np
@@ -279,7 +280,7 @@ class Client(object):
         res_json = self._proc(self.svname, 'stop_server', [], timeout=timeout)
         return res_json
 
-    def predict(self, name:str, image = None, image_file:Path = None, image_type:str = 'jpeg', output_image_file:Path = None, output_preview:bool=False, nodraw:bool=False, timeout:int = 60):
+    def predict(self, name:str, image = None, image_file:Path = None, image_file_enable:bool=True, image_type:str = 'jpeg', output_image_file:Path = None, output_preview:bool=False, nodraw:bool=False, timeout:int = 60):
         """
         画像をRedisサーバーに送信し、推論結果を取得する
 
@@ -287,6 +288,7 @@ class Client(object):
             name (str): モデル名
             image (np.ndarray | bytes, optional): 画像データ. Defaults to None. np.ndarray型の場合はデコードしない(RGBであること).
             image_file (Path, optional): 画像ファイルのパス. Defaults to None.
+            image_file_enable (bool, optional): 画像ファイルを使用するかどうか. Defaults to True. image_fileがNoneでなく、このパラメーターがTrueの場合はimage_fileを使用する.
             image_type (str, optional): 画像の形式. Defaults to 'jpeg'.
             output_image_file (Path, optional): 予測結果の画像ファイルのパス. Defaults to None.
             output_preview (bool, optional): 予測結果の画像をプレビューするかどうか. Defaults to False.
@@ -306,7 +308,7 @@ class Client(object):
             self.logger.error(f"image and image_file is empty.")
             return {"error": f"image and image_file is empty."}
         npy_b64 = None
-        if image_file is not None:
+        if image_file is not None and image_file_enable:
             if not image_file.exists():
                 self.logger.error(f"Not found image_file. {image_file}.")
                 return {"error": f"Not found image_file. {image_file}."}
@@ -323,11 +325,12 @@ class Client(object):
                         h = int(capture_data[2])
                         w = int(capture_data[3])
                         c = int(capture_data[4])
+                        fn = Path(capture_data[5].strip())
                         if t == 'capture':
                             img_npy = common.b64str2npy(img, shape=(h, w, c) if c > 0 else (h, w))
                         else:
                             img_npy = common.imgbytes2npy(common.b64str2bytes(img))
-                        res_json = self.predict(name, image=img_npy, output_image_file=output_image_file, output_preview=output_preview, nodraw=nodraw, timeout=timeout)
+                        res_json = self.predict(name, image=img_npy, image_file=fn, image_file_enable=False, output_image_file=output_image_file, output_preview=output_preview, nodraw=nodraw, timeout=timeout)
                         res_list.append(res_json)
                     if len(res_list) <= 0:
                         return {"warn": f"capture file is no data."}
@@ -339,11 +342,12 @@ class Client(object):
                     res_list = []
                     for line in f:
                         res_json = json.loads(line)
-                        if not ("output_image" in res_json and "output_image_shape" in res_json):
-                            self.logger.warn(f"image_file data is invalid. Not found output_image or output_image_shape key.")
+                        if not ("output_image" in res_json and "output_image_shape" in res_json and "output_image_name" in res_json):
+                            self.logger.warn(f"image_file data is invalid. Not found output_image or output_image_shape or output_image_name key.")
                             continue
                         img_npy = common.b64str2npy(res_json["output_image"], shape=res_json["output_image_shape"])
-                        res_json = self.predict(name, image=img_npy, output_image_file=output_image_file, output_preview=output_preview, nodraw=nodraw, timeout=timeout)
+                        res_json = self.predict(name, image=img_npy, image_file=Path(res_json['output_image_name']), image_file_enable=False,
+                                                output_image_file=output_image_file, output_preview=output_preview, nodraw=nodraw, timeout=timeout)
                         res_list.append(res_json)
                     if len(res_list) <= 0:
                         return {"warn": f"output_json file is no data."}
@@ -356,6 +360,8 @@ class Client(object):
         else:
             if type(image) == np.ndarray:
                 img_npy = image
+                if image_file is None: image_file = Path(f'{datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")}.capture')
+                image_file_enable = False
             elif image_type == 'capture':
                 capture_data = image.split(',')
                 self.logger.info(f"capture_data={capture_data[1:]}")
@@ -364,18 +370,24 @@ class Client(object):
                 h = int(capture_data[2])
                 w = int(capture_data[3])
                 c = int(capture_data[4])
+                if image_file is None: image_file = Path(capture_data[5])
+                image_file_enable = False
                 if t == 'capture':
                     img_npy = common.b64str2npy(img, shape=(h, w, c) if c > 0 else (h, w))
                 else:
                     img_npy = common.imgbytes2npy(common.b64str2bytes(img))
             elif image_type == 'output_json':
                 res_json = json.loads(image)
-                if not ("output_image" in res_json and "output_image_shape" in res_json):
-                    self.logger.error(f"image_file data is invalid. Not found output_image or output_image_shape key.")
-                    return {"error": f"image_file data is invalid. Not found output_image or output_image_shape key."}
+                if not ("output_image" in res_json and "output_image_shape" in res_json and "output_image_name" in res_json):
+                    self.logger.error(f"image_file data is invalid. Not found output_image or output_image_shape or output_image_name key.")
+                    return {"error": f"image_file data is invalid. Not found output_image or output_image_shape or output_image_name key."}
                 img_npy = common.b64str2npy(res_json["output_image"], shape=res_json["output_image_shape"])
+                if image_file is None: image_file = Path(res_json["output_image_name"])
+                image_file_enable = False
             elif image_type == 'jpeg' or image_type == 'png' or image_type == 'bmp':
                 img_npy = common.imgbytes2npy(image)
+                if image_file is None: image_file = Path(f'{datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")}.{image_type}')
+                image_file_enable = False
             else:
                 self.logger.error(f"image_type is invalid. {image_type}.")
                 return {"error": f"image_type is invalid. {image_type}."}
@@ -383,7 +395,7 @@ class Client(object):
         npy_b64 = common.npy2b64str(img_npy)
         #img_npy2 = np.frombuffer(base64.b64decode(npy_b64), dtype='uint8').reshape(img_npy.shape)
 
-        res_json = self._proc(self.svname, 'predict', [name, npy_b64, str(nodraw), str(img_npy.shape[0]), str(img_npy.shape[1]), str(img_npy.shape[2] if len(img_npy.shape) > 2 else '')], timeout=timeout)
+        res_json = self._proc(self.svname, 'predict', [name, npy_b64, str(nodraw), str(img_npy.shape[0]), str(img_npy.shape[1]), str(img_npy.shape[2] if len(img_npy.shape) > 2 else '-1'), image_file.name], timeout=timeout)
         if "output_image" in res_json and "output_image_shape" in res_json:
             #byteio = BytesIO(base64.b64decode(res_json["output_image"]))
             #img_npy = np.load(byteio)
@@ -392,9 +404,8 @@ class Client(object):
                 common.npy2imgfile(img_npy, output_image_file=output_image_file, image_type=image_type)
             if output_preview:
                 # RGB画像をBGR画像に変換
-                img_npy = common.bgr2rgb(img_npy)
                 try:
-                    cv2.imshow('preview', img_npy)
+                    cv2.imshow('preview', common.bgr2rgb(img_npy))
                     cv2.waitKey(1)
                 except KeyboardInterrupt:
                     pass
@@ -431,12 +442,12 @@ class Client(object):
             while True:
                 start = time.perf_counter()
                 ret, frame = cap.read()
+                output_image_name = datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")
                 if ret:
                     img_npy = common.bgr2rgb(frame)
                     if output_preview:
                         # RGB画像をBGR画像に変換
-                        img_npy = common.bgr2rgb(img_npy)
-                        cv2.imshow('preview', img_npy)
+                        cv2.imshow('preview', common.bgr2rgb(img_npy))
                         cv2.waitKey(1)
                     img_b64 = None
                     if image_type == 'capture' or image_type is None:
@@ -444,7 +455,8 @@ class Client(object):
                         img_b64 = common.npy2b64str(img_npy)
                     else:
                         img_b64 = common.bytes2b64str(common.npy2imgfile(img_npy, image_type=image_type))
-                    yield image_type, img_b64, img_npy.shape[0], img_npy.shape[1], img_npy.shape[2] if len(img_npy.shape) > 2 else -1
+                    output_image_name = f"{output_image_name}.{image_type}"
+                    yield image_type, img_b64, img_npy.shape[0], img_npy.shape[1], img_npy.shape[2] if len(img_npy.shape) > 2 else -1, output_image_name
                 else:
                     self.logger.error(f"Capture failed. devide_id={capture_device}", stack_info=True)
                     break
