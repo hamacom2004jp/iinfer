@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>iinfer.app.postprocess &mdash; iinfer 2024/01/13 documentation</title>
+  <title>iinfer.app.postprocess &mdash; iinfer 2024/01/14 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -15,7 +15,7 @@
   
         <script src="../../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=45d209bf"></script>
+        <script src="../../../_static/documentation_options.js?v=8e5b9972"></script>
         <script src="../../../_static/doctools.js?v=888ff710"></script>
         <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -125,15 +125,16 @@
                     <span class="k">del</span> <span class="n">outputs</span><span class="p">[</span><span class="s2">&quot;output_image&quot;</span><span class="p">]</span>
                     <span class="k">del</span> <span class="n">outputs</span><span class="p">[</span><span class="s2">&quot;output_image_shape&quot;</span><span class="p">]</span>
 
-                <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_json</span><span class="p">(</span><span class="n">json_session</span><span class="p">,</span> <span class="n">outputs</span><span class="p">)</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_json</span><span class="p">(</span><span class="n">json_session</span><span class="p">,</span> <span class="n">outputs</span><span class="p">,</span> <span class="n">output_image</span><span class="p">)</span>
 
                 <span class="k">if</span> <span class="n">img_session</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="o">==</span> <span class="nb">dict</span> <span class="ow">and</span> <span class="n">output_image</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                        <span class="n">output_image</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_img</span><span class="p">(</span><span class="n">img_session</span><span class="p">,</span> <span class="n">outputs</span><span class="p">,</span> <span class="n">output_image</span><span class="p">)</span>
+                        <span class="n">output_image</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_img</span><span class="p">(</span><span class="n">img_session</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="n">output_image</span><span class="p">)</span>
                         <span class="n">output_image_npy</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">img2npy</span><span class="p">(</span><span class="n">output_image</span><span class="p">)</span>
                         <span class="n">output_image_b64</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">npy2b64str</span><span class="p">(</span><span class="n">output_image_npy</span><span class="p">)</span>
-                        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">success</span><span class="o">=</span><span class="n">result</span><span class="p">,</span> <span class="n">output_image</span><span class="o">=</span><span class="n">output_image_b64</span><span class="p">,</span> <span class="n">output_image_shape</span><span class="o">=</span><span class="n">output_image_npy</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-
+                        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">success</span><span class="o">=</span><span class="n">result</span><span class="p">,</span> <span class="n">output_image</span><span class="o">=</span><span class="n">output_image_b64</span><span class="p">,</span> <span class="n">output_image_shape</span><span class="o">=</span><span class="n">output_image_npy</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">output_image_name</span><span class="o">=</span><span class="n">outputs</span><span class="p">[</span><span class="s2">&quot;output_image_name&quot;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">result</span>
             <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">success</span><span class="o">=</span><span class="n">result</span><span class="p">)</span></div>
 
 
@@ -176,13 +177,14 @@
 
 <div class="viewcode-block" id="Postprocess.post_json">
 <a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.postprocess.Postprocess.post_json">[docs]</a>
-    <span class="k">def</span> <span class="nf">post_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">json_session</span><span class="p">,</span> <span class="n">outputs</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
+    <span class="k">def</span> <span class="nf">post_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">json_session</span><span class="p">,</span> <span class="n">outputs</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">output_image</span><span class="p">:</span><span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        outputsに対して後処理を行う関数です。</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            json_session (任意): JSONセッション</span>
 <span class="sd">            outputs (Dict[str, Any]): 推論結果</span>
+<span class="sd">            output_image (Image.Image): 入力画像（RGB配列であること）</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            Dict[str, Any]: 後処理結果</span>
@@ -192,15 +194,15 @@
 
 <div class="viewcode-block" id="Postprocess.post_img">
 <a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.postprocess.Postprocess.post_img">[docs]</a>
-    <span class="k">def</span> <span class="nf">post_img</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">img_session</span><span class="p">,</span> <span class="n">outputs</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">output_image</span><span class="p">:</span><span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">post_img</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">img_session</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">output_image</span><span class="p">:</span><span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        output_imageに対して後処理を行う関数です。</span>
 <span class="sd">        引数のimageはRGBですので、戻り値の出力画像もRGBにしてください。</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            img_session (任意): 画像セッション</span>
-<span class="sd">            outputs (Dict[str, Any]): 後処理結果</span>
-<span class="sd">            output_image (Image): 入力画像（RGB配列であること）</span>
+<span class="sd">            result (Dict[str, Any]): 後処理結果</span>
+<span class="sd">            output_image (Image.Image): 入力画像（RGB配列であること）</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            Image: 後処理結果</span>

@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>コマンドリファレンス（postprocessモード） &mdash; iinfer 2024/01/13 documentation</title>
+  <title>コマンドリファレンス（postprocessモード） &mdash; iinfer 2024/01/14 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -16,7 +16,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=45d209bf"></script>
+        <script src="../_static/documentation_options.js?v=8e5b9972"></script>
         <script src="../_static/doctools.js?v=888ff710"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -59,6 +59,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#iinfer-m-postprocess-c-det-filter-option">後処理(物体検知フィルター) : <cite>iinfer -m postprocess -c det_filter &lt;Option&gt;</cite></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#iinfer-m-postprocess-c-det-jadge-option">後処理(物体検知判定) : <cite>iinfer -m postprocess -c det_jadge &lt;Option&gt;</cite></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#iinfer-m-postprocess-c-cls-jadge-option">後処理(画像分類判定) : <cite>iinfer -m postprocess -c cls_jadge &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#iinfer-m-postprocess-c-det-clip-option">後処理(物体検知個所切り出し) : <cite>iinfer -m postprocess -c det_clip &lt;Option&gt;</cite></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#csv-iinfer-m-postprocess-c-csv-option">後処理(CSV出力) : <cite>iinfer -m postprocess -c csv &lt;Option&gt;</cite></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#http-iinfer-m-postprocess-c-httpreq-option">後処理(HTTPリクエストの実行) : <cite>iinfer -m postprocess -c httpreq &lt;Option&gt;</cite></a></li>
 </ul>
@@ -296,6 +297,57 @@
 </tbody>
 </table>
 </section>
+<section id="iinfer-m-postprocess-c-det-clip-option">
+<h2>後処理(物体検知個所切り出し) : <cite>iinfer -m postprocess -c det_clip &lt;Option&gt;</cite><a class="headerlink" href="#iinfer-m-postprocess-c-det-clip-option" title="Link to this heading"></a></h2>
+<p>ObjectDetectionで検知した個所を切り出し、caprute形式のcsvで出力します。</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 10.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>-i,--input_file &lt;推論結果ファイル&gt;</p></td>
+<td><p><cite>--stdin</cite> を指定しない場合〇</p></td>
+<td><p>後処理させる推論結果をファイルで指定します。</p></td>
+</tr>
+<tr class="row-odd"><td><p>--stdin</p></td>
+<td><p><cite>--input_file</cite> を指定しない場合〇</p></td>
+<td><p>後処理させる推論結果を標準入力から読み込みます。</p></td>
+</tr>
+<tr class="row-even"><td><p>--image_type &lt;出力する画像タイプ&gt;</p></td>
+<td></td>
+<td><p>出力する画像のタイプを指定する。指定可能な画像タイプは <cite>bmp</cite> , <cite>png</cite> , <cite>jpeg</cite> , <cite>capture</cite></p></td>
+</tr>
+<tr class="row-odd"><td><p>--clip_margin &lt;マージン幅&gt;</p></td>
+<td></td>
+<td><p>検視したbboxの周囲に余白を設けるピクセル数です。但し、元画像の外側に余白が出る場合は、確保できるだけ余白を取得します。</p></td>
+</tr>
+<tr class="row-even"><td><p>--output_csv &lt;処理結果csvの保存先ファイル&gt;</p></td>
+<td></td>
+<td><p>内容をcsvで保存する。これを指定した場合、標準出力は行いません。</p></td>
+</tr>
+<tr class="row-odd"><td><p>-o, -output_json &lt;処理結果jsonの保存先ファイル&gt;</p></td>
+<td></td>
+<td><p>このオプションは使用できません</p></td>
+</tr>
+<tr class="row-even"><td><p>-a, -output_json_append</p></td>
+<td></td>
+<td><p>このオプションは使用できません</p></td>
+</tr>
+<tr class="row-odd"><td><p>-f,--format</p></td>
+<td></td>
+<td><p>このコマンドではこのオプションは無視されます。</p></td>
+</tr>
+</tbody>
+</table>
+</section>
 <section id="csv-iinfer-m-postprocess-c-csv-option">
 <h2>後処理(CSV出力) : <cite>iinfer -m postprocess -c csv &lt;Option&gt;</cite><a class="headerlink" href="#csv-iinfer-m-postprocess-c-csv-option" title="Link to this heading"></a></h2>
 <table class="docutils align-default">
@@ -327,15 +379,19 @@
 <td></td>
 <td><p>ヘッダー行の出力を行いません。</p></td>
 </tr>
-<tr class="row-even"><td><p>-o, -output_json &lt;処理結果jsonの保存先ファイル&gt;</p></td>
+<tr class="row-even"><td><p>--output_csv &lt;処理結果csvの保存先ファイル&gt;</p></td>
+<td></td>
+<td><p>内容をcsvで保存する。これを指定した場合、標準出力は行いません。</p></td>
+</tr>
+<tr class="row-odd"><td><p>-o, -output_json &lt;処理結果jsonの保存先ファイル&gt;</p></td>
 <td></td>
 <td><p>このオプションは使用できません</p></td>
 </tr>
-<tr class="row-odd"><td><p>-a, -output_json_append</p></td>
+<tr class="row-even"><td><p>-a, -output_json_append</p></td>
 <td></td>
 <td><p>このオプションは使用できません</p></td>
 </tr>
-<tr class="row-even"><td><p>-f,--format</p></td>
+<tr class="row-odd"><td><p>-f,--format</p></td>
 <td></td>
 <td><p>このコマンドではこのオプションは無視されます。</p></td>
 </tr>
