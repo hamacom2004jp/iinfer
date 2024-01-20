@@ -76,9 +76,10 @@ class OnnxDetTinyYoloV3(predict.Predict):
             idx_1 = (idx_[0], idx_[2])
             out_boxes.append(output_boxes[idx_1])
 
-        output_image, output_labels = common.draw_boxes(image_obj, out_boxes, out_scores, out_classes, labels=labels, colors=colors, nodraw=nodraw)
+        ids = [i for i in range(len(out_boxes))]
+        output_image, output_labels = common.draw_boxes(image_obj, out_boxes, out_scores, out_classes, ids=ids, labels=labels, colors=colors, nodraw=nodraw)
 
-        return dict(output_boxes=out_boxes, output_scores=out_scores, output_classes=out_classes, output_labels=output_labels), output_image
+        return dict(output_ids=ids, output_scores=out_scores, output_classes=out_classes, output_labels=output_labels, output_boxes=out_boxes), output_image
 
     def resize_img(self, image:Image.Image, to_w, to_h):
         '''resize image with unchanged aspect ratio using padding'''

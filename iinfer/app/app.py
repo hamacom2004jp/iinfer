@@ -8,6 +8,7 @@ from iinfer.app import redis
 from iinfer.app import server
 from iinfer.app.postprocesses import csv
 from iinfer.app.postprocesses import det_clip
+from iinfer.app.postprocesses import det_face_store
 from iinfer.app.postprocesses import det_filter
 from iinfer.app.postprocesses import det_jadge
 from iinfer.app.postprocesses import cls_jadge
@@ -41,12 +42,12 @@ def _main(args_list:list=None):
     parser.add_argument('-n', '--name', help='Setting the cmd name.')
     parser.add_argument('--timeout', help='Setting the cmd timeout.', type=int, default=60)
     parser.add_argument('-c', '--cmd', help='Setting the cmd type.',
-                        choices=['redis', 'server', 'onnx', 'mmdet', 'mmcls', 'mmpretrain', 'mmrotate', # install mode
+                        choices=['redis', 'server', 'onnx', 'mmdet', 'mmcls', 'mmpretrain', 'mmrotate', 'insightface', # install mode
                                  'docker_run', 'docker_stop', # redis mode
                                  'start', 'stop', # server or client or gui mode
                                  'list' , # server mode
                                  'deploy', 'deploy_list', 'undeploy', 'predict', 'predict_type_list', 'capture', # client mode
-                                 'det_filter', 'det_jadge', 'det_clip', 'cls_jadge', 'csv', 'httpreq', # postprocess mode
+                                 'det_filter', 'det_jadge', 'det_clip', 'det_face_store', 'cls_jadge', 'csv', 'httpreq', # postprocess mode
                                 ])
     parser.add_argument('-T','--use_track', help='Setting the multi object tracking enable for Object Detection.', action='store_true')
     parser.add_argument('--model_img_width', help='Setting the cmd deploy model_img_width.', type=int)
@@ -104,6 +105,7 @@ def _main(args_list:list=None):
     parser.add_argument('--ext_score_th', help='Setting the postprocess ext_score_th.', type=float, default=None)
     parser.add_argument('--ext_classes', help='Setting the postprocess ext_classes.', type=int, action='append')
     parser.add_argument('--ext_labels', help='Setting the postprocess ext_labels.', type=str, action='append')
+    parser.add_argument('--face_threshold', help='Setting the postprocess face_threshold.', type=float, default=0.0)
 
     parser.add_argument('--install_iinfer', help='Setting the install server install_iinfer.', type=str, default='iinfer')
     parser.add_argument('--install_onnx', help='Setting the install server install_onnx.', action='store_true')
@@ -111,6 +113,7 @@ def _main(args_list:list=None):
     parser.add_argument('--install_mmcls', help='Setting the install server install_mmcls.', action='store_true')
     parser.add_argument('--install_mmpretrain', help='Setting the install server install_mmpretrain.', action='store_true')
     parser.add_argument('--install_mmrotate', help='Setting the install server install_mmrotate.', action='store_true')
+    parser.add_argument('--install_insightface', help='Setting the install server install_insightface.', action='store_true')
     parser.add_argument('--install_tag', help='Setting the install server install_tag.', type=str, default=None)
 
     argcomplete.autocomplete(parser)
@@ -187,6 +190,7 @@ def _main(args_list:list=None):
     ext_score_th = common.getopt(opt, 'ext_score_th', preval=args_dict, withset=True)
     ext_classes = common.getopt(opt, 'ext_classes', preval=args_dict, withset=True)
     ext_labels = common.getopt(opt, 'ext_labels', preval=args_dict, withset=True)
+    face_threshold = common.getopt(opt, 'face_threshold', preval=args_dict, withset=True)
 
     install_iinfer = common.getopt(opt, 'install_iinfer', preval=args_dict, withset=True)
     install_onnx = common.getopt(opt, 'install_onnx', preval=args_dict, withset=True)
@@ -194,6 +198,7 @@ def _main(args_list:list=None):
     install_mmcls = common.getopt(opt, 'install_mmcls', preval=args_dict, withset=True)
     install_mmpretrain = common.getopt(opt, 'install_mmpretrain', preval=args_dict, withset=True)
     install_mmrotate = common.getopt(opt, 'install_mmrotate', preval=args_dict, withset=True)
+    install_insightface = common.getopt(opt, 'install_insightface', preval=args_dict, withset=True)
     install_tag = common.getopt(opt, 'install_tag', preval=args_dict, withset=True)
 
     tm = time.time()
@@ -230,13 +235,13 @@ def _main(args_list:list=None):
                 return 1, msg
             cl = client.Client(logger, redis_host=host, redis_port=port, redis_password=password, svname=svname)
             ret = cl.stop_server(timeout=timeout)
-            common.print_format(msg, format, tm, output_json, output_json_append)
+            common.print_format(ret, format, tm, output_json, output_json_append)
             if 'success' not in ret:
                 return 1, ret
         elif cmd == 'list':
             sv = server.Server(Path(data), logger, redis_host=host, redis_port=port, redis_password=password, svname='server') # list取得なのでデフォルトのsvnameを指定
             ret = sv.list_server()
-            common.print_format(msg, format, tm, output_json, output_json_append)
+            common.print_format(ret, format, tm, output_json, output_json_append)
             if 'success' not in ret:
                 return 1, ret
         else:
@@ -446,6 +451,18 @@ def _main(args_list:list=None):
                 common.print_format(msg, format, tm, None, False)
                 return 1, msg
 
+        elif cmd == 'det_face_store':
+            proc = det_face_store.DetFaceStore(logger, face_threshold=face_threshold, image_type=image_type, clip_margin=clip_margin)
+            if input_file is not None:
+                with open(input_file, 'r') as f:
+                    ret = _to_proc(f, proc, json_connectstr, img_connectstr, None, timeout, False, tm, output_json, output_json_append)
+            elif stdin:
+                ret = _to_proc(sys.stdin, proc, json_connectstr, img_connectstr, None, timeout, False, tm, output_json, output_json_append)
+            else:
+                msg = {"warn":f"Image file or stdin is empty."}
+                common.print_format(msg, format, tm, None, False)
+                return 1, msg
+
         elif cmd == 'csv':
             proc = csv.Csv(logger, out_headers=out_headers, noheader=noheader)
             if input_file is not None:
@@ -500,18 +517,20 @@ def _main(args_list:list=None):
                 return 1, ret
 
         elif cmd == 'server':
-            install_set = not (install_onnx or install_mmdet or install_mmcls or install_mmpretrain or install_mmrotate)
+            install_set = not (install_onnx or install_mmdet or install_mmcls or install_mmpretrain or install_mmrotate or install_insightface)
             onnx = install_set
             mmdet = install_set
             mmcls = False
             mmpretrain = install_set
             mmrotate = install_set
+            insightface = install_set
             onnx = install_onnx if install_onnx else onnx
             mmdet = install_mmdet if install_mmdet else mmdet
             mmcls = install_mmcls if install_mmcls else mmcls
             mmpretrain = install_mmpretrain if install_mmpretrain else mmpretrain
             mmrotate = install_mmrotate if install_mmrotate else mmrotate
-            ret = inst.server(install_iinfer, install_onnx=onnx, install_mmdet=mmdet, install_mmcls=mmcls, install_mmpretrain=mmpretrain, install_mmrotate=mmrotate, install_tag=install_tag)
+            insightface = install_insightface if install_insightface else insightface
+            ret = inst.server(install_iinfer, install_onnx=onnx, install_mmdet=mmdet, install_mmcls=mmcls, install_mmpretrain=mmpretrain, install_mmrotate=mmrotate, install_insightface=insightface, install_tag=install_tag)
             common.print_format(ret, format, tm, output_json, output_json_append)
             if 'success' not in ret:
                 return 1, ret
@@ -554,6 +573,16 @@ def _main(args_list:list=None):
                 common.print_format(msg, format, tm, output_json, output_json_append)
                 return 1, msg
             ret = inst.mmrotate(Path(data))
+            common.print_format(ret, format, tm, output_json, output_json_append)
+            if 'success' not in ret:
+                return 1, ret
+
+        elif cmd == 'insightface':
+            if data is None:
+                msg = {"warn":f"Please specify the --data option."}
+                common.print_format(msg, format, tm, output_json, output_json_append)
+                return 1, msg
+            ret = inst.insightface(Path(data))
             common.print_format(ret, format, tm, output_json, output_json_append)
             if 'success' not in ret:
                 return 1, ret

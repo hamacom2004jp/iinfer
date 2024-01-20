@@ -52,6 +52,8 @@ def default_json_enc(o) -> str:
         return float(o)
     if isinstance(o, np.int64):
         return int(o)
+    if isinstance(o, np.int32):
+        return int(o)
     if isinstance(o, np.intc):
         return int(o)
     if isinstance(o, Path):

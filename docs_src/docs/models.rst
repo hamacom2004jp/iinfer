@@ -43,3 +43,15 @@ Image Classification
     "`EfficientNet-Lite4 <https://github.com/onnx/models/tree/main/vision/classification/efficientnet-lite4>`_ ","onnx","224x224","EfficientNet-Lite4-11-int8","onnx_cls_EfficientNet_Lite4",""
     "`EfficientNet-Lite4 <https://github.com/onnx/models/tree/main/vision/classification/efficientnet-lite4>`_ ","onnx","224x224","EfficientNet-Lite4-11-qdq","onnx_cls_EfficientNet_Lite4",""
 
+Face Detection and Recognition
+================================
+
+.. csv-table::
+
+    :header: "base","frameWork","input","model","predict_type","memo"
+    "`insightface <https://github.com/deepinsight/insightface/tree/master/python-package>`_ ","insightface","640x640","antelopev2","insightface_det",""
+    "`insightface <https://github.com/deepinsight/insightface/tree/master/python-package>`_ ","insightface","640x640","buffalo_l","insightface_det",""
+    "`insightface <https://github.com/deepinsight/insightface/tree/master/python-package>`_ ","insightface","640x640","buffalo_m","insightface_det",""
+    "`insightface <https://github.com/deepinsight/insightface/tree/master/python-package>`_ ","insightface","640x640","buffalo_s","insightface_det",""
+    "`insightface <https://github.com/deepinsight/insightface/tree/master/python-package>`_ ","insightface","640x640","buffalo_sc","insightface_det",""
+
