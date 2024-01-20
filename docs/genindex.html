@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Index &mdash; iinfer 2024/01/14 documentation</title>
+  <title>Index &mdash; iinfer 2024/01/21 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="_static/custom.css?v=3fafac33" />
@@ -15,7 +15,7 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=8e5b9972"></script>
+        <script src="_static/documentation_options.js?v=7b027700"></script>
         <script src="_static/doctools.js?v=888ff710"></script>
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
@@ -47,6 +47,9 @@
 <li class="toctree-l1"><a class="reference internal" href="docs/gui.html">GUIモード</a></li>
 <li class="toctree-l1"><a class="reference internal" href="docs/command.html">コマンドリファレンス</a></li>
 <li class="toctree-l1"><a class="reference internal" href="docs/models.html">動作確認済みモデル</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/detection.html">物体検知</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/face.html">顔認識</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/pipeline.html">パイプライン</a></li>
 <li class="toctree-l1"><a class="reference internal" href="docs/customize.html">カスタマイズ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="docs/developer.html">開発者向け情報</a></li>
 <li class="toctree-l1"><a class="reference internal" href="docs/errors.html">よくあるエラー</a></li>
@@ -130,6 +133,8 @@
 
       <ul>
         <li><a href="resources/iinfer.app.html#iinfer.app.predict.Predict.create_session">(iinfer.app.predict.Predict method)</a>
+</li>
+        <li><a href="resources/iinfer.app.predicts.html#iinfer.app.predicts.insightface_det.InsightfaceDet.create_session">(iinfer.app.predicts.insightface_det.InsightfaceDet method)</a>
 </li>
         <li><a href="resources/iinfer.app.predicts.html#iinfer.app.predicts.mmdet_det_YoloX.MMDetYoloX.create_session">(iinfer.app.predicts.mmdet_det_YoloX.MMDetYoloX method)</a>
 </li>
@@ -267,6 +272,13 @@
 </li>
       </ul></li>
       <li>
+    iinfer.app.predicts.insightface_det
+
+      <ul>
+        <li><a href="resources/iinfer.app.predicts.html#module-iinfer.app.predicts.insightface_det">module</a>
+</li>
+      </ul></li>
+      <li>
     iinfer.app.predicts.mmdet_det_YoloX
 
       <ul>
@@ -374,6 +386,10 @@
 </li>
       <li><a href="resources/iinfer.app.html#iinfer.app.common.imgfile2npy">imgfile2npy() (in module iinfer.app.common)</a>
 </li>
+      <li><a href="resources/iinfer.app.html#iinfer.app.install.Install.insightface">insightface() (iinfer.app.install.Install method)</a>
+</li>
+      <li><a href="resources/iinfer.app.predicts.html#iinfer.app.predicts.insightface_det.InsightfaceDet">InsightfaceDet (class in iinfer.app.predicts.insightface_det)</a>
+</li>
       <li><a href="resources/iinfer.app.html#iinfer.app.install.Install">Install (class in iinfer.app.install)</a>
 </li>
   </ul></td>
@@ -447,6 +463,8 @@
         <li><a href="resources/iinfer.app.html#module-iinfer.app.predict">iinfer.app.predict</a>
 </li>
         <li><a href="resources/iinfer.app.predicts.html#module-iinfer.app.predicts">iinfer.app.predicts</a>
+</li>
+        <li><a href="resources/iinfer.app.predicts.html#module-iinfer.app.predicts.insightface_det">iinfer.app.predicts.insightface_det</a>
 </li>
         <li><a href="resources/iinfer.app.predicts.html#module-iinfer.app.predicts.mmdet_det_YoloX">iinfer.app.predicts.mmdet_det_YoloX</a>
 </li>
@@ -566,6 +584,8 @@
       <ul>
         <li><a href="resources/iinfer.app.html#iinfer.app.predict.Predict.predict">(iinfer.app.predict.Predict method)</a>
 </li>
+        <li><a href="resources/iinfer.app.predicts.html#iinfer.app.predicts.insightface_det.InsightfaceDet.predict">(iinfer.app.predicts.insightface_det.InsightfaceDet method)</a>
+</li>
         <li><a href="resources/iinfer.app.predicts.html#iinfer.app.predicts.mmdet_det_YoloX.MMDetYoloX.predict">(iinfer.app.predicts.mmdet_det_YoloX.MMDetYoloX method)</a>
 </li>
         <li><a href="resources/iinfer.app.predicts.html#iinfer.app.predicts.mmpretrain_cls_swin.MMPretrainClsSwin.predict">(iinfer.app.predicts.mmpretrain_cls_swin.MMPretrainClsSwin method)</a>
@@ -648,6 +668,8 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="resources/iinfer.app.html#iinfer.app.common.saveopt">saveopt() (in module iinfer.app.common)</a>
+</li>
+      <li><a href="resources/iinfer.app.predicts.html#iinfer.app.predicts.insightface_det.InsightfaceDet.search_face">search_face() (iinfer.app.predicts.insightface_det.InsightfaceDet method)</a>
 </li>
       <li><a href="resources/iinfer.app.html#iinfer.app.server.Server">Server (class in iinfer.app.server)</a>
 </li>

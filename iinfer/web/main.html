@@ -667,7 +667,7 @@ $(function(){
                     }
                 } else if (data_type=='float') {
                     if(data_val && data_val!='') {
-                        if(!isFloat(data_val)) $(elem).addClass('is-invalid');
+                        if(!isFloat(data_val) && !isInt(data_val)) $(elem).addClass('is-invalid');
                         else {
                             $(elem).removeClass('is-invalid');
                             $(elem).addClass('is-valid');

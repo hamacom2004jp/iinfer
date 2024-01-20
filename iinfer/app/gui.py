@@ -38,7 +38,7 @@ class Web(object):
             elif mode == "server":
                 return ['', 'start', 'stop', 'list']
             elif mode == "postprocess":
-                return ['', 'det_filter', 'det_jadge', 'det_clip', 'cls_jadge', 'csv', 'httpreq']
+                return ['', 'det_filter', 'det_jadge', 'det_clip', 'det_face_store', 'cls_jadge', 'csv', 'httpreq']
             elif mode == "redis":
                 return ['', 'docker_run', 'docker_stop']
             elif mode == "install":
@@ -253,6 +253,17 @@ class Web(object):
                         dict(opt="image_type", type="str", default="capture", required=False, multi=False, hide=False, choise=['bmp', 'png', 'jpeg', 'capture']),
                         dict(opt="clip_margin", type="int", default=0, required=False, multi=False, hide=False, choise=None),
                         dict(opt="output_csv", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="stdout_log", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False])
+                    ]
+                elif cmd == "det_face_store":
+                    return [
+                        dict(opt="input_file", type="file", default="", required=False, multi=False, hide=False, choise=None),
+                        dict(opt="stdin", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False]),
+                        dict(opt="image_type", type="str", default="capture", required=False, multi=False, hide=False, choise=['bmp', 'png', 'jpeg', 'capture']),
+                        dict(opt="face_threshold", type="float", default=0.0, required=False, multi=False, hide=False, choise=None),
+                        dict(opt="clip_margin", type="int", default=0, required=False, multi=False, hide=False, choise=None),
+                        dict(opt="output_json", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json_append", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False]),
                         dict(opt="stdout_log", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False])
                     ]
                 elif cmd == "csv":

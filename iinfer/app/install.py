@@ -78,13 +78,32 @@ class Install(object):
             return {"error": f"Failed to install onnxruntime."}
         return {"success": f"Success to install onnxruntime."}
 
+    def insightface(self, data_dir: Path):
+        returncode, _ = common.cmd('pip install cython', logger=self.logger)
+        if returncode != 0:
+            self.logger.error(f"Failed to install cython.")
+            return {"error": f"Failed to install cython."}
+        returncode, _ = common.cmd('pip install onnxruntime', logger=self.logger)
+        if returncode != 0:
+            self.logger.error(f"Failed to install onnxruntime.")
+            return {"error": f"Failed to install onnxruntime."}
+        returncode, _ = common.cmd('python -m pip install --upgrade pip setuptools', logger=self.logger)
+        if returncode != 0:
+            self.logger.error(f"Failed to install setuptools.")
+            return {"error": f"Failed to install setuptools."}
+        returncode, _ = common.cmd('pip install insightface', logger=self.logger)
+        if returncode != 0:
+            self.logger.error(f"Failed to install insightface.")
+            return {"error": f"Failed to install insightface."}
+        return {"success": f"Success to install insightface."}
+
     def mmdet(self, data_dir: Path):
         returncode, _ = common.cmd(f'git clone https://github.com/open-mmlab/mmdetection.git', logger=self.logger)
         if returncode != 0:
             self.logger.error(f"Failed to git clone mmdetection.")
             return {"error": f"Failed to git clone mmdetection."}
         srcdir = Path('.') / 'mmdetection'
-        shutil.copytree(srcdir, data_dir / 'mmdetection', dirs_exist_ok=True)
+        shutil.copytree(srcdir, data_dir / 'mmdetection', dirs_exist_ok=True, ignore=shutil.ignore_patterns('.git'))
         shutil.rmtree(srcdir, ignore_errors=True)
 
         returncode, _ = common.cmd('pip install torch torchvision openmim', logger=self.logger)
@@ -107,7 +126,7 @@ class Install(object):
             self.logger.error(f"Failed to git clone mmrotate.")
             return {"error": f"Failed to git clone mmrotate."}
         srcdir = Path('.') / 'mmrotate'
-        shutil.copytree(srcdir, data_dir / 'mmrotate', dirs_exist_ok=True)
+        shutil.copytree(srcdir, data_dir / 'mmrotate', dirs_exist_ok=True, ignore=shutil.ignore_patterns('.git'))
         shutil.rmtree(srcdir, ignore_errors=True)
 
         returncode, _ = common.cmd('pip install torch torchvision openmim', logger=self.logger)
@@ -143,7 +162,7 @@ class Install(object):
             self.logger.error(f"Failed to git clone mmpretrain.")
             return {"error": f"Failed to git clone mmpretrain."}
         srcdir = Path('.') / 'mmpretrain'
-        shutil.copytree(srcdir, data_dir / 'mmpretrain', dirs_exist_ok=True)
+        shutil.copytree(srcdir, data_dir / 'mmpretrain', dirs_exist_ok=True, ignore=shutil.ignore_patterns('.git'))
         shutil.rmtree(srcdir, ignore_errors=True)
 
         returncode, _ = common.cmd('pip install torch torchvision openmim', logger=self.logger)

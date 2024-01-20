@@ -409,11 +409,6 @@ class Client(object):
                     cv2.waitKey(1)
                 except KeyboardInterrupt:
                     pass
-                finally:
-                    try:
-                        cv2.destroyWindow('preview')
-                    except:
-                        pass
         return res_json
 
     def capture(self, capture_device='0', image_type:str='capture', capture_frame_width:int=None, capture_frame_height:int=None, capture_fps:int=1000, output_preview:bool=False):
@@ -467,8 +462,4 @@ class Client(object):
         except KeyboardInterrupt:
             self.logger.info("KeyboardInterrupt", exc_info=True)
         finally:
-            try:
-                cv2.destroyWindow('preview')
-            except:
-                pass
             cap.release()

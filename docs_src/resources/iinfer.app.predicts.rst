@@ -4,6 +4,14 @@ iinfer.app.predicts package
 Submodules
 ----------
 
+iinfer.app.predicts.insightface\_det module
+-------------------------------------------
+
+.. automodule:: iinfer.app.predicts.insightface_det
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 iinfer.app.predicts.mmdet\_det\_YoloX module
 --------------------------------------------
 

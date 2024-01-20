@@ -71,10 +71,11 @@ class MMDetYoloX(predict.Predict):
         result = inference_detector(model, img_npy)
         boxes = result.pred_instances.bboxes.numpy().tolist()
         boxes = [[row[1],row[0],row[3],row[2]] for row in boxes]
+        ids = [i for i in range(len(boxes))]
         scores = result.pred_instances.scores.numpy().tolist()
         clses = result.pred_instances.labels.numpy().tolist()
-        output_image, output_labels = common.draw_boxes(image, boxes, scores, clses, labels=labels, colors=colors, nodraw=nodraw)
-        return dict(output_boxes=boxes, output_scores=scores, output_classes=clses, output_labels=output_labels), output_image
+        output_image, output_labels = common.draw_boxes(image, boxes, scores, clses, ids=ids, labels=labels, colors=colors, nodraw=nodraw)
+        return dict(output_ids=ids, output_scores=scores, output_classes=clses, output_labels=output_labels, output_boxes=boxes), output_image
 
     def preprocess(self, img, input_size, swap=(2, 0, 1)):
         """
