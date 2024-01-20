@@ -26,7 +26,7 @@
 ２．顔認識モデルをデプロイする（通常Windows上で実行）
 =============================================================
 
-- :doc`./models` の `Face Detection and Recognition` の項目に記載されているモデルをダウンロードしてください。
+- :doc:`./models` の `Face Detection and Recognition` の項目に記載されているモデルをダウンロードしてください。
 - `iinfer -m client -c deploy <Option>` コマンドで顔検出モデルを配備してください。
 
     .. code-block:: bash

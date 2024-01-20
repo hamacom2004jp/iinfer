@@ -25,7 +25,7 @@
 ２．物体検知モデルをデプロイする（通常Windows上で実行）
 =============================================================
 
-- :doc`./models` の `Object Detection` の項目に記載されているモデルをダウンロードしてください。
+- :doc:`./models` の `Object Detection` の項目に記載されているモデルをダウンロードしてください。
 - `iinfer -m client -c deploy <Option>` コマンドで顔検出モデルを配備してください。
     - mmdetection の場合``
 
