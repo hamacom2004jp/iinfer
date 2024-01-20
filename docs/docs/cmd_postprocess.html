@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>コマンドリファレンス（postprocessモード） &mdash; iinfer 2024/01/14 documentation</title>
+  <title>コマンドリファレンス（postprocessモード） &mdash; iinfer 2024/01/21 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -16,7 +16,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=8e5b9972"></script>
+        <script src="../_static/documentation_options.js?v=7b027700"></script>
         <script src="../_static/doctools.js?v=888ff710"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -60,6 +60,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#iinfer-m-postprocess-c-det-jadge-option">後処理(物体検知判定) : <cite>iinfer -m postprocess -c det_jadge &lt;Option&gt;</cite></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#iinfer-m-postprocess-c-cls-jadge-option">後処理(画像分類判定) : <cite>iinfer -m postprocess -c cls_jadge &lt;Option&gt;</cite></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#iinfer-m-postprocess-c-det-clip-option">後処理(物体検知個所切り出し) : <cite>iinfer -m postprocess -c det_clip &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#iinfer-m-postprocess-c-det-face-store-option">後処理(顔認識用ストアファイル生成) : <cite>iinfer -m postprocess -c det_face_store &lt;Option&gt;</cite></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#csv-iinfer-m-postprocess-c-csv-option">後処理(CSV出力) : <cite>iinfer -m postprocess -c csv &lt;Option&gt;</cite></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#http-iinfer-m-postprocess-c-httpreq-option">後処理(HTTPリクエストの実行) : <cite>iinfer -m postprocess -c httpreq &lt;Option&gt;</cite></a></li>
 </ul>
@@ -67,6 +68,9 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="models.html">動作確認済みモデル</a></li>
+<li class="toctree-l1"><a class="reference internal" href="detection.html">物体検知</a></li>
+<li class="toctree-l1"><a class="reference internal" href="face.html">顔認識</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pipeline.html">パイプライン</a></li>
 <li class="toctree-l1"><a class="reference internal" href="customize.html">カスタマイズ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developer.html">開発者向け情報</a></li>
 <li class="toctree-l1"><a class="reference internal" href="errors.html">よくあるエラー</a></li>
@@ -347,6 +351,61 @@
 </tr>
 </tbody>
 </table>
+</section>
+<section id="iinfer-m-postprocess-c-det-face-store-option">
+<h2>後処理(顔認識用ストアファイル生成) : <cite>iinfer -m postprocess -c det_face_store &lt;Option&gt;</cite><a class="headerlink" href="#iinfer-m-postprocess-c-det-face-store-option" title="Link to this heading"></a></h2>
+<p>Face Detection and Recognitionで検知した顔特徴データを個所を切り出し、顔認識ストアファイルを生成します。顔認識ストアファイルの使用方法は以下のとおりです。
+1. 生成したファイルをテキストエディタで開き、face_label項目に名前を入力します。
+2. 生成したファイルを <cite>client</cite> モードの <cite>deploy</cite> コマンドの <cite>--model_conf_file</cite> オプションに指定し、上書きデプロイします。
+3. デプロイしたモデルを <cite>client</cite> モードの <cite>start</cite> コマンドで起動します。
+4. 起動したモデルに対して、 <cite>client</cite> モードの <cite>predict</cite> コマンドで推論を実行します。
+5. 推論結果の <cite>output_labels</cite> に顔認識結果が出力されます。</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 10.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>-i,--input_file &lt;推論結果ファイル&gt;</p></td>
+<td><p><cite>--stdin</cite> を指定しない場合〇</p></td>
+<td><p>後処理させる推論結果をファイルで指定します。</p></td>
+</tr>
+<tr class="row-odd"><td><p>--stdin</p></td>
+<td><p><cite>--input_file</cite> を指定しない場合〇</p></td>
+<td><p>後処理させる推論結果を標準入力から読み込みます。</p></td>
+</tr>
+<tr class="row-even"><td><p>--image_type &lt;出力する画像タイプ&gt;</p></td>
+<td></td>
+<td><p>出力する画像のタイプを指定する。指定可能な画像タイプは <cite>bmp</cite> , <cite>png</cite> , <cite>jpeg</cite> , <cite>capture</cite></p></td>
+</tr>
+<tr class="row-odd"><td><p>--face_threshold &lt;顔スコアに対する閾値&gt;</p></td>
+<td></td>
+<td><p>顔スコアが閾値以下の場合は、顔特徴量ストアに含まれないようにします。※1</p></td>
+</tr>
+<tr class="row-even"><td><p>--clip_margin &lt;マージン幅&gt;</p></td>
+<td></td>
+<td><p>検視したbboxの周囲に余白を設けるピクセル数です。但し、元画像の外側に余白が出る場合は、確保できるだけ余白を取得します。</p></td>
+</tr>
+<tr class="row-odd"><td><p>-o, -output_json &lt;処理結果jsonの保存先ファイル&gt;</p></td>
+<td></td>
+<td><p>このオプションは使用できません</p></td>
+</tr>
+<tr class="row-even"><td><p>-a, -output_json_append</p></td>
+<td></td>
+<td><p>このオプションは使用できません</p></td>
+</tr>
+</tbody>
+</table>
+<ul class="simple">
+<li><p>※1 : 顔特徴量ストアに登録されている顔特徴量と、推論結果の顔特徴量との差が顔スコアになります。</p></li>
+</ul>
 </section>
 <section id="csv-iinfer-m-postprocess-c-csv-option">
 <h2>後処理(CSV出力) : <cite>iinfer -m postprocess -c csv &lt;Option&gt;</cite><a class="headerlink" href="#csv-iinfer-m-postprocess-c-csv-option" title="Link to this heading"></a></h2>

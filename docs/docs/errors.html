@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>よくあるエラー &mdash; iinfer 2024/01/14 documentation</title>
+  <title>よくあるエラー &mdash; iinfer 2024/01/21 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -16,7 +16,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=8e5b9972"></script>
+        <script src="../_static/documentation_options.js?v=7b027700"></script>
         <script src="../_static/doctools.js?v=888ff710"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -50,6 +50,9 @@
 <li class="toctree-l1"><a class="reference internal" href="gui.html">GUIモード</a></li>
 <li class="toctree-l1"><a class="reference internal" href="command.html">コマンドリファレンス</a></li>
 <li class="toctree-l1"><a class="reference internal" href="models.html">動作確認済みモデル</a></li>
+<li class="toctree-l1"><a class="reference internal" href="detection.html">物体検知</a></li>
+<li class="toctree-l1"><a class="reference internal" href="face.html">顔認識</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pipeline.html">パイプライン</a></li>
 <li class="toctree-l1"><a class="reference internal" href="customize.html">カスタマイズ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developer.html">開発者向け情報</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">よくあるエラー</a></li>
@@ -115,40 +118,50 @@
 <td><p>現在のディレクトリにmmrotateが既に存在したり、データディレクトリ「~/.iinfer/」にmmrotateが存在する</p></td>
 <td><p>mmrotateのディレクトリを削除</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>iinfer -m install -c &lt;mm系&gt;</cite></p></td>
+<tr class="row-even"><td><p><cite>iinfer -m install -c insightface</cite></p></td>
+<td><p>Could not install packages due to an OSError: [WinError 5] アクセスが拒否されました。</p></td>
+<td><p>更新ファイルが使用中？</p></td>
+<td><p><cite>pip install insightface</cite> でインストール</p></td>
+</tr>
+<tr class="row-odd"><td><p><cite>iinfer -m install -c &lt;mm系&gt;</cite></p></td>
 <td><p>Failed to uninstall mmcv</p></td>
 <td><p>mmdet又はmmpretrainのモデルが起動中</p></td>
 <td><p><cite>iinfer -m server</cite> で起動したサーバープロセスを停止</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>iinfer -m install -c &lt;mm系&gt;</cite></p></td>
+<tr class="row-even"><td><p><cite>iinfer -m install -c &lt;mm系&gt;</cite></p></td>
 <td><p>fatal: unable to access '<a class="reference external" href="https://github.com/open-mmlab/mmpretrain.git/">https://github.com/open-mmlab/mmpretrain.git/</a>': Could not resolve host: github.com</p></td>
 <td><p><cite>ping github.com</cite> コマンドなどで名前解決できるか確認。できたら <cite>iinfer -m install -c &lt;mm系&gt;</cite> を再実行</p></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><p><cite>iinfer -m client -c start</cite></p></td>
+<tr class="row-odd"><td><p><cite>iinfer -m client -c start</cite></p></td>
 <td><p>Failed to create session: No module named 'mmdet'</p></td>
 <td><p>mmdetがインストールされていません</p></td>
 <td><p><cite>iinfer -m install -c mmdet</cite></p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>iinfer -m client -c start</cite></p></td>
+<tr class="row-even"><td><p><cite>iinfer -m client -c start</cite></p></td>
 <td><p>Failed to create session: No module named 'mmpretrain'</p></td>
 <td><p>mmpretrainがインストールされていません</p></td>
 <td><p><cite>iinfer -m install -c mmpretrain</cite></p></td>
 </tr>
-<tr class="row-even"><td><p><cite>iinfer -m client -c start</cite></p></td>
+<tr class="row-odd"><td><p><cite>iinfer -m client -c start</cite></p></td>
 <td><p>Failed to create session: No module named 'mmrotate'</p></td>
 <td><p>mmrotateがインストールされていません</p></td>
 <td><p><cite>iinfer -m install -c mmrotate</cite></p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>iinfer -m client -c start</cite></p></td>
+<tr class="row-even"><td><p><cite>iinfer -m client -c start</cite></p></td>
 <td><p>AssertionError: test_cfg specified in both outer field and model field</p></td>
 <td><p><cite>mmdet</cite> と <cite>mmrotate</cite> のバージョンの互換性がありません</p></td>
 <td><p>両方使用する場合は <cite>iinfer -m install -c server --install_mmrotate --install_tag mmrotate</cite> のように別のイメージを作成してください</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>iinfer -m client -c predict</cite></p></td>
+<tr class="row-odd"><td><p><cite>iinfer -m client -c predict</cite></p></td>
 <td><p>Failed to run inference: riroi_align_rotated_forward_impl: implementation for device cpu not found.</p></td>
 <td><p><cite>mmrotate</cite> を使用するときはGPUが使用できるPCが必要です</p></td>
 <td><p>GPUが使用できるPCで実行</p></td>
+</tr>
+<tr class="row-even"><td><p><cite>iinfer -m client -c predict</cite></p></td>
+<td><p>The function is not implemented. Rebuild the library with Windows, GTK+ 2.x or Cocoa support. If you are on Ubuntu or Debian, install libgtk2.0-dev and pkg-config, then re-run cmake or configure script in function 'cvShowImage'</p></td>
+<td><p>ライブラリが不足しています</p></td>
+<td><p><cite>pip uninstall -y opencv-python</cite> で一度削除してから <cite>pip install opencv-python</cite> で再インストール</p></td>
 </tr>
 </tbody>
 </table>

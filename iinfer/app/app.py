@@ -16,6 +16,7 @@ from iinfer.app.postprocesses import httpreq
 from pathlib import Path
 import argparse
 import argcomplete
+import cv2
 import os
 import sys
 import time
@@ -311,35 +312,40 @@ def _main(args_list:list=None):
                 return 1, ret
 
         elif cmd == 'predict':
-            if input_file is not None:
-                ret = cl.predict(name, image_file=Path(input_file), image_type=image_type, output_image_file=output_image, output_preview=output_preview, nodraw=nodraw, timeout=timeout)
-                if type(ret) is list:
-                    for r in ret:
-                        common.print_format(r, format, tm, output_json, output_json_append)
-                        tm = time.time()
-                        output_json_append = True
-                else:
-                    common.print_format(ret, format, tm, output_json, output_json_append)
-            elif stdin:
-                if image_type is None:
-                    msg = {"warn":f"Please specify the --image_type option."}
-                    common.print_format(msg, format, tm, output_json, output_json_append)
-                    return 1, msg
-                if image_type == 'capture':
-                    for line in sys.stdin:
-                        ret = cl.predict(name, image=line, image_type=image_type, output_image_file=output_image, output_preview=output_preview, nodraw=nodraw, timeout=timeout)
+            try:
+                if input_file is not None:
+                    ret = cl.predict(name, image_file=Path(input_file), image_type=image_type, output_image_file=output_image, output_preview=output_preview, nodraw=nodraw, timeout=timeout)
+                    if type(ret) is list:
+                        for r in ret:
+                            common.print_format(r, format, tm, output_json, output_json_append)
+                            tm = time.time()
+                            output_json_append = True
+                    else:
+                        common.print_format(ret, format, tm, output_json, output_json_append)
+                elif stdin:
+                    if image_type is None:
+                        msg = {"warn":f"Please specify the --image_type option."}
+                        common.print_format(msg, format, tm, output_json, output_json_append)
+                        return 1, msg
+                    if image_type == 'capture':
+                        for line in sys.stdin:
+                            ret = cl.predict(name, image=line, image_type=image_type, output_image_file=output_image, output_preview=output_preview, nodraw=nodraw, timeout=timeout)
+                            common.print_format(ret, format, tm, output_json, output_json_append)
+                            tm = time.time()
+                            output_json_append = True
+                    else:
+                        ret = cl.predict(name, image=sys.stdin.buffer.read(), image_type=image_type, output_image_file=output_image, output_preview=output_preview, nodraw=nodraw, timeout=timeout)
                         common.print_format(ret, format, tm, output_json, output_json_append)
                         tm = time.time()
-                        output_json_append = True
                 else:
-                    ret = cl.predict(name, image=sys.stdin.buffer.read(), image_type=image_type, output_image_file=output_image, output_preview=output_preview, nodraw=nodraw, timeout=timeout)
-                    common.print_format(ret, format, tm, output_json, output_json_append)
-                    tm = time.time()
-            else:
-                msg = {"warn":f"Image file or stdin is empty."}
-                common.print_format(msg, format, tm, output_json, output_json_append)
-                return 1, msg
-
+                    msg = {"warn":f"Image file or stdin is empty."}
+                    common.print_format(msg, format, tm, output_json, output_json_append)
+                    return 1, msg
+            finally:
+                try:
+                    cv2.destroyWindow('preview')
+                except:
+                    pass
         elif cmd == 'predict_type_list':
             type_list = [dict(predict_type=key, site=val['site'], image_width=val['image_width'], image_height=val['image_height'], use_model_conf=val['use_model_conf']) for key,val in common.BASE_MODELS.items()]
             type_list.append(dict(predict_type='Custom', site='Custom', image_width=None, image_height=None))
@@ -349,19 +355,25 @@ def _main(args_list:list=None):
         elif cmd == 'capture':
             count = 0
             append = False
-            for t,b64,h,w,c,fn in cl.capture(capture_device=capture_device, image_type=image_type,
-                                 capture_frame_width=capture_frame_width, capture_frame_height=capture_frame_height, capture_fps=capture_fps,
-                                 output_preview=output_preview):
-                ret = f"{t},"+b64+f",{h},{w},{c},{fn}"
-                if output_csv is not None:
-                    with open(output_csv, 'a' if append else 'w', encoding="utf-8") as f:
-                        print(ret, file=f)
-                        append = True
-                else: common.print_format(ret, False, tm, None, False)
-                tm = time.time()
-                count += 1
-                if capture_count > 0 and count >= capture_count:
-                    break
+            try:
+                for t,b64,h,w,c,fn in cl.capture(capture_device=capture_device, image_type=image_type,
+                                    capture_frame_width=capture_frame_width, capture_frame_height=capture_frame_height, capture_fps=capture_fps,
+                                    output_preview=output_preview):
+                    ret = f"{t},"+b64+f",{h},{w},{c},{fn}"
+                    if output_csv is not None:
+                        with open(output_csv, 'a' if append else 'w', encoding="utf-8") as f:
+                            print(ret, file=f)
+                            append = True
+                    else: common.print_format(ret, False, tm, None, False)
+                    tm = time.time()
+                    count += 1
+                    if capture_count > 0 and count >= capture_count:
+                        break
+            finally:
+                try:
+                    cv2.destroyWindow('preview')
+                except:
+                    pass
 
         else:
             msg = {"warn":f"Unkown command."}
@@ -371,32 +383,37 @@ def _main(args_list:list=None):
     elif mode == 'postprocess':
         logger, _ = common.load_config(mode)
         def _to_proc(f, proc:postprocess.Postprocess, json_connectstr, img_connectstr, text_connectstr, timeout, format, tm, output_json, output_json_append, output_csv=None):
-            lines = f.readlines()
-            for line in lines:
-                line = line.rstrip()
-                if line == "":
-                    continue
+            try:
+                for line in f:
+                    line = line.rstrip()
+                    if line == "":
+                        continue
+                    try:
+                        json_session, img_session, text_session = proc.create_session(json_connectstr, img_connectstr, text_connectstr)
+                        ret = proc.postprocess(json_session, img_session, text_session, line, timeout=timeout)
+                        if output_csv is not None:
+                            with open(output_csv, 'a' if output_json_append else 'w', encoding="utf-8") as f:
+                                txt = common.print_format(ret, format, tm, output_json, output_json_append, stdout=False)
+                                print(txt.strip(), file=f)
+                        else: common.print_format(ret, format, tm, output_json, output_json_append)
+                    except Exception as e:
+                        msg = {"warn":f"Invalid input. {e}"}
+                        common.print_format(msg, format, tm, output_json, output_json_append)
+                        ret = msg
+                    tm = time.time()
+                    output_json_append = True
+                return ret
+            finally:
                 try:
-                    json_session, img_session, text_session = proc.create_session(json_connectstr, img_connectstr, text_connectstr)
-                    ret = proc.postprocess(json_session, img_session, text_session, line, timeout=timeout)
-                    if output_csv is not None:
-                        with open(output_csv, 'a' if output_json_append else 'w', encoding="utf-8") as f:
-                            txt = common.print_format(ret, format, tm, output_json, output_json_append, stdout=False)
-                            print(txt.strip(), file=f)
-                    else: common.print_format(ret, format, tm, output_json, output_json_append)
-                except Exception as e:
-                    msg = {"warn":f"Invalid input. {e}"}
-                    common.print_format(msg, format, tm, output_json, output_json_append)
-                    ret = msg
-                tm = time.time()
-                output_json_append = True
-            return ret
+                    cv2.destroyWindow('preview')
+                except:
+                    pass
 
         if cmd == 'det_filter':
             proc = det_filter.DetFilter(logger, score_th=score_th, width_th=width_th, height_th=height_th, classes=classes, labels=labels, nodraw=nodraw, output_preview=output_preview)
             if input_file is not None:
                 with open(input_file, 'r', encoding="UTF-8") as f:
-                    ret = _to_proc(f, proc, json_connectstr, img_connectstr, None, timeout, format, tm, output_json, output_json_append)
+                    ret = _to_proc(f.readlines(), proc, json_connectstr, img_connectstr, None, timeout, format, tm, output_json, output_json_append)
             elif stdin:
                 ret = _to_proc(sys.stdin, proc, json_connectstr, img_connectstr, None, timeout, format, tm, output_json, output_json_append)
             else:
@@ -416,7 +433,7 @@ def _main(args_list:list=None):
                 return 1, msg
             if input_file is not None:
                 with open(input_file, 'r', encoding="UTF-8") as f:
-                    ret = _to_proc(f, proc, json_connectstr, img_connectstr, None, timeout, format, tm, output_json, output_json_append)
+                    ret = _to_proc(f.readlines(), proc, json_connectstr, img_connectstr, None, timeout, format, tm, output_json, output_json_append)
             elif stdin:
                 ret = _to_proc(sys.stdin, proc, json_connectstr, img_connectstr, None, timeout, format, tm, output_json, output_json_append)
             else:
@@ -431,7 +448,7 @@ def _main(args_list:list=None):
                                       nodraw=nodraw, output_preview=output_preview)
             if input_file is not None:
                 with open(input_file, 'r', encoding="UTF-8") as f:
-                    ret = _to_proc(f, proc, json_connectstr, img_connectstr, None, timeout, format, tm, output_json, output_json_append)
+                    ret = _to_proc(f.readlines(), proc, json_connectstr, img_connectstr, None, timeout, format, tm, output_json, output_json_append)
             elif stdin:
                 ret = _to_proc(sys.stdin, proc, json_connectstr, img_connectstr, None, timeout, format, tm, output_json, output_json_append)
             else:
@@ -443,7 +460,7 @@ def _main(args_list:list=None):
             proc = det_clip.DetClip(logger, image_type=image_type, clip_margin=clip_margin)
             if input_file is not None:
                 with open(input_file, 'r') as f:
-                    ret = _to_proc(f, proc, json_connectstr, img_connectstr, None, timeout, False, tm, None, False, output_csv=output_csv)
+                    ret = _to_proc(f.readlines(), proc, json_connectstr, img_connectstr, None, timeout, False, tm, None, False, output_csv=output_csv)
             elif stdin:
                 ret = _to_proc(sys.stdin, proc, json_connectstr, img_connectstr, None, timeout, False, tm, None, False, output_csv=output_csv)
             else:
@@ -455,7 +472,7 @@ def _main(args_list:list=None):
             proc = det_face_store.DetFaceStore(logger, face_threshold=face_threshold, image_type=image_type, clip_margin=clip_margin)
             if input_file is not None:
                 with open(input_file, 'r') as f:
-                    ret = _to_proc(f, proc, json_connectstr, img_connectstr, None, timeout, False, tm, output_json, output_json_append)
+                    ret = _to_proc(f.readlines(), proc, json_connectstr, img_connectstr, None, timeout, False, tm, output_json, output_json_append)
             elif stdin:
                 ret = _to_proc(sys.stdin, proc, json_connectstr, img_connectstr, None, timeout, False, tm, output_json, output_json_append)
             else:
@@ -467,7 +484,7 @@ def _main(args_list:list=None):
             proc = csv.Csv(logger, out_headers=out_headers, noheader=noheader)
             if input_file is not None:
                 with open(input_file, 'r') as f:
-                    ret = _to_proc(f, proc, json_connectstr, img_connectstr, None, timeout, False, tm, None, False, output_csv=output_csv)
+                    ret = _to_proc(f.readlines(), proc, json_connectstr, img_connectstr, None, timeout, False, tm, None, False, output_csv=output_csv)
             elif stdin:
                 ret = _to_proc(sys.stdin, proc, json_connectstr, img_connectstr, None, timeout, False, tm, None, False, output_csv=output_csv)
             else:
@@ -479,7 +496,7 @@ def _main(args_list:list=None):
             proc = httpreq.Httpreq(logger, fileup_name=fileup_name)
             if input_file is not None:
                 with open(input_file, 'r') as f:
-                    ret = _to_proc(f, proc, json_connectstr, img_connectstr, text_connectstr, timeout, format, tm, None, False)
+                    ret = _to_proc(f.readlines(), proc, json_connectstr, img_connectstr, text_connectstr, timeout, format, tm, None, False)
             elif stdin:
                 ret = _to_proc(sys.stdin, proc, json_connectstr, img_connectstr, text_connectstr, timeout, format, tm, None, False)
             else:

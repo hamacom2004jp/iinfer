@@ -4,7 +4,8 @@
 動作確認済みモデル
 ******************
 
-下記のモデルはiinferで推論実行できることを確認しています。
+- 下記のモデルはiinferで推論実行できることを確認しています。
+- なお、以下に示すサイトの事前学習モデルは、配布元のライセンスに従って使用してください。
 
 Object Detection
 ==================
@@ -16,18 +17,18 @@ Object Detection
     "`YOLOX(mmdet) <https://github.com/open-mmlab/mmdetection/tree/main/configs/yolox>`_ ","mmdetection","640x640","YOLOX-s","mmdet_det_YoloX",""
     "`YOLOX(mmdet) <https://github.com/open-mmlab/mmdetection/tree/main/configs/yolox>`_ ","mmdetection","640x640","YOLOX-l","mmdet_det_YoloX",""
     "`YOLOX(mmdet) <https://github.com/open-mmlab/mmdetection/tree/main/configs/yolox>`_ ","mmdetection","640x640","YOLOX-x","mmdet_det_YoloX",""
-    "`YOLOX <https://github.com/Megvii-BaseDetection/YOLOX/#benchmark>`_ ","onnx","416x416","YOLOX-Nano","onnx_det_YoloX_Lite","\*1"
-    "`YOLOX <https://github.com/Megvii-BaseDetection/YOLOX/#benchmark>`_ ","onnx","416x416","YOLOX-Tiny","onnx_det_YoloX_Lite","\*1"
-    "`YOLOX <https://github.com/Megvii-BaseDetection/YOLOX/#benchmark>`_ ","onnx","640x640","YOLOX-s","onnx_det_YoloX","\*1"
-    "`YOLOX <https://github.com/Megvii-BaseDetection/YOLOX/#benchmark>`_ ","onnx","640x640","YOLOX-m","onnx_det_YoloX","\*1"
-    "`YOLOX <https://github.com/Megvii-BaseDetection/YOLOX/#benchmark>`_ ","onnx","640x640","YOLOX-l","onnx_det_YoloX","\*1"
-    "`YOLOX <https://github.com/Megvii-BaseDetection/YOLOX/#benchmark>`_ ","onnx","640x640","YOLOX-x","onnx_det_YoloX","\*1"
+    "`YOLOX <https://github.com/Megvii-BaseDetection/YOLOX/#benchmark>`_ ","onnx","416x416","YOLOX-Nano","onnx_det_YoloX_Lite","※1"
+    "`YOLOX <https://github.com/Megvii-BaseDetection/YOLOX/#benchmark>`_ ","onnx","416x416","YOLOX-Tiny","onnx_det_YoloX_Lite","※1"
+    "`YOLOX <https://github.com/Megvii-BaseDetection/YOLOX/#benchmark>`_ ","onnx","640x640","YOLOX-s","onnx_det_YoloX","※1"
+    "`YOLOX <https://github.com/Megvii-BaseDetection/YOLOX/#benchmark>`_ ","onnx","640x640","YOLOX-m","onnx_det_YoloX","※1"
+    "`YOLOX <https://github.com/Megvii-BaseDetection/YOLOX/#benchmark>`_ ","onnx","640x640","YOLOX-l","onnx_det_YoloX","※1"
+    "`YOLOX <https://github.com/Megvii-BaseDetection/YOLOX/#benchmark>`_ ","onnx","640x640","YOLOX-x","onnx_det_YoloX","※1"
     "`YOLOv3 <https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/yolov3>`_ ","onnx","416x416","YOLOv3-10","onnx_det_YoloV3",""
     "`YOLOv3 <https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/yolov3>`_ ","onnx","416x416","YOLOv3-12","onnx_det_YoloV3",""
     "`YOLOv3 <https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/yolov3>`_ ","onnx","416x416","YOLOv3-12-int8","onnx_det_YoloV3",""
     "`TinyYOLOv3 <https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/tiny-yolov3>`_ ","onnx","416x416","TinyYOLOv3","onnx_det_TinyYoloV3",""
 
-*1）`pth2onnx <https://github.com/hamacom2004jp/pth2onnx>`_ を使用してONNX形式に変換して使用*
+- ※1 : `pth2onnx <https://github.com/hamacom2004jp/pth2onnx>`_ を使用してONNX形式に変換して使用*
 
 Image Classification
 ======================

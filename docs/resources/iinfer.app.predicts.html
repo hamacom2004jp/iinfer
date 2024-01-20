@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>iinfer.app.predicts package &mdash; iinfer 2024/01/14 documentation</title>
+  <title>iinfer.app.predicts package &mdash; iinfer 2024/01/21 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -16,7 +16,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=8e5b9972"></script>
+        <script src="../_static/documentation_options.js?v=7b027700"></script>
         <script src="../_static/doctools.js?v=888ff710"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -48,6 +48,9 @@
 <li class="toctree-l1"><a class="reference internal" href="../docs/gui.html">GUIモード</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../docs/command.html">コマンドリファレンス</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../docs/models.html">動作確認済みモデル</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/detection.html">物体検知</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/face.html">顔認識</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/pipeline.html">パイプライン</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../docs/customize.html">カスタマイズ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../docs/developer.html">開発者向け情報</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../docs/errors.html">よくあるエラー</a></li>
@@ -82,6 +85,74 @@
 <h1>iinfer.app.predicts package<a class="headerlink" href="#iinfer-app-predicts-package" title="Link to this heading"></a></h1>
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-iinfer.app.predicts.insightface_det">
+<span id="iinfer-app-predicts-insightface-det-module"></span><h2>iinfer.app.predicts.insightface_det module<a class="headerlink" href="#module-iinfer.app.predicts.insightface_det" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="iinfer.app.predicts.insightface_det.InsightfaceDet">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">iinfer.app.predicts.insightface_det.</span></span><span class="sig-name descname"><span class="pre">InsightfaceDet</span></span><a class="reference internal" href="../_modules/iinfer/app/predicts/insightface_det.html#InsightfaceDet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.insightface_det.InsightfaceDet" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="iinfer.app.html#iinfer.app.predict.Predict" title="iinfer.app.predict.Predict"><code class="xref py py-class docutils literal notranslate"><span class="pre">Predict</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.predicts.insightface_det.InsightfaceDet.create_session">
+<span class="sig-name descname"><span class="pre">create_session</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_conf_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_provider</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gpu_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/insightface_det.html#InsightfaceDet.create_session"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.insightface_det.InsightfaceDet.create_session" title="Link to this definition"></a></dt>
+<dd><p>推論セッションを作成する関数です。
+startコマンド実行時に呼び出されます。
+この関数内でAIモデルのロードを行い、推論準備を完了するようにしてください。
+戻り値の推論セッションの型は問いません。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>logger</strong> (<em>logging.Logger</em>) -- ロガー</p></li>
+<li><p><strong>model_path</strong> (<em>Path</em>) -- モデルファイルのパス</p></li>
+<li><p><strong>model_conf_path</strong> (<em>Path</em>) -- モデル設定ファイルのパス</p></li>
+<li><p><strong>gpu_id</strong> (<em>int</em><em>, </em><em>optional</em>) -- GPU ID. Defaults to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>推論セッション</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.predicts.insightface_det.InsightfaceDet.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_height</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodraw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/insightface_det.html#InsightfaceDet.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.insightface_det.InsightfaceDet.predict" title="Link to this definition"></a></dt>
+<dd><p>予測を行う関数です。
+predictコマンドやcaptureコマンド実行時に呼び出されます。
+引数のimageはRGBですので、戻り値の出力画像もRGBにしてください。
+戻り値の推論結果のdictは、通常推論結果項目ごとに値(list)を設定します。
+例）Image Classification（EfficientNet_Lite4）の場合
+return dict(output_scores=output_scores, output_classes=output_classes), image_obj
+例）Object Detection（YoloX）の場合
+return dict(output_boxes=final_boxes, output_scores=final_scores, output_classes=final_cls_inds), output_image</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> -- 推論セッション</p></li>
+<li><p><strong>img_width</strong> (<em>int</em>) -- モデルのINPUTサイズ（画像の幅）</p></li>
+<li><p><strong>img_height</strong> (<em>int</em>) -- モデルのINPUTサイズ（画像の高さ）</p></li>
+<li><p><strong>image</strong> (<em>Image</em>) -- 入力画像（RGB配列であること）</p></li>
+<li><p><strong>labels</strong> (<em>List</em><em>[</em><em>str</em><em>]</em><em>, </em><em>optional</em>) -- クラスラベルのリスト. Defaults to None.</p></li>
+<li><p><strong>colors</strong> (<em>List</em><em>[</em><em>Tuple</em><em>[</em><em>int</em><em>]</em><em>]</em><em>, </em><em>optional</em>) -- ボックスの色のリスト. Defaults to None.</p></li>
+<li><p><strong>nodraw</strong> (<em>bool</em><em>, </em><em>optional</em>) -- 描画フラグ. Defaults to False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>予測結果と出力画像(RGB)のタプル</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[Dict[str, Any], Image]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.predicts.insightface_det.InsightfaceDet.search_face">
+<span class="sig-name descname"><span class="pre">search_face</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">store</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">face_embedding</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">th</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/insightface_det.html#InsightfaceDet.search_face"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.insightface_det.InsightfaceDet.search_face" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </section>
 <section id="module-iinfer.app.predicts.mmdet_det_YoloX">
 <span id="iinfer-app-predicts-mmdet-det-yolox-module"></span><h2>iinfer.app.predicts.mmdet_det_YoloX module<a class="headerlink" href="#module-iinfer.app.predicts.mmdet_det_YoloX" title="Link to this heading"></a></h2>

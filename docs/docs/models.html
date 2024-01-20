@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>動作確認済みモデル &mdash; iinfer 2024/01/14 documentation</title>
+  <title>動作確認済みモデル &mdash; iinfer 2024/01/21 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -16,13 +16,13 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=8e5b9972"></script>
+        <script src="../_static/documentation_options.js?v=7b027700"></script>
         <script src="../_static/doctools.js?v=888ff710"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="カスタマイズ" href="customize.html" />
+    <link rel="next" title="物体検知（ Object Detection ）" href="detection.html" />
     <link rel="prev" title="コマンドリファレンス（postprocessモード）" href="cmd_postprocess.html" /> 
 </head>
 
@@ -52,8 +52,12 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">動作確認済みモデル</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#object-detection">Object Detection</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#image-classification">Image Classification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#face-detection-and-recognition">Face Detection and Recognition</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="detection.html">物体検知</a></li>
+<li class="toctree-l1"><a class="reference internal" href="face.html">顔認識</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pipeline.html">パイプライン</a></li>
 <li class="toctree-l1"><a class="reference internal" href="customize.html">カスタマイズ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developer.html">開発者向け情報</a></li>
 <li class="toctree-l1"><a class="reference internal" href="errors.html">よくあるエラー</a></li>
@@ -86,7 +90,10 @@
              
   <section id="id1">
 <h1>動作確認済みモデル<a class="headerlink" href="#id1" title="Link to this heading"></a></h1>
-<p>下記のモデルはiinferで推論実行できることを確認しています。</p>
+<ul class="simple">
+<li><p>下記のモデルはiinferで推論実行できることを確認しています。</p></li>
+<li><p>なお、以下に示すサイトの事前学習モデルは、配布元のライセンスに従って使用してください。</p></li>
+</ul>
 <section id="object-detection">
 <h2>Object Detection<a class="headerlink" href="#object-detection" title="Link to this heading"></a></h2>
 <table class="docutils align-default">
@@ -136,42 +143,42 @@
 <td><p>416x416</p></td>
 <td><p>YOLOX-Nano</p></td>
 <td><p>onnx_det_YoloX_Lite</p></td>
-<td><p>*1</p></td>
+<td><p>※1</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference external" href="https://github.com/Megvii-BaseDetection/YOLOX/#benchmark">YOLOX</a></p></td>
 <td><p>onnx</p></td>
 <td><p>416x416</p></td>
 <td><p>YOLOX-Tiny</p></td>
 <td><p>onnx_det_YoloX_Lite</p></td>
-<td><p>*1</p></td>
+<td><p>※1</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference external" href="https://github.com/Megvii-BaseDetection/YOLOX/#benchmark">YOLOX</a></p></td>
 <td><p>onnx</p></td>
 <td><p>640x640</p></td>
 <td><p>YOLOX-s</p></td>
 <td><p>onnx_det_YoloX</p></td>
-<td><p>*1</p></td>
+<td><p>※1</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference external" href="https://github.com/Megvii-BaseDetection/YOLOX/#benchmark">YOLOX</a></p></td>
 <td><p>onnx</p></td>
 <td><p>640x640</p></td>
 <td><p>YOLOX-m</p></td>
 <td><p>onnx_det_YoloX</p></td>
-<td><p>*1</p></td>
+<td><p>※1</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference external" href="https://github.com/Megvii-BaseDetection/YOLOX/#benchmark">YOLOX</a></p></td>
 <td><p>onnx</p></td>
 <td><p>640x640</p></td>
 <td><p>YOLOX-l</p></td>
 <td><p>onnx_det_YoloX</p></td>
-<td><p>*1</p></td>
+<td><p>※1</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference external" href="https://github.com/Megvii-BaseDetection/YOLOX/#benchmark">YOLOX</a></p></td>
 <td><p>onnx</p></td>
 <td><p>640x640</p></td>
 <td><p>YOLOX-x</p></td>
 <td><p>onnx_det_YoloX</p></td>
-<td><p>*1</p></td>
+<td><p>※1</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference external" href="https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/yolov3">YOLOv3</a></p></td>
 <td><p>onnx</p></td>
@@ -203,7 +210,9 @@
 </tr>
 </tbody>
 </table>
-<p><em>1）`pth2onnx &lt;https://github.com/hamacom2004jp/pth2onnx&gt;`_ を使用してONNX形式に変換して使用</em></p>
+<ul class="simple">
+<li><p>※1 : <a class="reference external" href="https://github.com/hamacom2004jp/pth2onnx">pth2onnx</a> を使用してONNX形式に変換して使用*</p></li>
+</ul>
 </section>
 <section id="image-classification">
 <h2>Image Classification<a class="headerlink" href="#image-classification" title="Link to this heading"></a></h2>
@@ -273,6 +282,60 @@
 </tbody>
 </table>
 </section>
+<section id="face-detection-and-recognition">
+<h2>Face Detection and Recognition<a class="headerlink" href="#face-detection-and-recognition" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><dl class="field-list simple">
+<dt class="field-odd">header<span class="colon">:</span></dt>
+<dd class="field-odd"><p>&quot;base&quot;</p>
+</dd>
+</dl>
+</td>
+<td><p>frameWork</p></td>
+<td><p>input</p></td>
+<td><p>model</p></td>
+<td><p>predict_type</p></td>
+<td><p>memo</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference external" href="https://github.com/deepinsight/insightface/tree/master/python-package">insightface</a></p></td>
+<td><p>insightface</p></td>
+<td><p>640x640</p></td>
+<td><p>antelopev2</p></td>
+<td><p>insightface_det</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="https://github.com/deepinsight/insightface/tree/master/python-package">insightface</a></p></td>
+<td><p>insightface</p></td>
+<td><p>640x640</p></td>
+<td><p>buffalo_l</p></td>
+<td><p>insightface_det</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference external" href="https://github.com/deepinsight/insightface/tree/master/python-package">insightface</a></p></td>
+<td><p>insightface</p></td>
+<td><p>640x640</p></td>
+<td><p>buffalo_m</p></td>
+<td><p>insightface_det</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="https://github.com/deepinsight/insightface/tree/master/python-package">insightface</a></p></td>
+<td><p>insightface</p></td>
+<td><p>640x640</p></td>
+<td><p>buffalo_s</p></td>
+<td><p>insightface_det</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference external" href="https://github.com/deepinsight/insightface/tree/master/python-package">insightface</a></p></td>
+<td><p>insightface</p></td>
+<td><p>640x640</p></td>
+<td><p>buffalo_sc</p></td>
+<td><p>insightface_det</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</section>
 </section>
 
 
@@ -280,7 +343,7 @@
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="cmd_postprocess.html" class="btn btn-neutral float-left" title="コマンドリファレンス（postprocessモード）" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="customize.html" class="btn btn-neutral float-right" title="カスタマイズ" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="detection.html" class="btn btn-neutral float-right" title="物体検知（ Object Detection ）" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

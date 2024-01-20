@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>iinfer package &mdash; iinfer 2024/01/14 documentation</title>
+  <title>iinfer package &mdash; iinfer 2024/01/21 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -16,7 +16,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=8e5b9972"></script>
+        <script src="../_static/documentation_options.js?v=7b027700"></script>
         <script src="../_static/doctools.js?v=888ff710"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -48,6 +48,9 @@
 <li class="toctree-l1"><a class="reference internal" href="../docs/gui.html">GUIモード</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../docs/command.html">コマンドリファレンス</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../docs/models.html">動作確認済みモデル</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/detection.html">物体検知</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/face.html">顔認識</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/pipeline.html">パイプライン</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../docs/customize.html">カスタマイズ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../docs/developer.html">開発者向け情報</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../docs/errors.html">よくあるエラー</a></li>
@@ -88,6 +91,7 @@
 <li class="toctree-l2"><a class="reference internal" href="iinfer.app.html#subpackages">Subpackages</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="iinfer.app.predicts.html">iinfer.app.predicts package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#module-iinfer.app.predicts.insightface_det">iinfer.app.predicts.insightface_det module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#module-iinfer.app.predicts.mmdet_det_YoloX">iinfer.app.predicts.mmdet_det_YoloX module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#module-iinfer.app.predicts.mmdet_det_YoloX_Lite">iinfer.app.predicts.mmdet_det_YoloX_Lite module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#module-iinfer.app.predicts.mmpretrain_cls_swin">iinfer.app.predicts.mmpretrain_cls_swin module</a></li>
@@ -167,6 +171,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="iinfer.app.html#module-iinfer.app.install">iinfer.app.install module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="iinfer.app.html#iinfer.app.install.Install"><code class="docutils literal notranslate"><span class="pre">Install</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.install.Install.insightface"><code class="docutils literal notranslate"><span class="pre">Install.insightface()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.install.Install.mmcls"><code class="docutils literal notranslate"><span class="pre">Install.mmcls()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.install.Install.mmdet"><code class="docutils literal notranslate"><span class="pre">Install.mmdet()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.install.Install.mmpretrain"><code class="docutils literal notranslate"><span class="pre">Install.mmpretrain()</span></code></a></li>
