@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="jp" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>サーバー環境構築 &mdash; iinfer 2024/01/21 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=7b027700"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="物体検知（ Object Detection ）" href="detection.html" />
+    <link rel="prev" title="動作確認済みモデル" href="models.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            iinfer
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">iinferの概要</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gui.html">GUIモード</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command.html">コマンドリファレンス</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">動作確認済みモデル</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">サーバー環境構築</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#ubuntu">１．サーバー環境を構築する（Ubuntu上で実行）</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id2">２．推論サーバーに接続する</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="detection.html">物体検知</a></li>
+<li class="toctree-l1"><a class="reference internal" href="face.html">顔認識</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pipeline.html">パイプライン</a></li>
+<li class="toctree-l1"><a class="reference internal" href="customize.html">カスタマイズ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developer.html">開発者向け情報</a></li>
+<li class="toctree-l1"><a class="reference internal" href="errors.html">よくあるエラー</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">ライセンス</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">iinfer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">サーバー環境構築</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/docs/install.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="id1">
+<h1>サーバー環境構築<a class="headerlink" href="#id1" title="Link to this heading"></a></h1>
+<ul class="simple">
+<li><p><cite>iinfer</cite> を使用して各種AIフレームワークをインストールしたDockerイメージを構築することが出来ます。</p></li>
+<li><p>物体検知を実行するための手順を解説します。</p></li>
+</ul>
+<section id="ubuntu">
+<h2>１．サーバー環境を構築する（Ubuntu上で実行）<a class="headerlink" href="#ubuntu" title="Link to this heading"></a></h2>
+<ul>
+<li><dl>
+<dt><cite>iinfer -m install -c server &lt;Option&gt;</cite> コマンドでサーバー環境を構築できます。</dt><dd><ul class="simple">
+<li><p><cite>--install_mmdet</cite> オプションは <cite>mmdetection</cite> のみをDockerイメージに含めるための指定です。</p></li>
+<li><p><cite>--install_mmdet</cite> オプション等をし停止ない場合は、デフォルトのフレームワークがインストールされます。 <a class="reference internal" href="cmd_install.html"><span class="doc">コマンドリファレンス（installモード）</span></a> を参照してください。</p></li>
+<li><p><cite>--install_tag mmdet</cite> は、作成するイメージ名やコンテナ名、 <cite>iinfer</cite> 推論サーバーの名前に使用されるタグ名です。</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>iinfer<span class="w"> </span>-m<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>server<span class="w"> </span>--install_mmdet<span class="w"> </span>--install_tag<span class="w"> </span>mmdet
+</pre></div>
+</div>
+</dd>
+</dl>
+</li>
+<li><p>上記のコマンドを実行すると、以下のようなDockerイメージが作成されます。</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>docker<span class="w"> </span>images
+REPOSITORY<span class="w">       </span>TAG<span class="w">                </span>IMAGE<span class="w"> </span>ID<span class="w">       </span>CREATED<span class="w">             </span>SIZE
+hamacom/iinfer<span class="w">   </span><span class="m">0</span>.5.6_mmdet<span class="w">        </span>4a501392d33e<span class="w">   </span>About<span class="w"> </span>a<span class="w"> </span>minute<span class="w"> </span>ago<span class="w">  </span><span class="m">9</span>.54GB
+ubuntu/redis<span class="w">     </span>latest<span class="w">             </span>4603cee0d86e<span class="w">   </span>About<span class="w"> </span>a<span class="w"> </span>minute<span class="w"> </span>ago<span class="w">  </span>110MB
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>また、実行時のディレクトリに <cite>docker-compose.yml</cite> が作成されますので、下記のコマンドで推論サーバーを起動できます。</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>docker-compose<span class="w"> </span>up<span class="w"> </span>-d
+Creating<span class="w"> </span>network<span class="w"> </span><span class="s2">&quot;ubuntu_backend&quot;</span><span class="w"> </span>with<span class="w"> </span>driver<span class="w"> </span><span class="s2">&quot;bridge&quot;</span>
+Creating<span class="w"> </span>iinfer_server_mmdet<span class="w">      </span>...<span class="w"> </span><span class="k">done</span>
+Creating<span class="w"> </span>redis<span class="w">                    </span>...<span class="w"> </span><span class="k">done</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>続けて顔認識の推論サーバーを下記のコマンドで構築してみます。</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>iinfer<span class="w"> </span>-m<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>server<span class="w"> </span>--install_insightface<span class="w"> </span>--install_tag<span class="w"> </span>face
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>作成されたDockerイメージは以下のようになります。</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>docker<span class="w"> </span>images
+REPOSITORY<span class="w">       </span>TAG<span class="w">                </span>IMAGE<span class="w"> </span>ID<span class="w">       </span>CREATED<span class="w">             </span>SIZE
+hamacom/iinfer<span class="w">   </span><span class="m">0</span>.5.6_mmdet<span class="w">        </span>4a501392d33e<span class="w">   </span><span class="m">8</span><span class="w"> </span>minutes<span class="w"> </span>ago<span class="w">       </span><span class="m">9</span>.54GB
+hamacom/iinfer<span class="w">   </span><span class="m">0</span>.5.6_face<span class="w">         </span>43fcfe20c33f<span class="w">   </span>About<span class="w"> </span>a<span class="w"> </span>minute<span class="w"> </span>ago<span class="w">  </span><span class="m">1</span>.91GB
+ubuntu/redis<span class="w">     </span>latest<span class="w">             </span>4603cee0d86e<span class="w">   </span><span class="m">8</span><span class="w"> </span>minutes<span class="w"> </span>ago<span class="w">       </span>110MB
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>推論サーバーを再起動させます。</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>docker-compose<span class="w"> </span>down
+Stopping<span class="w"> </span>redis<span class="w">                    </span>...<span class="w"> </span><span class="k">done</span>
+Stopping<span class="w"> </span>iinfer_server_mmdet<span class="w">      </span>...<span class="w"> </span><span class="k">done</span>
+Removing<span class="w"> </span>redis<span class="w">                    </span>...<span class="w"> </span><span class="k">done</span>
+Removing<span class="w"> </span>iinfer_server_mmdet<span class="w">      </span>...<span class="w"> </span><span class="k">done</span>
+Removing<span class="w"> </span>network<span class="w"> </span>ubuntu_backend
+$
+$<span class="w"> </span>docker-compose<span class="w"> </span>up<span class="w"> </span>-d
+Creating<span class="w"> </span>network<span class="w"> </span><span class="s2">&quot;ubuntu_backend&quot;</span><span class="w"> </span>with<span class="w"> </span>driver<span class="w"> </span><span class="s2">&quot;bridge&quot;</span>
+Creating<span class="w"> </span>iinfer_server_mmdet<span class="w">      </span>...<span class="w"> </span><span class="k">done</span>
+Creating<span class="w"> </span>iinfer_server_face<span class="w">       </span>...<span class="w"> </span><span class="k">done</span>
+Creating<span class="w"> </span>redis<span class="w">                    </span>...<span class="w"> </span><span class="k">done</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p><cite>iinfer -m server -c list -f</cite> コマンドで推論サーバーの一覧を表示できます。</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>iinfer<span class="w"> </span>-m<span class="w"> </span>server<span class="w"> </span>-c<span class="w"> </span>list<span class="w"> </span>-f
+<span class="p">|</span><span class="w"> </span>svname<span class="w">            </span><span class="p">|</span><span class="w">   </span>recive_cnt<span class="w"> </span><span class="p">|</span><span class="w">   </span>sccess_cnt<span class="w"> </span><span class="p">|</span><span class="w">   </span>warn_cnt<span class="w"> </span><span class="p">|</span><span class="w">   </span>error_cnt<span class="w"> </span><span class="p">|</span>
+<span class="p">|</span>-------------------<span class="p">|</span>--------------<span class="p">|</span>--------------<span class="p">|</span>------------<span class="p">|</span>-------------<span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>server_mmdet<span class="w">      </span><span class="p">|</span><span class="w">            </span><span class="m">0</span><span class="w"> </span><span class="p">|</span><span class="w">            </span><span class="m">0</span><span class="w"> </span><span class="p">|</span><span class="w">          </span><span class="m">0</span><span class="w"> </span><span class="p">|</span><span class="w">           </span><span class="m">0</span><span class="w"> </span><span class="p">|</span>
+<span class="p">|</span><span class="w"> </span>server_face<span class="w">       </span><span class="p">|</span><span class="w">            </span><span class="m">0</span><span class="w"> </span><span class="p">|</span><span class="w">            </span><span class="m">0</span><span class="w"> </span><span class="p">|</span><span class="w">          </span><span class="m">0</span><span class="w"> </span><span class="p">|</span><span class="w">           </span><span class="m">0</span><span class="w"> </span><span class="p">|</span>
+<span class="m">0</span>.020<span class="w"> </span>seconds.
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+</ul>
+</section>
+<section id="id2">
+<h2>２．推論サーバーに接続する<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<ul>
+<li><p><cite>iinfer -m client -c deploy_list &lt;Option&gt;</cite> コマンドで推論サーバー接続を試してみます。</p></li>
+<li><p><cite>--svname server_mmdet</cite> コマンドで推論サーバー名を指定しています。</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>iinfer<span class="w"> </span>-m<span class="w"> </span>client<span class="w"> </span>-c<span class="w"> </span>deploy_list<span class="w"> </span>--svname<span class="w"> </span>server_mmdet
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="models.html" class="btn btn-neutral float-left" title="動作確認済みモデル" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="detection.html" class="btn btn-neutral float-right" title="物体検知（ Object Detection ）" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright (c) 2023-2024 hamacom2004jp All Rights Reserved..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
