@@ -37,7 +37,7 @@ class Install(object):
             return {"warn":f"Unsupported platform."}
 
     def server(self, install_iinfer:str='iinfer', install_onnx:bool=True, install_mmdet:bool=True, install_mmcls:bool=False, install_mmpretrain:bool=True, install_mmrotate:bool=False,
-               install_tag:str=None):
+               install_insightface=False, install_tag:str=None):
         if platform.system() == 'Windows':
             return {"warn": f"Build server command is Unsupported in windows platform."}
         from importlib.resources import read_text
@@ -51,6 +51,7 @@ class Install(object):
             text = text.replace('#{INSTALL_MMCLS}', f'RUN iinfer -m install -c mmcls --data /home/{user}/.iinfer' if install_mmcls else '')
             text = text.replace('#{INSTALL_MMPRETRAIN}', f'RUN iinfer -m install -c mmpretrain --data /home/{user}/.iinfer' if install_mmpretrain else '')
             text = text.replace('#{INSTALL_MMROTATE}', f'RUN iinfer -m install -c mmrotate --data /home/{user}/.iinfer' if install_mmrotate else '')
+            text = text.replace('#{INSTALL_INSIGHTFACE}', f'RUN iinfer -m install -c insightface --data /home/{user}/.iinfer' if install_insightface else '')
             fp.write(text)
         install_tag = f"_{install_tag}" if install_tag is not None else ''
         with open(f'docker-compose{install_tag}.yml', 'w', encoding='utf-8') as fp:

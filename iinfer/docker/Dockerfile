@@ -5,7 +5,7 @@ ARG MKUSER
 RUN groupadd ${MKUSER} && \
     useradd -m -g ${MKUSER} -s /usr/bin/bash ${MKUSER}
 RUN apt-get update && \
-    apt-get install -y libgl1-mesa-dev libglib2.0-0 git
+    apt-get install -y libgl1-mesa-dev libglib2.0-0 git build-essential
 RUN pip install --upgrade pip && \
     pip install ${INSTALL_IINFER}
 
@@ -14,7 +14,8 @@ RUN pip install --upgrade pip && \
 #{INSTALL_MMCLS}
 #{INSTALL_MMPRETRAIN}
 #{INSTALL_MMROTATE}
-RUN chown -R ${MKUSER}. /home/${MKUSER}/.iinfer
+#{INSTALL_INSIGHTFACE}
+RUN mkdir -p /home/${MKUSER}/.iinfer && chown -R ${MKUSER}:${MKUSER} /home/${MKUSER}/.iinfer
 
 ENV REDIS_HOST=redis
 ENV REDIS_PORT=6379

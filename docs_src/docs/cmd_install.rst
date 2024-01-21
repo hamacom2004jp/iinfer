@@ -67,8 +67,9 @@
     "--install_mmcls","","指定すると `mmclassification` をインストールします。※1,2"
     "--install_mmpretrain","","指定すると `mmpretrain` をインストールします。※1"
     "--install_mmrotate","","指定すると `mmrotate` をインストールします。※1"
+    "--install_insightface","","指定すると `insightface` をインストールします。※1"
     "--install_tag <追加のタグ名>","","指定すると作成するdockerイメージのタグ名に追記出来ます。"
     
 
-- ※1 : これらのオプションを何れも指定しない場合、 `--install_mmcls` `--install_mmrotate` 以外すべてをインストールします。
+- ※1 : これらのオプションを何れも指定しない場合、 `--install_mmcls` `--install_mmrotate` `--install_insightface` 以外すべてをインストールします。
 - ※2 : `mmclassification` と `mmpretrain` はバージョンによって共存できない場合があります。
