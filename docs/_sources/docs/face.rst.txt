@@ -20,7 +20,7 @@
 
     .. code-block:: bash
 
-         $ docker-compose -f docker-compose_face.yml up -d
+         $ docker-compose up -d
 
 
 ２．顔認識モデルをデプロイする（通常Windows上で実行）

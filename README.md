@@ -1,7 +1,13 @@
 # iinfer (Image Inference Application)
 
-onnx又はmmlabフォーマットのAIモデルファイルを実行するアプリケーションです。
-ドキュメントは[こちら](https://hamacom2004jp.github.io/iinfer/)。
+- onnx又はmmlabフォーマットのAIモデルファイルを実行するアプリケーションです。
+- ドキュメントは[こちら](https://hamacom2004jp.github.io/iinfer/)。
+- iinferを使用することで、AIモデルを簡単に実行することが出来ます。
+- 動作確認したモデルは[動作確認済みモデル](https://hamacom2004jp.github.io/iinfer/docs/models.html)に記載しています。
+- 主なAIタスクは、画像分類、物体検知、顔検知、顔認識です。
+- 複数の `iinfer` コマンドの入出力をつなげる、パイプライン処理を行うことが出来ます。
+- GUIモードを使用することで、 `iinfer` コマンド操作を簡単に行うことが出来ます。
+
 
 ## iinferの動作イメージ
 

@@ -47,6 +47,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/gui.html">GUIモード</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/command.html">コマンドリファレンス</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/models.html">動作確認済みモデル</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/install.html">サーバー環境構築</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/detection.html">物体検知</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/face.html">顔認識</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/pipeline.html">パイプライン</a></li>
@@ -448,15 +449,6 @@
             <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;-&#39;</span><span class="p">]</span>
 
         <span class="nd">@eel</span><span class="o">.</span><span class="n">expose</span>
-        <span class="k">def</span> <span class="nf">get_opt</span><span class="p">():</span>
-            <span class="k">return</span> <span class="p">{</span>
-                <span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="n">width</span><span class="p">,</span>
-                <span class="s2">&quot;height&quot;</span><span class="p">:</span> <span class="n">height</span><span class="p">,</span>
-                <span class="s2">&quot;web_host&quot;</span><span class="p">:</span> <span class="n">web_host</span><span class="p">,</span>
-                <span class="s2">&quot;web_port&quot;</span><span class="p">:</span> <span class="n">web_port</span>
-            <span class="p">}</span>
-
-        <span class="nd">@eel</span><span class="o">.</span><span class="n">expose</span>
         <span class="k">def</span> <span class="nf">list_cmd</span><span class="p">():</span>
             <span class="n">paths</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">/</span> <span class="s2">&quot;cmd-*.json&quot;</span><span class="p">))</span>
             <span class="n">ret</span> <span class="o">=</span> <span class="p">[</span><span class="n">common</span><span class="o">.</span><span class="n">loadopt</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">]</span>
@@ -584,6 +576,44 @@
                     <span class="n">children</span> <span class="o">=</span> <span class="p">{</span><span class="n">mk_key</span><span class="p">(</span><span class="n">p</span><span class="p">):</span><span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">is_dir</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">is_dir</span><span class="p">(),</span> <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span><span class="p">,</span> <span class="n">last</span><span class="o">=</span><span class="n">ts2str</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_mtime</span><span class="p">))</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">path</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()}</span>
                 <span class="n">path_tree</span><span class="p">[</span><span class="n">path_key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">part</span><span class="p">,</span> <span class="n">is_dir</span><span class="o">=</span><span class="n">path</span><span class="o">.</span><span class="n">is_dir</span><span class="p">(),</span> <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">),</span> <span class="n">children</span><span class="o">=</span><span class="n">children</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">path</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span><span class="p">,</span> <span class="n">last</span><span class="o">=</span><span class="n">ts2str</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_mtime</span><span class="p">))</span>
             <span class="k">return</span> <span class="n">path_tree</span>
+        
+        <span class="nd">@eel</span><span class="o">.</span><span class="n">expose</span>
+        <span class="k">def</span> <span class="nf">load_result</span><span class="p">(</span><span class="n">current_path</span><span class="p">):</span>
+            <span class="n">current_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">current_path</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">current_path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+                <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;warn&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;A non-file was selected.: </span><span class="si">{</span><span class="n">current_path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">}</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">current_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">ret</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">res_json</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="s1">&#39;output_image&#39;</span> <span class="ow">in</span> <span class="n">res_json</span> <span class="ow">and</span> <span class="s1">&#39;output_image_shape&#39;</span> <span class="ow">in</span> <span class="n">res_json</span><span class="p">:</span>
+                        <span class="n">img_npy</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">b64str2npy</span><span class="p">(</span><span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;output_image&quot;</span><span class="p">],</span> <span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;output_image_shape&quot;</span><span class="p">])</span>
+                        <span class="n">img_bytes</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">npy2imgfile</span><span class="p">(</span><span class="n">img_npy</span><span class="p">,</span> <span class="n">image_type</span><span class="o">=</span><span class="s1">&#39;jpeg&#39;</span><span class="p">)</span>
+                        <span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;output_image&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">bytes2b64str</span><span class="p">(</span><span class="n">img_bytes</span><span class="p">)</span>
+                    <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res_json</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">ret</span>
+
+        <span class="nd">@eel</span><span class="o">.</span><span class="n">expose</span>
+        <span class="k">def</span> <span class="nf">load_capture</span><span class="p">(</span><span class="n">current_path</span><span class="p">):</span>
+            <span class="n">current_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">current_path</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">current_path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+                <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;warn&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;A non-file was selected.: </span><span class="si">{</span><span class="n">current_path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">}</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">current_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">ret</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">cel</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+                    <span class="n">res_json</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">success</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">image_name</span><span class="o">=</span><span class="n">cel</span><span class="p">[</span><span class="mi">5</span><span class="p">]),</span>
+                                    <span class="n">output_image</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                    <span class="n">output_image_shape</span><span class="o">=</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">cel</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span><span class="nb">int</span><span class="p">(</span><span class="n">cel</span><span class="p">[</span><span class="mi">3</span><span class="p">]),</span><span class="nb">int</span><span class="p">(</span><span class="n">cel</span><span class="p">[</span><span class="mi">4</span><span class="p">])),</span>
+                                    <span class="n">output_image_name</span><span class="o">=</span><span class="n">cel</span><span class="p">[</span><span class="mi">5</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="n">cel</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;capture&#39;</span><span class="p">:</span>
+                        <span class="n">img_npy</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">b64str2npy</span><span class="p">(</span><span class="n">cel</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;output_image_shape&quot;</span><span class="p">])</span>
+                        <span class="n">img_bytes</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">npy2imgfile</span><span class="p">(</span><span class="n">img_npy</span><span class="p">,</span> <span class="n">image_type</span><span class="o">=</span><span class="s1">&#39;jpeg&#39;</span><span class="p">)</span>
+                        <span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;output_image&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">bytes2b64str</span><span class="p">(</span><span class="n">img_bytes</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;output_image&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cel</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res_json</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">ret</span>
 
         <span class="nd">@eel</span><span class="o">.</span><span class="n">expose</span>
         <span class="k">def</span> <span class="nf">list_pipe</span><span class="p">():</span>
@@ -653,10 +683,10 @@
 <div class="viewcode-block" id="Web.stop">
 <a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.gui.Web.stop">[docs]</a>
     <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">route</span><span class="p">,</span> <span class="n">websockets</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Stop eel web. </span><span class="si">{</span><span class="n">route</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Stop eel web. </span><span class="si">{</span><span class="n">route</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 </div>
 
+        <span class="c1">#exit(0)</span>
 
 </pre></div>
 

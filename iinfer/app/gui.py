@@ -361,15 +361,6 @@ class Web(object):
             return ['-']
 
         @eel.expose
-        def get_opt():
-            return {
-                "width": width,
-                "height": height,
-                "web_host": web_host,
-                "web_port": web_port
-            }
-
-        @eel.expose
         def list_cmd():
             paths = glob.glob(str(self.data / "cmd-*.json"))
             ret = [common.loadopt(path) for path in paths]
@@ -497,6 +488,44 @@ class Web(object):
                     children = {mk_key(p):dict(name=p.name, is_dir=p.is_dir(), path=str(p), size=p.stat().st_size, last=ts2str(p.stat().st_mtime)) for p in path.iterdir()}
                 path_tree[path_key] = dict(name=part, is_dir=path.is_dir(), path=str(path), children=children, size=path.stat().st_size, last=ts2str(path.stat().st_mtime))
             return path_tree
+        
+        @eel.expose
+        def load_result(current_path):
+            current_path = Path(current_path)
+            if not current_path.is_file():
+                return {'warn': f'A non-file was selected.: {current_path}'}
+            with open(current_path, 'r', encoding='utf-8') as f:
+                ret = []
+                for line in f:
+                    res_json = json.loads(line)
+                    if 'output_image' in res_json and 'output_image_shape' in res_json:
+                        img_npy = common.b64str2npy(res_json["output_image"], res_json["output_image_shape"])
+                        img_bytes = common.npy2imgfile(img_npy, image_type='jpeg')
+                        res_json["output_image"] = common.bytes2b64str(img_bytes)
+                    ret.append(res_json)
+            return ret
+
+        @eel.expose
+        def load_capture(current_path):
+            current_path = Path(current_path)
+            if not current_path.is_file():
+                return {'warn': f'A non-file was selected.: {current_path}'}
+            with open(current_path, 'r', encoding='utf-8') as f:
+                ret = []
+                for line in f:
+                    cel = line.split(',')
+                    res_json = dict(success=dict(image_name=cel[5]),
+                                    output_image=None,
+                                    output_image_shape=(int(cel[2]),int(cel[3]),int(cel[4])),
+                                    output_image_name=cel[5])
+                    if cel[0] == 'capture':
+                        img_npy = common.b64str2npy(cel[1], res_json["output_image_shape"])
+                        img_bytes = common.npy2imgfile(img_npy, image_type='jpeg')
+                        res_json["output_image"] = common.bytes2b64str(img_bytes)
+                    else:
+                        res_json["output_image"] = cel[1]
+                    ret.append(res_json)
+            return ret
 
         @eel.expose
         def list_pipe():
@@ -564,5 +593,5 @@ class Web(object):
 
     def stop(self, route, websockets):
         self.logger.info(f"Stop eel web. {route}")
-        exit(0)
+        #exit(0)
 

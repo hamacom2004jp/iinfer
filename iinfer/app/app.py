@@ -547,7 +547,11 @@ def _main(args_list:list=None):
             mmpretrain = install_mmpretrain if install_mmpretrain else mmpretrain
             mmrotate = install_mmrotate if install_mmrotate else mmrotate
             insightface = install_insightface if install_insightface else insightface
-            ret = inst.server(install_iinfer, install_onnx=onnx, install_mmdet=mmdet, install_mmcls=mmcls, install_mmpretrain=mmpretrain, install_mmrotate=mmrotate, install_insightface=insightface, install_tag=install_tag)
+            if data is None:
+                msg = {"warn":f"Please specify the --data option."}
+                common.print_format(msg, format, tm, output_json, output_json_append)
+                return 1, msg
+            ret = inst.server(Path(data), install_iinfer, install_onnx=onnx, install_mmdet=mmdet, install_mmcls=mmcls, install_mmpretrain=mmpretrain, install_mmrotate=mmrotate, install_insightface=insightface, install_tag=install_tag)
             common.print_format(ret, format, tm, output_json, output_json_append)
             if 'success' not in ret:
                 return 1, ret

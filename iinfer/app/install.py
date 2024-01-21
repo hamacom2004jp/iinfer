@@ -6,6 +6,7 @@ import logging
 import os
 import platform
 import shutil
+import yaml
 
 class Install(object):
     def __init__(self, logger: logging.Logger, wsl_name: str = None, wsl_user: str = None):
@@ -36,16 +37,25 @@ class Install(object):
         else:
             return {"warn":f"Unsupported platform."}
 
-    def server(self, install_iinfer:str='iinfer', install_onnx:bool=True, install_mmdet:bool=True, install_mmcls:bool=False, install_mmpretrain:bool=True, install_mmrotate:bool=False,
+    def server(self, data:Path, install_iinfer:str='iinfer', install_onnx:bool=True, install_mmdet:bool=True, install_mmcls:bool=False, install_mmpretrain:bool=True, install_mmrotate:bool=False,
                install_insightface=False, install_tag:str=None):
         if platform.system() == 'Windows':
             return {"warn": f"Build server command is Unsupported in windows platform."}
         from importlib.resources import read_text
         user = getpass.getuser()
+        install_tag = f"_{install_tag}" if install_tag is not None else ''
         with open('Dockerfile', 'w', encoding='utf-8') as fp:
             text = read_text(f'{common.APP_ID}.docker', 'Dockerfile')
+            wheel = Path(install_iinfer)
+            if wheel.exists() and wheel.suffix == '.whl':
+                shutil.copy(wheel, Path('.').resolve() / wheel.name)
+                install_iinfer = f'/home/{user}/{wheel.name}'
+                text = text.replace('#{COPY_IINFER}', f'COPY {wheel.name} {install_iinfer}')
+            else:
+                text = text.replace('#{COPY_IINFER}', '')
             text = text.replace('${MKUSER}', user)
-            text = text.replace('${INSTALL_IINFER}', install_iinfer)
+            text = text.replace('#{INSTALL_TAG}', install_tag)
+            text = text.replace('#{INSTALL_IINFER}', install_iinfer)
             text = text.replace('#{INSTALL_ONNX}', f'RUN iinfer -m install -c onnx --data /home/{user}/.iinfer' if install_onnx else '')
             text = text.replace('#{INSTALL_MMDET}', f'RUN iinfer -m install -c mmdet --data /home/{user}/.iinfer' if install_mmdet else '')
             text = text.replace('#{INSTALL_MMCLS}', f'RUN iinfer -m install -c mmcls --data /home/{user}/.iinfer' if install_mmcls else '')
@@ -53,12 +63,36 @@ class Install(object):
             text = text.replace('#{INSTALL_MMROTATE}', f'RUN iinfer -m install -c mmrotate --data /home/{user}/.iinfer' if install_mmrotate else '')
             text = text.replace('#{INSTALL_INSIGHTFACE}', f'RUN iinfer -m install -c insightface --data /home/{user}/.iinfer' if install_insightface else '')
             fp.write(text)
-        install_tag = f"_{install_tag}" if install_tag is not None else ''
-        with open(f'docker-compose{install_tag}.yml', 'w', encoding='utf-8') as fp:
-            text = read_text(f'{common.APP_ID}.docker', 'docker-compose.yml')
-            text = text.replace('${VERSION}', version.__version__)
-            text = text.replace('${TAG_NAME}', install_tag)
-            fp.write(text)
+        docker_compose_path = Path('docker-compose.yml')
+        if not docker_compose_path.exists():
+            with open(docker_compose_path, 'w', encoding='utf-8') as fp:
+                text = read_text(f'{common.APP_ID}.docker', 'docker-compose.yml')
+                fp.write(text)
+        with open(f'docker-compose.yml', 'r+', encoding='utf-8') as fp:
+            comp = yaml.safe_load(fp)
+            services = comp['services']
+            common.mkdirs(data)
+            services[f'iinfer_server{install_tag}'] = dict(
+                image=f'hamacom/iinfer:{version.__version__}{install_tag}',
+                container_name=f'iinfer_server{install_tag}',
+                environment=dict(
+                    TZ='Asia/Tokyo',
+                    REDIS_HOST='${REDIS_HOST:-redis}',
+                    REDIS_PORT='${REDIS_PORT:-6379}',
+                    REDIS_PASSWORD='${REDIS_PASSWORD:-password}',
+                    SVNAME='${SVNAME:-server'+install_tag+'}'
+                ),
+                networks=['backend'],
+                user=user,
+                restart='always',
+                working_dir=f'/home/{user}',
+                volumes=[
+                    f'~/:/home/{user}/',
+                    f'{data}:/home/{user}/.iinfer'
+                ]
+            )
+            fp.seek(0)
+            yaml.dump(comp, fp)
         cmd = f'docker build -t hamacom/iinfer:{version.__version__}{install_tag} -f Dockerfile .'
 
         if platform.system() == 'Linux':
@@ -67,7 +101,7 @@ class Install(object):
             if returncode != 0:
                 self.logger.error(f"Failed to install iinfer-server.")
                 return {"error": f"Failed to install iinfer-server."}
-            return {"success": f"Success to install iinfer-server. and docker-compose{install_tag}.yml is copied."}
+            return {"success": f"Success to install iinfer-server. and docker-compose.yml is copied."}
 
         else:
             return {"warn":f"Unsupported platform."}

@@ -31,6 +31,14 @@
                         <ul class="dropdown-menu" aria-labelledby="fileMenuLink">
                             <li><a class="dropdown-item" href="#" onclick="$('.cmd_add').click();">New Command</a></li>
                             <li><a class="dropdown-item" href="#" onclick="$('.pipe_add').click();">New Pipeline</a></li>
+                            <li>
+                                <a class="dropdown-item" href="#" onclick="open_output_json_func('open_output_json_path')">Open output_json</a>
+                                <input type="hidden" id="open_output_json_path" value=""/>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="#" onclick="open_capture_func('open_capture_path')">Open capture</a>
+                                <input type="hidden" id="open_capture_path" value=""/>
+                            </li>
                         </ul>
                     </li>
                     <li class="nav-item dropdown">
@@ -760,7 +768,7 @@ $(function(){
         });
     });
     // ファイラーモーダル
-    filer_modal_func = async function(target_id, modal_title, current_path) {
+    filer_modal_func = async function(target_id, modal_title, current_path, call_back_func) {
         filer_modal = $('#filer_modal');
         filer_modal.find('.modal-title').text(modal_title);
         filer_modal.find('.modal-body').html('<ul class="tree-menu overflow-auto border col-4"></ul><div class="file-list overflow-auto col-8"></div>');
@@ -793,7 +801,7 @@ $(function(){
                     current_node.append(li_elem);
                 }
                 mk_func = function(target_id, current_node, current_path){
-                    // nodeの値を残すためにクロージャーにする
+                    // 左側ペインのフォルダを選択した時の処理
                     return function(){
                         reload_tree(target_id, current_node, current_path);
                     }
@@ -824,7 +832,7 @@ $(function(){
                 filer_modal.find('.filer_address').val(node['path']);
                 if(node['children']) {
                     mk_func = function(target_id, current_node, current_path){
-                        // nodeの値を残すためにクロージャーにする
+                        // 右側ペインのフォルダを選択した時の処理
                         return function(){
                             reload_tree(target_id, current_node, current_path);
                         }
@@ -841,10 +849,11 @@ $(function(){
                         tr_elem.append($('<td>' + n['last'] + '</td>'));
                     });
                     mk_func = function(target_id, current_node, current_path){
-                        // nodeの値を残すためにクロージャーにする
+                        // 右側ペインのファイルを選択した時の処理
                         return function(){
                             $('[id="'+target_id+'"]').val(current_path);
                             filer_modal.modal('hide');
+                            if(call_back_func) call_back_func(current_path);
                         }
                     }
                     $.each(node['children'], function(k, n){
@@ -985,6 +994,28 @@ $(function(){
         list2table(result, table_head, table_body);
         result_modal.modal('show');
     }
+    // output_jsonファイルを選択して表示する
+    open_output_json_func = function(target_id){
+        // ファイル選択後に結果画面を開く
+        view_output_json_func = function(current_path){
+            eel.load_result(current_path)().then(function(result){
+                view_result_func(current_path, result);
+                $('#loading').addClass('d-none');
+            });
+        };
+        filer_modal_func(target_id, 'output_json', '', view_output_json_func);
+    };
+    // captureファイルを選択して表示する
+    open_capture_func = function(target_id){
+        // ファイル選択後に結果画面を開く
+        view_capture_func = function(current_path){
+            eel.load_capture(current_path)().then(function(result){
+                view_result_func(current_path, result);
+                $('#loading').addClass('d-none');
+            });
+        };
+        filer_modal_func(target_id, 'capture', '', view_capture_func);
+    };
     // 保存済みパイプラインファイル一覧の取得
     list_pipe_func = async function(){
         $('#pipe_items').html('');

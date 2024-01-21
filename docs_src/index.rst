@@ -14,6 +14,7 @@ iinfer (Image Inference Application)
    GUIモード <docs/gui.rst>
    コマンドリファレンス <docs/command.rst>
    動作確認済みモデル <docs/models.rst>
+   サーバー環境構築 <docs/install.rst>
    物体検知 <docs/detection.rst>
    顔認識 <docs/face.rst>
    パイプライン <docs/pipeline.rst>
