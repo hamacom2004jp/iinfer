@@ -593,5 +593,5 @@ class Web(object):
 
     def stop(self, route, websockets):
         self.logger.info(f"Stop eel web. {route}")
-        #exit(0)
+        exit(0)
 

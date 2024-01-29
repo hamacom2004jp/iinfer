@@ -12,7 +12,7 @@
 
 - `iinfer -m install -c server <Option>` コマンドでサーバー環境を構築できます。
     - `--install_mmdet` オプションは `mmdetection` のみをDockerイメージに含めるための指定です。
-    - `--install_mmdet` オプション等をし停止ない場合は、デフォルトのフレームワークがインストールされます。 :doc:`./cmd_install` を参照してください。
+    - `--install_mmdet` オプションを使用しない場合は、デフォルトのフレームワークがインストールされます。 :doc:`./cmd_install` を参照してください。
     - `--install_tag mmdet` は、作成するイメージ名やコンテナ名、 `iinfer` 推論サーバーの名前に使用されるタグ名です。
 
     .. code-block:: bash
