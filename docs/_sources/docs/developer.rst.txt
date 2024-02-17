@@ -129,3 +129,62 @@ iinferの開発環境を構築するための手順を説明します。
 
         pip install your-package
 
+【参考】WSL2-Ubuntu20.04-docker環境を構築する手順
+=====================================================
+
+1. WSL2のインストール
+
+    Windowsコマンドプロンプトで以下のコマンドを実行します:
+
+    .. code-block:: bat
+
+        wsl --install -d Ubuntu-20.04
+
+2. Ubuntu初期設定
+
+    起動したUbuntuにログインし、以下のコマンドを実行します:
+
+    .. code-block:: bash
+
+        cd /etc/apt
+        sudo sed -i.bak -e "s/http:\/\/archive\.ubuntu\.com/http:\/\/jp\.archive\.ubuntu\.com/g" sources.list
+        sudo apt update
+        sudo apt install -y language-pack-ja
+        sudo update-locale LANG=ja_JP.UTF-8
+        sudo apt install -y manpages-ja manpages-ja-dev
+
+3. Dockerのインストール
+
+    同じくUbuntu内で以下のコマンドを実行します:
+
+    .. code-block:: bash
+
+        sudo apt install -y apt-transport-https ca-certificates curl software-properties-common
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+        sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
+        sudo apt update
+        apt-cache policy docker-ce
+        sudo apt install -y docker-ce docker-compose
+        sudo systemctl start docker
+        sudo systemctl enable docker
+        sudo usermod -aG docker $USER
+        exit
+
+4. WSL-Ubuntu-dockerイメージファイル作成
+
+    Windowsコマンドプロンプトで以下のコマンドを実行します:
+
+    .. code-block:: bat
+
+        wsl --shutdown
+        wsl --export Ubuntu-20.04 <任意のパス>/Ubuntu_docker-20.04.tar
+        wsl --unregister Ubuntu-20.04
+
+5. WSL-Ubuntu-dockerイメージファイルのインポート
+
+    Windowsコマンドプロンプトで以下のコマンドを実行します:
+
+    .. code-block:: bat
+
+        wsl --import Ubuntu_docker-20.04 <任意のパス> <任意のパス>/Ubuntu_docker-20.04.tar --version 2
+

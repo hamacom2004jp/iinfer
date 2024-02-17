@@ -46,7 +46,7 @@ with open('README.md', 'r', encoding='utf-8') as fp:
     readme = fp.read()
 LONG_DESCRIPTION = readme
 LONG_DESCRIPTION_CONTENT_TYPE = 'text/markdown'
-RESORCE_TEXT_FILES = dict(iinfer=['*.yml', 'docker/*', 'datasets/**', 'licenses/**', 'web/**'])
+RESORCE_TEXT_FILES = dict(iinfer=['*.yml', 'docker/*', 'datasets/**', 'licenses/**', 'web/**', 'web/*/*', 'web/*/*/*', 'web/*/*/*/*'])
 setup(
     name=NAME,
     version=VERSION,

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>iinfer.app.install &mdash; iinfer 2024/01/21 documentation</title>
+  <title>iinfer.app.install &mdash; iinfer 2024/02/17 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -15,7 +15,7 @@
   
         <script src="../../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=7b027700"></script>
+        <script src="../../../_static/documentation_options.js?v=8ee95736"></script>
         <script src="../../../_static/doctools.js?v=888ff710"></script>
         <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -162,6 +162,7 @@
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;docker-compose.yml&#39;</span><span class="p">,</span> <span class="s1">&#39;r+&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
             <span class="n">comp</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
             <span class="n">services</span> <span class="o">=</span> <span class="n">comp</span><span class="p">[</span><span class="s1">&#39;services&#39;</span><span class="p">]</span>
+            <span class="n">common</span><span class="o">.</span><span class="n">mkdirs</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
             <span class="n">services</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;iinfer_server</span><span class="si">{</span><span class="n">install_tag</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
                 <span class="n">image</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;hamacom/iinfer:</span><span class="si">{</span><span class="n">version</span><span class="o">.</span><span class="n">__version__</span><span class="si">}{</span><span class="n">install_tag</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
                 <span class="n">container_name</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;iinfer_server</span><span class="si">{</span><span class="n">install_tag</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>

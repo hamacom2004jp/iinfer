@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>開発者向け情報 &mdash; iinfer 2024/01/21 documentation</title>
+  <title>開発者向け情報 &mdash; iinfer 2024/02/17 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -16,7 +16,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=7b027700"></script>
+        <script src="../_static/documentation_options.js?v=8ee95736"></script>
         <script src="../_static/doctools.js?v=888ff710"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -59,6 +59,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#id2">プロジェクトのインストール方法</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#id3">モジュールのコミット方法</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#pypl">【参考】pyplにアップするための手順</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#wsl2-ubuntu20-04-docker">【参考】WSL2-Ubuntu20.04-docker環境を構築する手順</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="errors.html">よくあるエラー</a></li>
@@ -223,6 +224,67 @@ python setup.py bdist_wheel
 <li><p>本番環境のモジュールをインストール</p>
 <blockquote>
 <div><div class="highlight-bat notranslate"><div class="highlight"><pre><span></span>pip install your-package
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+</ol>
+</section>
+<section id="wsl2-ubuntu20-04-docker">
+<h2>【参考】WSL2-Ubuntu20.04-docker環境を構築する手順<a class="headerlink" href="#wsl2-ubuntu20-04-docker" title="Link to this heading"></a></h2>
+<ol class="arabic">
+<li><p>WSL2のインストール</p>
+<blockquote>
+<div><p>Windowsコマンドプロンプトで以下のコマンドを実行します:</p>
+<div class="highlight-bat notranslate"><div class="highlight"><pre><span></span>wsl --install -d Ubuntu-20.04
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>Ubuntu初期設定</p>
+<blockquote>
+<div><p>起動したUbuntuにログインし、以下のコマンドを実行します:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>/etc/apt
+sudo<span class="w"> </span>sed<span class="w"> </span>-i.bak<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;s/http:\/\/archive\.ubuntu\.com/http:\/\/jp\.archive\.ubuntu\.com/g&quot;</span><span class="w"> </span>sources.list
+sudo<span class="w"> </span>apt<span class="w"> </span>update
+sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>language-pack-ja
+sudo<span class="w"> </span>update-locale<span class="w"> </span><span class="nv">LANG</span><span class="o">=</span>ja_JP.UTF-8
+sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>manpages-ja<span class="w"> </span>manpages-ja-dev
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>Dockerのインストール</p>
+<blockquote>
+<div><p>同じくUbuntu内で以下のコマンドを実行します:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>apt-transport-https<span class="w"> </span>ca-certificates<span class="w"> </span>curl<span class="w"> </span>software-properties-common
+curl<span class="w"> </span>-fsSL<span class="w"> </span>https://download.docker.com/linux/ubuntu/gpg<span class="w"> </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>apt-key<span class="w"> </span>add<span class="w"> </span>-
+sudo<span class="w"> </span>add-apt-repository<span class="w"> </span><span class="s2">&quot;deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable&quot;</span>
+sudo<span class="w"> </span>apt<span class="w"> </span>update
+apt-cache<span class="w"> </span>policy<span class="w"> </span>docker-ce
+sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>docker-ce<span class="w"> </span>docker-compose
+sudo<span class="w"> </span>systemctl<span class="w"> </span>start<span class="w"> </span>docker
+sudo<span class="w"> </span>systemctl<span class="w"> </span><span class="nb">enable</span><span class="w"> </span>docker
+sudo<span class="w"> </span>usermod<span class="w"> </span>-aG<span class="w"> </span>docker<span class="w"> </span><span class="nv">$USER</span>
+<span class="nb">exit</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>WSL-Ubuntu-dockerイメージファイル作成</p>
+<blockquote>
+<div><p>Windowsコマンドプロンプトで以下のコマンドを実行します:</p>
+<div class="highlight-bat notranslate"><div class="highlight"><pre><span></span>wsl --shutdown
+wsl --export Ubuntu-20.04 <span class="p">&lt;</span>任意のパス<span class="p">&gt;</span>/Ubuntu_docker-20.04.tar
+wsl --unregister Ubuntu-20.04
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>WSL-Ubuntu-dockerイメージファイルのインポート</p>
+<blockquote>
+<div><p>Windowsコマンドプロンプトで以下のコマンドを実行します:</p>
+<div class="highlight-bat notranslate"><div class="highlight"><pre><span></span>wsl --import Ubuntu_docker-20.04 <span class="p">&lt;</span>任意のパス<span class="p">&gt;</span> &lt;任意のパス<span class="p">&gt;</span>/Ubuntu_docker-20.04.tar --version 2
 </pre></div>
 </div>
 </div></blockquote>
