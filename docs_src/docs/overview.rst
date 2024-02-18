@@ -28,22 +28,24 @@ iinferの動作イメージ
 
 次の手順でインストールしてください:
 
-1. pipを使用してインストールします:
+1. pipを使用してインストールします。(venvの使用を推奨します):
 
   .. code-block:: bash
 
-      pip install --upgrade pip
-      pip install iinfer
-      eval "$(register-python-argcomplete iinfer)" # Ubuntuの場合コマンドラインオプションを補完できるようにします。
+    python3 -m venv .venv
+    source .venv/bin/activate
+    pip install --upgrade pip
+    pip install iinfer
+    eval "$(register-python-argcomplete iinfer)" # Ubuntuの場合コマンドラインオプションを補完できるようにします。
 
 2. Ubuntuでサーバーを立てるの場合、コンテナをインストールして起動します。:
    ※docker及びdocker-composeを別途インストールしておく必要があります。
 
   .. code-block:: bash
 
-      cd ~/
-      iinfer -m install -c server
-      docker-compose -f up -d
+    cd ~/
+    iinfer -m install -c server
+    docker-compose -f up -d
 
   ※インストールを実行したフォルダに `docker-compose.yml` が作成されます。
 
@@ -54,15 +56,17 @@ iinferの動作イメージ
 
     .. code-block:: bat
 
-        wsl -d <WSLイメージ名> -u {WSLユーザー名}
+      wsl -d <WSLイメージ名> -u {WSLユーザー名}
 
   2. WSL2のUbunntu上にiinferをインストールします。
 
     .. code-block:: bash
 
-        pip install --upgrade pip
-        pip install iinfer
-        eval "$(register-python-argcomplete iinfer)"
+      python3 -m venv .venv
+      source .venv/bin/activate
+      pip install --upgrade pip
+      pip install iinfer
+      eval "$(register-python-argcomplete iinfer)"
 
   3. コンテナをインストールして起動します。:
 
@@ -73,6 +77,28 @@ iinferの動作イメージ
       docker-compose -f up -d
 
     ※インストールを実行したフォルダに `docker-compose.yml` が作成されます。
+
+GPUを使用する場合（pytorch版）
+==============================
+
+GPUを使用する場合、次の手順でインストールしてください:
+
+1. iinfer を新規インストールします。(venvの使用を推奨します)
+
+  .. code-block:: bash
+
+    python3 -m venv .venv
+    source .venv/bin/activate
+    pip install --upgrade pip
+    pip install iinfer
+    eval "$(register-python-argcomplete iinfer)" # Ubuntuの場合コマンドラインオプションを補完できるようにします。
+
+2. `--install_use_gpu` オプションをつけて `mmdet` などのインストールを行います。
+
+  .. code-block:: bash
+
+    iinfer -m install -c mmdet --install_use_gpu
+
 
 iinferの使用方法
 ================

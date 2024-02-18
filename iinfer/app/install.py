@@ -37,7 +37,8 @@ class Install(object):
         else:
             return {"warn":f"Unsupported platform."}
 
-    def server(self, data:Path, install_iinfer:str='iinfer', install_onnx:bool=True, install_mmdet:bool=True, install_mmcls:bool=False, install_mmpretrain:bool=True, install_mmrotate:bool=False,
+    def server(self, data:Path, install_iinfer:str='iinfer', install_onnx:bool=True,
+               install_mmdet:bool=True, install_mmcls:bool=False, install_mmpretrain:bool=True, install_mmrotate:bool=False, install_use_gpu:bool=False,
                install_insightface=False, install_tag:str=None):
         if platform.system() == 'Windows':
             return {"warn": f"Build server command is Unsupported in windows platform."}
@@ -132,7 +133,37 @@ class Install(object):
             return {"error": f"Failed to install insightface."}
         return {"success": f"Success to install insightface."}
 
-    def mmdet(self, data_dir: Path):
+    def _torch(self, install_use_gpu:bool=False):
+        if install_use_gpu:
+            returncode, _ = common.cmd('pip install torch==2.1.0 torchvision --index-url https://download.pytorch.org/whl/cu118', logger=self.logger)
+        else:
+            returncode, _ = common.cmd('pip install torch==2.1.0 torchvision', logger=self.logger)
+        if returncode != 0:
+            self.logger.error(f"Failed to install torch.")
+            return {"error": f"Failed to install torch."}
+        return {"success": f"Success to install torch."}
+
+    def _openmin(self, install_use_gpu:bool=False):
+        returncode, _ = common.cmd('pip install openmim', logger=self.logger)
+        if returncode != 0:
+            self.logger.error(f"Failed to install openmim.")
+            return {"error": f"Failed to install openmim."}
+        return {"success": f"Success to install openmim."}
+
+    def _mmcv(self, install_use_gpu:bool=False):
+        if install_use_gpu:
+            returncode, _ = common.cmd('pip install mmcv==2.1.0 -f https://download.openmmlab.com/mmcv/dist/cu118/torch2.1/index.html', logger=self.logger)
+            if returncode != 0:
+                self.logger.error(f"Failed to install mmcv.")
+                return {"error": f"Failed to install mmcv."}
+        else:
+            returncode, _ = common.cmd('mim install mmcv>=2.0.0', logger=self.logger)
+        if returncode != 0:
+            self.logger.error(f"Failed to install mmcv.")
+            return {"error": f"Failed to install mmcv."}
+        return {"success": f"Success to install mmcv."}
+
+    def mmdet(self, data_dir:Path, install_use_gpu:bool=False):
         returncode, _ = common.cmd(f'git clone https://github.com/open-mmlab/mmdetection.git', logger=self.logger)
         if returncode != 0:
             self.logger.error(f"Failed to git clone mmdetection.")
@@ -141,21 +172,23 @@ class Install(object):
         shutil.copytree(srcdir, data_dir / 'mmdetection', dirs_exist_ok=True, ignore=shutil.ignore_patterns('.git'))
         shutil.rmtree(srcdir, ignore_errors=True)
 
-        returncode, _ = common.cmd('pip install torch torchvision openmim', logger=self.logger)
-        if returncode != 0:
-            self.logger.error(f"Failed to install torch.")
-            return {"error": f"Failed to install torch."}
+        ret = self._torch(install_use_gpu)
+        if "error" in ret: return ret
+        ret = self._openmin(install_use_gpu)
+        if "error" in ret: return ret
+        ret = self._mmcv(install_use_gpu)
+        if "error" in ret: return ret
 
-        returncode, _ = common.cmd('mim install mmengine mmcv mmdet', logger=self.logger)
-        if returncode != 0:
-            self.logger.error(f"Failed to install mmdet.")
-            return {"error": f"Failed to install mmdet."}
+        ret, _ = common.cmd('mim install mmengine mmdet', logger=self.logger)
+        if ret != 0:
+            self.logger.error(f"Failed to install mmengine mmdet.")
+            return {"error": f"Failed to install mmengine mmdet."}
 
         if srcdir.exists():
             return {"success": f"Please remove '{srcdir / 'mmdetection'}' manually."}
         return {"success": f"Success to install mmdet."}
 
-    def mmrotate(self, data_dir: Path):
+    def mmrotate(self, data_dir:Path, install_use_gpu:bool=False):
         returncode, _ = common.cmd(f'git clone https://github.com/open-mmlab/mmrotate.git', logger=self.logger)
         if returncode != 0:
             self.logger.error(f"Failed to git clone mmrotate.")
@@ -164,34 +197,39 @@ class Install(object):
         shutil.copytree(srcdir, data_dir / 'mmrotate', dirs_exist_ok=True, ignore=shutil.ignore_patterns('.git'))
         shutil.rmtree(srcdir, ignore_errors=True)
 
-        returncode, _ = common.cmd('pip install torch torchvision openmim', logger=self.logger)
-        if returncode != 0:
-            self.logger.error(f"Failed to install torch.")
-            return {"error": f"Failed to install torch."}
+        ret = self._torch(install_use_gpu)
+        if "error" in ret: return ret
+        ret = self._openmin(install_use_gpu)
+        if "error" in ret: return ret
+        ret = self._mmcv(install_use_gpu)
+        if "error" in ret: return ret
 
-        returncode, _ = common.cmd('mim install mmengine mmcv mmdet mmrotate', logger=self.logger)
-        if returncode != 0:
-            self.logger.error(f"Failed to install mmrotate.")
-            return {"error": f"Failed to install mmrotate."}
+        ret, _ = common.cmd('mim install mmengine mmdet mmrotate', logger=self.logger)
+        if ret != 0:
+            self.logger.error(f"Failed to install mmengine mmdet mmrotate.")
+            return {"error": f"Failed to install mmengine mmdet mmrotate."}
 
         if srcdir.exists():
             return {"success": f"Please remove '{srcdir / 'mmrotate'}' manually."}
         return {"success": f"Success to install mmrotate."}
 
-    def mmcls(self):
-        returncode, _ = common.cmd('pip install torch torchvision openmim', logger=self.logger)
-        if returncode != 0:
-            self.logger.error(f"Failed to install torch.")
-            return {"error": f"Failed to install torch."}
+    def mmcls(self, data_dir:Path, install_use_gpu:bool=False):
 
-        returncode, _ = common.cmd('mim install mmengine mmcv mmcls', logger=self.logger)
-        if returncode != 0:
-            self.logger.error(f"Failed to install mmcls.")
-            return {"error": f"Failed to install mmcls."}
+        ret = self._torch(install_use_gpu)
+        if "error" in ret: return ret
+        ret = self._openmin(install_use_gpu)
+        if "error" in ret: return ret
+        ret = self._mmcv(install_use_gpu)
+        if "error" in ret: return ret
+
+        ret, _ = common.cmd('mim install mmengine mmcls', logger=self.logger)
+        if ret != 0:
+            self.logger.error(f"Failed to install mmengine mmcls.")
+            return {"error": f"Failed to install mmengine mmcls."}
 
         return {"success": f"Success to install mmcls."}
 
-    def mmpretrain(self, data_dir: Path):
+    def mmpretrain(self, data_dir:Path, install_use_gpu:bool=False):
         returncode, _ = common.cmd(f'git clone https://github.com/open-mmlab/mmpretrain.git', logger=self.logger)
         if returncode != 0:
             self.logger.error(f"Failed to git clone mmpretrain.")
@@ -200,18 +238,15 @@ class Install(object):
         shutil.copytree(srcdir, data_dir / 'mmpretrain', dirs_exist_ok=True, ignore=shutil.ignore_patterns('.git'))
         shutil.rmtree(srcdir, ignore_errors=True)
 
-        returncode, _ = common.cmd('pip install torch torchvision openmim', logger=self.logger)
-        if returncode != 0:
-            self.logger.error(f"Failed to install torch.")
-            return {"error": f"Failed to install torch."}
+        ret = self._torch(install_use_gpu)
+        if "error" in ret: return ret
+        ret = self._openmin(install_use_gpu)
+        if "error" in ret: return ret
+        ret = self._mmcv(install_use_gpu)
+        if "error" in ret: return ret
 
-        returncode, _ = common.cmd('pip uninstall -y mmcv', logger=self.logger)
-        if returncode != 0:
-            self.logger.error(f"Failed to uninstall mmcv.")
-            return {"error": f"Failed to uninstall mmcv."}
-
-        returncode, _ = common.cmd('mim install mmengine mmcv>=2.0.0 mmpretrain', logger=self.logger)
-        if returncode != 0:
+        ret, _ = common.cmd('mim install mmengine mmpretrain', logger=self.logger)
+        if ret != 0:
             self.logger.error(f"Failed to install mmpretrain.")
             return {"error": f"Failed to install mmpretrain."}
 

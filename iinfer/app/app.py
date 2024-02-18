@@ -120,6 +120,7 @@ def _main(args_list:list=None):
     parser.add_argument('--install_mmrotate', help='Setting the install server install_mmrotate.', action='store_true')
     parser.add_argument('--install_insightface', help='Setting the install server install_insightface.', action='store_true')
     parser.add_argument('--install_tag', help='Setting the install server install_tag.', type=str, default=None)
+    parser.add_argument('--install_use_gpu', help='Setting the install use gpu.', action='store_true')
 
     argcomplete.autocomplete(parser)
     if args_list is not None:
@@ -209,6 +210,7 @@ def _main(args_list:list=None):
     install_mmrotate = common.getopt(opt, 'install_mmrotate', preval=args_dict, withset=True)
     install_insightface = common.getopt(opt, 'install_insightface', preval=args_dict, withset=True)
     install_tag = common.getopt(opt, 'install_tag', preval=args_dict, withset=True)
+    install_use_gpu = common.getopt(opt, 'install_use_gpu', preval=args_dict, withset=True)
 
     tm = time.time()
     ret = {"success":f"Start command. {args}"}
@@ -568,7 +570,9 @@ def _main(args_list:list=None):
                 msg = {"warn":f"Please specify the --data option."}
                 common.print_format(msg, format, tm, output_json, output_json_append)
                 return 1, msg
-            ret = inst.server(Path(data), install_iinfer, install_onnx=onnx, install_mmdet=mmdet, install_mmcls=mmcls, install_mmpretrain=mmpretrain, install_mmrotate=mmrotate, install_insightface=insightface, install_tag=install_tag)
+            ret = inst.server(Path(data), install_iinfer, install_onnx=onnx,
+                              install_mmdet=mmdet, install_mmcls=mmcls, install_mmpretrain=mmpretrain, install_mmrotate=mmrotate, install_use_gpu=install_use_gpu,
+                              install_insightface=insightface, install_tag=install_tag)
             common.print_format(ret, format, tm, output_json, output_json_append)
             if 'success' not in ret:
                 return 1, ret
@@ -584,13 +588,13 @@ def _main(args_list:list=None):
                 msg = {"warn":f"Please specify the --data option."}
                 common.print_format(msg, format, tm, output_json, output_json_append)
                 return 1, msg
-            ret = inst.mmdet(Path(data))
+            ret = inst.mmdet(Path(data), install_use_gpu=install_use_gpu)
             common.print_format(ret, format, tm, output_json, output_json_append)
             if 'success' not in ret:
                 return 1, ret
 
         elif cmd == 'mmcls':
-            ret = inst.mmcls()
+            ret = inst.mmcls(Path(data), install_use_gpu=install_use_gpu)
             common.print_format(ret, format, tm, output_json, output_json_append)
             if 'success' not in ret:
                 return 1, ret
@@ -600,7 +604,7 @@ def _main(args_list:list=None):
                 msg = {"warn":f"Please specify the --data option."}
                 common.print_format(msg, format, tm, output_json, output_json_append)
                 return 1, msg
-            ret = inst.mmpretrain(Path(data))
+            ret = inst.mmpretrain(Path(data), install_use_gpu=install_use_gpu)
             common.print_format(ret, format, tm, output_json, output_json_append)
             if 'success' not in ret:
                 return 1, ret
@@ -610,7 +614,7 @@ def _main(args_list:list=None):
                 msg = {"warn":f"Please specify the --data option."}
                 common.print_format(msg, format, tm, output_json, output_json_append)
                 return 1, msg
-            ret = inst.mmrotate(Path(data))
+            ret = inst.mmrotate(Path(data), install_use_gpu=install_use_gpu)
             common.print_format(ret, format, tm, output_json, output_json_append)
             if 'success' not in ret:
                 return 1, ret

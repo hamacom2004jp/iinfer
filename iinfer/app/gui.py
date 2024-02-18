@@ -318,24 +318,28 @@ class Web(object):
                     ]
                 elif cmd == "mmdet":
                     return [
+                        dict(opt="install_use_gpu", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False]),
                         dict(opt="output_json", type="file", default="", required=False, multi=False, hide=True, choise=None),
                         dict(opt="output_json_append", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False]),
-                        dict(opt="stdout_log", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False])
+                        dict(opt="stdout_log", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False]),
                     ]
                 elif cmd == "mmcls":
                     return [
+                        dict(opt="install_use_gpu", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False]),
                         dict(opt="output_json", type="file", default="", required=False, multi=False, hide=True, choise=None),
                         dict(opt="output_json_append", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False]),
                         dict(opt="stdout_log", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False])
                     ]
                 elif cmd == "mmpretrain":
                     return [
+                        dict(opt="install_use_gpu", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False]),
                         dict(opt="output_json", type="file", default="", required=False, multi=False, hide=True, choise=None),
                         dict(opt="output_json_append", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False]),
                         dict(opt="stdout_log", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False])
                     ]
                 elif cmd == "mmrotate":
                     return [
+                        dict(opt="install_use_gpu", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False]),
                         dict(opt="output_json", type="file", default="", required=False, multi=False, hide=True, choise=None),
                         dict(opt="output_json_append", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False]),
                         dict(opt="stdout_log", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False])
@@ -351,6 +355,7 @@ class Web(object):
                 elif cmd == "server":
                     return [
                         dict(opt="data", type="file", default=None, required=False, multi=False, hide=False, choise=None),
+                        dict(opt="install_use_gpu", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False]),
                         dict(opt="install_iinfer", type="str", default='iinfer', required=False, multi=False, hide=True, choise=None),
                         dict(opt="install_onnx", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False]),
                         dict(opt="install_mmdet", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False]),
