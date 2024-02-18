@@ -11,8 +11,10 @@ IMAGE_HEIGHT = 416
 USE_MODEL_CONF = False
 
 class OnnxdetYoloXLite(onnx_det_YoloX.OnnxDetYoloX):
+    def __init__(self, logger:logging.Logger) -> None:
+        super().__init__(logger)
 
-    def create_session(self, logger:logging.Logger, model_path:Path, model_conf_path:Path, model_provider:str, gpu_id:int=None):
+    def create_session(self, model_path:Path, model_conf_path:Path, model_provider:str, gpu_id:int=None):
         """
         推論セッションを作成する関数です。
         startコマンド実行時に呼び出されます。
@@ -20,7 +22,6 @@ class OnnxdetYoloXLite(onnx_det_YoloX.OnnxDetYoloX):
         戻り値の推論セッションの型は問いません。
 
         Args:
-            logger (logging.Logger): ロガー
             model_path (Path): モデルファイルのパス
             model_conf_path (Path): モデル設定ファイルのパス
             gpu_id (int, optional): GPU ID. Defaults to None.
@@ -28,7 +29,7 @@ class OnnxdetYoloXLite(onnx_det_YoloX.OnnxDetYoloX):
         Returns:
             推論セッション
         """
-        return super().create_session(logger, model_path, model_conf_path, model_provider, gpu_id)
+        return super().create_session(model_path, model_conf_path, model_provider, gpu_id)
 
     def predict(self, session, img_width:int, img_height:int, image:Image.Image, labels:List[str]=None, colors:List[Tuple[int]]=None, nodraw:bool=False):
         """

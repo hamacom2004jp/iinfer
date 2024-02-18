@@ -1,10 +1,10 @@
-from iinfer.app import predict
+from iinfer.app import predict, injection
 from io import BytesIO
 from pathlib import Path
 from PIL import Image, ImageDraw
 from pkg_resources import resource_string
 from tabulate import tabulate
-from typing import List, Tuple
+from typing import List, Tuple, Dict, Any
 import base64
 import importlib.util
 import inspect
@@ -208,29 +208,31 @@ def print_format(data:dict, format:bool, tm:float, output_json:str=None, output_
             pass
     return txt
 
-def load_custom_predict(custom_predict_py:Path) -> predict.Predict:
+def load_custom_predict(custom_predict_py:Path, logger:logging.Logger) -> predict.Predict:
     """
     カスタム予測オブジェクトを読み込みます。
 
     Args:
         custom_predict_py (Path): カスタム予測オブジェクトのパス
+        logger (logging.Logger): ロガー
 
     Returns:
         iinfer.app.predict.Predict: 予測オブジェクト
     """
-    spec = importlib.util.spec_from_file_location("predict", custom_predict_py)
+    spec = importlib.util.spec_from_file_location("iinfer.user.predict", custom_predict_py)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     for name, obj in inspect.getmembers(module):
         if inspect.isclass(obj) and issubclass(obj, predict.Predict):
-            return obj()
+            return obj(logger)
 
-def load_predict(predict_type:str) -> predict.Predict:
+def load_predict(predict_type:str, logger:logging.Logger) -> predict.Predict:
     """
     指定された予測オブジェクトを読み込みます。
 
     Args:
         predict_type (str): 予測オブジェクトのパッケージ名
+        logger (logging.Logger): ロガー
 
     Raises:
         BaseException: 指定されたオブジェクトが見つからない場合
@@ -241,7 +243,52 @@ def load_predict(predict_type:str) -> predict.Predict:
     module = importlib.import_module("iinfer.app.predicts." + predict_type)
     for name, obj in inspect.getmembers(module):
         if inspect.isclass(obj) and issubclass(obj, predict.Predict):
-            return obj()
+            return obj(logger)
+
+def load_before_injections(before_injection_py:List[Path], config:Dict[str,Any], logger:logging.Logger) -> List[injection.BeforeInjection]:
+    """
+    前処理オブジェクトを読み込みます。
+
+    Args:
+        before_injection_py (List[Path]): 前処理オブジェクトのパス
+        config (Dict[str,Any]): 設定
+        logger (logging.Logger): ロガー
+
+    Returns:
+        List[injection.BeforeInjection]: 前処理オブジェクト
+    """
+    injections = []
+    for p in before_injection_py:
+        spec = importlib.util.spec_from_file_location("iinfer.user.injection", p)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        for name, obj in inspect.getmembers(module):
+            if inspect.isclass(obj) and issubclass(obj, injection.BeforeInjection):
+                injections.append(obj(config, logger))
+    return injections
+
+
+def load_after_injections(after_injection_py:List[Path], config:Dict[str,Any], logger:logging.Logger) -> List[injection.AfterInjection]:
+    """
+    後処理オブジェクトを読み込みます。
+
+    Args:
+        after_injection_py (List[Path]): 後処理オブジェクトのパス
+        config (Dict[str,Any]): 設定
+        logger (logging.Logger): ロガー
+
+    Returns:
+        List[injection.AfterInjection]: 後処理オブジェクト
+    """
+    injections = []
+    for p in after_injection_py:
+        spec = importlib.util.spec_from_file_location("iinfer.user.injection", p)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        for name, obj in inspect.getmembers(module):
+            if inspect.isclass(obj) and issubclass(obj, injection.AfterInjection):
+                injections.append(obj(config, logger))
+    return injections
 
 def get_module_list(package_name) -> List[str]:
     package = __import__(package_name, fromlist=[''])

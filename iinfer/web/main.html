@@ -2,7 +2,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="assets/bootstrap/bootstrap.min.5.0.2.css">
+    <link rel="stylesheet" href="assets/bootstrap/bootstrap.min.5.3.0.css">
     <link rel="stylesheet" href="assets/lightbox2/css/lightbox.min.css">
     <link rel="stylesheet" href="assets/tree-menu/css/tree-menu.css">
     <script type="text/javascript" src="/eel.js"></script>
@@ -46,6 +46,7 @@
                             View
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="viewMenuLink">
+                            <li><a class="dropdown-item" href="#" onclick="change_dark_mode();">Change Dark Mode</a></li>
                             <li><a class="dropdown-item" href="#" onclick="$('#console_modal').modal('show');">Console log</a></li>
                         </ul>
                     </li>
@@ -421,14 +422,22 @@
     <!-- フッター -->
     <footer class="bg-dark fixed-bottom text-center text-white p-2 copyright"></footer>
 </body>
-<script type="text/javascript" src="assets/bootstrap/bootstrap.bundle.min.5.0.2.js"></script>
+<script type="text/javascript" src="assets/bootstrap/bootstrap.bundle.min.5.3.0.js"></script>
 <script type="text/javascript" src="assets/jquery/jquery.min.3.2.0.js"></script>
 <script type="text/javascript" src="assets/jquery-ui/jquery-ui.min.js"></script>
 <script type="text/javascript" src="assets/jquery-resizable/jquery-resizable.min.js"></script>
 <script type="text/javascript" src="assets/tree-menu/js/tree-menu.js"></script>
 <script type="text/javascript" src="assets/lightbox2/js/lightbox.min.js"></script>
 <script type="text/javascript">
+change_dark_mode = function(dark_mode){
+    html = $('html');
+    if(dark_mode) html.attr('data-bs-theme','dark');
+    else if(html.attr('data-bs-theme')=='dark') html.removeAttr('data-bs-theme');
+    else html.attr('data-bs-theme','dark');
+}
 $(function(){
+    // ダークモード対応
+    change_dark_mode(window.matchMedia('(prefers-color-scheme: dark)').matches);
     // copyright情報取得
     copyright_func = async function(){
         copyright = await eel.copyright()();
@@ -541,7 +550,7 @@ $(function(){
                         btn_a.click(mk_func(row, input_elem.parent().parent()));
                         // 2個目以降は削除ボタンを追加
                         if (cmd_modal.find('[name="'+target_name+'"]').length > 1) {
-                            mk_func = function(del_elem){
+                            mk_func = function(del_elem, row){
                                 // del_elemの値を残すためにクロージャーにする
                                 return function(){del_elem.remove();}
                             }
@@ -551,7 +560,7 @@ $(function(){
                                     +'<path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>'
                                     +'</svg>');
                             input_elem.parent().append(btn_t);
-                            btn_t.click(mk_func(input_elem.parent().parent()));
+                            btn_t.click(mk_func(input_elem.parent().parent(), row));
                         }
                     }
                     title = elem.find('.row_content_template_title');
@@ -622,6 +631,7 @@ $(function(){
                 cmd_modal.find('[name="name"]').attr('readonly', false);
             }
             cmd_modal.find('.modal-title').text('Command : ' + modal_title);
+            cmd_modal.find('.row_content_hide').hide();
             cmd_modal.modal('show');
         }
         $('.cmd_card').off('click');

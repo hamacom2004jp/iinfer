@@ -1,5 +1,5 @@
 from iinfer.app import common
-from iinfer.app import predict
+from iinfer.app import predict, injection
 from pathlib import Path
 from PIL import Image
 import base64
@@ -58,12 +58,14 @@ def test_04_01_mkdirs():
 
 def test_05_01_load_custom_predict():
     custom_predict_py = Path("iinfer/app/predicts/onnx_det_YoloX.py")
-    result = common.load_custom_predict(custom_predict_py)
+    logger, _ = common.load_config("server")
+    result = common.load_custom_predict(custom_predict_py, logger)
     assert result is not None
     assert isinstance(result, predict.Predict)
 
 def test_06_01_load_predict():
-    result = common.load_predict('onnx_det_YoloX')
+    logger, _ = common.load_config("server")
+    result = common.load_predict('onnx_det_YoloX', logger)
     assert result is not None
     assert isinstance(result, predict.Predict)
 
@@ -188,3 +190,17 @@ def test_22_01_draw_boxes():
     assert isinstance(result, Image.Image)
     assert result.size == (100, 100)
     assert out_labels[0] == labels[0]
+
+def test_23_01_load_before_injections():
+    logger, _ = common.load_config("server")
+    injection_py = Path("extensions/injection/before_grayimg_injection.py")
+    result = common.load_before_injections([injection_py], None, logger)
+    assert result is not None
+    assert isinstance(result[0], injection.BeforeInjection)
+
+def test_24_01_load_after_injections():
+    logger, _ = common.load_config("server")
+    injection_py = Path("extensions/injection/after_csv_injection.py")
+    result = common.load_after_injections([injection_py], None, logger)
+    assert result is not None
+    assert isinstance(result[0], injection.AfterInjection)

@@ -60,6 +60,10 @@ def _main(args_list:list=None):
     parser.add_argument('--custom_predict_py', help='Setting the cmd deploy custom_predict.py file.')
     parser.add_argument('--label_file', help='Setting the cmd deploy label_txt file.')
     parser.add_argument('--color_file', help='Setting the cmd deploy color_txt file.')
+    parser.add_argument('--before_injection_conf', help='Setting the cmd deploy before_injection_conf file.')
+    parser.add_argument('--before_injection_py', help='Setting the cmd deploy before_injection_py file.', action='append')
+    parser.add_argument('--after_injection_conf', help='Setting the cmd deploy after_injection_conf file.')
+    parser.add_argument('--after_injection_py', help='Setting the cmd deploy after_injection_py file.', action='append')
     parser.add_argument('--overwrite', help='Setting the cmd deploy overwrite save.', action='store_true')
 
     parser.add_argument('--model_provider', help='Setting the cmd start model_provider.',
@@ -142,6 +146,10 @@ def _main(args_list:list=None):
     custom_predict_py = common.getopt(opt, 'custom_predict_py', preval=args_dict, withset=True)
     label_file = common.getopt(opt, 'label_file', preval=args_dict, withset=True)
     color_file = common.getopt(opt, 'color_file', preval=args_dict, withset=True)
+    before_injection_conf = common.getopt(opt, 'before_injection_conf', preval=args_dict, withset=True)
+    before_injection_py = common.getopt(opt, 'before_injection_py', preval=args_dict, withset=True)
+    after_injection_conf = common.getopt(opt, 'after_injection_conf', preval=args_dict, withset=True)
+    after_injection_py = common.getopt(opt, 'after_injection_py', preval=args_dict, withset=True)
     overwrite = common.getopt(opt, 'overwrite', preval=args_dict, withset=True)
 
     model_provider = common.getopt(opt, 'model_provider', preval=args_dict, withset=True)
@@ -278,11 +286,20 @@ def _main(args_list:list=None):
             model_file = Path(model_file) if model_file is not None else None
             if model_conf_file is not None:
                 model_conf_file = [Path(f) for f in model_conf_file if f is not None and f != '']
+            if before_injection_py is not None:
+                before_injection_py = [Path(f) for f in before_injection_py if f is not None and f != '']
+            if after_injection_py is not None:
+                after_injection_py = [Path(f) for f in after_injection_py if f is not None and f != '']
             custom_predict_py = Path(custom_predict_py) if custom_predict_py is not None else None
             label_file = Path(label_file) if label_file is not None else None
             color_file = Path(color_file) if color_file is not None else None
-            ret = cl.deploy(name, model_img_width, model_img_height, model_file, model_conf_file, predict_type, custom_predict_py,
-                            label_file=label_file, color_file=color_file, overwrite=overwrite, timeout=timeout)
+            before_injection_conf = Path(before_injection_conf) if before_injection_conf is not None else None
+            after_injection_conf = Path(after_injection_conf) if after_injection_conf is not None else None
+            ret = cl.deploy(name, model_img_width, model_img_height, model_file, model_conf_file, predict_type,
+                            custom_predict_py, label_file=label_file, color_file=color_file,
+                            before_injection_conf=before_injection_conf, before_injection_py=before_injection_py,
+                            after_injection_conf=after_injection_conf, after_injection_py=after_injection_py,
+                            overwrite=overwrite, timeout=timeout)
             common.print_format(ret, format, tm, output_json, output_json_append)
             if 'success' not in ret:
                 return 1, ret

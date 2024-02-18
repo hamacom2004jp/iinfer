@@ -11,8 +11,11 @@ IMAGE_WIDTH = 224
 IMAGE_HEIGHT = 224
 USE_MODEL_CONF = False
 
-class OnnxClsEfficientNetLite4(predict.Predict):
-    def create_session(self, logger:logging.Logger, model_path:Path, model_conf_path:Path, model_provider:str, gpu_id:int=None):
+class OnnxClsEfficientNetLite4(predict.OnnxPredict):
+    def __init__(self, logger:logging.Logger) -> None:
+        super().__init__(logger)
+
+    def create_session(self, model_path:Path, model_conf_path:Path, model_provider:str, gpu_id:int=None):
         """
         推論セッションを作成する関数です。
         startコマンド実行時に呼び出されます。
@@ -20,7 +23,6 @@ class OnnxClsEfficientNetLite4(predict.Predict):
         戻り値の推論セッションの型は問いません。
 
         Args:
-            logger (logging.Logger): ロガー
             model_path (Path): モデルファイルのパス
             model_conf_path (Path): モデル設定ファイルのパス
             gpu_id (int, optional): GPU ID. Defaults to None.
@@ -29,7 +31,7 @@ class OnnxClsEfficientNetLite4(predict.Predict):
             推論セッション
         """
         import onnxruntime as rt
-        if gpu_id is None:
+        if self.is_gpu_available(model_path, model_conf_path, gpu_id):
             session = rt.InferenceSession(model_path, providers=[model_provider])
         else:
             session = rt.InferenceSession(model_path, providers=[model_provider], providers_options=[{'device_id': str(gpu_id)}])

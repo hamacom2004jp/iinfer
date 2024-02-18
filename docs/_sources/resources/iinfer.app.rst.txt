@@ -44,6 +44,14 @@ iinfer.app.gui module
    :undoc-members:
    :show-inheritance:
 
+iinfer.app.injection module
+---------------------------
+
+.. automodule:: iinfer.app.injection
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 iinfer.app.install module
 -------------------------
 

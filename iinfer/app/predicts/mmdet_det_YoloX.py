@@ -12,8 +12,11 @@ IMAGE_WIDTH = 640
 IMAGE_HEIGHT = 640
 USE_MODEL_CONF = True
 
-class MMDetYoloX(predict.Predict):
-    def create_session(self, logger:logging.Logger, model_path:Path, model_conf_path:Path, model_provider:str, gpu_id:int=None):
+class MMDetYoloX(predict.TorchPredict):
+    def __init__(self, logger:logging.Logger) -> None:
+        super().__init__(logger)
+
+    def create_session(self, model_path:Path, model_conf_path:Path, model_provider:str, gpu_id:int=None):
         """
         推論セッションを作成する関数です。
         startコマンド実行時に呼び出されます。
@@ -21,7 +24,6 @@ class MMDetYoloX(predict.Predict):
         戻り値の推論セッションの型は問いません。
 
         Args:
-            logger (logging.Logger): ロガー
             model_path (Path): モデルファイルのパス
             model_conf_path (Path): モデル設定ファイルのパス
             gpu_id (int, optional): GPU ID. Defaults to None.
@@ -32,7 +34,7 @@ class MMDetYoloX(predict.Predict):
         from mmdet.apis import init_detector
         import torch
         gpu = f'cuda:{gpu_id}' if gpu_id is not None else 'gpu'
-        device = torch.device(gpu if torch.cuda.is_available() else 'cpu')
+        device = torch.device(gpu if self.is_gpu_available(model_path, model_conf_path, gpu_id) else 'cpu')
         model = init_detector(model_conf_path, str(model_path), device=device) # , cfg_options = {'show': True}
         return model
 

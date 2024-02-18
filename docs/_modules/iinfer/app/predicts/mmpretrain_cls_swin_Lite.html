@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>iinfer.app.predicts.mmpretrain_cls_swin_Lite &mdash; iinfer 2024/02/17 documentation</title>
+  <title>iinfer.app.predicts.mmpretrain_cls_swin_Lite &mdash; iinfer 2024/02/18 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=3fafac33" />
@@ -15,7 +15,7 @@
   
         <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../../_static/documentation_options.js?v=8ee95736"></script>
+        <script src="../../../../_static/documentation_options.js?v=66f3f4f4"></script>
         <script src="../../../../_static/doctools.js?v=888ff710"></script>
         <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/js/theme.js"></script>
@@ -83,6 +83,7 @@
              
   <h1>Source code for iinfer.app.predicts.mmpretrain_cls_swin_Lite</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">iinfer.app.predicts</span> <span class="kn">import</span> <span class="n">mmpretrain_cls_swin</span>
+<span class="kn">import</span> <span class="nn">logging</span>
 
 <span class="n">SITE</span> <span class="o">=</span> <span class="s1">&#39;https://github.com/open-mmlab/mmpretrain/tree/master/configs/swin_transformer&#39;</span>
 <span class="n">IMAGE_WIDTH</span> <span class="o">=</span> <span class="mi">224</span>
@@ -92,7 +93,8 @@
 <div class="viewcode-block" id="MMPretrainClsSwinLite">
 <a class="viewcode-back" href="../../../../resources/iinfer.app.predicts.html#iinfer.app.predicts.mmpretrain_cls_swin_Lite.MMPretrainClsSwinLite">[docs]</a>
 <span class="k">class</span> <span class="nc">MMPretrainClsSwinLite</span><span class="p">(</span><span class="n">mmpretrain_cls_swin</span><span class="o">.</span><span class="n">MMPretrainClsSwin</span><span class="p">):</span>
-    <span class="k">pass</span></div>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">logger</span><span class="p">)</span></div>
 
 </pre></div>
 

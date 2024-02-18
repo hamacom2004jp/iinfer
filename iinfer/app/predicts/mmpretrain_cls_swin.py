@@ -10,8 +10,11 @@ IMAGE_WIDTH = 384
 IMAGE_HEIGHT = 384
 USE_MODEL_CONF = True
 
-class MMPretrainClsSwin(predict.Predict):
-    def create_session(self, logger:logging.Logger, model_path:Path, model_conf_path:Path, model_provider:str, gpu_id:int=None):
+class MMPretrainClsSwin(predict.TorchPredict):
+    def __init__(self, logger:logging.Logger) -> None:
+        super().__init__(logger)
+
+    def create_session(self, model_path:Path, model_conf_path:Path, model_provider:str, gpu_id:int=None):
         """
         推論セッションを作成する関数です。
         startコマンド実行時に呼び出されます。
@@ -19,7 +22,6 @@ class MMPretrainClsSwin(predict.Predict):
         戻り値の推論セッションの型は問いません。
 
         Args:
-            logger (logging.Logger): ロガー
             model_path (Path): モデルファイルのパス
             model_conf_path (Path): モデル設定ファイルのパス
             gpu_id (int, optional): GPU ID. Defaults to None.
@@ -30,7 +32,7 @@ class MMPretrainClsSwin(predict.Predict):
         self.deploy_dir = model_path.parent
         import torch
         import mmpretrain
-        device = torch.device('cuda' if torch.cuda.is_available() and gpu_id is not None else 'cpu')
+        device = torch.device('cuda' if self.is_gpu_available(model_path, model_conf_path, gpu_id) and gpu_id is not None else 'cpu')
         session = mmpretrain.ImageClassificationInferencer(str(model_conf_path), pretrained=str(model_path), device=device)
         return session
 

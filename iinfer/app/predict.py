@@ -4,6 +4,29 @@ from typing import List, Tuple, Dict, Any
 import logging
 
 class Predict(object):
+    def __init__(self, logger:logging.Logger) -> None:
+        """
+        このクラスのインスタンスを初期化します。
+        継承時は、このコンストラクタを呼び出すようにしてください。
+            super().__init__(logger)
+        Args:
+            logger (logging.Logger): ロガー
+        """
+        self.logger = logger
+
+    def is_gpu_available(self, gpu_id:int=None) -> bool:
+        """
+        GPUが利用可能かどうかを返す関数です。
+        戻り値がTrueの場合、GPUが利用可能です。
+        戻り値がFalseの場合、GPUが利用不可です。
+
+        Args:
+            gpu_id (int, optional): GPU ID. Defaults to None.
+        Returns:
+            bool: GPUが利用可能かどうか
+        """
+        raise NotImplementedError()
+
     def create_session(self, logger:logging.Logger, model_path:Path, model_conf_path:Path, model_provider:str, gpu_id:int=None) -> Any:
         """
         推論セッションを作成する関数です。
@@ -46,4 +69,64 @@ class Predict(object):
             Tuple[Dict[str, Any], Image]: 予測結果と出力画像(RGB)のタプル
         """
         raise NotImplementedError()
-    
+
+class OnnxPredict(Predict):
+    def __init__(self, logger:logging.Logger) -> None:
+        """
+        このクラスのインスタンスを初期化します。
+        継承時は、このコンストラクタを呼び出すようにしてください。
+            super().__init__(logger)
+        Args:
+            logger (logging.Logger): ロガー
+        """
+        super().__init__(logger)
+
+    def is_gpu_available(self, model_path:Path, model_conf_path:Path, gpu_id:int=None) -> bool:
+        """
+        GPUが利用可能かどうかを返す関数です。
+        戻り値がTrueの場合、GPUが利用可能です。
+        戻り値がFalseの場合、GPUが利用不可です。
+
+        Args:
+            model_path (Path): モデルファイルのパス
+            model_conf_path (Path): モデル設定ファイルのパス
+            gpu_id (int, optional): GPU ID. Defaults to None.
+        Returns:
+            bool: GPUが利用可能かどうか
+        """
+        try:
+            import onnxruntime as rt
+            rt.InferenceSession(model_path, providers=["CUDAExecutionProvider"], providers_options=[{'device_id': str(gpu_id)}])
+            return True
+        except:
+            return False
+
+class TorchPredict(Predict):
+    def __init__(self, logger:logging.Logger) -> None:
+        """
+        このクラスのインスタンスを初期化します。
+        継承時は、このコンストラクタを呼び出すようにしてください。
+            super().__init__(logger)
+        Args:
+            logger (logging.Logger): ロガー
+        """
+        super().__init__(logger)
+
+    def is_gpu_available(self, model_path:Path, model_conf_path:Path, gpu_id:int=None) -> bool:
+        """
+        GPUが利用可能かどうかを返す関数です。
+        戻り値がTrueの場合、GPUが利用可能です。
+        戻り値がFalseの場合、GPUが利用不可です。
+
+        Args:
+            model_path (Path): モデルファイルのパス
+            model_conf_path (Path): モデル設定ファイルのパス
+            gpu_id (int, optional): GPU ID. Defaults to None.
+        Returns:
+            bool: GPUが利用可能かどうか
+        """
+        try:
+            import torch
+            return torch.cuda.is_available()
+        except:
+            return False

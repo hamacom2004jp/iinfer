@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="jp" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>iinfer.app.injection &mdash; iinfer 2024/02/18 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=66f3f4f4"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            iinfer
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/overview.html">iinferの概要</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/gui.html">GUIモード</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/command.html">コマンドリファレンス</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/models.html">動作確認済みモデル</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/install.html">サーバー環境構築</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/detection.html">物体検知</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/face.html">顔認識</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/pipeline.html">パイプライン</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/customize.html">カスタマイズ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/developer.html">開発者向け情報</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/errors.html">よくあるエラー</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/license.html">ライセンス</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">iinfer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">iinfer.app.injection</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for iinfer.app.injection</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+
+<div class="viewcode-block" id="BeforeInjection">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.injection.BeforeInjection">[docs]</a>
+<span class="k">class</span> <span class="nc">BeforeInjection</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="n">Any</span><span class="p">],</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        このクラスのインスタンスを初期化します。</span>
+<span class="sd">        継承時は、このコンストラクタを呼び出すようにしてください。super().__init__(logger)</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            config (Dict[str,Any]): 設定</span>
+<span class="sd">            logger (logging.Logger): ロガー</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            BeforeInjection</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logger</span>
+
+<div class="viewcode-block" id="BeforeInjection.action">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.injection.BeforeInjection.action">[docs]</a>
+    <span class="k">def</span> <span class="nf">action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reskey</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">image</span><span class="p">:</span><span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">,</span> <span class="n">session</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        このメソッドは推論を実行する前処理を実行します。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            reskey (str): レスポンスキー</span>
+<span class="sd">            name (str): モデル名</span>
+<span class="sd">            image (Image.Image): 推論する画像データ</span>
+<span class="sd">            session (Dict[str, Any]): 推論セッション。次の項目が含まれます。</span>
+<span class="sd">                                        session: app.predict.Predict#create_session() で作成されたセッション</span>
+<span class="sd">                                        model_img_width: モデルの入力画像の幅</span>
+<span class="sd">                                        model_img_height: モデルの入力画像の高さ</span>
+<span class="sd">                                        predict_obj: app.predict.Predict インスタンス</span>
+<span class="sd">                                        labels: クラスラベルのリスト</span>
+<span class="sd">                                        colors: ボックスの色のリスト</span>
+<span class="sd">                                        tracker: use_trackがTrueの場合、トラッカーのインスタンス</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            Image.Image: 前処理後の画像データ</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">image</span></div>
+</div>
+
+
+<div class="viewcode-block" id="AfterInjection">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.injection.AfterInjection">[docs]</a>
+<span class="k">class</span> <span class="nc">AfterInjection</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="n">Any</span><span class="p">],</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        このクラスのインスタンスを初期化します。</span>
+<span class="sd">        継承時は、このコンストラクタを呼び出すようにしてください。super().__init__(logger)</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            config (Dict[str,Any]): 設定</span>
+<span class="sd">            logger (logging.Logger): ロガー</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            AfterInjection</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logger</span>
+
+<div class="viewcode-block" id="AfterInjection.action">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.injection.AfterInjection.action">[docs]</a>
+    <span class="k">def</span> <span class="nf">action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reskey</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">outputs</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">output_image</span><span class="p">:</span><span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">,</span> <span class="n">session</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        このメソッドは推論を実行した後の処理を実行します。</span>
+<span class="sd">        Args:</span>
+<span class="sd">            reskey (str): レスポンスキー</span>
+<span class="sd">            name (str): モデル名</span>
+<span class="sd">            outputs (Dict[str, Any]): 推論結果。次の項目が含まれます。</span>
+<span class="sd">                                      success or warn: 推論成功か警告のキーに対して、その内容が格納されます。</span>
+<span class="sd">                                      output_image: 推論後の画像データをbase64エンコードした文字列</span>
+<span class="sd">                                      output_image_shape: 推論後の画像データの形状（base46でコードするときに必要）</span>
+<span class="sd">                                      output_image_name: クライアントから指定されてきた推論後の画像データの名前</span>
+<span class="sd">            output_image (Image.Image): 推論後の画像データ</span>
+<span class="sd">            session (Dict[str, Any]): 推論セッション。次の項目が含まれます。</span>
+<span class="sd">                                      session: app.predict.Predict#create_session() で作成されたセッション</span>
+<span class="sd">                                      model_img_width: モデルの入力画像の幅</span>
+<span class="sd">                                      model_img_height: モデルの入力画像の高さ</span>
+<span class="sd">                                      predict_obj: app.predict.Predict インスタンス</span>
+<span class="sd">                                      labels: クラスラベルのリスト</span>
+<span class="sd">                                      colors: ボックスの色のリスト</span>
+<span class="sd">                                      tracker: use_trackがTrueの場合、トラッカーのインスタンス</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            Tuple[Dict[str, Any], Image.Image]: 後処理後の推論結果と画像データのタプル</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">outputs</span><span class="p">,</span> <span class="n">output_image</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright (c) 2023-2024 hamacom2004jp All Rights Reserved..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

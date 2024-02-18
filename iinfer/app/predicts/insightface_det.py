@@ -13,8 +13,11 @@ IMAGE_WIDTH = 640
 IMAGE_HEIGHT = 640
 USE_MODEL_CONF = False
 
-class InsightfaceDet(predict.Predict):
-    def create_session(self, logger:logging.Logger, model_path:Path, model_conf_path:Path, model_provider:str, gpu_id:int=None):
+class InsightfaceDet(predict.OnnxPredict):
+    def __init__(self, logger:logging.Logger) -> None:
+        super().__init__(logger)
+
+    def create_session(self, model_path:Path, model_conf_path:Path, model_provider:str, gpu_id:int=None):
         """
         推論セッションを作成する関数です。
         startコマンド実行時に呼び出されます。
@@ -22,7 +25,6 @@ class InsightfaceDet(predict.Predict):
         戻り値の推論セッションの型は問いません。
 
         Args:
-            logger (logging.Logger): ロガー
             model_path (Path): モデルファイルのパス
             model_conf_path (Path): モデル設定ファイルのパス
             gpu_id (int, optional): GPU ID. Defaults to None.

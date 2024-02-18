@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>開発者向け情報 &mdash; iinfer 2024/02/17 documentation</title>
+  <title>開発者向け情報 &mdash; iinfer 2024/02/18 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -16,7 +16,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=8ee95736"></script>
+        <script src="../_static/documentation_options.js?v=66f3f4f4"></script>
         <script src="../_static/doctools.js?v=888ff710"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -60,6 +60,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#id3">モジュールのコミット方法</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#pypl">【参考】pyplにアップするための手順</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#wsl2-ubuntu20-04-docker">【参考】WSL2-Ubuntu20.04-docker環境を構築する手順</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#rediswindows">【参考】RedisをWindows環境を構築する手順</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="errors.html">よくあるエラー</a></li>
@@ -290,6 +291,29 @@ wsl --unregister Ubuntu-20.04
 </div></blockquote>
 </li>
 </ol>
+</section>
+<section id="rediswindows">
+<h2>【参考】RedisをWindows環境を構築する手順<a class="headerlink" href="#rediswindows" title="Link to this heading"></a></h2>
+<ul>
+<li><p><cite>iinfer</cite> はRedisを使用しています。</p></li>
+<li><p><cite>iinfer -m install -c redis</cite> コマンドはWSL2内のUbuntuに対するRedisインストールになりますので、Windows環境にインストールする場合は下記の手順を実行します。</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>インストーラーを <a class="reference external" href="https://github.com/MicrosoftArchive/redis/releases">GitHub</a> からダウンロードします。</p></li>
+<li><p>ダウンロードしたインストーラー（MSIファイル）を実行します。</p></li>
+<li><p>ウィザードの中でインストール先ディレクトリの設定があるので、設定したパスをメモしておいてください。デフォルトは <cite>C:\Program Files\Redis</cite> です。</p></li>
+<li><p>ウィザードの中でRedisサーバーのサービスポートの設定があるので、設定したポートをメモしておいてください。デフォルトは6379です。</p></li>
+<li><p>ウィザードの中で使用するメモリ最大量の設定があるので、必要に応じて設定してください。開発用なら100mb程度で十分です。</p></li>
+<li><p>インストールが完了したら、インストール先ディレクトリをエクスプローラーで開いてください。</p></li>
+<li><p>その中の <cite>redis.windows-service.conf</cite> ファイルと <cite>redis.windows-service.conf</cite> ファイルをメモ帳などのテキストエディタで開いてください。</p></li>
+<li><p>このファイルの中で、 <cite>requirepass foobared</cite> を検索し、 <cite>#</cite> を削除しコメントアウトを解除してください。</p></li>
+<li><p><cite>requirepass foobared</cite> の <cite>foobared</cite> の部分を任意のパスワードに変更してください。変更したパスワードをメモしておいてください。</p></li>
+<li><p>このパスワードが、 <cite>iinfer</cite> コマンドの中で指定するパスワードになります。</p></li>
+<li><p>Windowsのタスクマネージャーを開いて、サービスタブを開いて <cite>Redis</cite> を右クリックし、サービスを再起動してください。</p></li>
+</ol>
+</div></blockquote>
+</li>
+</ul>
 </section>
 </section>
 

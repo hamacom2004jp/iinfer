@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>よくあるエラー &mdash; iinfer 2024/02/17 documentation</title>
+  <title>よくあるエラー &mdash; iinfer 2024/02/18 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -16,7 +16,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=8ee95736"></script>
+        <script src="../_static/documentation_options.js?v=66f3f4f4"></script>
         <script src="../_static/doctools.js?v=888ff710"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -109,30 +109,50 @@
 <td><p>現在のディレクトリにmmdetectionが既に存在したり、データディレクトリ「~/.iinfer/」にmmdetectionが存在する</p></td>
 <td><p>mmdetectionのディレクトリを削除</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>iinfer -m install -c mmpretrain</cite></p></td>
+<tr class="row-even"><td><p><cite>iinfer -m install -c mmdet</cite></p></td>
+<td><p>error: Microsoft Visual C++ 14.0 or greater is required. Get it with <cite>Microsoft C++ Build Tools</cite>: <a class="reference external" href="https://visualstudio.microsoft.com/visual-cpp-build-tools/">https://visualstudio.microsoft.com/visual-cpp-build-tools/</a></p></td>
+<td><p>Windows SDKが必要です。</p></td>
+<td><p><a class="reference external" href="https://developer.microsoft.com/en-gb/windows/downloads/sdk-archive/">Windows SDK</a> をインストールしてください。</p></td>
+</tr>
+<tr class="row-odd"><td><p><cite>iinfer -m install -c mmpretrain</cite></p></td>
 <td><p>shutil.Error ...</p></td>
 <td><p>現在のディレクトリにmmpretrainが既に存在したり、データディレクトリ「~/.iinfer/」にmmpretrainが存在する</p></td>
 <td><p>mmpretrainのディレクトリを削除</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>iinfer -m install -c mmrotate</cite></p></td>
+<tr class="row-even"><td><p><cite>iinfer -m install -c mmrotate</cite></p></td>
 <td><p>shutil.Error ...</p></td>
 <td><p>現在のディレクトリにmmrotateが既に存在したり、データディレクトリ「~/.iinfer/」にmmrotateが存在する</p></td>
 <td><p>mmrotateのディレクトリを削除</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>iinfer -m install -c insightface</cite></p></td>
+<tr class="row-odd"><td><p><cite>iinfer -m install -c insightface</cite></p></td>
 <td><p>Could not install packages due to an OSError: [WinError 5] アクセスが拒否されました。</p></td>
 <td><p>更新ファイルが使用中？</p></td>
 <td><p><cite>pip install insightface</cite> でインストール</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>iinfer -m install -c &lt;mm系&gt;</cite></p></td>
+<tr class="row-even"><td><p><cite>iinfer -m install -c &lt;mm系&gt;</cite></p></td>
 <td><p>Failed to uninstall mmcv</p></td>
 <td><p>mmdet又はmmpretrainのモデルが起動中</p></td>
 <td><p><cite>iinfer -m server</cite> で起動したサーバープロセスを停止</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>iinfer -m install -c &lt;mm系&gt;</cite></p></td>
+<tr class="row-odd"><td><p><cite>iinfer -m install -c &lt;mm系&gt;</cite></p></td>
 <td><p>fatal: unable to access '<a class="reference external" href="https://github.com/open-mmlab/mmpretrain.git/">https://github.com/open-mmlab/mmpretrain.git/</a>': Could not resolve host: github.com</p></td>
 <td><p><cite>ping github.com</cite> コマンドなどで名前解決できるか確認。できたら <cite>iinfer -m install -c &lt;mm系&gt;</cite> を再実行</p></td>
 <td></td>
+</tr>
+<tr class="row-even"><td><p><cite>iinfer -m client -c deploy</cite></p></td>
+<td><p>Failed to git clone mmpretrain.</p></td>
+<td><p>gitコマンドがインストールされていません</p></td>
+<td><p><a class="reference external" href="https://git-scm.com/downloads">https://git-scm.com/downloads</a> を参照しサーバー側にgitコマンドをインストールしてください</p></td>
+</tr>
+<tr class="row-odd"><td><p><cite>iinfer -m client -c deploy</cite></p></td>
+<td><p>Failed to git clone mmdetection.</p></td>
+<td><p>gitコマンドがインストールされていません</p></td>
+<td><p><a class="reference external" href="https://git-scm.com/downloads">https://git-scm.com/downloads</a> を参照しサーバー側にgitコマンドをインストールしてください</p></td>
+</tr>
+<tr class="row-even"><td><p><cite>iinfer -m client -c deploy</cite></p></td>
+<td><p>Failed to git clone mmrotate.</p></td>
+<td><p>gitコマンドがインストールされていません</p></td>
+<td><p><a class="reference external" href="https://git-scm.com/downloads">https://git-scm.com/downloads</a> を参照しサーバー側にgitコマンドをインストールしてください</p></td>
 </tr>
 <tr class="row-odd"><td><p><cite>iinfer -m client -c start</cite></p></td>
 <td><p>Failed to create session: No module named 'mmdet'</p></td>

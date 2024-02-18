@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>iinfer.app.common &mdash; iinfer 2024/02/17 documentation</title>
+  <title>iinfer.app.common &mdash; iinfer 2024/02/18 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -15,7 +15,7 @@
   
         <script src="../../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=8ee95736"></script>
+        <script src="../../../_static/documentation_options.js?v=66f3f4f4"></script>
         <script src="../../../_static/doctools.js?v=888ff710"></script>
         <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -82,13 +82,13 @@
            <div itemprop="articleBody">
              
   <h1>Source code for iinfer.app.common</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">iinfer.app</span> <span class="kn">import</span> <span class="n">predict</span>
+<span></span><span class="kn">from</span> <span class="nn">iinfer.app</span> <span class="kn">import</span> <span class="n">predict</span><span class="p">,</span> <span class="n">injection</span>
 <span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="n">BytesIO</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span><span class="p">,</span> <span class="n">ImageDraw</span>
 <span class="kn">from</span> <span class="nn">pkg_resources</span> <span class="kn">import</span> <span class="n">resource_string</span>
 <span class="kn">from</span> <span class="nn">tabulate</span> <span class="kn">import</span> <span class="n">tabulate</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span>
 <span class="kn">import</span> <span class="nn">base64</span>
 <span class="kn">import</span> <span class="nn">importlib.util</span>
 <span class="kn">import</span> <span class="nn">inspect</span>
@@ -321,32 +321,34 @@
 
 <div class="viewcode-block" id="load_custom_predict">
 <a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.common.load_custom_predict">[docs]</a>
-<span class="k">def</span> <span class="nf">load_custom_predict</span><span class="p">(</span><span class="n">custom_predict_py</span><span class="p">:</span><span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">predict</span><span class="o">.</span><span class="n">Predict</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">load_custom_predict</span><span class="p">(</span><span class="n">custom_predict_py</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">predict</span><span class="o">.</span><span class="n">Predict</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    カスタム予測オブジェクトを読み込みます。</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        custom_predict_py (Path): カスタム予測オブジェクトのパス</span>
+<span class="sd">        logger (logging.Logger): ロガー</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        iinfer.app.predict.Predict: 予測オブジェクト</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">spec</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spec_from_file_location</span><span class="p">(</span><span class="s2">&quot;predict&quot;</span><span class="p">,</span> <span class="n">custom_predict_py</span><span class="p">)</span>
+    <span class="n">spec</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spec_from_file_location</span><span class="p">(</span><span class="s2">&quot;iinfer.user.predict&quot;</span><span class="p">,</span> <span class="n">custom_predict_py</span><span class="p">)</span>
     <span class="n">module</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">module_from_spec</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
     <span class="n">spec</span><span class="o">.</span><span class="n">loader</span><span class="o">.</span><span class="n">exec_module</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getmembers</span><span class="p">(</span><span class="n">module</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">predict</span><span class="o">.</span><span class="n">Predict</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">obj</span><span class="p">()</span></div>
+            <span class="k">return</span> <span class="n">obj</span><span class="p">(</span><span class="n">logger</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="load_predict">
 <a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.common.load_predict">[docs]</a>
-<span class="k">def</span> <span class="nf">load_predict</span><span class="p">(</span><span class="n">predict_type</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">predict</span><span class="o">.</span><span class="n">Predict</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">load_predict</span><span class="p">(</span><span class="n">predict_type</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">predict</span><span class="o">.</span><span class="n">Predict</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    指定された予測オブジェクトを読み込みます。</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        predict_type (str): 予測オブジェクトのパッケージ名</span>
+<span class="sd">        logger (logging.Logger): ロガー</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        BaseException: 指定されたオブジェクトが見つからない場合</span>
@@ -357,7 +359,58 @@
     <span class="n">module</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="s2">&quot;iinfer.app.predicts.&quot;</span> <span class="o">+</span> <span class="n">predict_type</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getmembers</span><span class="p">(</span><span class="n">module</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">predict</span><span class="o">.</span><span class="n">Predict</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">obj</span><span class="p">()</span></div>
+            <span class="k">return</span> <span class="n">obj</span><span class="p">(</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="load_before_injections">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.common.load_before_injections">[docs]</a>
+<span class="k">def</span> <span class="nf">load_before_injections</span><span class="p">(</span><span class="n">before_injection_py</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Path</span><span class="p">],</span> <span class="n">config</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="n">Any</span><span class="p">],</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">injection</span><span class="o">.</span><span class="n">BeforeInjection</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    前処理オブジェクトを読み込みます。</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        before_injection_py (List[Path]): 前処理オブジェクトのパス</span>
+<span class="sd">        config (Dict[str,Any]): 設定</span>
+<span class="sd">        logger (logging.Logger): ロガー</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        List[injection.BeforeInjection]: 前処理オブジェクト</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">injections</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">before_injection_py</span><span class="p">:</span>
+        <span class="n">spec</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spec_from_file_location</span><span class="p">(</span><span class="s2">&quot;iinfer.user.injection&quot;</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+        <span class="n">module</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">module_from_spec</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">loader</span><span class="o">.</span><span class="n">exec_module</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getmembers</span><span class="p">(</span><span class="n">module</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">injection</span><span class="o">.</span><span class="n">BeforeInjection</span><span class="p">):</span>
+                <span class="n">injections</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">obj</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">logger</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">injections</span></div>
+
+
+
+<div class="viewcode-block" id="load_after_injections">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.common.load_after_injections">[docs]</a>
+<span class="k">def</span> <span class="nf">load_after_injections</span><span class="p">(</span><span class="n">after_injection_py</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Path</span><span class="p">],</span> <span class="n">config</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="n">Any</span><span class="p">],</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">injection</span><span class="o">.</span><span class="n">AfterInjection</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    後処理オブジェクトを読み込みます。</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        after_injection_py (List[Path]): 後処理オブジェクトのパス</span>
+<span class="sd">        config (Dict[str,Any]): 設定</span>
+<span class="sd">        logger (logging.Logger): ロガー</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        List[injection.AfterInjection]: 後処理オブジェクト</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">injections</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">after_injection_py</span><span class="p">:</span>
+        <span class="n">spec</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spec_from_file_location</span><span class="p">(</span><span class="s2">&quot;iinfer.user.injection&quot;</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+        <span class="n">module</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">module_from_spec</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">loader</span><span class="o">.</span><span class="n">exec_module</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getmembers</span><span class="p">(</span><span class="n">module</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">injection</span><span class="o">.</span><span class="n">AfterInjection</span><span class="p">):</span>
+                <span class="n">injections</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">obj</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">logger</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">injections</span></div>
 
 
 <div class="viewcode-block" id="get_module_list">

@@ -103,8 +103,10 @@ class Client(object):
             self.logger.info(str(msg_json))
         return res_json
 
-    def deploy(self, name:str, model_img_width:int, model_img_height:int, model_file:Path, model_conf_file:List[Path], predict_type:str, custom_predict_py:Path,
-               label_file:Path, color_file:Path, overwrite:bool, timeout:int = 60):
+    def deploy(self, name:str, model_img_width:int, model_img_height:int, model_file:Path, model_conf_file:List[Path], predict_type:str,
+               custom_predict_py:Path, label_file:Path, color_file:Path,
+               before_injection_conf:Path, before_injection_py:List[Path],
+               after_injection_conf:Path, after_injection_py:List[Path], overwrite:bool, timeout:int = 60):
         """
         モデルをRedisサーバーにデプロイする
 
@@ -118,6 +120,10 @@ class Client(object):
             custom_predict_py (Path): 推論スクリプトのパス
             label_file (Path): ラベルファイルのパス
             color_file (Path): 色ファイルのパス
+            before_injection_conf (Path): 推論前処理設定ファイルのパス
+            before_injection_py (List[Path]): 推論前処理スクリプトのパス
+            after_injection_conf (Path): 推論後処理設定ファイルのパス
+            after_injection_py (List[Path]): 推論後処理スクリプトのパス
             overwrite (bool): モデルを上書きするかどうか
             timeout (int, optional): タイムアウト時間. Defaults to 60.
 
@@ -157,43 +163,50 @@ class Client(object):
                 custom_predict_py_b64 = base64.b64encode(pf.read()).decode('utf-8')
         else:
             custom_predict_py_b64 = None
-        if label_file is not None and not label_file.exists():
-            self.logger.error(f"label_file {str(label_file)} does not exist")
-            return {"error": f"label_file {str(label_file)} does not exist"}
-        elif label_file is not None:
-            with open(label_file, "rb") as lf:
-                label_file_b64 = base64.b64encode(lf.read()).decode('utf-8')
-        else:
-            label_file_b64 = None
-        if color_file is not None and not color_file.exists():
-            self.logger.error(f"color_file {str(color_file)} does not exist")
-            return {"error": f"color_file {str(color_file)} does not exist"}
-        elif color_file is not None:
-            with open(color_file, "rb") as cf:
-                color_file_b64 = base64.b64encode(cf.read()).decode('utf-8')
-        else:
-            color_file_b64 = None
-
+        def _conf_b64(name:str, conf:Path):
+            if conf is not None and not conf.exists():
+                self.logger.error(f"{name} {conf} does not exist")
+                return False, {"error": f"{name} {conf} does not exist"}
+            elif conf is not None:
+                with open(conf, "rb") as lf:
+                    conf_b64 = base64.b64encode(lf.read()).decode('utf-8')
+            else:
+                conf_b64 = None
+            return True, conf_b64
+        ret, label_file_b64 = _conf_b64("label_file", label_file)
+        if not ret: return label_file_b64
+        ret, color_file_b64 = _conf_b64("color_file", color_file)
+        if not ret: return color_file_b64
+        ret, before_injection_conf_b64 = _conf_b64("before_injection_conf", before_injection_conf)
+        if not ret: return before_injection_conf_b64
+        ret, after_injection_conf_b64 = _conf_b64("after_injection_conf", after_injection_conf)
+        if not ret: return after_injection_conf_b64
         with open(model_file, "rb") as mf:
             model_bytes_b64 = base64.b64encode(mf.read()).decode('utf-8')
-        if model_conf_file is not None:
-            model_conf_bytes_b64 = []
-            model_conf_file_name = []
-            for cf in model_conf_file:
-                if not cf.exists():
-                    self.logger.error(f"model_conf_file {str(cf)} does not exist")
-                    return {"error": f"model_conf_file {str(cf)} does not exist"}
-                with open(cf, "rb") as f:
-                    model_conf_bytes_b64.append(base64.b64encode(f.read()).decode('utf-8'))
-                model_conf_file_name.append(cf.name)
-            model_conf_bytes_b64 = ','.join(model_conf_bytes_b64)
-            model_conf_file_name = ','.join(model_conf_file_name)
-        else:
-            model_conf_bytes_b64 = None
-            model_conf_file_name = None
+        def _name_b64(aname:str, files:List[Path]):
+            if files is not None:
+                b64s = []
+                names = []
+                for p in files:
+                    if not p.exists():
+                        self.logger.error(f"{aname} {p} does not exist")
+                        return False, {"error": f"{aname} {p} does not exist"}, None
+                    with open(p, "rb") as f:
+                        b64s.append(base64.b64encode(f.read()).decode('utf-8'))
+                    names.append(p.name)
+                return True, ','.join(names), ','.join(b64s)
+            return True, None, None
+        ret, model_conf_file_name, model_conf_bytes_b64 = _name_b64("model_conf_file", model_conf_file)
+        if not ret: return model_conf_file_name
+        ret, before_injection_py_name, before_injection_py_b64 = _name_b64("before_injection_py", before_injection_py)
+        if not ret: return before_injection_py_name
+        ret, after_injection_py_name, after_injection_py_b64 = _name_b64("after_injection_py", after_injection_py)
+        if not ret: return after_injection_py_name
         res_json = self._proc(self.svname, 'deploy', [name, str(model_img_width), str(model_img_height), predict_type,
-                                                   model_file.name, model_bytes_b64, model_conf_file_name, model_conf_bytes_b64, custom_predict_py_b64,
-                                                   label_file_b64, color_file_b64, overwrite], timeout=timeout)
+                                                   model_file.name, model_bytes_b64, model_conf_file_name, model_conf_bytes_b64,
+                                                   custom_predict_py_b64, label_file_b64, color_file_b64,
+                                                   before_injection_conf_b64, before_injection_py_name, before_injection_py_b64,
+                                                   after_injection_conf_b64, after_injection_py_name, after_injection_py_b64, overwrite], timeout=timeout)
         return res_json
 
     def deploy_list(self, timeout:int = 60):
