@@ -92,3 +92,92 @@
 
          $ iinfer -m client -c deploy_list --svname server_mmdet
 
+****************************************************
+GPU環境構築
+****************************************************
+
+- サーバー環境にGPUを搭載した場合、GPU環境を構築することが出来ます。
+- なおこの手順はNVIDIA製のGPUを使用する場合の手順です。
+
+CUDA + cuDNNのインストール
+==============================================
+
+1. Windowsの場合 `Build Tools for Visual Studio 2022 <https://visualstudio.microsoft.com/ja/visual-cpp-build-tools/>`__ をインストールします。
+    1. インストールするモジュールは以下の通りです。環境によって必要なものが異なる場合があります。
+        - C++ 2022 再配布可能パッケージの更新プログラム
+        - C++ Build Tools コア機能
+        - MSVC v143 - VS 2022 C++ x64/x86 ビルドツール
+        - MSVC v142 - VS 2019 C++ x64/x86 ビルドツール
+        - Windows ユニバーサル CRT
+        - Windows 10 SDK
+        - Windows用 C++ CMakeツール
+2. CUDA対応GPUであるかどうかを `こちら <https://developer.nvidia.com/cuda-gpus>`__ で確認します。
+3. CUDA Toolkitを `公式サイト <https://developer.nvidia.com/cuda-toolkit-archive>`__ からダウンロードしてからインストールします。
+    1. ダウンロードするpyTorchやmmcv、onnxruntimeに、かなり複雑に依存しています。
+    2. pyTorchとCUDAバージョンの関係は `こちら <https://pytorch.org/get-started/locally/>`__ で確認してください。
+    3. onnxruntimeとCUDAバージョンの関係は `こちら <https://onnxruntime.ai/docs/execution-providers/CUDA-ExecutionProvider.html#requirements>`__ で確認してください。
+    4. Windowsの場合、システム環境変数に `CUDA_PATH` が設定されていることを確認します。cuDNNインストールで使用するので、設定されているパスをメモしておいてください。
+4. 下記のコマンドでGPUドライバとCUDA Toolkitのバージョンを確認します。
+
+    .. code-block:: bash
+
+        $ nvidia-smi
+
+5. cuDNNを `公式サイト <https://developer.nvidia.com/rdp/cudnn-archive>`__ からダウンロードします。
+    1. cuDNNとCUDAのバージョンの関係は `こちら <https://docs.nvidia.com/deeplearning/cudnn/support-matrix/index.html>`__ で確認してください。
+6. cuDNNをインストールします。
+    1. Windowsの場合、zipファイルなのでファイルを解凍します。
+    2. 解凍したファイルには、 `bin` 、 `include` 、 `lib` の3つのフォルダがあります。
+    3. 3つのフォルダをCUDA Toolkitのインストールディレクトリ（ `CUDA_PATH`` に設定されていたパス）の中にコピーします。
+    4. `bin` フォルダの中に `cudnn64_XXX.dll` （ `XXX` はバージョン）ファイルがあることを確認して、次のコマンドでエラーにならないことを確認します。
+
+        .. code-block:: bat
+
+            where cudnn64_XXX.dll
+
+7. Windwosの場合 `Could not locate zlibwapi.dll. Please make sure it is in your library path!` というエラーが出る場合は、以下の手順を行ってください。
+    1. `C:\Program Files\NVIDIA Corporation\Nsight System 2022.4.2\host-windows-x64\` フォルダ又は類似のフォルダにある `zlib.dll` ファイルを `%CUDA_PATH%\bin\` フォルダにコピーします。
+    2. コピーした `zlib.dll` ファイルを `zlibwapi.dll` に名前を変更します。
+
+
+GPU対応版のフレームワークインストール
+==============================================
+
+- mmdetectionのGPU対応版をインストールする場合、下記のコマンドでインストールできます。
+
+    .. code-block:: bash
+
+         $ iinfer -m install -c mmdet --install_use_gpu
+
+- mmpretrainのGPU対応版をインストールする場合、下記のコマンドでインストールできます。
+
+    .. code-block:: bash
+
+         $ iinfer -m install -c mmpretrain --install_use_gpu
+
+- mmclsのGPU対応版をインストールする場合、下記のコマンドでインストールできます。
+
+    .. code-block:: bash
+
+         $ iinfer -m install -c mmcls --install_use_gpu
+
+- insightfaceのGPU対応版をインストールする場合、下記のコマンドでインストールできます。
+    
+    .. code-block:: bash
+
+        $ iinfer -m install -c insightface --install_use_gpu
+
+- onnxruntimeのGPU対応版をインストールする場合、下記のコマンドでインストールできます。
+
+    .. code-block:: bash
+
+         $ iinfer -m install -c onnx --install_use_gpu
+
+GPU対応版のサーバーインストール
+==============================================
+
+- 下記のコマンドでインストールできます。
+
+    .. code-block:: bash
+
+         $ iinfer -m install -c server --install_use_gpu

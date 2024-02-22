@@ -377,7 +377,7 @@ class Client(object):
                 image_file_enable = False
             elif image_type == 'capture':
                 capture_data = image.split(',')
-                self.logger.info(f"capture_data={capture_data[1:]}")
+                #self.logger.info(f"capture_data={capture_data[1:]}")
                 t = capture_data[0]
                 img = capture_data[1]
                 h = int(capture_data[2])
