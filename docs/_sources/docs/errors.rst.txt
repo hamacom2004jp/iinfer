@@ -15,6 +15,8 @@
     "`iinfer -m install -c mmpretrain` ","shutil.Error ...","現在のディレクトリにmmpretrainが既に存在したり、データディレクトリ「~/.iinfer/」にmmpretrainが存在する","mmpretrainのディレクトリを削除"
     "`iinfer -m install -c mmrotate` ","shutil.Error ...","現在のディレクトリにmmrotateが既に存在したり、データディレクトリ「~/.iinfer/」にmmrotateが存在する","mmrotateのディレクトリを削除"
     "`iinfer -m install -c insightface` ","Could not install packages due to an OSError: [WinError 5] アクセスが拒否されました。","更新ファイルが使用中？","`pip install insightface` でインストール"
+    "`iinfer -m install -c insightface` ","CreateExecutionProviderInstance CUDA_PATH is set but CUDA wasnt able to be loaded.","CUDAのバージョンとonnxruntimeのバージョンが合っていない","https://onnxruntime.ai/docs/execution-providers/CUDA-ExecutionProvider.html#requirements で確認し適切なバージョンのonnxruntime及びonnxruntime-guiをインストールしてください。"
+    "`iinfer -m install -c insightface` ","CreateExecutionProviderInstance CUDA_PATH is set but CUDA wasnt able to be loaded.","cudnnがインストールされていない","https://developer.nvidia.com/rdp/cudnn-archive で適切なバージョンのcudnnをダウンロードしインストールしてください。"
     "`iinfer -m install -c <mm系>` ","Failed to uninstall mmcv","mmdet又はmmpretrainのモデルが起動中","`iinfer -m server` で起動したサーバープロセスを停止"
     "`iinfer -m install -c <mm系>` ","fatal: unable to access 'https://github.com/open-mmlab/mmpretrain.git/': Could not resolve host: github.com","`ping github.com` コマンドなどで名前解決できるか確認。できたら `iinfer -m install -c <mm系>` を再実行"
     "`iinfer -m client -c deploy` ","Failed to git clone mmpretrain.","gitコマンドがインストールされていません","https://git-scm.com/downloads を参照しサーバー側にgitコマンドをインストールしてください"

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>iinfer.app.injection &mdash; iinfer 2024/02/18 documentation</title>
+  <title>iinfer.app.injection &mdash; iinfer 2024/02/24 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -15,7 +15,7 @@
   
         <script src="../../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=66f3f4f4"></script>
+        <script src="../../../_static/documentation_options.js?v=1441ad90"></script>
         <script src="../../../_static/doctools.js?v=888ff710"></script>
         <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -48,6 +48,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/command.html">コマンドリファレンス</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/models.html">動作確認済みモデル</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/install.html">サーバー環境構築</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/install.html#gpu">GPU環境構築</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/detection.html">物体検知</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/face.html">顔認識</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/pipeline.html">パイプライン</a></li>
@@ -116,13 +117,13 @@
 <span class="sd">            name (str): モデル名</span>
 <span class="sd">            image (Image.Image): 推論する画像データ</span>
 <span class="sd">            session (Dict[str, Any]): 推論セッション。次の項目が含まれます。</span>
-<span class="sd">                                        session: app.predict.Predict#create_session() で作成されたセッション</span>
-<span class="sd">                                        model_img_width: モデルの入力画像の幅</span>
-<span class="sd">                                        model_img_height: モデルの入力画像の高さ</span>
-<span class="sd">                                        predict_obj: app.predict.Predict インスタンス</span>
-<span class="sd">                                        labels: クラスラベルのリスト</span>
-<span class="sd">                                        colors: ボックスの色のリスト</span>
-<span class="sd">                                        tracker: use_trackがTrueの場合、トラッカーのインスタンス</span>
+<span class="sd">            ・session: app.predict.Predict#create_session() で作成されたセッション</span>
+<span class="sd">            ・model_img_width: モデルの入力画像の幅</span>
+<span class="sd">            ・model_img_height: モデルの入力画像の高さ</span>
+<span class="sd">            ・predict_obj: app.predict.Predict インスタンス</span>
+<span class="sd">            ・labels: クラスラベルのリスト</span>
+<span class="sd">            ・colors: ボックスの色のリスト</span>
+<span class="sd">            ・tracker: use_trackがTrueの場合、トラッカーのインスタンス</span>
 <span class="sd">        Returns:</span>
 <span class="sd">            Image.Image: 前処理後の画像データ</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -153,23 +154,24 @@
     <span class="k">def</span> <span class="nf">action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reskey</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">outputs</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">output_image</span><span class="p">:</span><span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">,</span> <span class="n">session</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        このメソッドは推論を実行した後の処理を実行します。</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            reskey (str): レスポンスキー</span>
 <span class="sd">            name (str): モデル名</span>
 <span class="sd">            outputs (Dict[str, Any]): 推論結果。次の項目が含まれます。</span>
-<span class="sd">                                      success or warn: 推論成功か警告のキーに対して、その内容が格納されます。</span>
-<span class="sd">                                      output_image: 推論後の画像データをbase64エンコードした文字列</span>
-<span class="sd">                                      output_image_shape: 推論後の画像データの形状（base46でコードするときに必要）</span>
-<span class="sd">                                      output_image_name: クライアントから指定されてきた推論後の画像データの名前</span>
+<span class="sd">            ・success or warn: 推論成功か警告のキーに対して、その内容が格納されます。</span>
+<span class="sd">            ・output_image: 推論後の画像データをbase64エンコードした文字列</span>
+<span class="sd">            ・output_image_shape: 推論後の画像データの形状（base46でコードするときに必要）</span>
+<span class="sd">            ・output_image_name: クライアントから指定されてきた推論後の画像データの名前</span>
 <span class="sd">            output_image (Image.Image): 推論後の画像データ</span>
 <span class="sd">            session (Dict[str, Any]): 推論セッション。次の項目が含まれます。</span>
-<span class="sd">                                      session: app.predict.Predict#create_session() で作成されたセッション</span>
-<span class="sd">                                      model_img_width: モデルの入力画像の幅</span>
-<span class="sd">                                      model_img_height: モデルの入力画像の高さ</span>
-<span class="sd">                                      predict_obj: app.predict.Predict インスタンス</span>
-<span class="sd">                                      labels: クラスラベルのリスト</span>
-<span class="sd">                                      colors: ボックスの色のリスト</span>
-<span class="sd">                                      tracker: use_trackがTrueの場合、トラッカーのインスタンス</span>
+<span class="sd">            ・session: app.predict.Predict#create_session() で作成されたセッション</span>
+<span class="sd">            ・model_img_width: モデルの入力画像の幅</span>
+<span class="sd">            ・model_img_height: モデルの入力画像の高さ</span>
+<span class="sd">            ・predict_obj: app.predict.Predict インスタンス</span>
+<span class="sd">            ・labels: クラスラベルのリスト</span>
+<span class="sd">            ・colors: ボックスの色のリスト</span>
+<span class="sd">            ・tracker: use_trackがTrueの場合、トラッカーのインスタンス</span>
 <span class="sd">        Returns:</span>
 <span class="sd">            Tuple[Dict[str, Any], Image.Image]: 後処理後の推論結果と画像データのタプル</span>
 <span class="sd">        &quot;&quot;&quot;</span>

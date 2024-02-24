@@ -1,10 +1,13 @@
-FROM python:3.8.18-slim
+#{FROM}
 
 ARG MKUSER
 
 #{COPY_IINFER}
 RUN groupadd ${MKUSER} && \
     useradd -m -g ${MKUSER} -s /usr/bin/bash ${MKUSER}
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=Asia/Tokyo
+#{INSTALL_PYTHON}
 RUN apt-get update && \
     apt-get install -y libgl1-mesa-dev libglib2.0-0 git build-essential
 RUN pip install --upgrade pip && \

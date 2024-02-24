@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>よくあるエラー &mdash; iinfer 2024/02/19 documentation</title>
+  <title>よくあるエラー &mdash; iinfer 2024/02/24 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -16,7 +16,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=c28b70ed"></script>
+        <script src="../_static/documentation_options.js?v=1441ad90"></script>
         <script src="../_static/doctools.js?v=888ff710"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -51,6 +51,7 @@
 <li class="toctree-l1"><a class="reference internal" href="command.html">コマンドリファレンス</a></li>
 <li class="toctree-l1"><a class="reference internal" href="models.html">動作確認済みモデル</a></li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">サーバー環境構築</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html#gpu">GPU環境構築</a></li>
 <li class="toctree-l1"><a class="reference internal" href="detection.html">物体検知</a></li>
 <li class="toctree-l1"><a class="reference internal" href="face.html">顔認識</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pipeline.html">パイプライン</a></li>
@@ -128,6 +129,16 @@
 <td><p>Could not install packages due to an OSError: [WinError 5] アクセスが拒否されました。</p></td>
 <td><p>更新ファイルが使用中？</p></td>
 <td><p><cite>pip install insightface</cite> でインストール</p></td>
+</tr>
+<tr class="row-even"><td><p><cite>iinfer -m install -c insightface</cite></p></td>
+<td><p>CreateExecutionProviderInstance CUDA_PATH is set but CUDA wasnt able to be loaded.</p></td>
+<td><p>CUDAのバージョンとonnxruntimeのバージョンが合っていない</p></td>
+<td><p><a class="reference external" href="https://onnxruntime.ai/docs/execution-providers/CUDA-ExecutionProvider.html#requirements">https://onnxruntime.ai/docs/execution-providers/CUDA-ExecutionProvider.html#requirements</a> で確認し適切なバージョンのonnxruntime及びonnxruntime-guiをインストールしてください。</p></td>
+</tr>
+<tr class="row-odd"><td><p><cite>iinfer -m install -c insightface</cite></p></td>
+<td><p>CreateExecutionProviderInstance CUDA_PATH is set but CUDA wasnt able to be loaded.</p></td>
+<td><p>cudnnがインストールされていない</p></td>
+<td><p><a class="reference external" href="https://developer.nvidia.com/rdp/cudnn-archive">https://developer.nvidia.com/rdp/cudnn-archive</a> で適切なバージョンのcudnnをダウンロードしインストールしてください。</p></td>
 </tr>
 <tr class="row-even"><td><p><cite>iinfer -m install -c &lt;mm系&gt;</cite></p></td>
 <td><p>Failed to uninstall mmcv</p></td>

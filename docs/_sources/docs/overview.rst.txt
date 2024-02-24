@@ -45,7 +45,7 @@ iinferの動作イメージ
 
     cd ~/
     iinfer -m install -c server
-    docker-compose -f up -d
+    docker-compose up -d
 
   ※インストールを実行したフォルダに `docker-compose.yml` が作成されます。
 

@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>iinfer.app package &mdash; iinfer 2024/02/19 documentation</title>
+  <title>iinfer.app package &mdash; iinfer 2024/02/24 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -16,7 +16,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=c28b70ed"></script>
+        <script src="../_static/documentation_options.js?v=1441ad90"></script>
         <script src="../_static/doctools.js?v=888ff710"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -49,6 +49,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../docs/command.html">コマンドリファレンス</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../docs/models.html">動作確認済みモデル</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../docs/install.html">サーバー環境構築</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/install.html#gpu">GPU環境構築</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../docs/detection.html">物体検知</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../docs/face.html">顔認識</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../docs/pipeline.html">パイプライン</a></li>
@@ -996,30 +997,26 @@ output_image_fileが省略された場合は保存されません</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.injection.AfterInjection.action">
 <span class="sig-name descname"><span class="pre">action</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reskey</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outputs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Image</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/iinfer/app/injection.html#AfterInjection.action"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.injection.AfterInjection.action" title="Link to this definition"></a></dt>
-<dd><p>このメソッドは推論を実行した後の処理を実行します。
-:param reskey: レスポンスキー
-:type reskey: str
-:param name: モデル名
-:type name: str
-:param outputs: 推論結果。次の項目が含まれます。</p>
-<blockquote>
-<div><p>success or warn: 推論成功か警告のキーに対して、その内容が格納されます。
-output_image: 推論後の画像データをbase64エンコードした文字列
-output_image_shape: 推論後の画像データの形状（base46でコードするときに必要）
-output_image_name: クライアントから指定されてきた推論後の画像データの名前</p>
-</div></blockquote>
+<dd><p>このメソッドは推論を実行した後の処理を実行します。</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
+<li><p><strong>reskey</strong> (<em>str</em>) -- レスポンスキー</p></li>
+<li><p><strong>name</strong> (<em>str</em>) -- モデル名</p></li>
+<li><p><strong>outputs</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>) -- 推論結果。次の項目が含まれます。</p></li>
+<li><p><strong>warn</strong> (<em>・success or</em>) -- 推論成功か警告のキーに対して、その内容が格納されます。</p></li>
+<li><p><strong>・output_image</strong> -- 推論後の画像データをbase64エンコードした文字列</p></li>
+<li><p><strong>・output_image_shape</strong> -- 推論後の画像データの形状（base46でコードするときに必要）</p></li>
+<li><p><strong>・output_image_name</strong> -- クライアントから指定されてきた推論後の画像データの名前</p></li>
 <li><p><strong>output_image</strong> (<em>Image.Image</em>) -- 推論後の画像データ</p></li>
-<li><p><strong>session</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>) -- 推論セッション。次の項目が含まれます。
-session: app.predict.Predict#create_session() で作成されたセッション
-model_img_width: モデルの入力画像の幅
-model_img_height: モデルの入力画像の高さ
-predict_obj: app.predict.Predict インスタンス
-labels: クラスラベルのリスト
-colors: ボックスの色のリスト
-tracker: use_trackがTrueの場合、トラッカーのインスタンス</p></li>
+<li><p><strong>session</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>) -- 推論セッション。次の項目が含まれます。</p></li>
+<li><p><strong>・session</strong> -- app.predict.Predict#create_session() で作成されたセッション</p></li>
+<li><p><strong>・model_img_width</strong> -- モデルの入力画像の幅</p></li>
+<li><p><strong>・model_img_height</strong> -- モデルの入力画像の高さ</p></li>
+<li><p><strong>・predict_obj</strong> -- app.predict.Predict インスタンス</p></li>
+<li><p><strong>・labels</strong> -- クラスラベルのリスト</p></li>
+<li><p><strong>・colors</strong> -- ボックスの色のリスト</p></li>
+<li><p><strong>・tracker</strong> -- use_trackがTrueの場合、トラッカーのインスタンス</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1047,14 +1044,14 @@ tracker: use_trackがTrueの場合、トラッカーのインスタンス</p></l
 <li><p><strong>reskey</strong> (<em>str</em>) -- レスポンスキー</p></li>
 <li><p><strong>name</strong> (<em>str</em>) -- モデル名</p></li>
 <li><p><strong>image</strong> (<em>Image.Image</em>) -- 推論する画像データ</p></li>
-<li><p><strong>session</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>) -- 推論セッション。次の項目が含まれます。
-session: app.predict.Predict#create_session() で作成されたセッション
-model_img_width: モデルの入力画像の幅
-model_img_height: モデルの入力画像の高さ
-predict_obj: app.predict.Predict インスタンス
-labels: クラスラベルのリスト
-colors: ボックスの色のリスト
-tracker: use_trackがTrueの場合、トラッカーのインスタンス</p></li>
+<li><p><strong>session</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>) -- 推論セッション。次の項目が含まれます。</p></li>
+<li><p><strong>・session</strong> -- app.predict.Predict#create_session() で作成されたセッション</p></li>
+<li><p><strong>・model_img_width</strong> -- モデルの入力画像の幅</p></li>
+<li><p><strong>・model_img_height</strong> -- モデルの入力画像の高さ</p></li>
+<li><p><strong>・predict_obj</strong> -- app.predict.Predict インスタンス</p></li>
+<li><p><strong>・labels</strong> -- クラスラベルのリスト</p></li>
+<li><p><strong>・colors</strong> -- ボックスの色のリスト</p></li>
+<li><p><strong>・tracker</strong> -- use_trackがTrueの場合、トラッカーのインスタンス</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1077,7 +1074,7 @@ tracker: use_trackがTrueの場合、トラッカーのインスタンス</p></l
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.install.Install.insightface">
-<span class="sig-name descname"><span class="pre">insightface</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/install.html#Install.insightface"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.install.Install.insightface" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">insightface</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">install_use_gpu</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/install.html#Install.insightface"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.install.Install.insightface" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -1102,7 +1099,7 @@ tracker: use_trackがTrueの場合、トラッカーのインスタンス</p></l
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.install.Install.onnx">
-<span class="sig-name descname"><span class="pre">onnx</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/install.html#Install.onnx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.install.Install.onnx" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">onnx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">install_use_gpu</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/install.html#Install.onnx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.install.Install.onnx" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -1112,7 +1109,7 @@ tracker: use_trackがTrueの場合、トラッカーのインスタンス</p></l
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.install.Install.server">
-<span class="sig-name descname"><span class="pre">server</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">install_iinfer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'iinfer'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">install_onnx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">install_mmdet</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">install_mmcls</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">install_mmpretrain</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">install_mmrotate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">install_use_gpu</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">install_insightface</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">install_tag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/install.html#Install.server"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.install.Install.server" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">server</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">install_iinfer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'iinfer'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">install_onnx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">install_mmdet</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">install_mmcls</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">install_mmpretrain</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">install_mmrotate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">install_insightface</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">install_tag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">install_use_gpu</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/install.html#Install.server"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.install.Install.server" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>

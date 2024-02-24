@@ -115,7 +115,7 @@ iinferの開発環境を構築するための手順を説明します。
 
     .. code-block:: bat
 
-        pip install -i https://test.pypi.org/simple/ your-package
+        pip install -i https://test.pypi.org/simple/ iinfer
 
 6. 本番環境にアップロード
 
@@ -127,7 +127,7 @@ iinferの開発環境を構築するための手順を説明します。
 
     .. code-block:: bat
 
-        pip install your-package
+        pip install iinfer
 
 【参考】WSL2-Ubuntu20.04-docker環境を構築する手順
 =====================================================

@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>サーバー環境構築 &mdash; iinfer 2024/02/19 documentation</title>
+  <title>サーバー環境構築 &mdash; iinfer 2024/02/24 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -16,7 +16,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=c28b70ed"></script>
+        <script src="../_static/documentation_options.js?v=1441ad90"></script>
         <script src="../_static/doctools.js?v=888ff710"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -53,6 +53,12 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">サーバー環境構築</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#ubuntu">１．サーバー環境を構築する（Ubuntu上で実行）</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#id2">２．推論サーバーに接続する</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#gpu">GPU環境構築</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#cuda-cudnn">CUDA + cuDNNのインストール</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id3">GPU対応版のフレームワークインストール</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id4">GPU対応版のサーバーインストール</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="detection.html">物体検知</a></li>
@@ -186,6 +192,178 @@ Creating<span class="w"> </span>redis<span class="w">                    </span>
 <li><p><cite>--svname server_mmdet</cite> コマンドで推論サーバー名を指定しています。</p>
 <blockquote>
 <div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>iinfer<span class="w"> </span>-m<span class="w"> </span>client<span class="w"> </span>-c<span class="w"> </span>deploy_list<span class="w"> </span>--svname<span class="w"> </span>server_mmdet
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+</ul>
+</section>
+</section>
+<section id="gpu">
+<h1>GPU環境構築<a class="headerlink" href="#gpu" title="Link to this heading"></a></h1>
+<ul class="simple">
+<li><p>サーバー環境にGPUを搭載した場合、GPU環境を構築することが出来ます。</p></li>
+<li><p>なおこの手順はNVIDIA製のGPUを使用する場合の手順です。</p></li>
+</ul>
+<section id="cuda-cudnn">
+<h2>CUDA + cuDNNのインストール<a class="headerlink" href="#cuda-cudnn" title="Link to this heading"></a></h2>
+<ol class="arabic">
+<li><dl class="simple">
+<dt>Windowsの場合 <a class="reference external" href="https://visualstudio.microsoft.com/ja/visual-cpp-build-tools/">Build Tools for Visual Studio 2022</a> をインストールします。</dt><dd><ol class="arabic simple">
+<li><dl class="simple">
+<dt>インストールするモジュールは以下の通りです。環境によって必要なものが異なる場合があります。</dt><dd><ul class="simple">
+<li><p>C++ 2022 再配布可能パッケージの更新プログラム</p></li>
+<li><p>C++ Build Tools コア機能</p></li>
+<li><p>MSVC v143 - VS 2022 C++ x64/x86 ビルドツール</p></li>
+<li><p>MSVC v142 - VS 2019 C++ x64/x86 ビルドツール</p></li>
+<li><p>Windows ユニバーサル CRT</p></li>
+<li><p>Windows 10 SDK</p></li>
+<li><p>Windows用 C++ CMakeツール</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+</li>
+<li><p>CUDA対応GPUであるかどうかを <a class="reference external" href="https://developer.nvidia.com/cuda-gpus">こちら</a> で確認します。</p></li>
+<li><dl class="simple">
+<dt>CUDA Toolkitを <a class="reference external" href="https://developer.nvidia.com/cuda-toolkit-archive">公式サイト</a> からダウンロードしてからインストールします。</dt><dd><ol class="arabic simple">
+<li><p>ダウンロードするpyTorchやmmcv、onnxruntimeに、かなり複雑に依存しています。</p></li>
+<li><p>pyTorchとCUDAバージョンの関係は <a class="reference external" href="https://pytorch.org/get-started/locally/">こちら</a> で確認してください。</p></li>
+<li><p>onnxruntimeとCUDAバージョンの関係は <a class="reference external" href="https://onnxruntime.ai/docs/execution-providers/CUDA-ExecutionProvider.html#requirements">こちら</a> で確認してください。</p></li>
+<li><p>Windowsの場合、システム環境変数に <cite>CUDA_PATH</cite> が設定されていることを確認します。cuDNNインストールで使用するので、設定されているパスをメモしておいてください。</p></li>
+</ol>
+</dd>
+</dl>
+</li>
+<li><p>下記のコマンドでGPUドライバとCUDA Toolkitのバージョンを確認します。</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>nvidia-smi
+$<span class="w"> </span>/usr/local/cuda/bin/nvcc<span class="w"> </span>--version
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><dl class="simple">
+<dt>cuDNNを <a class="reference external" href="https://developer.nvidia.com/rdp/cudnn-archive">公式サイト</a> からダウンロードします。</dt><dd><ol class="arabic simple">
+<li><p>cuDNNとCUDAのバージョンの関係は <a class="reference external" href="https://docs.nvidia.com/deeplearning/cudnn/support-matrix/index.html">こちら</a> で確認してください。</p></li>
+</ol>
+</dd>
+</dl>
+</li>
+<li><dl>
+<dt>cuDNNをインストールします。</dt><dd><ol class="arabic">
+<li><p>Windowsの場合、zipファイルなのでファイルを解凍します。</p></li>
+<li><p>Windowsの場合、解凍したファイルには、 <cite>bin</cite> 、 <cite>include</cite> 、 <cite>lib</cite> の3つのフォルダがあります。</p></li>
+<li><p>Windowsの場合、3つのフォルダをCUDA Toolkitのインストールディレクトリ（ <cite>CUDA_PATH`</cite> に設定されていたパス）の中にコピーします。</p></li>
+<li><p>Windowsの場合、<cite>bin</cite> フォルダの中に <cite>cudnn64_XXX.dll</cite> （ <cite>XXX</cite> はバージョン）ファイルがあることを確認して、次のコマンドでエラーにならないことを確認します。</p>
+<blockquote>
+<div><div class="highlight-bat notranslate"><div class="highlight"><pre><span></span>where cudnn64_XXX.dll
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>Ubuntuの場合、解凍したファイルには、 <cite>lib64</cite> フォルダがあります。</p></li>
+</ol>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Windwosの場合 <cite>Could not locate zlibwapi.dll. Please make sure it is in your library path!</cite> というエラーが出る場合は、以下の手順を行ってください。</dt><dd><ol class="arabic simple">
+<li><p><cite>C:Program FilesNVIDIA CorporationNsight System 2022.4.2host-windows-x64` フォルダ又は類似のフォルダにある `zlib.dll</cite> ファイルを <cite>%CUDA_PATH%bin</cite> フォルダにコピーします。</p></li>
+<li><p>コピーした <cite>zlib.dll</cite> ファイルを <cite>zlibwapi.dll</cite> に名前を変更します。</p></li>
+</ol>
+</dd>
+</dl>
+</li>
+<li><p>Dockerを使用する( <cite>iinfer -m install -c server</cite> コマンドを使用する )場合、docker-composeのバージョンを1.28以降にします。</p>
+<blockquote>
+<div><ol class="arabic">
+<li><p>docker-composeのバージョンを確認します。</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker-compose<span class="w"> </span>--version
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>docker-composeのバージョンが1.28以降でない場合、以下のコマンドでバージョンをアップデートします。</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>rm<span class="w"> </span>-rf<span class="w"> </span>/usr/bin/docker-compose
+sudo<span class="w"> </span>curl<span class="w"> </span>-L<span class="w"> </span><span class="s2">&quot;https://github.com/docker/compose/releases/download/1.29.1/docker-compose-</span><span class="k">$(</span>uname<span class="w"> </span>-s<span class="k">)</span><span class="s2">-</span><span class="k">$(</span>uname<span class="w"> </span>-m<span class="k">)</span><span class="s2">&quot;</span><span class="w"> </span>-o<span class="w"> </span>/usr/local/bin/docker-compose
+sudo<span class="w"> </span>chmod<span class="w"> </span>+x<span class="w"> </span>/usr/local/bin/docker-compose
+sudo<span class="w"> </span>ln<span class="w"> </span>-s<span class="w"> </span>/usr/local/bin/docker-compose<span class="w"> </span>/usr/bin/docker-compose
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+</ol>
+</div></blockquote>
+</li>
+<li><p>Dockerを使用する( <cite>iinfer -m install -c server</cite> コマンドを使用する )場合、NVIDIA Container Toolkitをインストールします。</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">distribution</span><span class="o">=</span><span class="k">$(</span>.<span class="w"> </span>/etc/os-release<span class="p">;</span><span class="nb">echo</span><span class="w"> </span><span class="nv">$ID$VERSION_ID</span><span class="k">)</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span><span class="o">&amp;&amp;</span><span class="w"> </span>curl<span class="w"> </span>-fsSL<span class="w"> </span>https://nvidia.github.io/libnvidia-container/gpgkey<span class="w"> </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>gpg<span class="w"> </span>--dearmor<span class="w"> </span>-o<span class="w"> </span>/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span><span class="o">&amp;&amp;</span><span class="w"> </span>curl<span class="w"> </span>-s<span class="w"> </span>-L<span class="w"> </span>https://nvidia.github.io/libnvidia-container/<span class="nv">$distribution</span>/libnvidia-container.list<span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>sed<span class="w"> </span><span class="s1">&#39;s#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>sudo<span class="w"> </span>tee<span class="w"> </span>/etc/apt/sources.list.d/nvidia-container-toolkit.list
+sudo<span class="w"> </span>apt-get<span class="w"> </span>update
+sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>nvidia-container-toolkit
+sudo<span class="w"> </span>nvidia-ctk<span class="w"> </span>runtime<span class="w"> </span>configure<span class="w"> </span>--runtime<span class="o">=</span>docker
+</pre></div>
+</div>
+<p>ここでUbuntuの再起動を行うこと。</p>
+</div></blockquote>
+</li>
+</ol>
+</section>
+<section id="id3">
+<h2>GPU対応版のフレームワークインストール<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
+<ul>
+<li><p>mmdetectionのGPU対応版をインストールする場合、下記のコマンドでインストールできます。</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>iinfer<span class="w"> </span>-m<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>mmdet<span class="w"> </span>--install_use_gpu
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>mmpretrainのGPU対応版をインストールする場合、下記のコマンドでインストールできます。</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>iinfer<span class="w"> </span>-m<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>mmpretrain<span class="w"> </span>--install_use_gpu
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>mmclsのGPU対応版をインストールする場合、下記のコマンドでインストールできます。</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>iinfer<span class="w"> </span>-m<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>mmcls<span class="w"> </span>--install_use_gpu
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>insightfaceのGPU対応版をインストールする場合、下記のコマンドでインストールできます。</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>iinfer<span class="w"> </span>-m<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>insightface<span class="w"> </span>--install_use_gpu
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>onnxruntimeのGPU対応版をインストールする場合、下記のコマンドでインストールできます。</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>iinfer<span class="w"> </span>-m<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>onnx<span class="w"> </span>--install_use_gpu
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+</ul>
+</section>
+<section id="id4">
+<h2>GPU対応版のサーバーインストール<a class="headerlink" href="#id4" title="Link to this heading"></a></h2>
+<ul>
+<li><p>下記のコマンドでインストールできます。</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>iinfer<span class="w"> </span>-m<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>server<span class="w"> </span>--install_use_gpu
 </pre></div>
 </div>
 </div></blockquote>

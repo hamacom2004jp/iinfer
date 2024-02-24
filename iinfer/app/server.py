@@ -343,7 +343,7 @@ class Server(object):
         ret, before_injection_conf = _save_s("before_injection_conf.json", before_injection_conf)
         ret, after_injection_conf = _save_s("after_injection_conf.json", after_injection_conf)
 
-        def _save_m(name:str, files:list[str], datas:list[bytes]):
+        def _save_m(name:str, files:List[str], datas:List[bytes]):
             if files is not None and datas is None:
                 self.logger.warn(f"{name}_file is not None but {name}_bin is None.")
                 self.responce(reskey, {"warn": f"{name}_file is not None but {name}_bin is None."})

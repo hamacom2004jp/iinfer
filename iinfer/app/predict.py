@@ -97,8 +97,10 @@ class OnnxPredict(Predict):
         try:
             import onnxruntime as rt
             rt.InferenceSession(model_path, providers=["CUDAExecutionProvider"], providers_options=[{'device_id': str(gpu_id)}])
+            self.logger.info(f'GPU is available: True')
             return True
         except:
+            self.logger.info(f'GPU is available: False')
             return False
 
 class TorchPredict(Predict):
@@ -127,6 +129,9 @@ class TorchPredict(Predict):
         """
         try:
             import torch
-            return torch.cuda.is_available()
+            ret = torch.cuda.is_available()
+            self.logger.info(f'GPU is available: True')
+            return ret
         except:
+            self.logger.info(f'GPU is available: False')
             return False

@@ -38,8 +38,8 @@ class Install(object):
             return {"warn":f"Unsupported platform."}
 
     def server(self, data:Path, install_iinfer:str='iinfer', install_onnx:bool=True,
-               install_mmdet:bool=True, install_mmcls:bool=False, install_mmpretrain:bool=True, install_mmrotate:bool=False, install_use_gpu:bool=False,
-               install_insightface=False, install_tag:str=None):
+               install_mmdet:bool=True, install_mmcls:bool=False, install_mmpretrain:bool=True, install_mmrotate:bool=False,
+               install_insightface=False, install_tag:str=None, install_use_gpu:bool=False):
         if platform.system() == 'Windows':
             return {"warn": f"Build server command is Unsupported in windows platform."}
         from importlib.resources import read_text
@@ -54,15 +54,18 @@ class Install(object):
                 text = text.replace('#{COPY_IINFER}', f'COPY {wheel.name} {install_iinfer}')
             else:
                 text = text.replace('#{COPY_IINFER}', '')
+            install_use_gpu = '--install_use_gpu' if install_use_gpu else ''
+            text = text.replace('#{FROM}', f'FROM nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu20.04' if install_use_gpu else f'FROM python:3.8.18-slim')
             text = text.replace('${MKUSER}', user)
+            text = text.replace('#{INSTALL_PYTHON}', f'RUN apt-get update && apt-get install -y python3.8 python3.8-distutils python3-pip python-is-python3' if install_use_gpu else '')
             text = text.replace('#{INSTALL_TAG}', install_tag)
             text = text.replace('#{INSTALL_IINFER}', install_iinfer)
-            text = text.replace('#{INSTALL_ONNX}', f'RUN iinfer -m install -c onnx --data /home/{user}/.iinfer' if install_onnx else '')
-            text = text.replace('#{INSTALL_MMDET}', f'RUN iinfer -m install -c mmdet --data /home/{user}/.iinfer' if install_mmdet else '')
-            text = text.replace('#{INSTALL_MMCLS}', f'RUN iinfer -m install -c mmcls --data /home/{user}/.iinfer' if install_mmcls else '')
-            text = text.replace('#{INSTALL_MMPRETRAIN}', f'RUN iinfer -m install -c mmpretrain --data /home/{user}/.iinfer' if install_mmpretrain else '')
-            text = text.replace('#{INSTALL_MMROTATE}', f'RUN iinfer -m install -c mmrotate --data /home/{user}/.iinfer' if install_mmrotate else '')
-            text = text.replace('#{INSTALL_INSIGHTFACE}', f'RUN iinfer -m install -c insightface --data /home/{user}/.iinfer' if install_insightface else '')
+            text = text.replace('#{INSTALL_ONNX}', f'RUN iinfer -m install -c onnx --data /home/{user}/.iinfer {install_use_gpu}' if install_onnx else '')
+            text = text.replace('#{INSTALL_MMDET}', f'RUN iinfer -m install -c mmdet --data /home/{user}/.iinfer {install_use_gpu}' if install_mmdet else '')
+            text = text.replace('#{INSTALL_MMCLS}', f'RUN iinfer -m install -c mmcls --data /home/{user}/.iinfer {install_use_gpu}' if install_mmcls else '')
+            text = text.replace('#{INSTALL_MMPRETRAIN}', f'RUN iinfer -m install -c mmpretrain --data /home/{user}/.iinfer {install_use_gpu}' if install_mmpretrain else '')
+            text = text.replace('#{INSTALL_MMROTATE}', f'RUN iinfer -m install -c mmrotate --data /home/{user}/.iinfer {install_use_gpu}' if install_mmrotate else '')
+            text = text.replace('#{INSTALL_INSIGHTFACE}', f'RUN iinfer -m install -c insightface --data /home/{user}/.iinfer {install_use_gpu}' if install_insightface else '')
             fp.write(text)
         docker_compose_path = Path('docker-compose.yml')
         if not docker_compose_path.exists():
@@ -76,6 +79,13 @@ class Install(object):
             services[f'iinfer_server{install_tag}'] = dict(
                 image=f'hamacom/iinfer:{version.__version__}{install_tag}',
                 container_name=f'iinfer_server{install_tag}',
+                deploy=dict(
+                    resources=dict(
+                        reservations=dict(
+                            devices=[dict(capabilities=['gpu'])]
+                        )
+                    )
+                ),
                 environment=dict(
                     TZ='Asia/Tokyo',
                     REDIS_HOST='${REDIS_HOST:-redis}',
@@ -107,22 +117,25 @@ class Install(object):
         else:
             return {"warn":f"Unsupported platform."}
 
-    def onnx(self):
+    def onnx(self, install_use_gpu:bool=False):
         returncode, _ = common.cmd('pip install onnxruntime', logger=self.logger)
         if returncode != 0:
             self.logger.error(f"Failed to install onnxruntime.")
             return {"error": f"Failed to install onnxruntime."}
+        if install_use_gpu:
+            returncode, _ = common.cmd('pip install onnxruntime-gpu', logger=self.logger)
+            if returncode != 0:
+                self.logger.error(f"Failed to install onnxruntime-gpu.")
+                return {"error": f"Failed to install onnxruntime-gpu."}
         return {"success": f"Success to install onnxruntime."}
 
-    def insightface(self, data_dir: Path):
+    def insightface(self, data_dir: Path, install_use_gpu:bool=False):
         returncode, _ = common.cmd('pip install cython', logger=self.logger)
         if returncode != 0:
             self.logger.error(f"Failed to install cython.")
             return {"error": f"Failed to install cython."}
-        returncode, _ = common.cmd('pip install onnxruntime', logger=self.logger)
-        if returncode != 0:
-            self.logger.error(f"Failed to install onnxruntime.")
-            return {"error": f"Failed to install onnxruntime."}
+        ret = self.onnx(install_use_gpu)
+        if "error" in ret: return ret
         returncode, _ = common.cmd('python -m pip install --upgrade pip setuptools', logger=self.logger)
         if returncode != 0:
             self.logger.error(f"Failed to install setuptools.")

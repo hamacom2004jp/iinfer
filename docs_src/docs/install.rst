@@ -122,23 +122,57 @@ CUDA + cuDNNのインストール
     .. code-block:: bash
 
         $ nvidia-smi
+        $ /usr/local/cuda/bin/nvcc --version
 
 5. cuDNNを `公式サイト <https://developer.nvidia.com/rdp/cudnn-archive>`__ からダウンロードします。
     1. cuDNNとCUDAのバージョンの関係は `こちら <https://docs.nvidia.com/deeplearning/cudnn/support-matrix/index.html>`__ で確認してください。
 6. cuDNNをインストールします。
     1. Windowsの場合、zipファイルなのでファイルを解凍します。
-    2. 解凍したファイルには、 `bin` 、 `include` 、 `lib` の3つのフォルダがあります。
-    3. 3つのフォルダをCUDA Toolkitのインストールディレクトリ（ `CUDA_PATH`` に設定されていたパス）の中にコピーします。
-    4. `bin` フォルダの中に `cudnn64_XXX.dll` （ `XXX` はバージョン）ファイルがあることを確認して、次のコマンドでエラーにならないことを確認します。
+    2. Windowsの場合、解凍したファイルには、 `bin` 、 `include` 、 `lib` の3つのフォルダがあります。
+    3. Windowsの場合、3つのフォルダをCUDA Toolkitのインストールディレクトリ（ `CUDA_PATH`` に設定されていたパス）の中にコピーします。
+    4. Windowsの場合、`bin` フォルダの中に `cudnn64_XXX.dll` （ `XXX` はバージョン）ファイルがあることを確認して、次のコマンドでエラーにならないことを確認します。
 
         .. code-block:: bat
 
             where cudnn64_XXX.dll
 
+    5. Ubuntuの場合、解凍したファイルには、 `lib64` フォルダがあります。
+
 7. Windwosの場合 `Could not locate zlibwapi.dll. Please make sure it is in your library path!` というエラーが出る場合は、以下の手順を行ってください。
-    1. `C:\Program Files\NVIDIA Corporation\Nsight System 2022.4.2\host-windows-x64\` フォルダ又は類似のフォルダにある `zlib.dll` ファイルを `%CUDA_PATH%\bin\` フォルダにコピーします。
+    1. `C:\Program Files\NVIDIA Corporation\Nsight System 2022.4.2\host-windows-x64\` フォルダ又は類似のフォルダにある `zlib.dll` ファイルを `%CUDA_PATH%\bin\ ` フォルダにコピーします。
     2. コピーした `zlib.dll` ファイルを `zlibwapi.dll` に名前を変更します。
 
+8. Dockerを使用する( `iinfer -m install -c server` コマンドを使用する )場合、docker-composeのバージョンを1.28以降にします。
+
+    1. docker-composeのバージョンを確認します。
+
+        .. code-block:: bash
+
+            docker-compose --version
+
+    2. docker-composeのバージョンが1.28以降でない場合、以下のコマンドでバージョンをアップデートします。
+
+        .. code-block:: bash
+
+            sudo rm -rf /usr/bin/docker-compose
+            sudo curl -L "https://github.com/docker/compose/releases/download/1.29.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+            sudo chmod +x /usr/local/bin/docker-compose
+            sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+
+9. Dockerを使用する( `iinfer -m install -c server` コマンドを使用する )場合、NVIDIA Container Toolkitをインストールします。
+
+    .. code-block:: bash
+            
+        distribution=$(. /etc/os-release;echo $ID$VERSION_ID) \
+            && curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg \
+            && curl -s -L https://nvidia.github.io/libnvidia-container/$distribution/libnvidia-container.list | \
+            sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
+            sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+        sudo apt-get update
+        sudo apt-get install -y nvidia-container-toolkit
+        sudo nvidia-ctk runtime configure --runtime=docker
+
+    ここでUbuntuの再起動を行うこと。
 
 GPU対応版のフレームワークインストール
 ==============================================

@@ -571,14 +571,14 @@ def _main(args_list:list=None):
                 common.print_format(msg, format, tm, output_json, output_json_append)
                 return 1, msg
             ret = inst.server(Path(data), install_iinfer, install_onnx=onnx,
-                              install_mmdet=mmdet, install_mmcls=mmcls, install_mmpretrain=mmpretrain, install_mmrotate=mmrotate, install_use_gpu=install_use_gpu,
-                              install_insightface=insightface, install_tag=install_tag)
+                              install_mmdet=mmdet, install_mmcls=mmcls, install_mmpretrain=mmpretrain, install_mmrotate=mmrotate,
+                              install_insightface=insightface, install_tag=install_tag, install_use_gpu=install_use_gpu)
             common.print_format(ret, format, tm, output_json, output_json_append)
             if 'success' not in ret:
                 return 1, ret
 
         elif cmd == 'onnx':
-            ret = inst.onnx()
+            ret = inst.onnx(install_use_gpu=install_use_gpu)
             common.print_format(ret, format, tm, output_json, output_json_append)
             if 'success' not in ret:
                 return 1, ret
@@ -624,7 +624,7 @@ def _main(args_list:list=None):
                 msg = {"warn":f"Please specify the --data option."}
                 common.print_format(msg, format, tm, output_json, output_json_append)
                 return 1, msg
-            ret = inst.insightface(Path(data))
+            ret = inst.insightface(Path(data), install_use_gpu=install_use_gpu)
             common.print_format(ret, format, tm, output_json, output_json_append)
             if 'success' not in ret:
                 return 1, ret
