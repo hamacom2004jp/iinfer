@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>サーバー環境構築 &mdash; iinfer 2024/02/24 documentation</title>
+  <title>インストール &mdash; iinfer 2024/02/25 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -16,7 +16,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=1441ad90"></script>
+        <script src="../_static/documentation_options.js?v=b0392989"></script>
         <script src="../_static/doctools.js?v=888ff710"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -51,14 +51,22 @@
 <li class="toctree-l1"><a class="reference internal" href="command.html">コマンドリファレンス</a></li>
 <li class="toctree-l1"><a class="reference internal" href="models.html">動作確認済みモデル</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">サーバー環境構築</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#ubuntu">１．サーバー環境を構築する（Ubuntu上で実行）</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#id2">２．推論サーバーに接続する</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#client-install">クライアント環境構築</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#iinfer">１．<cite>iinfer</cite> のインストール</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="#gpu">GPU環境構築</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#cuda-cudnn">CUDA + cuDNNのインストール</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#id3">GPU対応版のフレームワークインストール</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#id4">GPU対応版のサーバーインストール</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ubuntu">サーバー（Ubuntu）環境構築する場合</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#docker">１．Dockerイメージを構築</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id3">２．推論サーバーに接続する</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#wsl2-docker">サーバー（WSL2+Docker）環境構築する場合</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#gpu">サーバー（GPU）環境構築する場合</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#cuda-cudnn">１．CUDA + cuDNNのインストール</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id4">２．GPU対応版のサーバーインストール</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id5">３．GPU対応版のフレームワークインストール</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="detection.html">物体検知</a></li>
@@ -84,7 +92,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">サーバー環境構築</li>
+      <li class="breadcrumb-item active">インストール</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/docs/install.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -95,16 +103,88 @@
            <div itemprop="articleBody">
              
   <section id="id1">
-<h1>サーバー環境構築<a class="headerlink" href="#id1" title="Link to this heading"></a></h1>
+<h1>インストール<a class="headerlink" href="#id1" title="Link to this heading"></a></h1>
+<ul class="simple">
+<li><p><cite>iinfer</cite> はクライアントとサーバーの両方の環境を構築する必要があります。</p></li>
+<li><dl class="simple">
+<dt>もちろん１台のPCで両方の環境を構築することも可能です。</dt><dd><ul>
+<li><p><a class="reference internal" href="#client-install"><span class="std std-ref">クライアント環境構築</span></a></p></li>
+<li><p><a class="reference internal" href="#server-ubuntu-install"><span class="std std-ref">サーバー環境構築する場合</span></a></p></li>
+<li><p><a class="reference internal" href="#server-wsl2docker-install"><span class="std std-ref">サーバー（WSL2+Docker）環境構築する場合</span></a></p></li>
+<li><p><a class="reference internal" href="#server-gpu-install"><span class="std std-ref">サーバー（GPU）環境構築する場合</span></a></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>なおサーバー環境の動作確認状況は下記のとおりです。</p></li>
+</ul>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td></td>
+<td><p>Ubuntu（Host）</p></td>
+<td><p>Ubuntu（Docker）</p></td>
+<td><p>Windows（Host）</p></td>
+<td><p>Windows（WSL2+Docker）</p></td>
+</tr>
+<tr class="row-even"><td><p>CPU</p></td>
+<td><p>確認済</p></td>
+<td><p>確認済</p></td>
+<td><p>確認済</p></td>
+<td><p>確認済</p></td>
+</tr>
+<tr class="row-odd"><td><p>GPU</p></td>
+<td><p>&lt;多分動く&gt;</p></td>
+<td><p>&lt;多分動く&gt;</p></td>
+<td><p>確認済</p></td>
+<td><p>確認済</p></td>
+</tr>
+</tbody>
+</table>
+<section id="client-install">
+<span id="id2"></span><h2>クライアント環境構築<a class="headerlink" href="#client-install" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>まず最初に <cite>iinfer</cite> をインストールします。</p></li>
+<li><p><cite>iinfer</cite> はPython3.8以上で動作します。</p></li>
+<li><p>これがクライアントとして動作します。</p></li>
+</ul>
+<section id="iinfer">
+<h3>１．<cite>iinfer</cite> のインストール<a class="headerlink" href="#iinfer" title="Link to this heading"></a></h3>
+<ul>
+<li><p>Windowsの場合</p>
+<blockquote>
+<div><div class="highlight-bat notranslate"><div class="highlight"><pre><span></span>python3 -m venv .venv
+.venv\\Scripts\\activate
+pip install --upgrade pip
+pip install iinfer
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>Ubuntuの場合</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv
+<span class="nb">source</span><span class="w"> </span>.venv/bin/activate
+pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>pip
+pip<span class="w"> </span>install<span class="w"> </span>iinfer
+<span class="nb">eval</span><span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span>register-python-argcomplete<span class="w"> </span>iinfer<span class="k">)</span><span class="s2">&quot;</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+</ul>
+</section>
+</section>
+<section id="ubuntu">
+<span id="server-ubuntu-install"></span><h2>サーバー（Ubuntu）環境構築する場合<a class="headerlink" href="#ubuntu" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p><cite>iinfer</cite> を使用して各種AIフレームワークをインストールしたDockerイメージを構築することが出来ます。</p></li>
 <li><p>物体検知を実行するための手順を解説します。</p></li>
 </ul>
-<section id="ubuntu">
-<h2>１．サーバー環境を構築する（Ubuntu上で実行）<a class="headerlink" href="#ubuntu" title="Link to this heading"></a></h2>
+<section id="docker">
+<h3>１．Dockerイメージを構築<a class="headerlink" href="#docker" title="Link to this heading"></a></h3>
 <ul>
 <li><dl>
-<dt><cite>iinfer -m install -c server &lt;Option&gt;</cite> コマンドでサーバー環境を構築できます。</dt><dd><ul class="simple">
+<dt><cite>iinfer -m install -c server &lt;Option&gt;</cite> コマンドで推論サーバーを構築できます。</dt><dd><ul class="simple">
 <li><p><cite>--install_mmdet</cite> オプションは <cite>mmdetection</cite> のみをDockerイメージに含めるための指定です。</p></li>
 <li><p><cite>--install_mmdet</cite> オプションを使用しない場合は、デフォルトのフレームワークがインストールされます。 <a class="reference internal" href="cmd_install.html"><span class="doc">コマンドリファレンス（installモード）</span></a> を参照してください。</p></li>
 <li><p><cite>--install_tag mmdet</cite> は、作成するイメージ名やコンテナ名、 <cite>iinfer</cite> 推論サーバーの名前に使用されるタグ名です。</p></li>
@@ -185,8 +265,8 @@ Creating<span class="w"> </span>redis<span class="w">                    </span>
 </li>
 </ul>
 </section>
-<section id="id2">
-<h2>２．推論サーバーに接続する<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<section id="id3">
+<h3>２．推論サーバーに接続する<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
 <ul>
 <li><p><cite>iinfer -m client -c deploy_list &lt;Option&gt;</cite> コマンドで推論サーバー接続を試してみます。</p></li>
 <li><p><cite>--svname server_mmdet</cite> コマンドで推論サーバー名を指定しています。</p>
@@ -199,14 +279,74 @@ Creating<span class="w"> </span>redis<span class="w">                    </span>
 </ul>
 </section>
 </section>
+<section id="wsl2-docker">
+<span id="server-wsl2docker-install"></span><h2>サーバー（WSL2+Docker）環境構築する場合<a class="headerlink" href="#wsl2-docker" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Windows環境ではWSL2を使用してUbuntu環境を構築することが出来ます。</p></li>
+<li><p>以下の手順で推論サーバーを構築してみます。</p></li>
+</ul>
+<ol class="arabic">
+<li><p>Ubuntuイメージインストール（cmdプロンプトで実行 : ubuntuユーザーを作成する）</p>
+<blockquote>
+<div><div class="highlight-bat notranslate"><div class="highlight"><pre><span></span>wsl --install -d Ubuntu-20.04
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>Ubuntu初期設定（bash上で実行）</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>/etc/apt
+sudo<span class="w"> </span>sed<span class="w"> </span>-i.bak<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;s/http:\/\/archive\.ubuntu\.com/http:\/\/jp\.archive\.ubuntu\.com/g&quot;</span><span class="w"> </span>sources.list
+sudo<span class="w"> </span>apt<span class="w"> </span>update
+sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>language-pack-ja<span class="w"> </span>manpages-ja<span class="w"> </span>manpages-ja-dev
+sudo<span class="w"> </span>update-locale<span class="w"> </span><span class="nv">LANG</span><span class="o">=</span>ja_JP.UTF-8
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>Dockerインストール（bash上で実行）</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>apt-transport-https<span class="w"> </span>ca-certificates<span class="w"> </span>curl<span class="w"> </span>software-properties-common
+<span class="nb">cd</span><span class="w"> </span>~/
+curl<span class="w"> </span>-fsSL<span class="w"> </span>https://download.docker.com/linux/ubuntu/gpg<span class="w"> </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>apt-key<span class="w"> </span>add<span class="w"> </span>-
+sudo<span class="w"> </span>add-apt-repository<span class="w"> </span><span class="s2">&quot;deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable&quot;</span>
+sudo<span class="w"> </span>apt<span class="w"> </span>update
+apt-cache<span class="w"> </span>policy<span class="w"> </span>docker-ce
+sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>docker-ce<span class="w"> </span>docker-compose
+sudo<span class="w"> </span>usermod<span class="w"> </span>-aG<span class="w"> </span>docker<span class="w"> </span>ubuntu
+<span class="nb">exit</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>Dockerインストール済みWSL2イメージ生成（cmdプロンプトで実行）</p>
+<blockquote>
+<div><div class="highlight-bat notranslate"><div class="highlight"><pre><span></span>wsl --shutdown
+wsl --export Ubuntu-20.04 Ubuntu_wsl2_docker-20.04.tar
+wsl --unregister Ubuntu-20.04
+<span class="k">mkdir</span> Ubuntu_docker-20.04
+wsl --import Ubuntu_docker-20.04 Ubuntu_docker-20.04 Ubuntu_wsl2_docker-20.04.tar --version 2
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>Dockerインストール済みWSL2イメージ生成（cmdプロンプトで実行）</p>
+<blockquote>
+<div><div class="highlight-bat notranslate"><div class="highlight"><pre><span></span>wsl -d Ubuntu_docker-20.04 -u ubuntu
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+</ol>
+</section>
 <section id="gpu">
-<h1>GPU環境構築<a class="headerlink" href="#gpu" title="Link to this heading"></a></h1>
+<span id="server-gpu-install"></span><h2>サーバー（GPU）環境構築する場合<a class="headerlink" href="#gpu" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>サーバー環境にGPUを搭載した場合、GPU環境を構築することが出来ます。</p></li>
 <li><p>なおこの手順はNVIDIA製のGPUを使用する場合の手順です。</p></li>
 </ul>
 <section id="cuda-cudnn">
-<h2>CUDA + cuDNNのインストール<a class="headerlink" href="#cuda-cudnn" title="Link to this heading"></a></h2>
+<h3>１．CUDA + cuDNNのインストール<a class="headerlink" href="#cuda-cudnn" title="Link to this heading"></a></h3>
 <ol class="arabic">
 <li><dl class="simple">
 <dt>Windowsの場合 <a class="reference external" href="https://visualstudio.microsoft.com/ja/visual-cpp-build-tools/">Build Tools for Visual Studio 2022</a> をインストールします。</dt><dd><ol class="arabic simple">
@@ -215,7 +355,6 @@ Creating<span class="w"> </span>redis<span class="w">                    </span>
 <li><p>C++ 2022 再配布可能パッケージの更新プログラム</p></li>
 <li><p>C++ Build Tools コア機能</p></li>
 <li><p>MSVC v143 - VS 2022 C++ x64/x86 ビルドツール</p></li>
-<li><p>MSVC v142 - VS 2019 C++ x64/x86 ビルドツール</p></li>
 <li><p>Windows ユニバーサル CRT</p></li>
 <li><p>Windows 10 SDK</p></li>
 <li><p>Windows用 C++ CMakeツール</p></li>
@@ -265,7 +404,6 @@ $<span class="w"> </span>/usr/local/cuda/bin/nvcc<span class="w"> </span>--versi
 </div>
 </div></blockquote>
 </li>
-<li><p>Ubuntuの場合、解凍したファイルには、 <cite>lib64</cite> フォルダがあります。</p></li>
 </ol>
 </dd>
 </dl>
@@ -318,48 +456,8 @@ sudo<span class="w"> </span>nvidia-ctk<span class="w"> </span>runtime<span class
 </li>
 </ol>
 </section>
-<section id="id3">
-<h2>GPU対応版のフレームワークインストール<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
-<ul>
-<li><p>mmdetectionのGPU対応版をインストールする場合、下記のコマンドでインストールできます。</p>
-<blockquote>
-<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>iinfer<span class="w"> </span>-m<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>mmdet<span class="w"> </span>--install_use_gpu
-</pre></div>
-</div>
-</div></blockquote>
-</li>
-<li><p>mmpretrainのGPU対応版をインストールする場合、下記のコマンドでインストールできます。</p>
-<blockquote>
-<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>iinfer<span class="w"> </span>-m<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>mmpretrain<span class="w"> </span>--install_use_gpu
-</pre></div>
-</div>
-</div></blockquote>
-</li>
-<li><p>mmclsのGPU対応版をインストールする場合、下記のコマンドでインストールできます。</p>
-<blockquote>
-<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>iinfer<span class="w"> </span>-m<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>mmcls<span class="w"> </span>--install_use_gpu
-</pre></div>
-</div>
-</div></blockquote>
-</li>
-<li><p>insightfaceのGPU対応版をインストールする場合、下記のコマンドでインストールできます。</p>
-<blockquote>
-<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>iinfer<span class="w"> </span>-m<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>insightface<span class="w"> </span>--install_use_gpu
-</pre></div>
-</div>
-</div></blockquote>
-</li>
-<li><p>onnxruntimeのGPU対応版をインストールする場合、下記のコマンドでインストールできます。</p>
-<blockquote>
-<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>iinfer<span class="w"> </span>-m<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>onnx<span class="w"> </span>--install_use_gpu
-</pre></div>
-</div>
-</div></blockquote>
-</li>
-</ul>
-</section>
 <section id="id4">
-<h2>GPU対応版のサーバーインストール<a class="headerlink" href="#id4" title="Link to this heading"></a></h2>
+<h3>２．GPU対応版のサーバーインストール<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
 <ul>
 <li><p>下記のコマンドでインストールできます。</p>
 <blockquote>
@@ -369,6 +467,23 @@ sudo<span class="w"> </span>nvidia-ctk<span class="w"> </span>runtime<span class
 </div></blockquote>
 </li>
 </ul>
+</section>
+<section id="id5">
+<h3>３．GPU対応版のフレームワークインストール<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<ul>
+<li><p>Dockerを使用せずに、GPU対応版のフレームワークをインストールする場合、下記のコマンドでインストールできます。</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>iinfer<span class="w"> </span>-m<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>mmdet<span class="w"> </span>--install_use_gpu
+$<span class="w"> </span>iinfer<span class="w"> </span>-m<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>mmpretrain<span class="w"> </span>--install_use_gpu
+$<span class="w"> </span>iinfer<span class="w"> </span>-m<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>mmcls<span class="w"> </span>--install_use_gpu
+$<span class="w"> </span>iinfer<span class="w"> </span>-m<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>insightface<span class="w"> </span>--install_use_gpu
+$<span class="w"> </span>iinfer<span class="w"> </span>-m<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>onnx<span class="w"> </span>--install_use_gpu
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+</ul>
+</section>
 </section>
 </section>
 

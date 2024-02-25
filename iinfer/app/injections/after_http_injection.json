@@ -1,0 +1,6 @@
+{
+    "outputs_url": "https://httpbin.org/post",
+    "output_image_url": "https://httpbin.org/post",
+    "output_image_ext": "jpeg",
+    "output_image_prefix": "output_"
+}

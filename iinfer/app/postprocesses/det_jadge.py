@@ -28,12 +28,14 @@ class DetJadge(postprocess.Postprocess):
             output_preview (bool): プレビューを出力する
         """
         super().__init__(logger)
-        if ok_score_th is not None and (ok_classes is not None and len(ok_classes)>0) and (ok_labels is not None and len(ok_labels)>0):
+        if ok_score_th is not None and ((ok_classes is not None and len(ok_classes)>0) or (ok_labels is not None and len(ok_labels)>0)):
             raise Exception('If ok_score_th is specified, ok_classes or ok_labels must be set.')
-        if ng_score_th is not None and (ng_classes is not None and len(ng_classes)>0) and (ng_labels is not None and len(ng_labels)>0):
+        if ng_score_th is not None and ((ng_classes is not None and len(ng_classes)>0) or (ng_labels is not None and len(ng_labels)>0)):
             raise Exception('If ng_score_th is specified, ng_classes or ng_labels must be set.')
-        if ext_score_th is not None and (ext_classes is not None and len(ext_classes)>0) and (ext_labels is not None and len(ext_labels)>0):
+        if ext_score_th is not None and ((ext_classes is not None and len(ext_classes)>0) or (ext_labels is not None and len(ext_labels)>0)):
+            self.add_warning(outputs, 'If ext_score_th is specified, ext_classes or ext_labels must be set.')
             raise Exception('If ext_score_th is specified, ext_classes or ext_labels must be set.')
+
         self.ok_score_th = ok_score_th
         self.ok_classes = ok_classes
         self.ok_labels = ok_labels
@@ -82,20 +84,18 @@ class DetJadge(postprocess.Postprocess):
         if 'output_scores' not in data or 'output_classes' not in data:
             raise Exception('Invalid outputs. outputs[\'success\'][\'output_scores\'] and outputs[\'success\'][\'output_classes\'] must be set.')
 
-        calc_scores = [0.0, 0.0, 0.0] # ok, ng, ext
+        output_jadge_score = [0.0, 0.0, 0.0] # ok, ng, ext
         for i, cls in enumerate(data['output_classes']):
             label = data['output_labels'][i] if 'output_labels' in data else None
             if self.ext_classes is not None and cls in self.ext_classes or self.ext_labels is not None and label in self.ext_labels:
-                calc_scores[2] += data['output_scores'][i]
+                output_jadge_score[2] = max(output_jadge_score[2], data['output_scores'][i])
             elif self.ng_classes is not None and cls in self.ng_classes or self.ng_labels is not None and label in self.ng_labels:
-                calc_scores[1] += data['output_scores'][i]
+                output_jadge_score[1] = max(output_jadge_score[1], data['output_scores'][i])
             elif self.ok_classes is not None and cls in self.ok_classes or self.ok_labels is not None and label in self.ok_labels:
-                calc_scores[0] += data['output_scores'][i]
+                output_jadge_score[0] = max(output_jadge_score[0], data['output_scores'][i])
             else:
-                calc_scores[2] += data['output_scores'][i]
+                output_jadge_score[2] = max(output_jadge_score[2], data['output_scores'][i])
 
-        calc_scores_sum = sum(calc_scores)
-        output_jadge_score = (calc_scores[0]/calc_scores_sum, calc_scores[1]/calc_scores_sum, calc_scores[2]/calc_scores_sum)
         output_jadge_label = ('ok', 'ng', 'gray')
         output_jadge = 'gray'
         if self.ext_score_th is not None and output_jadge_score[2] >= self.ext_score_th:

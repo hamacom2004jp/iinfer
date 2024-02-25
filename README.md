@@ -21,26 +21,7 @@
 
 ## インストール方法
 
-次の手順でインストールしてください:
-
-1. pipを使用してインストールします:
-
-```bash
-pip install --upgrade pip
-pip install iinfer
-eval "$(register-python-argcomplete iinfer)" # Ubuntuの場合コマンドラインオプションを補完できるようにします。
-```
-
-2. コンテナをインストールして起動します。:
-   ※docker及びdocker-composeを別途インストールしておく必要があります。
-
-```bash
-cd ~/
-iinfer -m install -c server
-docker-compose -f up -d
-```
-
-※インストールを実行したフォルダに `docker-compose.yml` が作成されます。
+インストール方法は [こちら](https://hamacom2004jp.github.io/iinfer/docs/install.html) を参照してください。
 
 ## iinferの使用方法
 

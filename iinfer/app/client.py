@@ -105,8 +105,8 @@ class Client(object):
 
     def deploy(self, name:str, model_img_width:int, model_img_height:int, model_file:Path, model_conf_file:List[Path], predict_type:str,
                custom_predict_py:Path, label_file:Path, color_file:Path,
-               before_injection_conf:Path, before_injection_py:List[Path],
-               after_injection_conf:Path, after_injection_py:List[Path], overwrite:bool, timeout:int = 60):
+               before_injection_conf:Path, before_injection_type:List[str], before_injection_py:List[Path],
+               after_injection_conf:Path, after_injection_type:List[str], after_injection_py:List[Path], overwrite:bool, timeout:int = 60):
         """
         モデルをRedisサーバーにデプロイする
 
@@ -121,7 +121,9 @@ class Client(object):
             label_file (Path): ラベルファイルのパス
             color_file (Path): 色ファイルのパス
             before_injection_conf (Path): 推論前処理設定ファイルのパス
+            before_injection_type (List[str]): 推論前処理タイプ
             before_injection_py (List[Path]): 推論前処理スクリプトのパス
+            after_injection_type (List[str]): 推論後処理タイプ
             after_injection_conf (Path): 推論後処理設定ファイルのパス
             after_injection_py (List[Path]): 推論後処理スクリプトのパス
             overwrite (bool): モデルを上書きするかどうか
@@ -163,6 +165,18 @@ class Client(object):
                 custom_predict_py_b64 = base64.b64encode(pf.read()).decode('utf-8')
         else:
             custom_predict_py_b64 = None
+        if before_injection_type is not None and len(before_injection_type) > 0:
+            for t in before_injection_type:
+                if t not in common.BASE_BREFORE_INJECTIONS:
+                    self.logger.error(f"Unknown before_injection_type. {t}")
+                    return {"error": f"Unknown before_injection_type. {t}"}
+            before_injection_type = ','.join(before_injection_type)
+        if after_injection_type is not None and len(after_injection_type) > 0:
+            for t in after_injection_type:
+                if t not in common.BASE_AFTER_INJECTIONS:
+                    self.logger.error(f"Unknown after_injection_type. {t}")
+                    return {"error": f"Unknown after_injection_type. {t}"}
+            after_injection_type = ','.join(after_injection_type)
         def _conf_b64(name:str, conf:Path):
             if conf is not None and not conf.exists():
                 self.logger.error(f"{name} {conf} does not exist")
@@ -205,8 +219,8 @@ class Client(object):
         res_json = self._proc(self.svname, 'deploy', [name, str(model_img_width), str(model_img_height), predict_type,
                                                    model_file.name, model_bytes_b64, model_conf_file_name, model_conf_bytes_b64,
                                                    custom_predict_py_b64, label_file_b64, color_file_b64,
-                                                   before_injection_conf_b64, before_injection_py_name, before_injection_py_b64,
-                                                   after_injection_conf_b64, after_injection_py_name, after_injection_py_b64, overwrite], timeout=timeout)
+                                                   before_injection_conf_b64, before_injection_type, before_injection_py_name, before_injection_py_b64,
+                                                   after_injection_conf_b64, after_injection_type, after_injection_py_name, after_injection_py_b64, overwrite], timeout=timeout)
         return res_json
 
     def deploy_list(self, timeout:int = 60):

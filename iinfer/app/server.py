@@ -165,34 +165,42 @@ class Server(object):
                     else:
                         before_injection_conf = base64.b64decode(msg[13])
                     if msg[14] == 'None':
+                        before_injection_type = None
+                    else:
+                        before_injection_type = msg[14].split(',')
+                    if msg[15] == 'None':
                         before_injection_py = None
                     else:
-                        before_injection_py = msg[14].split(',')
-                    if msg[15] == 'None':
+                        before_injection_py = msg[15].split(',')
+                    if msg[16] == 'None':
                         before_injection_bin = None
                     else:
-                        before_injection_bin = [base64.b64decode(m) for m in msg[15].split(',')]
-                    if msg[16] == 'None':
+                        before_injection_bin = [base64.b64decode(m) for m in msg[16].split(',')]
+                    if msg[17] == 'None':
                         after_injection_conf = None
                     else:
-                        after_injection_conf = base64.b64decode(msg[16])
-                    if msg[17] == 'None':
+                        after_injection_conf = base64.b64decode(msg[17])
+                    if msg[18] == 'None':
+                        after_injection_type = None
+                    else:
+                        after_injection_type = msg[18].split(',')
+                    if msg[19] == 'None':
                         after_injection_py = None
                     else:
-                        after_injection_py = msg[17].split(',')
-                    if msg[18] == 'None':
+                        after_injection_py = msg[19].split(',')
+                    if msg[20] == 'None':
                         after_injection_bin = None
                     else:
-                        after_injection_bin = [base64.b64decode(m) for m in msg[18].split(',')]
-                    if msg[19] == 'True':
+                        after_injection_bin = [base64.b64decode(m) for m in msg[20].split(',')]
+                    if msg[21] == 'True':
                         overwrite = True
                     else:
                         overwrite = False
 
                     st = self.deploy(msg[1], msg[2], int(msg[3]), int(msg[4]), msg[5], msg[6],
                                      model_bin, model_conf_file, model_conf_bin, custom_predict_py, label_txt, color_txt,
-                                     before_injection_conf, before_injection_py, before_injection_bin,
-                                     after_injection_conf, after_injection_py, after_injection_bin, overwrite)
+                                     before_injection_conf, before_injection_type, before_injection_py, before_injection_bin,
+                                     after_injection_conf, after_injection_type, after_injection_py, after_injection_bin, overwrite)
                 elif msg[0] == 'deploy_list':
                     st = self.deploy_list(msg[1])
                 elif msg[0] == 'undeploy':
@@ -268,8 +276,8 @@ class Server(object):
     def deploy(self, reskey:str, name:str, model_img_width:int, model_img_height:int, predict_type:str,
                model_file:str, model_bin:bytes, model_conf_file:List[str], model_conf_bin:List[bytes],
                custom_predict_py:bytes, label_txt:bytes, color_txt:bytes,
-               before_injection_conf:bytes, before_injection_py:List[str], before_injection_bin:List[bytes],
-               after_injection_conf:bytes, after_injection_py:List[str], after_injection_bin:List[bytes], overwrite:bool):
+               before_injection_conf:bytes, before_injection_type:List[str], before_injection_py:List[str], before_injection_bin:List[bytes],
+               after_injection_conf:bytes, after_injection_type:List[str], after_injection_py:List[str], after_injection_bin:List[bytes], overwrite:bool):
         """
         モデルをデプロイする
 
@@ -287,9 +295,11 @@ class Server(object):
             label_txt (bytes): ラベルファイル
             color_txt (bytes): 色設定ファイル
             before_injection_conf (bytes): 推論前処理の設定ファイル
+            before_injection_type (List[str]): 推論前処理のタイプ
             before_injection_py (List[str]): 推論前処理のPythonスクリプトファイル名
             before_injection_bin (List[bytes]): 推論前処理のPythonスクリプト
             after_injection_conf (bytes): 推論後処理の設定ファイル
+            after_injection_type (List[str]): 推論後処理のタイプ
             after_injection_py (List[str]): 推論後処理のPythonスクリプトファイル名
             after_injection_bin (List[bytes]): 推論後処理のPythonスクリプト
             overwrite (bool): 上書きするかどうか
@@ -389,6 +399,7 @@ class Server(object):
             conf = dict(model_img_width=model_img_width, model_img_height=model_img_height, predict_type=predict_type,
                         model_file=model_file, model_conf_file=model_conf_file, custom_predict_file=(custom_predict_file if custom_predict_file is not None else None),
                         label_file=label_file, color_file=color_file, before_injection_conf=before_injection_conf, after_injection_conf=after_injection_conf,
+                        before_injection_type=before_injection_type, after_injection_type=after_injection_type,
                         before_injection_py=before_injection_py, after_injection_py=after_injection_py)
             json.dump(conf, f, default=common.default_json_enc)
             self.logger.info(f"Save conf.json to {str(deploy_dir)}")
@@ -448,14 +459,18 @@ class Server(object):
                 model_conf_file = None
                 if "model_conf_file" in conf and conf["model_conf_file"] is not None and len(conf["model_conf_file"]) > 0 and Path(conf["model_conf_file"][0]).exists():
                     model_conf_file = 'exists'
-                before_injection_py = None
+                before_injection = None
                 if "before_injection_py" in conf and conf["before_injection_py"] is not None and len(conf["before_injection_py"]) > 0:
                     if len([True for p in conf["before_injection_py"] if  Path(p).exists()]) > 0:
-                        before_injection_py = 'exists'
-                after_injection_py = None
+                        before_injection = 'exists'
+                if "before_injection_type" in conf and conf["before_injection_type"] is not None and len(conf["before_injection_type"]) > 0:
+                    before_injection = 'enabled'
+                after_injection = None
                 if "after_injection_py" in conf and conf["after_injection_py"] is not None and len(conf["after_injection_py"]) > 0:
                     if len([True for p in conf["after_injection_py"] if  Path(p).exists()]) > 0:
-                        after_injection_py = 'exists'
+                        after_injection = 'exists'
+                if "after_injection_type" in conf and conf["after_injection_type"] is not None and len(conf["after_injection_type"]) > 0:
+                    after_injection = 'enabled'
                 custom_predict_file = 'exists' if "custom_predict_file" in conf and conf["custom_predict_file"] is not None and Path(conf["custom_predict_file"]).exists() else None
                 label_file = 'exists' if "label_file" in conf and conf["label_file"] is not None and Path(conf["label_file"]).exists() else None
                 color_file = 'exists' if "color_file" in conf and conf["color_file"] is not None and Path(conf["color_file"]).exists() else None
@@ -465,8 +480,8 @@ class Server(object):
                            label_file=label_file, color_file=color_file,
                            session=dir.name in self.sessions,
                            mot=dir.name in self.sessions and self.sessions[dir.name]['tracker'] is not None,
-                           before_injection_py=before_injection_py,
-                           after_injection_py=after_injection_py)
+                           before_injection_py=before_injection,
+                           after_injection_py=after_injection)
                 deploy_list.append(row)
         self.responce(reskey, {"success": deploy_list})
         return self.RESP_SCCESS
@@ -528,45 +543,68 @@ class Server(object):
                 model_conf_path = Path(conf["model_conf_file"][0])
             else:
                 model_conf_path = None
-            if "before_injection_conf" in conf and conf["before_injection_conf"] is not None:
-                before_injection_conf = dict()
-                with open(conf["before_injection_conf"], "r") as f:
-                    before_injection_conf = json.load(f)
-            else:
-                before_injection_conf = dict()
-            if "before_injection_py" in conf and conf["before_injection_py"] is not None and len(conf["before_injection_py"]) > 0:
-                paths = [Path(p) for p in conf["before_injection_py"]]
-                before_injections = common.load_before_injections(paths, before_injection_conf, self.logger)
-            else:
-                before_injections = None
-            if "after_injection_conf" in conf and conf["after_injection_conf"] is not None:
-                after_injection_conf = dict()
-                with open(conf["after_injection_conf"], "r") as f:
-                    after_injection_conf = json.load(f)
-            else:
-                after_injection_conf = dict()
-            if "after_injection_py" in conf and conf["after_injection_py"] is not None and len(conf["after_injection_py"]) > 0:
-                paths = [Path(p) for p in conf["after_injection_py"]]
-                after_injections = common.load_after_injections(paths, after_injection_conf, self.logger)
-            else:
-                after_injections = None
-            if not model_path.exists():
-                self.logger.warn(f"Model path {str(model_path)} does not exist")
-                self.responce(reskey, {"warn": f"Model path {str(model_path)} does not exist"})
+            try:
+                if "before_injection_conf" in conf and conf["before_injection_conf"] is not None:
+                    before_injection_conf = dict()
+                    with open(conf["before_injection_conf"], "r") as f:
+                        before_injection_conf = json.load(f)
+                else:
+                    before_injection_conf = dict()
+                if "before_injection_type" in conf and conf["before_injection_type"] is not None and len(conf["before_injection_type"]) > 0:
+                    types = [t for t in conf["before_injection_type"]]
+                    before_injections = common.load_before_injection_type(types, before_injection_conf, self.logger)
+                else:
+                    before_injections = None
+                if "before_injection_py" in conf and conf["before_injection_py"] is not None and len(conf["before_injection_py"]) > 0:
+                    paths = [Path(p) for p in conf["before_injection_py"]]
+                    before_injections = [] if before_injections is None else before_injections
+                    before_injections = common.load_before_injections(paths, before_injection_conf, self.logger)
+            except Exception as e:
+                self.logger.warn(f"Failed to load before_injection: {e}", exc_info=True)
+                self.responce(reskey, {"warn": f"Failed to load before_injection: {e}"})
                 return self.RESP_WARN
-            if conf["predict_type"] == 'Custom':
-                custom_predict_py = Path(conf["custom_predict_file"]) if conf["custom_predict_file"] is not None else None
-                if custom_predict_py is None:
-                    self.logger.warn(f"predict_type is Custom but custom_predict_py is None.")
-                    self.responce(reskey, {"warn": f"predict_type is Custom but custom_predict_py is None."})
+            try:
+                if "after_injection_conf" in conf and conf["after_injection_conf"] is not None:
+                    after_injection_conf = dict()
+                    with open(conf["after_injection_conf"], "r") as f:
+                        after_injection_conf = json.load(f)
+                else:
+                    after_injection_conf = dict()
+                if "after_injection_type" in conf and conf["after_injection_type"] is not None and len(conf["after_injection_type"]) > 0:
+                    types = [t for t in conf["after_injection_type"]]
+                    after_injections = common.load_after_injection_type(types, after_injection_conf, self.logger)
+                else:
+                    after_injections = None
+                if "after_injection_py" in conf and conf["after_injection_py"] is not None and len(conf["after_injection_py"]) > 0:
+                    paths = [Path(p) for p in conf["after_injection_py"]]
+                    after_injections = [] if after_injections is None else after_injections
+                    after_injections = common.load_after_injections(paths, after_injection_conf, self.logger)
+                if not model_path.exists():
+                    self.logger.warn(f"Model path {str(model_path)} does not exist")
+                    self.responce(reskey, {"warn": f"Model path {str(model_path)} does not exist"})
                     return self.RESP_WARN
-                if not custom_predict_py.exists():
-                    self.logger.warn(f"custom_predict_py path {str(custom_predict_py)} does not exist")
-                    self.responce(reskey, {"warn": f"custom_predict_py path {str(custom_predict_py)} does not exist"})
-                    return self.RESP_WARN
-                predict_obj = common.load_custom_predict(custom_predict_py, self.logger)
-            else:
-                predict_obj = common.load_predict(conf["predict_type"], self.logger)
+            except Exception as e:
+                self.logger.warn(f"Failed to load after_injection: {e}", exc_info=True)
+                self.responce(reskey, {"warn": f"Failed to load after_injection: {e}"})
+                return self.RESP_WARN
+            try:
+                if conf["predict_type"] == 'Custom':
+                    custom_predict_py = Path(conf["custom_predict_file"]) if conf["custom_predict_file"] is not None else None
+                    if custom_predict_py is None:
+                        self.logger.warn(f"predict_type is Custom but custom_predict_py is None.")
+                        self.responce(reskey, {"warn": f"predict_type is Custom but custom_predict_py is None."})
+                        return self.RESP_WARN
+                    if not custom_predict_py.exists():
+                        self.logger.warn(f"custom_predict_py path {str(custom_predict_py)} does not exist")
+                        self.responce(reskey, {"warn": f"custom_predict_py path {str(custom_predict_py)} does not exist"})
+                        return self.RESP_WARN
+                    predict_obj = common.load_custom_predict(custom_predict_py, self.logger)
+                else:
+                    predict_obj = common.load_predict(conf["predict_type"], self.logger)
+            except Exception as e:
+                self.logger.warn(f"Failed to load Predict: {e}", exc_info=True)
+                self.responce(reskey, {"warn": f"Failed to load Predict: {e}"})
+                return self.RESP_WARN
             if "label_file" in conf and conf["label_file"] is not None:
                 label_file = Path(conf["label_file"])
                 if not label_file.exists():

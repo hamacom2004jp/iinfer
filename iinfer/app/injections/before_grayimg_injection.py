@@ -1,7 +1,6 @@
 from iinfer.app import injection
-from pathlib import Path
 from PIL import Image
-from typing import List, Tuple, Dict, Any
+from typing import Dict, Any
 import logging
 
 class BeforeGrayimgInjection(injection.BeforeInjection):
@@ -27,13 +26,13 @@ class BeforeGrayimgInjection(injection.BeforeInjection):
             name (str): モデル名
             image (Image.Image): 推論する画像データ
             session (Dict[str, Any]): 推論セッション。次の項目が含まれます。
-                                      session: app.predict.Predict#create_session() で作成されたセッション
-                                      model_img_width: モデルの入力画像の幅
-                                      model_img_height: モデルの入力画像の高さ
-                                      predict_obj: app.predict.Predict インスタンス
-                                      labels: クラスラベルのリスト
-                                      colors: ボックスの色のリスト
-                                      tracker: use_trackがTrueの場合、トラッカーのインスタンス
+            ・session: app.predict.Predict#create_session() で作成されたセッション
+            ・model_img_width: モデルの入力画像の幅
+            ・model_img_height: モデルの入力画像の高さ
+            ・predict_obj: app.predict.Predict インスタンス
+            ・labels: クラスラベルのリスト
+            ・colors: ボックスの色のリスト
+            ・tracker: use_trackがTrueの場合、トラッカーのインスタンス
         Returns:
             Image.Image: 前処理後の画像データ
         """

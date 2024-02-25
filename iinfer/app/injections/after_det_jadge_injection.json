@@ -1,0 +1,12 @@
+{
+    "ok_score_th": 0.9,
+    "ok_classes": [0],
+    "ok_labels": [],
+    "ng_score_th": 0.9,
+    "ng_classes": [],
+    "ng_labels": [],
+    "ext_score_th": 0.9,
+    "ext_classes": [],
+    "ext_labels": [],
+    "nodraw": false
+}

@@ -1,16 +1,67 @@
 .. -*- coding: utf-8 -*-
 
 ****************************************************
-サーバー環境構築
+インストール
 ****************************************************
+
+- `iinfer` はクライアントとサーバーの両方の環境を構築する必要があります。
+- もちろん１台のPCで両方の環境を構築することも可能です。
+    - :ref:`クライアント環境構築 <client_install>`
+    - :ref:`サーバー環境構築する場合 <server_ubuntu_install>`
+    - :ref:`サーバー（WSL2+Docker）環境構築する場合 <server_wsl2docker_install>`
+    - :ref:`サーバー（GPU）環境構築する場合 <server_gpu_install>`
+- なおサーバー環境の動作確認状況は下記のとおりです。
+
+.. csv-table::
+
+    "","Ubuntu（Host）","Ubuntu（Docker）","Windows（Host）","Windows（WSL2+Docker）"
+    "CPU","確認済","確認済","確認済","確認済"
+    "GPU","<多分動く>","<多分動く>","確認済","確認済"
+
+.. _client_install:
+
+クライアント環境構築
+======================
+
+- まず最初に `iinfer` をインストールします。
+- `iinfer` はPython3.8以上で動作します。
+- これがクライアントとして動作します。
+
+１．`iinfer` のインストール
+--------------------------------
+
+- Windowsの場合
+
+    .. code-block:: bat
+
+        python3 -m venv .venv
+        .venv\\Scripts\\activate
+        pip install --upgrade pip
+        pip install iinfer
+
+- Ubuntuの場合
+
+    .. code-block:: bash
+
+        python3 -m venv .venv
+        source .venv/bin/activate
+        pip install --upgrade pip
+        pip install iinfer
+        eval "$(register-python-argcomplete iinfer)"
+
+
+.. _server_ubuntu_install:
+
+サーバー（Ubuntu）環境構築する場合
+====================================
 
 - `iinfer` を使用して各種AIフレームワークをインストールしたDockerイメージを構築することが出来ます。
 - 物体検知を実行するための手順を解説します。
 
-１．サーバー環境を構築する（Ubuntu上で実行）
-=============================================================================
+１．Dockerイメージを構築
+-----------------------------
 
-- `iinfer -m install -c server <Option>` コマンドでサーバー環境を構築できます。
+- `iinfer -m install -c server <Option>` コマンドで推論サーバーを構築できます。
     - `--install_mmdet` オプションは `mmdetection` のみをDockerイメージに含めるための指定です。
     - `--install_mmdet` オプションを使用しない場合は、デフォルトのフレームワークがインストールされます。 :doc:`./cmd_install` を参照してください。
     - `--install_tag mmdet` は、作成するイメージ名やコンテナ名、 `iinfer` 推論サーバーの名前に使用されるタグ名です。
@@ -83,7 +134,7 @@
 
 
 ２．推論サーバーに接続する
-=============================================================
+----------------------------------------------------
 
 - `iinfer -m client -c deploy_list <Option>` コマンドで推論サーバー接続を試してみます。
 - `--svname server_mmdet` コマンドで推論サーバー名を指定しています。
@@ -92,22 +143,78 @@
 
          $ iinfer -m client -c deploy_list --svname server_mmdet
 
-****************************************************
-GPU環境構築
-****************************************************
+
+.. _server_wsl2docker_install:
+
+サーバー（WSL2+Docker）環境構築する場合
+=========================================
+
+- Windows環境ではWSL2を使用してUbuntu環境を構築することが出来ます。
+- 以下の手順で推論サーバーを構築してみます。
+
+1. Ubuntuイメージインストール（cmdプロンプトで実行 : ubuntuユーザーを作成する）
+
+    .. code-block:: bat
+
+        wsl --install -d Ubuntu-20.04
+
+2. Ubuntu初期設定（bash上で実行）
+
+    .. code-block:: bash
+
+        cd /etc/apt
+        sudo sed -i.bak -e "s/http:\/\/archive\.ubuntu\.com/http:\/\/jp\.archive\.ubuntu\.com/g" sources.list
+        sudo apt update
+        sudo apt install -y language-pack-ja manpages-ja manpages-ja-dev
+        sudo update-locale LANG=ja_JP.UTF-8
+
+3. Dockerインストール（bash上で実行）
+
+    .. code-block:: bash
+
+        sudo apt install -y apt-transport-https ca-certificates curl software-properties-common
+        cd ~/
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+        sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
+        sudo apt update
+        apt-cache policy docker-ce
+        sudo apt install -y docker-ce docker-compose
+        sudo usermod -aG docker ubuntu
+        exit
+
+4. Dockerインストール済みWSL2イメージ生成（cmdプロンプトで実行）
+
+    .. code-block:: bat
+
+        wsl --shutdown
+        wsl --export Ubuntu-20.04 Ubuntu_wsl2_docker-20.04.tar
+        wsl --unregister Ubuntu-20.04
+        mkdir Ubuntu_docker-20.04
+        wsl --import Ubuntu_docker-20.04 Ubuntu_docker-20.04 Ubuntu_wsl2_docker-20.04.tar --version 2
+
+5. Dockerインストール済みWSL2イメージ生成（cmdプロンプトで実行）
+
+    .. code-block:: bat
+
+        wsl -d Ubuntu_docker-20.04 -u ubuntu
+
+
+.. _server_gpu_install:
+
+サーバー（GPU）環境構築する場合
+=================================
 
 - サーバー環境にGPUを搭載した場合、GPU環境を構築することが出来ます。
 - なおこの手順はNVIDIA製のGPUを使用する場合の手順です。
 
-CUDA + cuDNNのインストール
-==============================================
+１．CUDA + cuDNNのインストール
+--------------------------------
 
 1. Windowsの場合 `Build Tools for Visual Studio 2022 <https://visualstudio.microsoft.com/ja/visual-cpp-build-tools/>`__ をインストールします。
     1. インストールするモジュールは以下の通りです。環境によって必要なものが異なる場合があります。
         - C++ 2022 再配布可能パッケージの更新プログラム
         - C++ Build Tools コア機能
         - MSVC v143 - VS 2022 C++ x64/x86 ビルドツール
-        - MSVC v142 - VS 2019 C++ x64/x86 ビルドツール
         - Windows ユニバーサル CRT
         - Windows 10 SDK
         - Windows用 C++ CMakeツール
@@ -135,8 +242,6 @@ CUDA + cuDNNのインストール
         .. code-block:: bat
 
             where cudnn64_XXX.dll
-
-    5. Ubuntuの場合、解凍したファイルには、 `lib64` フォルダがあります。
 
 7. Windwosの場合 `Could not locate zlibwapi.dll. Please make sure it is in your library path!` というエラーが出る場合は、以下の手順を行ってください。
     1. `C:\Program Files\NVIDIA Corporation\Nsight System 2022.4.2\host-windows-x64\` フォルダ又は類似のフォルダにある `zlib.dll` ファイルを `%CUDA_PATH%\bin\ ` フォルダにコピーします。
@@ -174,44 +279,24 @@ CUDA + cuDNNのインストール
 
     ここでUbuntuの再起動を行うこと。
 
-GPU対応版のフレームワークインストール
-==============================================
-
-- mmdetectionのGPU対応版をインストールする場合、下記のコマンドでインストールできます。
-
-    .. code-block:: bash
-
-         $ iinfer -m install -c mmdet --install_use_gpu
-
-- mmpretrainのGPU対応版をインストールする場合、下記のコマンドでインストールできます。
-
-    .. code-block:: bash
-
-         $ iinfer -m install -c mmpretrain --install_use_gpu
-
-- mmclsのGPU対応版をインストールする場合、下記のコマンドでインストールできます。
-
-    .. code-block:: bash
-
-         $ iinfer -m install -c mmcls --install_use_gpu
-
-- insightfaceのGPU対応版をインストールする場合、下記のコマンドでインストールできます。
-    
-    .. code-block:: bash
-
-        $ iinfer -m install -c insightface --install_use_gpu
-
-- onnxruntimeのGPU対応版をインストールする場合、下記のコマンドでインストールできます。
-
-    .. code-block:: bash
-
-         $ iinfer -m install -c onnx --install_use_gpu
-
-GPU対応版のサーバーインストール
-==============================================
+２．GPU対応版のサーバーインストール
+----------------------------------------
 
 - 下記のコマンドでインストールできます。
 
     .. code-block:: bash
 
          $ iinfer -m install -c server --install_use_gpu
+
+３．GPU対応版のフレームワークインストール
+--------------------------------------------
+
+- Dockerを使用せずに、GPU対応版のフレームワークをインストールする場合、下記のコマンドでインストールできます。
+
+    .. code-block:: bash
+
+         $ iinfer -m install -c mmdet --install_use_gpu
+         $ iinfer -m install -c mmpretrain --install_use_gpu
+         $ iinfer -m install -c mmcls --install_use_gpu
+         $ iinfer -m install -c insightface --install_use_gpu
+         $ iinfer -m install -c onnx --install_use_gpu
