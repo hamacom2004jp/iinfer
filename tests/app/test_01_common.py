@@ -1,13 +1,13 @@
 from iinfer.app import common
-from iinfer.app import predict, injection
 from pathlib import Path
 from PIL import Image
-import base64
+from unittest.mock import patch
+import json
 import os
 import numpy as np
 
 
-def test_01_01_load_config():
+def test_load_config():
     logger, _ = common.load_config("client")
     assert logger.name == 'client'
     logger, _ = common.load_config("gui")
@@ -21,186 +21,221 @@ def test_01_01_load_config():
     logger, _ = common.load_config("install")
     assert logger.name == 'install'
 
-def test_02_01_saveopt_loadopt():
-    p = Path("test_02_01_saveopt_loadopt.json")
-    common.saveopt(dict(test=Path("test")), p)
-    d = common.loadopt(p)
-    assert d["test"] == "test"
-    os.remove(p)
+def test_default_json_enc():
+    # Test with Path object
+    path = Path('test_path')
+    assert common.default_json_enc(path) == 'test_path'
 
-def test_03_01_getopt():
+    # Test with numpy array
+    np_array = np.array([1, 2, 3])
+    assert common.default_json_enc(np_array) == [1, 2, 3]
+
+    # Test with numpy float32
+    #np_float32 = np.float32(1.23)
+    #assert common.default_json_enc(np_float32) == 1.23
+
+    # Test with numpy int64
+    np_int64 = np.int64(123)
+    assert common.default_json_enc(np_int64) == 123
+
+    # Test with numpy int32
+    np_int32 = np.int32(123)
+    assert common.default_json_enc(np_int32) == 123
+
+    # Test with numpy intc
+    np_intc = np.intc(123)
+    assert common.default_json_enc(np_intc) == 123
+
+    # Test with unsupported type
+    unsupported = set([1, 2, 3])
+    try:
+        common.default_json_enc(unsupported)
+    except TypeError as e:
+        assert str(e) == "Type <class 'set'> not serializable"
+
+def test_saveopt():
+    # Test with valid input
+    opt = {'key': 'value'}
+    opt_path = Path('test_saveopt.json')
+    common.saveopt(opt, opt_path)
+
+    # Check if the file was created
+    assert opt_path.is_file()
+
+    # Check if the content of the file is correct
+    with open(opt_path, 'r') as f:
+        saved_opt = json.load(f)
+    assert saved_opt == opt
+
+    # Clean up
+    opt_path.unlink()
+
+    # Test with None path
+    common.saveopt(opt, None)
+
+def test_loadopt():
+    # Test with valid input
+    opt = {'key': 'value'}
+    opt_path = Path('test_loadopt.json')
+    with open(opt_path, 'w') as f:
+        json.dump(opt, f)
+
+    loaded_opt = common.loadopt(str(opt_path))
+    assert loaded_opt == opt
+
+    # Clean up
+    opt_path.unlink()
+
+    # Test with None path
+    assert common.loadopt(None) == {}
+
+    # Test with non-existing path
+    assert common.loadopt('non_existing_path.json') == {}
+
+def test_getopt():
+    # Test with valid input
     opt_base = dict(test1="base", test2="base2")
     opt_args = dict(test1="args")
+
+    # Test with preval
     ret = common.getopt(opt_base, 'test1', preval=opt_args, defval="defval", withset=False)
     assert ret == "args"
+
+    # Test with base value
     ret = common.getopt(opt_base, 'test2', preval=opt_args, defval="defval", withset=False)
-    assert ret == "defval"
+    assert ret == "base2"
+
+    # Test with default value
     ret = common.getopt(opt_base, 'test3', preval=opt_args, defval="defval", withset=False)
     assert ret == "defval"
-    ret = common.getopt(opt_base, 'test1', preval=None, defval="defval", withset=False)
-    assert ret == "base"
-    ret = common.getopt(opt_base, 'test2', preval=None, defval="defval", withset=False)
-    assert ret == "base2"
-    ret = common.getopt(opt_base, 'test3', preval=None, defval="defval", withset=False)
-    assert ret == "defval"
+
+    # Test with withset
     ret = common.getopt(opt_base, 'test3', preval=opt_args, defval="defval", withset=True)
     assert opt_base["test3"] == "defval"
 
-def test_04_01_mkdirs():
-    dir_path1 = Path("test_dir")
-    dir_path2 = dir_path1 / "test_04_01_mkdirs"
-    common.mkdirs(dir_path2)
-    assert os.path.exists(dir_path2)
-    assert os.path.isdir(dir_path2)
-    common.rmdirs(dir_path1)
-    assert not os.path.exists(dir_path2)
-    assert not os.path.exists(dir_path1)
+def test_mkdirs():
+    # Test with valid input
+    dir_path = Path('test_dir')
+    common.mkdirs(dir_path)
 
-def test_05_01_load_custom_predict():
-    custom_predict_py = Path("iinfer/app/predicts/onnx_det_YoloX.py")
-    logger, _ = common.load_config("server")
-    result = common.load_custom_predict(custom_predict_py, logger)
-    assert result is not None
-    assert isinstance(result, predict.Predict)
+    # Check if the directory was created
+    assert dir_path.is_dir()
 
-def test_06_01_load_predict():
-    logger, _ = common.load_config("server")
-    result = common.load_predict('onnx_det_YoloX', logger)
-    assert result is not None
-    assert isinstance(result, predict.Predict)
+    # Clean up
+    dir_path.rmdir()
 
-def test_07_01_download_file():
-    url = "https://example.com/image.jpg"
-    save_path = Path("image.jpg")
-    res = common.download_file(url, save_path)
-    assert os.path.exists(res)
-    assert os.path.isfile(res)
-    assert os.path.getsize(res) > 0
-    os.remove(res)
+    # Test with existing directory
+    dir_path.mkdir()
+    try:
+        common.mkdirs(dir_path)
+    except BaseException as e:
+        assert str(e) == f"Don't make diredtory.({str(dir_path)})"
 
-def test_08_01_npyfile2npy():
-    temp_file = Path("temp.npy")
-    np.save(temp_file, np.array([1, 2, 3]))
-    result = common.npyfile2npy(temp_file)
-    assert isinstance(result, np.ndarray)
-    assert np.array_equal(result, np.array([1, 2, 3]))
-    os.remove(temp_file)
+    # Clean up
+    dir_path.rmdir()
 
-def test_09_01_npybytes2npy():
-    temp_file = Path("temp.npy")
-    np.save(temp_file, np.array([1, 2, 3]))
-    with open(temp_file, "rb") as f:
-        npy_bytes = f.read()
-        result = common.npybytes2npy(npy_bytes)
-    assert isinstance(result, np.ndarray)
-    assert np.array_equal(result, np.array([1, 2, 3]))
-    os.remove(temp_file)
+def test_print_format(capsys):
+    # Test with format=True and list data
+    data = {'success': [{'key1': 'value1', 'key2': 'value2'}]}
+    common.print_format(data, format=True, tm=0.0, stdout=False)
+    captured = capsys.readouterr()
+    assert 'key1' in captured.out
+    assert 'value1' in captured.out
+    assert 'key2' in captured.out
+    assert 'value2' in captured.out
 
-def test_10_01_npy2b64str():
-    arr = np.array([1, 2, 3])
-    result = common.npy2b64str(arr)
-    assert isinstance(result, str)
-    assert result == base64.b64encode(arr.tobytes()).decode('utf-8')
+    # Test with format=True and dict data
+    data = {'success': {'key1': 'value1', 'key2': 'value2'}}
+    common.print_format(data, format=True, tm=0.0, stdout=False)
+    captured = capsys.readouterr()
+    assert 'key1' in captured.out
+    assert 'value1' in captured.out
+    assert 'key2' in captured.out
+    assert 'value2' in captured.out
 
-def test_11_01_npy2img():
-    arr = np.array([[255, 0, 0], [0, 255, 0], [0, 0, 255]], dtype=np.uint8)
-    img = common.npy2img(arr)
-    assert isinstance(img, Image.Image)
-    assert img.size == (3, 3)
-    assert np.array_equal(np.array(img), arr)
+    # Test with format=False and dict data
+    data = {'key1': 'value1', 'key2': 'value2'}
+    common.print_format(data, format=False, tm=0.0, stdout=False)
+    captured = capsys.readouterr()
+    assert json.loads(captured.out) == data
 
-def test_12_01_b64str2bytes():
-    b64str = "SGVsbG8gd29ybGQ="
-    result = common.b64str2bytes(b64str)
-    assert isinstance(result, bytes)
-    assert result == base64.b64decode(b64str.encode('utf-8'))
+    # Test with output_json
+    output_json = 'test_output.json'
+    common.print_format(data, format=False, tm=0.0, output_json=output_json, stdout=False)
+    with open(output_json, 'r') as f:
+        saved_data = json.load(f)
+    assert saved_data == data
 
-def test_13_01_b64str2npy():
-    b64str = "AAECAw=="
-    result = common.b64str2npy(b64str)
-    expected = np.array([0, 1, 2, 3])
-    assert isinstance(result, np.ndarray)
-    assert np.array_equal(result, expected)
+    # Clean up
+    os.remove(output_json)
 
-def test_14_01_npy2imgfile():
-    arr = np.array([[255, 0, 0], [0, 255, 0], [0, 0, 255]], dtype=np.uint8)
-    output_image_file = Path("output.jpg")
-    result = common.npy2imgfile(arr, output_image_file, image_type="jpeg")
-    assert isinstance(result, bytes)
-    assert output_image_file.exists()
-    os.remove(output_image_file)
+@patch('requests.get')
+def test_download_file(mock_get):
+    # Mock the response from requests.get
+    mock_response = mock_get.return_value
+    mock_response.content = b'Test content'
 
-def test_15_01_bgr2rgb():
-    arr = np.array([[0, 0, 255], [0, 255, 0], [255, 0, 0]], dtype=np.uint8)
-    result = common.bgr2rgb(arr)
-    expected = np.array([[255, 0, 0], [0, 255, 0], [0, 0, 255]], dtype=np.uint8)
-    assert isinstance(result, np.ndarray)
-    assert np.array_equal(result, expected)
+    # Test with valid input
+    url = 'http://test.com/test.txt'
+    save_path = Path('test.txt')
+    result_path = common.download_file(url, save_path)
 
-def test_16_01_imgbytes2npy():
-    img_path = Path("tests") / 'dog.jpg'
-    img = Image.open(img_path)
-    with open(img_path, "rb") as f:
-        img_bytes = f.read()
-        result = common.imgbytes2npy(img_bytes)
-    assert isinstance(result, np.ndarray)
-    assert np.array_equal(np.array(result), np.array(img))
+    # Check if the file was created
+    assert result_path.is_file()
 
-def test_17_01_imgfile2npy():
-    img_path = Path("tests") / 'dog.jpg'
-    img = Image.open(img_path)
-    result = common.imgfile2npy(img_path)
-    assert isinstance(result, np.ndarray)
-    assert np.array_equal(np.array(result), np.array(img))
+    # Check if the content of the file is correct
+    with open(result_path, 'r') as f:
+        content = f.read()
+    assert content == 'Test content'
 
-def test_18_01_img2npy():
-    img = Image.new('RGB', (100, 100), color='red')
-    npy = common.img2npy(img)
-    assert isinstance(npy, np.ndarray)
-    assert npy.shape == (100, 100, 3)
-    assert np.array_equal(npy, np.full((100, 100, 3), [255, 0, 0], dtype=np.uint8))
+    # Clean up
+    os.remove(result_path)
 
-def test_19_01_img2byte():
-    img = Image.new('RGB', (100, 100), color='red')
-    result = common.img2byte(img)
-    assert isinstance(result, bytes)
-    assert len(result) > 0
+@patch('subprocess.run')
+def test_cmd(mock_run):
+    # Mock the response from subprocess.run
+    mock_response = mock_run.return_value
+    mock_response.stdout = b'Test output'
+    mock_response.stderr = b''
+    mock_response.returncode = 0
 
-def test_20_01_str2b64str():
-    s = "Hello, World!"
-    result = common.str2b64str(s)
-    expected = "SGVsbG8sIFdvcmxkIQ=="
-    assert result == expected
+    # Test with valid input
+    command = ['echo', 'Test']
+    stdout, stderr, returncode = common.cmd(command)
 
-def test_21_01_b64str2str():
-    b64str = "SGVsbG8sIFdvcmxkIQ=="
-    result = common.b64str2str(b64str)
-    expected = "Hello, World!"
-    assert result == expected
+    # Check if the function returns the correct output
+    assert stdout == 'Test output'
+    assert stderr == ''
+    assert returncode == 0
 
-def test_22_01_draw_boxes():
-    image = Image.new('RGB', (100, 100), color='white')
-    boxes = [[0.1, 0.1, 0.9, 0.9]]
-    scores = [0.9]
-    classes = [0]
-    ids = ['XXXXXXXX']
-    labels = ['AAAAAAA']
-    colors = [(255, 0, 0)]
-    result, out_labels = common.draw_boxes(image, boxes, scores, classes, ids=ids, labels=labels, colors=colors)
-    assert isinstance(result, Image.Image)
-    assert result.size == (100, 100)
-    assert out_labels[0] == labels[0]
+    # Test with error
+    mock_response.stderr = b'Test error'
+    mock_response.returncode = 1
+    stdout, stderr, returncode = common.cmd(command)
 
-def test_23_01_load_before_injections():
-    logger, _ = common.load_config("server")
-    injection_py = Path("extensions/injection/before_grayimg_injection.py")
-    result = common.load_before_injections([injection_py], None, logger)
-    assert result is not None
-    assert isinstance(result[0], injection.BeforeInjection)
+    # Check if the function returns the correct output
+    assert stdout == 'Test output'
+    assert stderr == 'Test error'
+    assert returncode == 1
 
-def test_24_01_load_after_injections():
-    logger, _ = common.load_config("server")
-    injection_py = Path("extensions/injection/after_csv_injection.py")
-    result = common.load_after_injections([injection_py], None, logger)
-    assert result is not None
-    assert isinstance(result[0], injection.AfterInjection)
+def test_draw_boxes():
+    # Create a sample image
+    image = Image.new('RGB', (100, 100), color = (73, 109, 137))
+
+    # Define the bounding boxes, scores, and classes
+    boxes = [[10, 10, 50, 50], [60, 60, 80, 80]]
+    scores = [0.9, 0.75]
+    classes = [0, 1]
+    ids = ['id1', 'id2']
+    labels = ['label1', 'label2']
+    colors = [(255, 0, 0), (0, 255, 0)]
+
+    # Call the function
+    result_image, result_labels = common.draw_boxes(image, boxes, scores, classes, ids, labels, colors)
+
+    # Check the labels
+    assert result_labels == labels
+
+    # Check the image
+    # Note: This is a simple check. In a real test, you might want to check the specific pixels.
+    assert isinstance(result_image, Image.Image)

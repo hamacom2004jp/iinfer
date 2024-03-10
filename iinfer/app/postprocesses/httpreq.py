@@ -1,4 +1,5 @@
-from iinfer.app import common, postprocess
+from iinfer.app import postprocess
+from iinfer.app.commons import convert
 from PIL import Image
 from typing import Dict, Any
 import logging
@@ -101,10 +102,10 @@ class Httpreq(postprocess.Postprocess):
             return output_image
         if self.fileup_name is None:
             raise Exception(f"fileup_name is empty.")
-        files = {self.fileup_name: common.img2byte(output_image, "JPEG")}
+        files = {self.fileup_name: convert.img2byte(output_image, "JPEG")}
         res = img_session[0].post(img_session[1], files=files, verify=False)
         if res.status_code != 200:
             raise Exception(f"Failed to postprocess. status_code={res.status_code}. res.reason={res.reason} res.text={res.text}")
-        output_image = common.imgbytes2npy(res.content)
+        output_image = convert.imgbytes2npy(res.content)
         return output_image
 

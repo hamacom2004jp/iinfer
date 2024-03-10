@@ -1,18 +1,6 @@
 from iinfer import version
-from iinfer.app import common
-from iinfer.app import client
-from iinfer.app import gui
-from iinfer.app import install
-from iinfer.app import postprocess
-from iinfer.app import redis
-from iinfer.app import server
-from iinfer.app.postprocesses import csv
-from iinfer.app.postprocesses import det_clip
-from iinfer.app.postprocesses import det_face_store
-from iinfer.app.postprocesses import det_filter
-from iinfer.app.postprocesses import det_jadge
-from iinfer.app.postprocesses import cls_jadge
-from iinfer.app.postprocesses import httpreq
+from iinfer.app import common, client, gui, install, postprocess, redis, server
+from iinfer.app.postprocesses import csv, det_clip, det_face_store, det_filter, det_jadge, cls_jadge, httpreq
 from pathlib import Path
 import argparse
 import argcomplete

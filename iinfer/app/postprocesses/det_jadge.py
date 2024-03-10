@@ -1,4 +1,5 @@
 from iinfer.app import common, postprocess
+from iinfer.app.commons import convert
 from PIL import Image, ImageDraw
 from typing import Dict, Any, List
 import cv2
@@ -33,7 +34,6 @@ class DetJadge(postprocess.Postprocess):
         if ng_score_th is not None and ((ng_classes is not None and len(ng_classes)>0) or (ng_labels is not None and len(ng_labels)>0)):
             raise Exception('If ng_score_th is specified, ng_classes or ng_labels must be set.')
         if ext_score_th is not None and ((ext_classes is not None and len(ext_classes)>0) or (ext_labels is not None and len(ext_labels)>0)):
-            self.add_warning(outputs, 'If ext_score_th is specified, ext_classes or ext_labels must be set.')
             raise Exception('If ext_score_th is specified, ext_classes or ext_labels must be set.')
 
         self.ok_score_th = ok_score_th
@@ -139,8 +139,8 @@ class DetJadge(postprocess.Postprocess):
         image = output_image
         if self.output_preview:
             # RGB画像をBGR画像に変換
-            img_npy = common.img2npy(image)
-            img_npy = common.bgr2rgb(img_npy)
+            img_npy = convert.img2npy(image)
+            img_npy = convert.bgr2rgb(img_npy)
             try:
                 cv2.imshow('preview', img_npy)
                 cv2.waitKey(1)

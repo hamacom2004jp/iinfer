@@ -2,7 +2,8 @@ from motpy import Detection, MultiObjectTracker
 from pathlib import Path
 from PIL import Image
 from iinfer.app import common, predict, injection
-from typing import List, Tuple, Dict, Any
+from iinfer.app.commons import convert, module
+from typing import List, Dict, Any
 import base64
 import logging
 import json
@@ -216,8 +217,8 @@ class Server(object):
                     shape = [int(msg[5]), int(msg[6])]
                     if int(msg[7]) > 0: shape.append(int(msg[7]))
                     output_image_name = msg[8]
-                    img_npy = common.b64str2npy(msg[3], shape)
-                    image = common.npy2img(img_npy)
+                    img_npy = convert.b64str2npy(msg[3], shape)
+                    image = convert.npy2img(img_npy)
                     st = self.predict(msg[1], msg[2], image, output_image_name, nodraw)
                 elif msg[0] == 'stop_server':
                     self.is_running = False
@@ -552,13 +553,13 @@ class Server(object):
                     before_injection_conf = dict()
                 if "before_injection_type" in conf and conf["before_injection_type"] is not None and len(conf["before_injection_type"]) > 0:
                     types = [t for t in conf["before_injection_type"]]
-                    before_injections = common.load_before_injection_type(types, before_injection_conf, self.logger)
+                    before_injections = module.load_before_injection_type(types, before_injection_conf, self.logger)
                 else:
                     before_injections = None
                 if "before_injection_py" in conf and conf["before_injection_py"] is not None and len(conf["before_injection_py"]) > 0:
                     paths = [Path(p) for p in conf["before_injection_py"]]
                     before_injections = [] if before_injections is None else before_injections
-                    before_injections = common.load_before_injections(paths, before_injection_conf, self.logger)
+                    before_injections = module.load_before_injections(paths, before_injection_conf, self.logger)
             except Exception as e:
                 self.logger.warn(f"Failed to load before_injection: {e}", exc_info=True)
                 self.responce(reskey, {"warn": f"Failed to load before_injection: {e}"})
@@ -572,13 +573,13 @@ class Server(object):
                     after_injection_conf = dict()
                 if "after_injection_type" in conf and conf["after_injection_type"] is not None and len(conf["after_injection_type"]) > 0:
                     types = [t for t in conf["after_injection_type"]]
-                    after_injections = common.load_after_injection_type(types, after_injection_conf, self.logger)
+                    after_injections = module.load_after_injection_type(types, after_injection_conf, self.logger)
                 else:
                     after_injections = None
                 if "after_injection_py" in conf and conf["after_injection_py"] is not None and len(conf["after_injection_py"]) > 0:
                     paths = [Path(p) for p in conf["after_injection_py"]]
                     after_injections = [] if after_injections is None else after_injections
-                    after_injections = common.load_after_injections(paths, after_injection_conf, self.logger)
+                    after_injections = module.load_after_injections(paths, after_injection_conf, self.logger)
                 if not model_path.exists():
                     self.logger.warn(f"Model path {str(model_path)} does not exist")
                     self.responce(reskey, {"warn": f"Model path {str(model_path)} does not exist"})
@@ -598,9 +599,9 @@ class Server(object):
                         self.logger.warn(f"custom_predict_py path {str(custom_predict_py)} does not exist")
                         self.responce(reskey, {"warn": f"custom_predict_py path {str(custom_predict_py)} does not exist"})
                         return self.RESP_WARN
-                    predict_obj = common.load_custom_predict(custom_predict_py, self.logger)
+                    predict_obj = module.load_custom_predict(custom_predict_py, self.logger)
                 else:
-                    predict_obj = common.load_predict(conf["predict_type"], self.logger)
+                    predict_obj = module.load_predict(conf["predict_type"], self.logger)
             except Exception as e:
                 self.logger.warn(f"Failed to load Predict: {e}", exc_info=True)
                 self.responce(reskey, {"warn": f"Failed to load Predict: {e}"})
@@ -722,8 +723,8 @@ class Server(object):
                 return output, output_image
 
             if output_image is not None:
-                output_image_npy = common.img2npy(output_image)
-                output_image_b64 = common.npy2b64str(output_image_npy)
+                output_image_npy = convert.img2npy(output_image)
+                output_image_b64 = convert.npy2b64str(output_image_npy)
                 output = dict(success=outputs, output_image=output_image_b64, output_image_shape=output_image_npy.shape, output_image_name=output_image_name)
                 # 後処理を実行
                 output, output_image = _after_injection(reskey, name, output, output_image, session)

@@ -1,9 +1,7 @@
-from iinfer.app import common
+from iinfer.app.commons import convert
 from iinfer.app.postprocesses import det_clip
-from pathlib import Path
 from PIL import Image
-from typing import Dict, Any, List
-import json
+from typing import Dict, Any
 import logging
 import numpy as np
 
@@ -74,15 +72,15 @@ class DetFaceStore(det_clip.DetClip):
             y2 = min(output_image.height, np.floor(y2 + 0.5).astype(int) + self.clip_margin)
 
             cropped_image = output_image.crop((x1, y1, x2, y2))
-            face_image_npy = common.img2npy(cropped_image)
+            face_image_npy = convert.img2npy(cropped_image)
 
             img_b64 = None
             #face_name = f"{output_image_name}.{i}.{self.image_type}"
             if self.image_type == 'capture' or self.image_type is None:
-                img_b64 = common.npy2b64str(face_image_npy)
+                img_b64 = convert.npy2b64str(face_image_npy)
             else:
-                img_byte = common.img2byte(cropped_image, format=self.image_type)
-                img_b64 = common.bytes2b64str(img_byte)
+                img_byte = convert.img2byte(cropped_image, format=self.image_type)
+                img_b64 = convert.bytes2b64str(img_byte)
             result.append(dict(face_label='', face_embedding=output_embeddings[i], face_embedding_dtype=output_embedding_dtypes[i], face_embedding_shape=output_embedding_shapes[i],
                                face_image_type=self.image_type, face_image_shape=face_image_npy.shape, face_image=img_b64))
             #result.append(dict(face_idx=output_ids[i], face_label='', face_name=face_name, face_scores=output_scores, face_image_type=self.image_type, face_image_shape=face_image_npy.shape, face_embedding=output_embeddings[i], face_image=img_b64))

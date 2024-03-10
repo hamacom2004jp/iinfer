@@ -1,6 +1,7 @@
 from pathlib import Path
 from PIL import Image
 from iinfer.app import common, predict
+from iinfer.app.commons import convert
 from typing import List, Tuple
 import json
 import logging
@@ -59,7 +60,7 @@ class InsightfaceDet(predict.OnnxPredict):
                             raise Exception('Invalid outputs. line[\'success\'][i][\'face_embedding_shape\'] must be set.')
 
                         face_store.append(dict(face_label=data['face_label'],
-                                               face_embedding=common.b64str2npy(data['face_embedding'], shape=data['face_embedding_shape'], dtype=data['face_embedding_dtype'])))
+                                               face_embedding=convert.b64str2npy(data['face_embedding'], shape=data['face_embedding_shape'], dtype=data['face_embedding_dtype'])))
 
         return dict(fa=fa, face_store=face_store, face_threshold=0.0)
 
@@ -92,8 +93,8 @@ class InsightfaceDet(predict.OnnxPredict):
             model['fa'].prepare(ctx_id=0, det_size=(self.input_height, self.input_width))
 
         # RGB画像をBGR画像に変換
-        img_npy = common.img2npy(image)
-        img_npy = common.bgr2rgb(img_npy)
+        img_npy = convert.img2npy(image)
+        img_npy = convert.bgr2rgb(img_npy)
 
         # 顔検知
         face_store = model['face_store']
@@ -110,7 +111,7 @@ class InsightfaceDet(predict.OnnxPredict):
         for i, face in enumerate(faces):
             box = face.bbox.astype(int)
             boxes.append([box[1], box[0], box[3], box[2]])
-            embeddings.append(common.npy2b64str(face.embedding))
+            embeddings.append(convert.npy2b64str(face.embedding))
             embedding_dtypes.append(face.embedding.dtype.name)
             embedding_shapes.append(face.embedding.shape)
             store_index, score = self.search_face(face_store, face.embedding, face_threshold)

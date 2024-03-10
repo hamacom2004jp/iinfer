@@ -1,5 +1,6 @@
 from pathlib import Path
 from iinfer.app import common
+from iinfer.app.commons import convert
 from typing import List
 import base64
 import cv2
@@ -341,7 +342,7 @@ class Client(object):
                 return {"error": f"Not found image_file. {image_file}."}
             if image_type == 'jpeg' or image_type == 'png' or image_type == 'bmp':
                 with open(image_file, "rb") as f:
-                    img_npy = common.imgfile2npy(f)
+                    img_npy = convert.imgfile2npy(f)
             elif image_type == 'capture':
                 with open(image_file, "r", encoding='utf-8') as f:
                     res_list = []
@@ -354,9 +355,9 @@ class Client(object):
                         c = int(capture_data[4])
                         fn = Path(capture_data[5].strip())
                         if t == 'capture':
-                            img_npy = common.b64str2npy(img, shape=(h, w, c) if c > 0 else (h, w))
+                            img_npy = convert.b64str2npy(img, shape=(h, w, c) if c > 0 else (h, w))
                         else:
-                            img_npy = common.imgbytes2npy(common.b64str2bytes(img))
+                            img_npy = convert.imgbytes2npy(convert.b64str2bytes(img))
                         res_json = self.predict(name, image=img_npy, image_file=fn, image_file_enable=False, output_image_file=output_image_file, output_preview=output_preview, nodraw=nodraw, timeout=timeout)
                         res_list.append(res_json)
                     if len(res_list) <= 0:
@@ -372,7 +373,7 @@ class Client(object):
                         if not ("output_image" in res_json and "output_image_shape" in res_json and "output_image_name" in res_json):
                             self.logger.warn(f"image_file data is invalid. Not found output_image or output_image_shape or output_image_name key.")
                             continue
-                        img_npy = common.b64str2npy(res_json["output_image"], shape=res_json["output_image_shape"])
+                        img_npy = convert.b64str2npy(res_json["output_image"], shape=res_json["output_image_shape"])
                         res_json = self.predict(name, image=img_npy, image_file=Path(res_json['output_image_name']), image_file_enable=False,
                                                 output_image_file=output_image_file, output_preview=output_preview, nodraw=nodraw, timeout=timeout)
                         res_list.append(res_json)
@@ -400,39 +401,39 @@ class Client(object):
                 if image_file is None: image_file = Path(capture_data[5])
                 image_file_enable = False
                 if t == 'capture':
-                    img_npy = common.b64str2npy(img, shape=(h, w, c) if c > 0 else (h, w))
+                    img_npy = convert.b64str2npy(img, shape=(h, w, c) if c > 0 else (h, w))
                 else:
-                    img_npy = common.imgbytes2npy(common.b64str2bytes(img))
+                    img_npy = convert.imgbytes2npy(convert.b64str2bytes(img))
             elif image_type == 'output_json':
                 res_json = json.loads(image)
                 if not ("output_image" in res_json and "output_image_shape" in res_json and "output_image_name" in res_json):
                     self.logger.error(f"image_file data is invalid. Not found output_image or output_image_shape or output_image_name key.")
                     return {"error": f"image_file data is invalid. Not found output_image or output_image_shape or output_image_name key."}
-                img_npy = common.b64str2npy(res_json["output_image"], shape=res_json["output_image_shape"])
+                img_npy = convert.b64str2npy(res_json["output_image"], shape=res_json["output_image_shape"])
                 if image_file is None: image_file = Path(res_json["output_image_name"])
                 image_file_enable = False
             elif image_type == 'jpeg' or image_type == 'png' or image_type == 'bmp':
-                img_npy = common.imgbytes2npy(image)
+                img_npy = convert.imgbytes2npy(image)
                 if image_file is None: image_file = Path(f'{datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")}.{image_type}')
                 image_file_enable = False
             else:
                 self.logger.error(f"image_type is invalid. {image_type}.")
                 return {"error": f"image_type is invalid. {image_type}."}
 
-        npy_b64 = common.npy2b64str(img_npy)
+        npy_b64 = convert.npy2b64str(img_npy)
         #img_npy2 = np.frombuffer(base64.b64decode(npy_b64), dtype='uint8').reshape(img_npy.shape)
 
         res_json = self._proc(self.svname, 'predict', [name, npy_b64, str(nodraw), str(img_npy.shape[0]), str(img_npy.shape[1]), str(img_npy.shape[2] if len(img_npy.shape) > 2 else '-1'), image_file.name], timeout=timeout)
         if "output_image" in res_json and "output_image_shape" in res_json:
             #byteio = BytesIO(base64.b64decode(res_json["output_image"]))
             #img_npy = np.load(byteio)
-            img_npy = common.b64str2npy(res_json["output_image"], res_json["output_image_shape"])
+            img_npy = convert.b64str2npy(res_json["output_image"], res_json["output_image_shape"])
             if output_image_file is not None:
-                common.npy2imgfile(img_npy, output_image_file=output_image_file, image_type=image_type)
+                convert.npy2imgfile(img_npy, output_image_file=output_image_file, image_type=image_type)
             if output_preview:
                 # RGB画像をBGR画像に変換
                 try:
-                    cv2.imshow('preview', common.bgr2rgb(img_npy))
+                    cv2.imshow('preview', convert.bgr2rgb(img_npy))
                     cv2.waitKey(1)
                 except KeyboardInterrupt:
                     pass
@@ -466,17 +467,17 @@ class Client(object):
                 ret, frame = cap.read()
                 output_image_name = datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")
                 if ret:
-                    img_npy = common.bgr2rgb(frame)
+                    img_npy = convert.bgr2rgb(frame)
                     if output_preview:
                         # RGB画像をBGR画像に変換
-                        cv2.imshow('preview', common.bgr2rgb(img_npy))
+                        cv2.imshow('preview', convert.bgr2rgb(img_npy))
                         cv2.waitKey(1)
                     img_b64 = None
                     if image_type == 'capture' or image_type is None:
                         image_type = 'capture'
-                        img_b64 = common.npy2b64str(img_npy)
+                        img_b64 = convert.npy2b64str(img_npy)
                     else:
-                        img_b64 = common.bytes2b64str(common.npy2imgfile(img_npy, image_type=image_type))
+                        img_b64 = convert.bytes2b64str(convert.npy2imgfile(img_npy, image_type=image_type))
                     output_image_name = f"{output_image_name}.{image_type}"
                     yield image_type, img_b64, img_npy.shape[0], img_npy.shape[1], img_npy.shape[2] if len(img_npy.shape) > 2 else -1, output_image_name
                 else:

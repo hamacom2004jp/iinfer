@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>iinfer.app.gui &mdash; iinfer 2024/02/25 documentation</title>
+  <title>iinfer.app.gui &mdash; iinfer 2024/03/10 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -15,7 +15,7 @@
   
         <script src="../../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=b0392989"></script>
+        <script src="../../../_static/documentation_options.js?v=57a6fbe1"></script>
         <script src="../../../_static/doctools.js?v=888ff710"></script>
         <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -44,10 +44,10 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/overview.html">iinferの概要</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/install.html">インストール</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/gui.html">GUIモード</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/command.html">コマンドリファレンス</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/models.html">動作確認済みモデル</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../docs/install.html">サーバー環境構築</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/detection.html">物体検知</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/face.html">顔認識</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/pipeline.html">パイプライン</a></li>
@@ -83,8 +83,8 @@
              
   <h1>Source code for iinfer.app.gui</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">iinfer</span> <span class="kn">import</span> <span class="n">version</span>
-<span class="kn">from</span> <span class="nn">iinfer.app</span> <span class="kn">import</span> <span class="n">app</span>
-<span class="kn">from</span> <span class="nn">iinfer.app</span> <span class="kn">import</span> <span class="n">common</span>
+<span class="kn">from</span> <span class="nn">iinfer.app</span> <span class="kn">import</span> <span class="n">app</span><span class="p">,</span> <span class="n">common</span>
+<span class="kn">from</span> <span class="nn">iinfer.app.commons</span> <span class="kn">import</span> <span class="n">convert</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">import</span> <span class="nn">datetime</span>
 <span class="kn">import</span> <span class="nn">glob</span>
@@ -95,7 +95,6 @@
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">import</span> <span class="nn">threading</span>
 <span class="kn">import</span> <span class="nn">traceback</span>
 
 
@@ -524,9 +523,9 @@
                 <span class="k">def</span> <span class="nf">to_json</span><span class="p">(</span><span class="n">o</span><span class="p">):</span>
                     <span class="n">res_json</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
                     <span class="k">if</span> <span class="s1">&#39;output_image&#39;</span> <span class="ow">in</span> <span class="n">res_json</span> <span class="ow">and</span> <span class="s1">&#39;output_image_shape&#39;</span> <span class="ow">in</span> <span class="n">res_json</span><span class="p">:</span>
-                        <span class="n">img_npy</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">b64str2npy</span><span class="p">(</span><span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;output_image&quot;</span><span class="p">],</span> <span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;output_image_shape&quot;</span><span class="p">])</span>
-                        <span class="n">img_bytes</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">npy2imgfile</span><span class="p">(</span><span class="n">img_npy</span><span class="p">,</span> <span class="n">image_type</span><span class="o">=</span><span class="s1">&#39;png&#39;</span><span class="p">)</span>
-                        <span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;output_image&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">bytes2b64str</span><span class="p">(</span><span class="n">img_bytes</span><span class="p">)</span>
+                        <span class="n">img_npy</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">b64str2npy</span><span class="p">(</span><span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;output_image&quot;</span><span class="p">],</span> <span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;output_image_shape&quot;</span><span class="p">])</span>
+                        <span class="n">img_bytes</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">npy2imgfile</span><span class="p">(</span><span class="n">img_npy</span><span class="p">,</span> <span class="n">image_type</span><span class="o">=</span><span class="s1">&#39;png&#39;</span><span class="p">)</span>
+                        <span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;output_image&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">bytes2b64str</span><span class="p">(</span><span class="n">img_bytes</span><span class="p">)</span>
                     <span class="k">return</span> <span class="n">res_json</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="n">ret</span> <span class="o">=</span> <span class="p">[</span><span class="n">to_json</span><span class="p">(</span><span class="n">o</span><span class="p">)</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">output</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">o</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">]</span>
@@ -598,9 +597,9 @@
                 <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
                     <span class="n">res_json</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
                     <span class="k">if</span> <span class="s1">&#39;output_image&#39;</span> <span class="ow">in</span> <span class="n">res_json</span> <span class="ow">and</span> <span class="s1">&#39;output_image_shape&#39;</span> <span class="ow">in</span> <span class="n">res_json</span><span class="p">:</span>
-                        <span class="n">img_npy</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">b64str2npy</span><span class="p">(</span><span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;output_image&quot;</span><span class="p">],</span> <span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;output_image_shape&quot;</span><span class="p">])</span>
-                        <span class="n">img_bytes</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">npy2imgfile</span><span class="p">(</span><span class="n">img_npy</span><span class="p">,</span> <span class="n">image_type</span><span class="o">=</span><span class="s1">&#39;jpeg&#39;</span><span class="p">)</span>
-                        <span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;output_image&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">bytes2b64str</span><span class="p">(</span><span class="n">img_bytes</span><span class="p">)</span>
+                        <span class="n">img_npy</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">b64str2npy</span><span class="p">(</span><span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;output_image&quot;</span><span class="p">],</span> <span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;output_image_shape&quot;</span><span class="p">])</span>
+                        <span class="n">img_bytes</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">npy2imgfile</span><span class="p">(</span><span class="n">img_npy</span><span class="p">,</span> <span class="n">image_type</span><span class="o">=</span><span class="s1">&#39;jpeg&#39;</span><span class="p">)</span>
+                        <span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;output_image&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">bytes2b64str</span><span class="p">(</span><span class="n">img_bytes</span><span class="p">)</span>
                     <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res_json</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">ret</span>
 
@@ -618,9 +617,9 @@
                                     <span class="n">output_image_shape</span><span class="o">=</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">cel</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span><span class="nb">int</span><span class="p">(</span><span class="n">cel</span><span class="p">[</span><span class="mi">3</span><span class="p">]),</span><span class="nb">int</span><span class="p">(</span><span class="n">cel</span><span class="p">[</span><span class="mi">4</span><span class="p">])),</span>
                                     <span class="n">output_image_name</span><span class="o">=</span><span class="n">cel</span><span class="p">[</span><span class="mi">5</span><span class="p">])</span>
                     <span class="k">if</span> <span class="n">cel</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;capture&#39;</span><span class="p">:</span>
-                        <span class="n">img_npy</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">b64str2npy</span><span class="p">(</span><span class="n">cel</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;output_image_shape&quot;</span><span class="p">])</span>
-                        <span class="n">img_bytes</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">npy2imgfile</span><span class="p">(</span><span class="n">img_npy</span><span class="p">,</span> <span class="n">image_type</span><span class="o">=</span><span class="s1">&#39;jpeg&#39;</span><span class="p">)</span>
-                        <span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;output_image&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">bytes2b64str</span><span class="p">(</span><span class="n">img_bytes</span><span class="p">)</span>
+                        <span class="n">img_npy</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">b64str2npy</span><span class="p">(</span><span class="n">cel</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;output_image_shape&quot;</span><span class="p">])</span>
+                        <span class="n">img_bytes</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">npy2imgfile</span><span class="p">(</span><span class="n">img_npy</span><span class="p">,</span> <span class="n">image_type</span><span class="o">=</span><span class="s1">&#39;jpeg&#39;</span><span class="p">)</span>
+                        <span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;output_image&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">bytes2b64str</span><span class="p">(</span><span class="n">img_bytes</span><span class="p">)</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;output_image&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cel</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
                     <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res_json</span><span class="p">)</span>

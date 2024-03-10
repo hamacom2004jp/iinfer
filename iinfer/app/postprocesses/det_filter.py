@@ -1,4 +1,5 @@
 from iinfer.app import common, postprocess
+from iinfer.app.commons import convert
 from PIL import Image
 from typing import Dict, Any, List
 import cv2
@@ -118,8 +119,8 @@ class DetFilter(postprocess.Postprocess):
                                                  ids=output_labels, labels=output_tracks, nodraw=self.nodraw, nolookup=True)
         if self.output_preview:
             # RGB画像をBGR画像に変換
-            img_npy = common.img2npy(image)
-            img_npy = common.bgr2rgb(img_npy)
+            img_npy = convert.img2npy(image)
+            img_npy = convert.bgr2rgb(img_npy)
             try:
                 cv2.imshow('preview', img_npy)
                 cv2.waitKey(1)

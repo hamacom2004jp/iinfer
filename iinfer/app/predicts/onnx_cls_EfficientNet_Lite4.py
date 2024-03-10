@@ -1,4 +1,5 @@
-from iinfer.app import common, predict
+from iinfer.app import predict
+from iinfer.app.commons import convert
 from pathlib import Path
 from PIL import Image
 from typing import List, Tuple
@@ -61,8 +62,8 @@ class OnnxClsEfficientNetLite4(predict.OnnxPredict):
             Tuple[Dict[str, Any], Image]: 予測結果と出力画像(RGB)のタプル
         """
         # RGB画像をBGR画像に変換
-        img_npy = common.img2npy(image)
-        img_npy = common.bgr2rgb(img_npy)
+        img_npy = convert.img2npy(image)
+        img_npy = convert.bgr2rgb(img_npy)
 
         image_data, _, image_obj = self.preprocess_img(image, img_width, img_height)
 

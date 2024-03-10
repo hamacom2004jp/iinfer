@@ -1,6 +1,7 @@
 from pathlib import Path
 from PIL import Image
 from iinfer.app import common, predict
+from iinfer.app.commons import convert
 from typing import List, Tuple
 import cv2
 import logging
@@ -33,7 +34,7 @@ class MMDetYoloX(predict.TorchPredict):
         """
         from mmdet.apis import init_detector
         import torch
-        gpu = f'cuda:{gpu_id}' if gpu_id is not None else 'gpu'
+        gpu = f'cuda:{gpu_id}' if gpu_id is not None else 'cuda'
         device = torch.device(gpu if self.is_gpu_available(model_path, model_conf_path, gpu_id) else 'cpu')
         model = init_detector(model_conf_path, str(model_path), device=device) # , cfg_options = {'show': True}
         return model
@@ -62,8 +63,8 @@ class MMDetYoloX(predict.TorchPredict):
             Tuple[Dict[str, Any], Image]: 予測結果と出力画像(RGB)のタプル
         """
         # RGB画像をBGR画像に変換
-        img_npy = common.img2npy(image)
-        img_npy = common.bgr2rgb(img_npy)
+        img_npy = convert.img2npy(image)
+        img_npy = convert.bgr2rgb(img_npy)
 
         #input_shape = (img_width, img_height)
         #img, ratio = self.preprocess(img_npy, input_shape)

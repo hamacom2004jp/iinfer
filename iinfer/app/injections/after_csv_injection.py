@@ -4,6 +4,7 @@ from PIL import Image
 from typing import Tuple, Dict, Any
 import logging
 
+
 class AfterCSVInjection(injection.AfterInjection):
     """
     このクラスは推論実行後の後処理のインジェクションクラスです。

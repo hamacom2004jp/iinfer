@@ -1,4 +1,5 @@
-from iinfer.app import common, injection
+from iinfer.app import injection
+from iinfer.app.commons import convert
 from PIL import Image
 from typing import Tuple, Dict, Any
 import datetime
@@ -45,7 +46,7 @@ class AfterHttpInjection(injection.AfterInjection):
         if output_image_url is not None:
             ext = self.get_config('output_image_ext', 'jpeg')
             prefix = self.get_config('output_image_prefix', 'output_')
-            img_bytes = common.img2byte(output_image, format=ext)
+            img_bytes = convert.img2byte(output_image, format=ext)
             finename = f'{prefix}{datetime.datetime.now().strftime("%Y%m%d%H%M%S")}.{ext}'
             finename = finename if 'output_image_name' not in outputs else outputs['output_image_name']
             file = {'file': (finename, io.BytesIO(img_bytes))}

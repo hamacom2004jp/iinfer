@@ -1,4 +1,4 @@
-from iinfer.app import common, client
+from iinfer.app.commons import convert
 from PIL import Image
 from typing import Dict, Any
 import logging
@@ -36,8 +36,8 @@ class Postprocess(object):
                 outputs = json.loads(res_str)
                 output_image = None
                 if "output_image" in outputs and "output_image_shape" in outputs:
-                    img_npy = common.b64str2npy(outputs["output_image"], outputs["output_image_shape"])
-                    output_image = common.npy2img(img_npy)
+                    img_npy = convert.b64str2npy(outputs["output_image"], outputs["output_image_shape"])
+                    output_image = convert.npy2img(img_npy)
                     del outputs["output_image"]
                     del outputs["output_image_shape"]
 
@@ -46,8 +46,8 @@ class Postprocess(object):
                 if img_session is not None:
                     if type(result) == dict and output_image is not None:
                         output_image = self.post_img(img_session, result, output_image)
-                        output_image_npy = common.img2npy(output_image)
-                        output_image_b64 = common.npy2b64str(output_image_npy)
+                        output_image_npy = convert.img2npy(output_image)
+                        output_image_b64 = convert.npy2b64str(output_image_npy)
                         return dict(success=result, output_image=output_image_b64, output_image_shape=output_image_npy.shape, output_image_name=outputs["output_image_name"])
             if type(result) == str:
                 return result

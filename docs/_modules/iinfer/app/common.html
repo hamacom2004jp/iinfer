@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>iinfer.app.common &mdash; iinfer 2024/02/25 documentation</title>
+  <title>iinfer.app.common &mdash; iinfer 2024/03/10 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -15,7 +15,7 @@
   
         <script src="../../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=b0392989"></script>
+        <script src="../../../_static/documentation_options.js?v=57a6fbe1"></script>
         <script src="../../../_static/doctools.js?v=888ff710"></script>
         <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -44,10 +44,10 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/overview.html">iinferの概要</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/install.html">インストール</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/gui.html">GUIモード</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/command.html">コマンドリファレンス</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/models.html">動作確認済みモデル</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../docs/install.html">サーバー環境構築</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/detection.html">物体検知</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/face.html">顔認識</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/pipeline.html">パイプライン</a></li>
@@ -82,22 +82,16 @@
            <div itemprop="articleBody">
              
   <h1>Source code for iinfer.app.common</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">iinfer.app</span> <span class="kn">import</span> <span class="n">predict</span><span class="p">,</span> <span class="n">injection</span>
-<span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="n">BytesIO</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span><span class="p">,</span> <span class="n">ImageDraw</span>
 <span class="kn">from</span> <span class="nn">pkg_resources</span> <span class="kn">import</span> <span class="n">resource_string</span>
 <span class="kn">from</span> <span class="nn">tabulate</span> <span class="kn">import</span> <span class="n">tabulate</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span>
-<span class="kn">import</span> <span class="nn">base64</span>
-<span class="kn">import</span> <span class="nn">importlib.util</span>
-<span class="kn">import</span> <span class="nn">inspect</span>
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">logging.config</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pkgutil</span>
 <span class="kn">import</span> <span class="nn">platform</span>
 <span class="kn">import</span> <span class="nn">random</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
@@ -132,7 +126,7 @@
 
 <div class="viewcode-block" id="default_json_enc">
 <a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.common.default_json_enc">[docs]</a>
-<span class="k">def</span> <span class="nf">default_json_enc</span><span class="p">(</span><span class="n">o</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">default_json_enc</span><span class="p">(</span><span class="n">o</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">Path</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
@@ -203,9 +197,11 @@
     <span class="k">if</span> <span class="n">preval</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">v</span> <span class="o">=</span> <span class="n">preval</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">preval</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-            <span class="n">v</span> <span class="o">=</span> <span class="n">preval</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">defval</span><span class="p">)</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="n">preval</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">v</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">v</span><span class="p">)</span> <span class="ow">and</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">opt</span><span class="p">:</span>
             <span class="n">v</span> <span class="o">=</span> <span class="n">opt</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">v</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">v</span><span class="p">:</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="n">defval</span>
         <span class="k">if</span> <span class="n">withset</span><span class="p">:</span>
             <span class="n">opt</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
         <span class="k">return</span> <span class="n">v</span>
@@ -319,199 +315,9 @@
     <span class="k">return</span> <span class="n">txt</span></div>
 
 
-<div class="viewcode-block" id="load_custom_predict">
-<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.common.load_custom_predict">[docs]</a>
-<span class="k">def</span> <span class="nf">load_custom_predict</span><span class="p">(</span><span class="n">custom_predict_py</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">predict</span><span class="o">.</span><span class="n">Predict</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    カスタム予測オブジェクトを読み込みます。</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        custom_predict_py (Path): カスタム予測オブジェクトのパス</span>
-<span class="sd">        logger (logging.Logger): ロガー</span>
-
-<span class="sd">    Raises:</span>
-<span class="sd">        BaseException: 指定されたオブジェクトが見つからない場合</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        iinfer.app.predict.Predict: 予測オブジェクト</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">spec</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spec_from_file_location</span><span class="p">(</span><span class="s2">&quot;iinfer.user.predict&quot;</span><span class="p">,</span> <span class="n">custom_predict_py</span><span class="p">)</span>
-    <span class="n">module</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">module_from_spec</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
-    <span class="n">spec</span><span class="o">.</span><span class="n">loader</span><span class="o">.</span><span class="n">exec_module</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getmembers</span><span class="p">(</span><span class="n">module</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">predict</span><span class="o">.</span><span class="n">Predict</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">obj</span><span class="p">(</span><span class="n">logger</span><span class="p">)</span>
-    <span class="k">raise</span> <span class="ne">BaseException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Predict class not found.(</span><span class="si">{</span><span class="n">custom_predict_py</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="load_predict">
-<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.common.load_predict">[docs]</a>
-<span class="k">def</span> <span class="nf">load_predict</span><span class="p">(</span><span class="n">predict_type</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">predict</span><span class="o">.</span><span class="n">Predict</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    指定された予測オブジェクトを読み込みます。</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        predict_type (str): 予測オブジェクトのモジュール名</span>
-<span class="sd">        logger (logging.Logger): ロガー</span>
-
-<span class="sd">    Raises:</span>
-<span class="sd">        BaseException: 指定されたオブジェクトが見つからない場合</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        predict.Predict: 予測オブジェクト</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">module</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="s2">&quot;iinfer.app.predicts.&quot;</span> <span class="o">+</span> <span class="n">predict_type</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getmembers</span><span class="p">(</span><span class="n">module</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">predict</span><span class="o">.</span><span class="n">Predict</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">obj</span><span class="p">(</span><span class="n">logger</span><span class="p">)</span>
-    <span class="k">raise</span> <span class="ne">BaseException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Predict class not found.(</span><span class="si">{</span><span class="n">predict_type</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="load_before_injection_type">
-<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.common.load_before_injection_type">[docs]</a>
-<span class="k">def</span> <span class="nf">load_before_injection_type</span><span class="p">(</span><span class="n">injection_type</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">config</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="n">Any</span><span class="p">],</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">injection</span><span class="o">.</span><span class="n">BeforeInjection</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    指定された前処理オブジェクトを読み込みます。</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        injection_type (List[str]): 前処理オブジェクトのモジュール名</span>
-<span class="sd">        config (Dict[str,Any]): 設定</span>
-<span class="sd">        logger (logging.Logger): ロガー</span>
-
-<span class="sd">    Raises:</span>
-<span class="sd">        BaseException: 指定されたオブジェクトが見つからない場合</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        List[injection.BeforeInjection]: 前処理オブジェクト</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">injections</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">injection_type</span><span class="p">:</span>
-        <span class="n">module</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="s2">&quot;iinfer.app.injections.&quot;</span> <span class="o">+</span> <span class="n">t</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getmembers</span><span class="p">(</span><span class="n">module</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">injection</span><span class="o">.</span><span class="n">BeforeInjection</span><span class="p">):</span>
-                <span class="n">injections</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">obj</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">logger</span><span class="p">))</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">injections</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">injections</span>
-    <span class="k">raise</span> <span class="ne">BaseException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;BeforeInjection class not found.(</span><span class="si">{</span><span class="n">injection_type</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="load_after_injection_type">
-<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.common.load_after_injection_type">[docs]</a>
-<span class="k">def</span> <span class="nf">load_after_injection_type</span><span class="p">(</span><span class="n">injection_type</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">config</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="n">Any</span><span class="p">],</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">injection</span><span class="o">.</span><span class="n">AfterInjection</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    指定された後処理オブジェクトを読み込みます。</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        injection_type (List[str]): 後処理オブジェクトのモジュール名</span>
-<span class="sd">        config (Dict[str,Any]): 設定</span>
-<span class="sd">        logger (logging.Logger): ロガー</span>
-
-<span class="sd">    Raises:</span>
-<span class="sd">        BaseException: 指定されたオブジェクトが見つからない場合</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        List[injection.AfterInjection]: 後処理オブジェクト</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">injections</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">injection_type</span><span class="p">:</span>
-        <span class="n">module</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="s2">&quot;iinfer.app.injections.&quot;</span> <span class="o">+</span> <span class="n">t</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getmembers</span><span class="p">(</span><span class="n">module</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">injection</span><span class="o">.</span><span class="n">AfterInjection</span><span class="p">):</span>
-                <span class="n">injections</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">obj</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">logger</span><span class="p">))</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">injections</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">injections</span>
-    <span class="k">raise</span> <span class="ne">BaseException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;AfterInjection class not found.(</span><span class="si">{</span><span class="n">injection_type</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="load_before_injections">
-<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.common.load_before_injections">[docs]</a>
-<span class="k">def</span> <span class="nf">load_before_injections</span><span class="p">(</span><span class="n">before_injection_py</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Path</span><span class="p">],</span> <span class="n">config</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="n">Any</span><span class="p">],</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">injection</span><span class="o">.</span><span class="n">BeforeInjection</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    前処理オブジェクトを読み込みます。</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        before_injection_py (List[Path]): 前処理オブジェクトのパス</span>
-<span class="sd">        config (Dict[str,Any]): 設定</span>
-<span class="sd">        logger (logging.Logger): ロガー</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        List[injection.BeforeInjection]: 前処理オブジェクト</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">injections</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">before_injection_py</span><span class="p">:</span>
-        <span class="n">spec</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spec_from_file_location</span><span class="p">(</span><span class="s2">&quot;iinfer.user.injection&quot;</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
-        <span class="n">module</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">module_from_spec</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
-        <span class="n">spec</span><span class="o">.</span><span class="n">loader</span><span class="o">.</span><span class="n">exec_module</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getmembers</span><span class="p">(</span><span class="n">module</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">injection</span><span class="o">.</span><span class="n">BeforeInjection</span><span class="p">):</span>
-                <span class="n">injections</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">obj</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">logger</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">injections</span></div>
-
-
-
-<div class="viewcode-block" id="load_after_injections">
-<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.common.load_after_injections">[docs]</a>
-<span class="k">def</span> <span class="nf">load_after_injections</span><span class="p">(</span><span class="n">after_injection_py</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Path</span><span class="p">],</span> <span class="n">config</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="n">Any</span><span class="p">],</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">injection</span><span class="o">.</span><span class="n">AfterInjection</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    後処理オブジェクトを読み込みます。</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        after_injection_py (List[Path]): 後処理オブジェクトのパス</span>
-<span class="sd">        config (Dict[str,Any]): 設定</span>
-<span class="sd">        logger (logging.Logger): ロガー</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        List[injection.AfterInjection]: 後処理オブジェクト</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">injections</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">after_injection_py</span><span class="p">:</span>
-        <span class="n">spec</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spec_from_file_location</span><span class="p">(</span><span class="s2">&quot;iinfer.user.injection&quot;</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
-        <span class="n">module</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">module_from_spec</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
-        <span class="n">spec</span><span class="o">.</span><span class="n">loader</span><span class="o">.</span><span class="n">exec_module</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getmembers</span><span class="p">(</span><span class="n">module</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">injection</span><span class="o">.</span><span class="n">AfterInjection</span><span class="p">):</span>
-                <span class="n">injections</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">obj</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">logger</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">injections</span></div>
-
-
-<div class="viewcode-block" id="get_module_list">
-<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.common.get_module_list">[docs]</a>
-<span class="k">def</span> <span class="nf">get_module_list</span><span class="p">(</span><span class="n">package_name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-    <span class="n">package</span> <span class="o">=</span> <span class="nb">__import__</span><span class="p">(</span><span class="n">package_name</span><span class="p">,</span> <span class="n">fromlist</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;&#39;</span><span class="p">])</span>
-    <span class="k">return</span> <span class="p">[</span><span class="n">name</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">pkgutil</span><span class="o">.</span><span class="n">iter_modules</span><span class="p">(</span><span class="n">package</span><span class="o">.</span><span class="n">__path__</span><span class="p">)]</span></div>
-
-
 <span class="n">BASE_MODELS</span> <span class="o">=</span> <span class="p">{}</span>
-<span class="k">for</span> <span class="n">mod</span> <span class="ow">in</span> <span class="n">get_module_list</span><span class="p">(</span><span class="s1">&#39;iinfer.app.predicts&#39;</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">mod</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;__&#39;</span><span class="p">):</span>
-        <span class="k">continue</span>
-    <span class="n">m</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="s2">&quot;iinfer.app.predicts.&quot;</span> <span class="o">+</span> <span class="n">mod</span><span class="p">)</span>
-    <span class="n">site</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">width</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">height</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">use_model_conf</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">f</span> <span class="o">==</span> <span class="s1">&#39;SITE&#39;</span><span class="p">:</span> <span class="n">site</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">f</span> <span class="o">==</span> <span class="s1">&#39;IMAGE_WIDTH&#39;</span><span class="p">:</span> <span class="n">width</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">f</span> <span class="o">==</span> <span class="s1">&#39;IMAGE_HEIGHT&#39;</span><span class="p">:</span> <span class="n">height</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">f</span> <span class="o">==</span> <span class="s1">&#39;USE_MODEL_CONF&#39;</span><span class="p">:</span> <span class="n">use_model_conf</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
-    <span class="n">BASE_MODELS</span><span class="p">[</span><span class="n">mod</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">site</span><span class="o">=</span><span class="n">site</span><span class="p">,</span> <span class="n">image_width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span> <span class="n">image_height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span> <span class="n">use_model_conf</span><span class="o">=</span><span class="n">use_model_conf</span><span class="p">)</span>
-
 <span class="n">BASE_BREFORE_INJECTIONS</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="n">BASE_AFTER_INJECTIONS</span> <span class="o">=</span> <span class="p">{}</span>
-<span class="k">for</span> <span class="n">mod</span> <span class="ow">in</span> <span class="n">get_module_list</span><span class="p">(</span><span class="s1">&#39;iinfer.app.injections&#39;</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">mod</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;__&#39;</span><span class="p">):</span>
-        <span class="k">continue</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">load_before_injection_type</span><span class="p">([</span><span class="n">mod</span><span class="p">],</span> <span class="nb">dict</span><span class="p">(),</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="n">BASE_BREFORE_INJECTIONS</span><span class="p">[</span><span class="n">mod</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="k">except</span><span class="p">:</span>
-        <span class="k">pass</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">load_after_injection_type</span><span class="p">([</span><span class="n">mod</span><span class="p">],</span> <span class="nb">dict</span><span class="p">(),</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="n">BASE_AFTER_INJECTIONS</span><span class="p">[</span><span class="n">mod</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-    <span class="k">except</span><span class="p">:</span>
-        <span class="k">pass</span>
 
 <div class="viewcode-block" id="download_file">
 <a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.common.download_file">[docs]</a>
@@ -563,250 +369,6 @@
                 <span class="k">pass</span>
 
     <span class="k">return</span> <span class="n">proc</span><span class="o">.</span><span class="n">returncode</span><span class="p">,</span> <span class="n">output</span></div>
-
-
-<div class="viewcode-block" id="npyfile2npy">
-<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.common.npyfile2npy">[docs]</a>
-<span class="k">def</span> <span class="nf">npyfile2npy</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    npyファイルからndarrayを読み込みます。</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        fp ([type]): npyファイルのパス</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        np.ndarray: 読み込んだndarray</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="npybytes2npy">
-<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.common.npybytes2npy">[docs]</a>
-<span class="k">def</span> <span class="nf">npybytes2npy</span><span class="p">(</span><span class="n">npy</span><span class="p">:</span><span class="nb">bytes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    バイト列からndarrayを読み込みます。</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        npy (bytes): ndarrayのバイト列</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        np.ndarray: 読み込んだndarray</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">npy</span><span class="p">))</span></div>
-
-
-<div class="viewcode-block" id="npy2b64str">
-<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.common.npy2b64str">[docs]</a>
-<span class="k">def</span> <span class="nf">npy2b64str</span><span class="p">(</span><span class="n">npy</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    ndarrayをBase64エンコードした文字列を返します。</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        npy (np.ndarray): ndarray</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        str: Base64エンコードされた文字列</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">npy</span><span class="o">.</span><span class="n">tobytes</span><span class="p">())</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="npy2img">
-<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.common.npy2img">[docs]</a>
-<span class="k">def</span> <span class="nf">npy2img</span><span class="p">(</span><span class="n">npy</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    ndarrayをPILのImageオブジェクトに変換します。</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        npy (np.ndarray): ndarray</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        Image.Image: PILのImageオブジェクト</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">Image</span><span class="o">.</span><span class="n">fromarray</span><span class="p">(</span><span class="n">npy</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="b64str2bytes">
-<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.common.b64str2bytes">[docs]</a>
-<span class="k">def</span> <span class="nf">b64str2bytes</span><span class="p">(</span><span class="n">b64str</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Base64文字列をバイト列に変換します。</span>
-
-<span class="sd">    Parameters:</span>
-<span class="sd">        b64str (str): Base64形式の文字列</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        bytes: バイト列</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64decode</span><span class="p">(</span><span class="n">b64str</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="b64str2npy">
-<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.common.b64str2npy">[docs]</a>
-<span class="k">def</span> <span class="nf">b64str2npy</span><span class="p">(</span><span class="n">b64str</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">shape</span><span class="p">:</span><span class="n">Tuple</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s1">&#39;uint8&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Base64エンコードされた文字列からndarrayを復元します。</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        b64str (str): Base64エンコードされた文字列</span>
-<span class="sd">        shape (tuple): ndarrayの形状</span>
-<span class="sd">        dtype (str, optional): ndarrayのデータ型. Defaults to &#39;uint8&#39;.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        np.ndarray: 復元したndarray</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">shape</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">base64</span><span class="o">.</span><span class="n">b64decode</span><span class="p">(</span><span class="n">b64str</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">base64</span><span class="o">.</span><span class="n">b64decode</span><span class="p">(</span><span class="n">b64str</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="npy2imgfile">
-<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.common.npy2imgfile">[docs]</a>
-<span class="k">def</span> <span class="nf">npy2imgfile</span><span class="p">(</span><span class="n">npy</span><span class="p">,</span> <span class="n">output_image_file</span><span class="p">:</span><span class="n">Path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">image_type</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s1">&#39;jpeg&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    ndarrayを画像bytesに変換しoutput_image_fileに保存します。</span>
-<span class="sd">    output_image_fileが省略された場合は保存されません</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        npy ([type]): ndarray</span>
-<span class="sd">        output_image_file (Path): 保存先の画像ファイルパス</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        bytes: 画像のバイト列</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">image</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">fromarray</span><span class="p">(</span><span class="n">npy</span><span class="p">)</span>
-    <span class="n">img_byte</span> <span class="o">=</span> <span class="n">img2byte</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="n">image_type</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">output_image_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">output_image_file</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">img_byte</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">img_byte</span></div>
-
-
-<div class="viewcode-block" id="bytes2b64str">
-<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.common.bytes2b64str">[docs]</a>
-<span class="k">def</span> <span class="nf">bytes2b64str</span><span class="p">(</span><span class="n">img</span><span class="p">:</span><span class="nb">bytes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    画像のバイト列をBase64エンコードします。</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        img (bytes): 画像のバイト列</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        str: Base64エンコードされた文字列</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">img</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="bgr2rgb">
-<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.common.bgr2rgb">[docs]</a>
-<span class="k">def</span> <span class="nf">bgr2rgb</span><span class="p">(</span><span class="n">npy</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    BGRのndarrayをRGBに変換します。</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        npy (np.ndarray): BGRのndarray</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        np.ndarray: RGBのndarray</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">npy</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div>
-
-
-
-<div class="viewcode-block" id="imgbytes2npy">
-<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.common.imgbytes2npy">[docs]</a>
-<span class="k">def</span> <span class="nf">imgbytes2npy</span><span class="p">(</span><span class="n">img</span><span class="p">:</span><span class="nb">bytes</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s1">&#39;uint8&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    画像のバイト列をndarrayに変換します。</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        img (bytes): 画像のバイト列</span>
-<span class="sd">        dtype (str, optional): ndarrayのデータ型. Defaults to &#39;uint8&#39;.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        np.ndarray: ndarray</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">img</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">img</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="imgfile2npy">
-<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.common.imgfile2npy">[docs]</a>
-<span class="k">def</span> <span class="nf">imgfile2npy</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s1">&#39;uint8&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    画像ファイルをndarrayに変換します。</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        fp ([type]): 画像ファイルのパス</span>
-<span class="sd">        dtype (str, optional): ndarrayのデータ型. Defaults to &#39;uint8&#39;.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        np.ndarray: ndarray</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">img</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="img2npy">
-<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.common.img2npy">[docs]</a>
-<span class="k">def</span> <span class="nf">img2npy</span><span class="p">(</span><span class="n">image</span><span class="p">:</span><span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s1">&#39;uint8&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    PILのImageオブジェクトをndarrayに変換します。</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        image (Image.Image): PILのImageオブジェクト</span>
-<span class="sd">        dtype (str, optional): ndarrayのデータ型. Defaults to &#39;uint8&#39;.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        np.ndarray: ndarray</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="img2byte">
-<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.common.img2byte">[docs]</a>
-<span class="k">def</span> <span class="nf">img2byte</span><span class="p">(</span><span class="n">image</span><span class="p">:</span><span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">,</span> <span class="nb">format</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s1">&#39;jpeg&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    画像をバイト列に変換します。</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        image (Image.Image): PILのImageオブジェクト</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        bytes: 画像のバイト列</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">with</span> <span class="n">BytesIO</span><span class="p">()</span> <span class="k">as</span> <span class="n">buffer</span><span class="p">:</span>
-        <span class="n">image</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="nb">format</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">buffer</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span></div>
-
-
-<div class="viewcode-block" id="str2b64str">
-<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.common.str2b64str">[docs]</a>
-<span class="k">def</span> <span class="nf">str2b64str</span><span class="p">(</span><span class="n">s</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    文字列をBase64エンコードします。</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        s (str): 文字列</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        str: Base64エンコードされた文字列</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="b64str2str">
-<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.common.b64str2str">[docs]</a>
-<span class="k">def</span> <span class="nf">b64str2str</span><span class="p">(</span><span class="n">b64str</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Base64エンコードされた文字列をデコードします。</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        b64str (str): Base64エンコードされた文字列</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        str: デコードされた文字列</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64decode</span><span class="p">(</span><span class="n">b64str</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="draw_boxes">

@@ -1,6 +1,6 @@
 from iinfer import version
-from iinfer.app import app
-from iinfer.app import common
+from iinfer.app import app, common
+from iinfer.app.commons import convert
 from pathlib import Path
 import datetime
 import glob
@@ -11,7 +11,6 @@ import logging
 import os
 import re
 import sys
-import threading
 import traceback
 
 
@@ -436,9 +435,9 @@ class Web(object):
                 def to_json(o):
                     res_json = json.loads(o)
                     if 'output_image' in res_json and 'output_image_shape' in res_json:
-                        img_npy = common.b64str2npy(res_json["output_image"], res_json["output_image_shape"])
-                        img_bytes = common.npy2imgfile(img_npy, image_type='png')
-                        res_json["output_image"] = common.bytes2b64str(img_bytes)
+                        img_npy = convert.b64str2npy(res_json["output_image"], res_json["output_image_shape"])
+                        img_bytes = convert.npy2imgfile(img_npy, image_type='png')
+                        res_json["output_image"] = convert.bytes2b64str(img_bytes)
                     return res_json
                 try:
                     ret = [to_json(o) for o in output.split('\n') if o.strip() != '']
@@ -510,9 +509,9 @@ class Web(object):
                 for line in f:
                     res_json = json.loads(line)
                     if 'output_image' in res_json and 'output_image_shape' in res_json:
-                        img_npy = common.b64str2npy(res_json["output_image"], res_json["output_image_shape"])
-                        img_bytes = common.npy2imgfile(img_npy, image_type='jpeg')
-                        res_json["output_image"] = common.bytes2b64str(img_bytes)
+                        img_npy = convert.b64str2npy(res_json["output_image"], res_json["output_image_shape"])
+                        img_bytes = convert.npy2imgfile(img_npy, image_type='jpeg')
+                        res_json["output_image"] = convert.bytes2b64str(img_bytes)
                     ret.append(res_json)
             return ret
 
@@ -530,9 +529,9 @@ class Web(object):
                                     output_image_shape=(int(cel[2]),int(cel[3]),int(cel[4])),
                                     output_image_name=cel[5])
                     if cel[0] == 'capture':
-                        img_npy = common.b64str2npy(cel[1], res_json["output_image_shape"])
-                        img_bytes = common.npy2imgfile(img_npy, image_type='jpeg')
-                        res_json["output_image"] = common.bytes2b64str(img_bytes)
+                        img_npy = convert.b64str2npy(cel[1], res_json["output_image_shape"])
+                        img_bytes = convert.npy2imgfile(img_npy, image_type='jpeg')
+                        res_json["output_image"] = convert.bytes2b64str(img_bytes)
                     else:
                         res_json["output_image"] = cel[1]
                     ret.append(res_json)

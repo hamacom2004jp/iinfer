@@ -1,6 +1,6 @@
 from iinfer.app import injection
 from PIL import Image
-from typing import List, Tuple, Dict, Any
+from typing import Tuple, Dict, Any
 
 
 class AfterDetFilterInjection(injection.AfterInjection):
@@ -74,5 +74,7 @@ class AfterDetFilterInjection(injection.AfterInjection):
             data['output_labels'] = output_labels
         if 'output_tracks' in data:
             data['output_tracks'] = output_tracks
+
+        self.add_success(outputs, "filterd")
 
         return outputs, output_image

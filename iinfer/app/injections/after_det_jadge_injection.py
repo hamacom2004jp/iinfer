@@ -1,9 +1,7 @@
 from iinfer.app import common, injection
 from PIL import Image, ImageDraw
-from typing import List, Tuple, Dict, Any
-import datetime
-import io
-import requests
+from typing import Tuple, Dict, Any
+
 
 class AfterDetJadgeInjection(injection.AfterInjection):
 
@@ -42,13 +40,13 @@ class AfterDetJadgeInjection(injection.AfterInjection):
         ext_labels = self.get_config('ext_labels', [])
         nodraw = self.get_config('nodraw', False)
 
-        if ok_score_th is not None and ((ok_classes is not None and len(ok_classes)>0) or (ok_labels is not None and len(ok_labels)>0)):
+        if ok_score_th is not None and (not(ok_classes is not None and len(ok_classes)>0) or (ok_labels is not None and len(ok_labels)>0)):
             self.add_warning(outputs, 'If ok_score_th is specified, ok_classes or ok_labels must be set.')
             return outputs, output_image
-        if ng_score_th is not None and ((ng_classes is not None and len(ng_classes)>0) or (ng_labels is not None and len(ng_labels)>0)):
+        if ng_score_th is not None and (not(ng_classes is not None and len(ng_classes)>0) or (ng_labels is not None and len(ng_labels)>0)):
             self.add_warning(outputs, 'If ng_score_th is specified, ng_classes or ng_labels must be set.')
             return outputs, output_image
-        if ext_score_th is not None and ((ext_classes is not None and len(ext_classes)>0) or (ext_labels is not None and len(ext_labels)>0)):
+        if ext_score_th is not None and (not(ext_classes is not None and len(ext_classes)>0) or (ext_labels is not None and len(ext_labels)>0)):
             self.add_warning(outputs, 'If ext_score_th is specified, ext_classes or ext_labels must be set.')
             return outputs, output_image
 
@@ -63,27 +61,28 @@ class AfterDetJadgeInjection(injection.AfterInjection):
         output_jadge_score = [0.0, 0.0, 0.0] # ok, ng, ext
         for i, cls in enumerate(data['output_classes']):
             label = data['output_labels'][i] if 'output_labels' in data else None
-            if self.ext_classes is not None and cls in self.ext_classes or self.ext_labels is not None and label in self.ext_labels:
+            if ext_classes is not None and cls in ext_classes or ext_labels is not None and label in ext_labels:
                 output_jadge_score[2] = max(output_jadge_score[2], data['output_scores'][i])
-            elif self.ng_classes is not None and cls in self.ng_classes or self.ng_labels is not None and label in self.ng_labels:
+            elif ng_classes is not None and cls in ng_classes or ng_labels is not None and label in ng_labels:
                 output_jadge_score[1] = max(output_jadge_score[1], data['output_scores'][i])
-            elif self.ok_classes is not None and cls in self.ok_classes or self.ok_labels is not None and label in self.ok_labels:
+            elif ok_classes is not None and cls in ok_classes or ok_labels is not None and label in ok_labels:
                 output_jadge_score[0] = max(output_jadge_score[0], data['output_scores'][i])
             else:
                 output_jadge_score[2] = max(output_jadge_score[2], data['output_scores'][i])
 
-        output_jadge_label = ('ok', 'ng', 'gray')
+        output_jadge_label = ['ok', 'ng', 'gray']
         output_jadge = 'gray'
-        if self.ext_score_th is not None and output_jadge_score[2] >= self.ext_score_th:
+        if ext_score_th is not None and output_jadge_score[2] >= ext_score_th:
             output_jadge = 'gray'
-        elif self.ng_score_th is not None and output_jadge_score[1] >= self.ng_score_th:
+        elif ng_score_th is not None and output_jadge_score[1] >= ng_score_th:
             output_jadge = 'ng'
-        elif self.ok_score_th is not None and output_jadge_score[0] >= self.ok_score_th:
+        elif ok_score_th is not None and output_jadge_score[0] >= ok_score_th:
             output_jadge = 'ok'
 
         data['output_jadge_score'] = output_jadge_score
         data['output_jadge_label'] = output_jadge_label
         data['output_jadge'] = output_jadge
+        self.add_success(outputs, output_jadge)
 
         jadge_score = output_jadge_score[output_jadge_score.index(max(output_jadge_score))]
         draw = ImageDraw.Draw(output_image)

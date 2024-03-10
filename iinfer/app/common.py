@@ -1,19 +1,13 @@
-from iinfer.app import predict, injection
-from io import BytesIO
 from pathlib import Path
 from PIL import Image, ImageDraw
 from pkg_resources import resource_string
 from tabulate import tabulate
 from typing import List, Tuple, Dict, Any
-import base64
-import importlib.util
-import inspect
 import json
 import os
 import logging
 import logging.config
 import numpy as np
-import pkgutil
 import platform
 import random
 import shutil
@@ -43,7 +37,7 @@ def load_config(mode:str) -> Tuple[logging.Logger, dict]:
     config = yaml.safe_load(resource_string(APP_ID, "config.yml"))
     return logger, config
 
-def default_json_enc(o) -> str:
+def default_json_enc(o) -> Any:
     if isinstance(o, Path):
         return str(o)
     if isinstance(o, np.ndarray):
@@ -105,9 +99,11 @@ def getopt(opt:dict, key:str, preval=None, defval=None, withset=False) -> any:
     if preval is not None:
         v = preval
         if isinstance(preval, dict):
-            v = preval.get(key, defval)
+            v = preval.get(key, None)
         if (v is None or not v) and key in opt:
             v = opt[key]
+        elif v is None or not v:
+            v = defval
         if withset:
             opt[key] = v
         return v
@@ -208,178 +204,9 @@ def print_format(data:dict, format:bool, tm:float, output_json:str=None, output_
             pass
     return txt
 
-def load_custom_predict(custom_predict_py:Path, logger:logging.Logger) -> predict.Predict:
-    """
-    カスタム予測オブジェクトを読み込みます。
-
-    Args:
-        custom_predict_py (Path): カスタム予測オブジェクトのパス
-        logger (logging.Logger): ロガー
-
-    Raises:
-        BaseException: 指定されたオブジェクトが見つからない場合
-
-    Returns:
-        iinfer.app.predict.Predict: 予測オブジェクト
-    """
-    spec = importlib.util.spec_from_file_location("iinfer.user.predict", custom_predict_py)
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    for name, obj in inspect.getmembers(module):
-        if inspect.isclass(obj) and issubclass(obj, predict.Predict):
-            return obj(logger)
-    raise BaseException(f"Predict class not found.({custom_predict_py})")
-
-def load_predict(predict_type:str, logger:logging.Logger) -> predict.Predict:
-    """
-    指定された予測オブジェクトを読み込みます。
-
-    Args:
-        predict_type (str): 予測オブジェクトのモジュール名
-        logger (logging.Logger): ロガー
-
-    Raises:
-        BaseException: 指定されたオブジェクトが見つからない場合
-
-    Returns:
-        predict.Predict: 予測オブジェクト
-    """
-    module = importlib.import_module("iinfer.app.predicts." + predict_type)
-    for name, obj in inspect.getmembers(module):
-        if inspect.isclass(obj) and issubclass(obj, predict.Predict):
-            return obj(logger)
-    raise BaseException(f"Predict class not found.({predict_type})")
-
-def load_before_injection_type(injection_type:List[str], config:Dict[str,Any], logger:logging.Logger) -> List[injection.BeforeInjection]:
-    """
-    指定された前処理オブジェクトを読み込みます。
-
-    Args:
-        injection_type (List[str]): 前処理オブジェクトのモジュール名
-        config (Dict[str,Any]): 設定
-        logger (logging.Logger): ロガー
-
-    Raises:
-        BaseException: 指定されたオブジェクトが見つからない場合
-
-    Returns:
-        List[injection.BeforeInjection]: 前処理オブジェクト
-    """
-    injections = []
-    for t in injection_type:
-        module = importlib.import_module("iinfer.app.injections." + t)
-        for name, obj in inspect.getmembers(module):
-            if inspect.isclass(obj) and issubclass(obj, injection.BeforeInjection):
-                injections.append(obj(config, logger))
-    if len(injections) > 0:
-        return injections
-    raise BaseException(f"BeforeInjection class not found.({injection_type})")
-
-def load_after_injection_type(injection_type:List[str], config:Dict[str,Any], logger:logging.Logger) -> List[injection.AfterInjection]:
-    """
-    指定された後処理オブジェクトを読み込みます。
-
-    Args:
-        injection_type (List[str]): 後処理オブジェクトのモジュール名
-        config (Dict[str,Any]): 設定
-        logger (logging.Logger): ロガー
-
-    Raises:
-        BaseException: 指定されたオブジェクトが見つからない場合
-
-    Returns:
-        List[injection.AfterInjection]: 後処理オブジェクト
-    """
-    injections = []
-    for t in injection_type:
-        module = importlib.import_module("iinfer.app.injections." + t)
-        for name, obj in inspect.getmembers(module):
-            if inspect.isclass(obj) and issubclass(obj, injection.AfterInjection):
-                injections.append(obj(config, logger))
-    if len(injections) > 0:
-        return injections
-    raise BaseException(f"AfterInjection class not found.({injection_type})")
-
-def load_before_injections(before_injection_py:List[Path], config:Dict[str,Any], logger:logging.Logger) -> List[injection.BeforeInjection]:
-    """
-    前処理オブジェクトを読み込みます。
-
-    Args:
-        before_injection_py (List[Path]): 前処理オブジェクトのパス
-        config (Dict[str,Any]): 設定
-        logger (logging.Logger): ロガー
-
-    Returns:
-        List[injection.BeforeInjection]: 前処理オブジェクト
-    """
-    injections = []
-    for p in before_injection_py:
-        spec = importlib.util.spec_from_file_location("iinfer.user.injection", p)
-        module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(module)
-        for name, obj in inspect.getmembers(module):
-            if inspect.isclass(obj) and issubclass(obj, injection.BeforeInjection):
-                injections.append(obj(config, logger))
-    return injections
-
-
-def load_after_injections(after_injection_py:List[Path], config:Dict[str,Any], logger:logging.Logger) -> List[injection.AfterInjection]:
-    """
-    後処理オブジェクトを読み込みます。
-
-    Args:
-        after_injection_py (List[Path]): 後処理オブジェクトのパス
-        config (Dict[str,Any]): 設定
-        logger (logging.Logger): ロガー
-
-    Returns:
-        List[injection.AfterInjection]: 後処理オブジェクト
-    """
-    injections = []
-    for p in after_injection_py:
-        spec = importlib.util.spec_from_file_location("iinfer.user.injection", p)
-        module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(module)
-        for name, obj in inspect.getmembers(module):
-            if inspect.isclass(obj) and issubclass(obj, injection.AfterInjection):
-                injections.append(obj(config, logger))
-    return injections
-
-def get_module_list(package_name) -> List[str]:
-    package = __import__(package_name, fromlist=[''])
-    return [name for _, name, _ in pkgutil.iter_modules(package.__path__)]
-
 BASE_MODELS = {}
-for mod in get_module_list('iinfer.app.predicts'):
-    if mod.startswith('__'):
-        continue
-    m = importlib.import_module("iinfer.app.predicts." + mod)
-    site = None
-    width = None
-    height = None
-    use_model_conf = False
-    for f in dir(m):
-        if f == 'SITE': site = getattr(m, f)
-        elif f == 'IMAGE_WIDTH': width = getattr(m, f)
-        elif f == 'IMAGE_HEIGHT': height = getattr(m, f)
-        elif f == 'USE_MODEL_CONF': use_model_conf = getattr(m, f)
-    BASE_MODELS[mod] = dict(site=site, image_width=width, image_height=height, use_model_conf=use_model_conf)
-
 BASE_BREFORE_INJECTIONS = {}
 BASE_AFTER_INJECTIONS = {}
-for mod in get_module_list('iinfer.app.injections'):
-    if mod.startswith('__'):
-        continue
-    try:
-        load_before_injection_type([mod], dict(), None)
-        BASE_BREFORE_INJECTIONS[mod] = dict()
-    except:
-        pass
-    try:
-        load_after_injection_type([mod], dict(), None)
-        BASE_AFTER_INJECTIONS[mod] = dict()
-    except:
-        pass
 
 def download_file(url:str, save_path:Path) -> Path:
     """
@@ -426,205 +253,6 @@ def cmd(cmd:str, logger:logging.Logger, strip:bool=False):
                 pass
 
     return proc.returncode, output
-
-def npyfile2npy(fp) -> np.ndarray:
-    """
-    npyファイルからndarrayを読み込みます。
-
-    Args:
-        fp ([type]): npyファイルのパス
-
-    Returns:
-        np.ndarray: 読み込んだndarray
-    """
-    return np.load(fp)
-
-def npybytes2npy(npy:bytes) -> np.ndarray:
-    """
-    バイト列からndarrayを読み込みます。
-
-    Args:
-        npy (bytes): ndarrayのバイト列
-
-    Returns:
-        np.ndarray: 読み込んだndarray
-    """
-    return np.load(BytesIO(npy))
-
-def npy2b64str(npy:np.ndarray) -> str:
-    """
-    ndarrayをBase64エンコードした文字列を返します。
-
-    Args:
-        npy (np.ndarray): ndarray
-
-    Returns:
-        str: Base64エンコードされた文字列
-    """
-    return base64.b64encode(npy.tobytes()).decode('utf-8')
-
-def npy2img(npy:np.ndarray) -> Image.Image:
-    """
-    ndarrayをPILのImageオブジェクトに変換します。
-
-    Args:
-        npy (np.ndarray): ndarray
-
-    Returns:
-        Image.Image: PILのImageオブジェクト
-    """
-    return Image.fromarray(npy)
-
-def b64str2bytes(b64str:str) -> bytes:
-    """
-    Base64文字列をバイト列に変換します。
-
-    Parameters:
-        b64str (str): Base64形式の文字列
-
-    Returns:
-        bytes: バイト列
-    """
-    return base64.b64decode(b64str)
-
-def b64str2npy(b64str:str, shape:Tuple=None, dtype:str='uint8') -> np.ndarray:
-    """
-    Base64エンコードされた文字列からndarrayを復元します。
-
-    Args:
-        b64str (str): Base64エンコードされた文字列
-        shape (tuple): ndarrayの形状
-        dtype (str, optional): ndarrayのデータ型. Defaults to 'uint8'.
-
-    Returns:
-        np.ndarray: 復元したndarray
-    """
-    if shape is None:
-        return np.frombuffer(base64.b64decode(b64str), dtype=dtype)
-    return np.frombuffer(base64.b64decode(b64str), dtype=dtype).reshape(shape)
-
-def npy2imgfile(npy, output_image_file:Path=None, image_type:str='jpeg') -> bytes:
-    """
-    ndarrayを画像bytesに変換しoutput_image_fileに保存します。
-    output_image_fileが省略された場合は保存されません
-
-    Args:
-        npy ([type]): ndarray
-        output_image_file (Path): 保存先の画像ファイルパス
-
-    Returns:
-        bytes: 画像のバイト列
-    """
-    image = Image.fromarray(npy)
-    img_byte = img2byte(image, format=image_type)
-    if output_image_file is not None:
-        with open(output_image_file, 'wb') as f:
-            f.write(img_byte)
-    return img_byte
-
-def bytes2b64str(img:bytes) -> str:
-    """
-    画像のバイト列をBase64エンコードします。
-
-    Args:
-        img (bytes): 画像のバイト列
-
-    Returns:
-        str: Base64エンコードされた文字列
-    """
-    return base64.b64encode(img).decode('utf-8')
-
-def bgr2rgb(npy:np.ndarray) -> np.ndarray:
-    """
-    BGRのndarrayをRGBに変換します。
-
-    Args:
-        npy (np.ndarray): BGRのndarray
-
-    Returns:
-        np.ndarray: RGBのndarray
-    """
-    return npy[..., ::-1].copy()
-
-
-def imgbytes2npy(img:bytes, dtype:str='uint8') -> np.ndarray:
-    """
-    画像のバイト列をndarrayに変換します。
-
-    Args:
-        img (bytes): 画像のバイト列
-        dtype (str, optional): ndarrayのデータ型. Defaults to 'uint8'.
-
-    Returns:
-        np.ndarray: ndarray
-    """
-    img = Image.open(BytesIO(img))
-    return np.array(img, dtype=dtype)
-
-def imgfile2npy(fp, dtype:str='uint8') -> np.ndarray:
-    """
-    画像ファイルをndarrayに変換します。
-
-    Args:
-        fp ([type]): 画像ファイルのパス
-        dtype (str, optional): ndarrayのデータ型. Defaults to 'uint8'.
-
-    Returns:
-        np.ndarray: ndarray
-    """
-    img = Image.open(fp)
-    return np.array(img, dtype=dtype)
-
-def img2npy(image:Image.Image, dtype:str='uint8') -> np.ndarray:
-    """
-    PILのImageオブジェクトをndarrayに変換します。
-
-    Args:
-        image (Image.Image): PILのImageオブジェクト
-        dtype (str, optional): ndarrayのデータ型. Defaults to 'uint8'.
-
-    Returns:
-        np.ndarray: ndarray
-    """
-    return np.array(image, dtype=dtype)
-
-def img2byte(image:Image.Image, format:str='jpeg') -> bytes:
-    """
-    画像をバイト列に変換します。
-
-    Args:
-        image (Image.Image): PILのImageオブジェクト
-
-    Returns:
-        bytes: 画像のバイト列
-    """
-    with BytesIO() as buffer:
-        image.save(buffer, format=format)
-        return buffer.getvalue()
-
-def str2b64str(s:str) -> str:
-    """
-    文字列をBase64エンコードします。
-
-    Args:
-        s (str): 文字列
-
-    Returns:
-        str: Base64エンコードされた文字列
-    """
-    return base64.b64encode(s.encode()).decode('utf-8')
-
-def b64str2str(b64str:str) -> str:
-    """
-    Base64エンコードされた文字列をデコードします。
-
-    Args:
-        b64str (str): Base64エンコードされた文字列
-
-    Returns:
-        str: デコードされた文字列
-    """
-    return base64.b64decode(b64str).decode('utf-8')
 
 def draw_boxes(image:Image.Image, boxes:List[List[float]], scores:List[float], classes:List[int], ids:List[str]=None, labels:List[str]=None, colors:List[Tuple[int]]=None,
                nodraw:bool=False, nolookup:bool=False) -> Tuple[Image.Image, List[str]]:

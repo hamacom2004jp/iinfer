@@ -15,4 +15,5 @@ six
 sphinx
 sphinx-rtd-theme
 sphinx_fontawesome
+sphinx-intl
 wheel

@@ -47,7 +47,9 @@ iinferの開発環境を構築するための手順を説明します。
         python setup.py sdist
         python setup.py bdist_wheel
 
-
+.. sphinx-build -b gettext docs_src docs_build
+.. sphinx-intl update -p docs_build -l en
+        
 モジュールのコミット方法
 =========================
 
