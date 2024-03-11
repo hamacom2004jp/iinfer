@@ -15,9 +15,9 @@ RUN pip install --upgrade pip && \
 
 #{INSTALL_ONNX}
 #{INSTALL_MMDET}
+#{INSTALL_MMSEG}
 #{INSTALL_MMCLS}
 #{INSTALL_MMPRETRAIN}
-#{INSTALL_MMROTATE}
 #{INSTALL_INSIGHTFACE}
 RUN mkdir -p /home/${MKUSER}/.iinfer && chown -R ${MKUSER}:${MKUSER} /home/${MKUSER}/.iinfer
 

@@ -13,10 +13,24 @@
 
 `onnxruntime` をインストールします。オプションの指定はありません。
 
+
 インストール(mmdet) : `iinfer -m install -c mmdet`
 ==============================================================================
 
 `mmdetection` をインストールします。オプションは以下の通りです。
+
+.. csv-table::
+    :widths: 20, 10, 70
+    :header-rows: 1
+
+    "Option","Required","Description"
+    "--install_use_gpu","","GPUを使用するモジュール構成でインストールします。"
+
+
+インストール(mmseg) : `iinfer -m install -c mmseg`
+==============================================================================
+
+`mmsegmentation` をインストールします。オプションは以下の通りです。
 
 .. csv-table::
     :widths: 20, 10, 70
@@ -43,19 +57,6 @@
 ==============================================================================
 
 `mmpretrain` をインストールします。オプションは以下の通りです。
-
-.. csv-table::
-    :widths: 20, 10, 70
-    :header-rows: 1
-
-    "Option","Required","Description"
-    "--install_use_gpu","","GPUを使用するモジュール構成でインストールします。（検証中）"
-
-
-インストール(mmrotate) : `iinfer -m install -c mmrotate`
-==============================================================================
-
-`mmrotate` をインストールします。オプションは以下の通りです。
 
 .. csv-table::
     :widths: 20, 10, 70
@@ -96,13 +97,13 @@
     "--install_iinfer <iinferモジュール名>","","省略した時は `iinfer` を使用します。 `iinfer==0.4.16` といった指定も可能です。"
     "--install_onnx","","指定すると `onnxruntime` をインストールします。※1"
     "--install_mmdet","","指定すると `mmdetection` をインストールします。※1"
+    "--install_mmseg","","指定すると `mmsegmentation` をインストールします。※1"
     "--install_mmcls","","指定すると `mmclassification` をインストールします。※1,2"
     "--install_mmpretrain","","指定すると `mmpretrain` をインストールします。※1"
-    "--install_mmrotate","","指定すると `mmrotate` をインストールします。※1"
     "--install_insightface","","指定すると `insightface` をインストールします。※1"
     "--install_tag <追加のタグ名>","","指定すると作成するdockerイメージのタグ名に追記出来ます。"
     "--install_use_gpu","","GPUを使用するモジュール構成でインストールします。（検証中）"
     
 
-- ※1 : これらのオプションを何れも指定しない場合、 `--install_mmcls` `--install_mmrotate` `--install_insightface` 以外すべてをインストールします。
+- ※1 : これらのオプションを何れも指定しない場合、 `--install_mmcls` `--install_insightface` 以外すべてをインストールします。
 - ※2 : `mmclassification` と `mmpretrain` はバージョンによって共存できない場合があります。

@@ -31,7 +31,7 @@ def _main(args_list:list=None):
     parser.add_argument('-n', '--name', help='Setting the cmd name.')
     parser.add_argument('--timeout', help='Setting the cmd timeout.', type=int, default=60)
     parser.add_argument('-c', '--cmd', help='Setting the cmd type.',
-                        choices=['redis', 'server', 'onnx', 'mmdet', 'mmcls', 'mmpretrain', 'mmrotate', 'insightface', # install mode
+                        choices=['redis', 'server', 'onnx', 'mmdet', 'mmseg', 'mmcls', 'mmpretrain', 'insightface', # install mode
                                  'docker_run', 'docker_stop', # redis mode
                                  'start', 'stop', # server or client or gui mode
                                  'list' , # server mode
@@ -107,9 +107,9 @@ def _main(args_list:list=None):
     parser.add_argument('--install_iinfer', help='Setting the install server install_iinfer.', type=str, default='iinfer')
     parser.add_argument('--install_onnx', help='Setting the install server install_onnx.', action='store_true')
     parser.add_argument('--install_mmdet', help='Setting the install server install_mmdet.', action='store_true')
+    parser.add_argument('--install_mmseg', help='Setting the install server install_mmseg.', action='store_true')
     parser.add_argument('--install_mmcls', help='Setting the install server install_mmcls.', action='store_true')
     parser.add_argument('--install_mmpretrain', help='Setting the install server install_mmpretrain.', action='store_true')
-    parser.add_argument('--install_mmrotate', help='Setting the install server install_mmrotate.', action='store_true')
     parser.add_argument('--install_insightface', help='Setting the install server install_insightface.', action='store_true')
     parser.add_argument('--install_tag', help='Setting the install server install_tag.', type=str, default=None)
     parser.add_argument('--install_use_gpu', help='Setting the install use gpu.', action='store_true')
@@ -199,9 +199,9 @@ def _main(args_list:list=None):
     install_iinfer = common.getopt(opt, 'install_iinfer', preval=args_dict, withset=True)
     install_onnx = common.getopt(opt, 'install_onnx', preval=args_dict, withset=True)
     install_mmdet = common.getopt(opt, 'install_mmdet', preval=args_dict, withset=True)
+    install_mmseg = common.getopt(opt, 'install_mmseg', preval=args_dict, withset=True)
     install_mmcls = common.getopt(opt, 'install_mmcls', preval=args_dict, withset=True)
     install_mmpretrain = common.getopt(opt, 'install_mmpretrain', preval=args_dict, withset=True)
-    install_mmrotate = common.getopt(opt, 'install_mmrotate', preval=args_dict, withset=True)
     install_insightface = common.getopt(opt, 'install_insightface', preval=args_dict, withset=True)
     install_tag = common.getopt(opt, 'install_tag', preval=args_dict, withset=True)
     install_use_gpu = common.getopt(opt, 'install_use_gpu', preval=args_dict, withset=True)
@@ -547,25 +547,25 @@ def _main(args_list:list=None):
                 return 1, ret
 
         elif cmd == 'server':
-            install_set = not (install_onnx or install_mmdet or install_mmcls or install_mmpretrain or install_mmrotate or install_insightface)
+            install_set = not (install_onnx or install_mmdet or install_mmseg or install_mmcls or install_mmpretrain or install_insightface)
             onnx = install_set
             mmdet = install_set
+            mmseg = install_set
             mmcls = False
             mmpretrain = install_set
-            mmrotate = install_set
             insightface = install_set
             onnx = install_onnx if install_onnx else onnx
             mmdet = install_mmdet if install_mmdet else mmdet
+            mmseg = install_mmseg if install_mmseg else mmseg
             mmcls = install_mmcls if install_mmcls else mmcls
             mmpretrain = install_mmpretrain if install_mmpretrain else mmpretrain
-            mmrotate = install_mmrotate if install_mmrotate else mmrotate
             insightface = install_insightface if install_insightface else insightface
             if data is None:
                 msg = {"warn":f"Please specify the --data option."}
                 common.print_format(msg, format, tm, output_json, output_json_append)
                 return 1, msg
             ret = inst.server(Path(data), install_iinfer, install_onnx=onnx,
-                              install_mmdet=mmdet, install_mmcls=mmcls, install_mmpretrain=mmpretrain, install_mmrotate=mmrotate,
+                              install_mmdet=mmdet, install_mmseg=mmseg, install_mmcls=mmcls, install_mmpretrain=mmpretrain,
                               install_insightface=insightface, install_tag=install_tag, install_use_gpu=install_use_gpu)
             common.print_format(ret, format, tm, output_json, output_json_append)
             if 'success' not in ret:
@@ -587,6 +587,16 @@ def _main(args_list:list=None):
             if 'success' not in ret:
                 return 1, ret
 
+        elif cmd == 'mmseg':
+            if data is None:
+                msg = {"warn":f"Please specify the --data option."}
+                common.print_format(msg, format, tm, output_json, output_json_append)
+                return 1, msg
+            ret = inst.mmseg(Path(data), install_use_gpu=install_use_gpu)
+            common.print_format(ret, format, tm, output_json, output_json_append)
+            if 'success' not in ret:
+                return 1, ret
+
         elif cmd == 'mmcls':
             ret = inst.mmcls(Path(data), install_use_gpu=install_use_gpu)
             common.print_format(ret, format, tm, output_json, output_json_append)
@@ -599,16 +609,6 @@ def _main(args_list:list=None):
                 common.print_format(msg, format, tm, output_json, output_json_append)
                 return 1, msg
             ret = inst.mmpretrain(Path(data), install_use_gpu=install_use_gpu)
-            common.print_format(ret, format, tm, output_json, output_json_append)
-            if 'success' not in ret:
-                return 1, ret
-
-        elif cmd == 'mmrotate':
-            if data is None:
-                msg = {"warn":f"Please specify the --data option."}
-                common.print_format(msg, format, tm, output_json, output_json_append)
-                return 1, msg
-            ret = inst.mmrotate(Path(data), install_use_gpu=install_use_gpu)
             common.print_format(ret, format, tm, output_json, output_json_append)
             if 'success' not in ret:
                 return 1, ret

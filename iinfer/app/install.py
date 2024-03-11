@@ -38,7 +38,7 @@ class Install(object):
             return {"warn":f"Unsupported platform."}
 
     def server(self, data:Path, install_iinfer:str='iinfer', install_onnx:bool=True,
-               install_mmdet:bool=True, install_mmcls:bool=False, install_mmpretrain:bool=True, install_mmrotate:bool=False,
+               install_mmdet:bool=True, install_mmseg:bool=True, install_mmcls:bool=False, install_mmpretrain:bool=True,
                install_insightface=False, install_tag:str=None, install_use_gpu:bool=False):
         if platform.system() == 'Windows':
             return {"warn": f"Build server command is Unsupported in windows platform."}
@@ -62,9 +62,9 @@ class Install(object):
             text = text.replace('#{INSTALL_IINFER}', install_iinfer)
             text = text.replace('#{INSTALL_ONNX}', f'RUN iinfer -m install -c onnx --data /home/{user}/.iinfer {install_use_gpu}' if install_onnx else '')
             text = text.replace('#{INSTALL_MMDET}', f'RUN iinfer -m install -c mmdet --data /home/{user}/.iinfer {install_use_gpu}' if install_mmdet else '')
+            text = text.replace('#{INSTALL_MMSEG}', f'RUN iinfer -m install -c mmseg --data /home/{user}/.iinfer {install_use_gpu}' if install_mmseg else '')
             text = text.replace('#{INSTALL_MMCLS}', f'RUN iinfer -m install -c mmcls --data /home/{user}/.iinfer {install_use_gpu}' if install_mmcls else '')
             text = text.replace('#{INSTALL_MMPRETRAIN}', f'RUN iinfer -m install -c mmpretrain --data /home/{user}/.iinfer {install_use_gpu}' if install_mmpretrain else '')
-            text = text.replace('#{INSTALL_MMROTATE}', f'RUN iinfer -m install -c mmrotate --data /home/{user}/.iinfer {install_use_gpu}' if install_mmrotate else '')
             text = text.replace('#{INSTALL_INSIGHTFACE}', f'RUN iinfer -m install -c insightface --data /home/{user}/.iinfer {install_use_gpu}' if install_insightface else '')
             fp.write(text)
         docker_compose_path = Path('docker-compose.yml')
@@ -201,13 +201,13 @@ class Install(object):
             return {"success": f"Please remove '{srcdir / 'mmdetection'}' manually."}
         return {"success": f"Success to install mmdet."}
 
-    def mmrotate(self, data_dir:Path, install_use_gpu:bool=False):
-        returncode, _ = common.cmd(f'git clone https://github.com/open-mmlab/mmrotate.git', logger=self.logger)
+    def mmseg(self, data_dir:Path, install_use_gpu:bool=False):
+        returncode, _ = common.cmd(f'git clone -b main https://github.com/open-mmlab/mmsegmentation.git', logger=self.logger)
         if returncode != 0:
-            self.logger.error(f"Failed to git clone mmrotate.")
-            return {"error": f"Failed to git clone mmrotate."}
-        srcdir = Path('.') / 'mmrotate'
-        shutil.copytree(srcdir, data_dir / 'mmrotate', dirs_exist_ok=True, ignore=shutil.ignore_patterns('.git'))
+            self.logger.error(f"Failed to git clone mmsegmentation.")
+            return {"error": f"Failed to git clone mmsegmentation."}
+        srcdir = Path('.') / 'mmsegmentation'
+        shutil.copytree(srcdir, data_dir / 'mmsegmentation', dirs_exist_ok=True, ignore=shutil.ignore_patterns('.git'))
         shutil.rmtree(srcdir, ignore_errors=True)
 
         ret = self._torch(install_use_gpu)
@@ -217,14 +217,19 @@ class Install(object):
         ret = self._mmcv(install_use_gpu)
         if "error" in ret: return ret
 
-        ret, _ = common.cmd('mim install mmengine mmdet mmrotate', logger=self.logger)
+        ret, _ = common.cmd('mim install mmengine mmsegmentation', logger=self.logger)
         if ret != 0:
-            self.logger.error(f"Failed to install mmengine mmdet mmrotate.")
-            return {"error": f"Failed to install mmengine mmdet mmrotate."}
+            self.logger.error(f"Failed to install mmengine mmsegmentation.")
+            return {"error": f"Failed to install mmengine mmsegmentation."}
+
+        ret, _ = common.cmd('pip install ftfy', logger=self.logger)
+        if ret != 0:
+            self.logger.error(f"Failed to install ftfy.")
+            return {"error": f"Failed to install ftfy."}
 
         if srcdir.exists():
-            return {"success": f"Please remove '{srcdir / 'mmrotate'}' manually."}
-        return {"success": f"Success to install mmrotate."}
+            return {"success": f"Please remove '{srcdir / 'mmsegmentation'}' manually."}
+        return {"success": f"Success to install mmsegmentation."}
 
     def mmcls(self, data_dir:Path, install_use_gpu:bool=False):
 

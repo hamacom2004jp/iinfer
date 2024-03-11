@@ -41,7 +41,7 @@ class Web(object):
             elif mode == "redis":
                 return ['', 'docker_run', 'docker_stop']
             elif mode == "install":
-                return ['', 'redis', 'server', 'onnx', 'mmdet', 'mmcls', 'mmpretrain', 'mmrotate']
+                return ['', 'redis', 'server', 'onnx', 'mmdet', 'mmseg', 'mmcls', 'mmpretrain']
             else:
                 return ['Please select mode.']
 
@@ -324,6 +324,13 @@ class Web(object):
                         dict(opt="output_json_append", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False]),
                         dict(opt="stdout_log", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False]),
                     ]
+                elif cmd == "mmseg":
+                    return [
+                        dict(opt="install_use_gpu", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False]),
+                        dict(opt="output_json", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json_append", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False]),
+                        dict(opt="stdout_log", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False]),
+                    ]
                 elif cmd == "mmcls":
                     return [
                         dict(opt="install_use_gpu", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False]),
@@ -332,13 +339,6 @@ class Web(object):
                         dict(opt="stdout_log", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False])
                     ]
                 elif cmd == "mmpretrain":
-                    return [
-                        dict(opt="install_use_gpu", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False]),
-                        dict(opt="output_json", type="file", default="", required=False, multi=False, hide=True, choise=None),
-                        dict(opt="output_json_append", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False]),
-                        dict(opt="stdout_log", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False])
-                    ]
-                elif cmd == "mmrotate":
                     return [
                         dict(opt="install_use_gpu", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False]),
                         dict(opt="output_json", type="file", default="", required=False, multi=False, hide=True, choise=None),
@@ -360,9 +360,9 @@ class Web(object):
                         dict(opt="install_iinfer", type="str", default='iinfer', required=False, multi=False, hide=True, choise=None),
                         dict(opt="install_onnx", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False]),
                         dict(opt="install_mmdet", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False]),
+                        dict(opt="install_mmseg", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False]),
                         dict(opt="install_mmcls", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False]),
                         dict(opt="install_mmpretrain", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False]),
-                        dict(opt="install_mmrotate", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False]),
                         dict(opt="output_json", type="file", default="", required=False, multi=False, hide=True, choise=None),
                         dict(opt="output_json_append", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False]),
                         dict(opt="stdout_log", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False])
