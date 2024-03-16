@@ -207,3 +207,18 @@ iinferの開発環境を構築するための手順を説明します。
     9. `requirepass foobared` の `foobared` の部分を任意のパスワードに変更してください。変更したパスワードをメモしておいてください。
     10. このパスワードが、 `iinfer` コマンドの中で指定するパスワードになります。
     11. Windowsのタスクマネージャーを開いて、サービスタブを開いて `Redis` を右クリックし、サービスを再起動してください。
+
+【参考】sitemap.xmlの作成手順
+=============================
+
+1. `xml-sitemaps <https://www.xml-sitemaps.com/>`__ でsitemap.xmlを作成します。:
+2. 作成したsitemap.xmlをダウンロードします。
+3. ダウンロードしたsitemap.xmlを `docs` ディレクトリにコピーします。
+4. プロジェクトのルートディレクトリに移動して、以下のコマンドを実行します:
+
+    .. code-block:: bat
+
+        sphinx-apidoc -F -o docs_src/resources iinfer
+        sphinx-build -b html docs_src docs
+        python setup.py sdist
+        python setup.py bdist_wheel
