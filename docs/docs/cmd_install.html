@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>コマンドリファレンス（installモード） &mdash; iinfer 2024/03/10 documentation</title>
+  <title>コマンドリファレンス（installモード） &mdash; iinfer 2024/03/16 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -16,7 +16,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=57a6fbe1"></script>
+        <script src="../_static/documentation_options.js?v=3857ef35"></script>
         <script src="../_static/doctools.js?v=888ff710"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -54,9 +54,9 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">インストール</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#onnx-iinfer-m-install-c-onnx">インストール(onnx) : <cite>iinfer -m install -c onnx</cite></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#mmdet-iinfer-m-install-c-mmdet">インストール(mmdet) : <cite>iinfer -m install -c mmdet</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mmseg-iinfer-m-install-c-mmseg">インストール(mmseg) : <cite>iinfer -m install -c mmseg</cite></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#mmcls-iinfer-m-install-c-mmcls">インストール(mmcls) : <cite>iinfer -m install -c mmcls</cite></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#mmpretrain-iinfer-m-install-c-mmpretrain">インストール(mmpretrain) : <cite>iinfer -m install -c mmpretrain</cite></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#mmrotate-iinfer-m-install-c-mmrotate">インストール(mmrotate) : <cite>iinfer -m install -c mmrotate</cite></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#redis-iinfer-m-install-c-redis-option">インストール(redis) : <cite>iinfer -m install -c redis &lt;Option&gt;</cite></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#server-iinfer-m-install-c-server-option">インストール(server) : <cite>iinfer -m install -c server &lt;Option&gt;</cite></a></li>
 </ul>
@@ -70,6 +70,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="models.html">動作確認済みモデル</a></li>
 <li class="toctree-l1"><a class="reference internal" href="detection.html">物体検知</a></li>
+<li class="toctree-l1"><a class="reference internal" href="segmentation.html">領域検知</a></li>
 <li class="toctree-l1"><a class="reference internal" href="face.html">顔認識</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pipeline.html">パイプライン</a></li>
 <li class="toctree-l1"><a class="reference internal" href="customize.html">カスタマイズ</a></li>
@@ -137,6 +138,29 @@
 </tbody>
 </table>
 </section>
+<section id="mmseg-iinfer-m-install-c-mmseg">
+<h2>インストール(mmseg) : <cite>iinfer -m install -c mmseg</cite><a class="headerlink" href="#mmseg-iinfer-m-install-c-mmseg" title="Link to this heading"></a></h2>
+<p><cite>mmsegmentation</cite> をインストールします。オプションは以下の通りです。</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 10.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>--install_use_gpu</p></td>
+<td></td>
+<td><p>GPUを使用するモジュール構成でインストールします。</p></td>
+</tr>
+</tbody>
+</table>
+</section>
 <section id="mmcls-iinfer-m-install-c-mmcls">
 <h2>インストール(mmcls) : <cite>iinfer -m install -c mmcls</cite><a class="headerlink" href="#mmcls-iinfer-m-install-c-mmcls" title="Link to this heading"></a></h2>
 <p><cite>mmcls</cite> をインストールします。オプションは以下の通りです。</p>
@@ -163,29 +187,6 @@
 <section id="mmpretrain-iinfer-m-install-c-mmpretrain">
 <h2>インストール(mmpretrain) : <cite>iinfer -m install -c mmpretrain</cite><a class="headerlink" href="#mmpretrain-iinfer-m-install-c-mmpretrain" title="Link to this heading"></a></h2>
 <p><cite>mmpretrain</cite> をインストールします。オプションは以下の通りです。</p>
-<table class="docutils align-default">
-<colgroup>
-<col style="width: 20.0%" />
-<col style="width: 10.0%" />
-<col style="width: 70.0%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>Option</p></th>
-<th class="head"><p>Required</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>--install_use_gpu</p></td>
-<td></td>
-<td><p>GPUを使用するモジュール構成でインストールします。（検証中）</p></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="mmrotate-iinfer-m-install-c-mmrotate">
-<h2>インストール(mmrotate) : <cite>iinfer -m install -c mmrotate</cite><a class="headerlink" href="#mmrotate-iinfer-m-install-c-mmrotate" title="Link to this heading"></a></h2>
-<p><cite>mmrotate</cite> をインストールします。オプションは以下の通りです。</p>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20.0%" />
@@ -271,17 +272,17 @@
 <td></td>
 <td><p>指定すると <cite>mmdetection</cite> をインストールします。※1</p></td>
 </tr>
-<tr class="row-even"><td><p>--install_mmcls</p></td>
+<tr class="row-even"><td><p>--install_mmseg</p></td>
+<td></td>
+<td><p>指定すると <cite>mmsegmentation</cite> をインストールします。※1</p></td>
+</tr>
+<tr class="row-odd"><td><p>--install_mmcls</p></td>
 <td></td>
 <td><p>指定すると <cite>mmclassification</cite> をインストールします。※1,2</p></td>
 </tr>
-<tr class="row-odd"><td><p>--install_mmpretrain</p></td>
+<tr class="row-even"><td><p>--install_mmpretrain</p></td>
 <td></td>
 <td><p>指定すると <cite>mmpretrain</cite> をインストールします。※1</p></td>
-</tr>
-<tr class="row-even"><td><p>--install_mmrotate</p></td>
-<td></td>
-<td><p>指定すると <cite>mmrotate</cite> をインストールします。※1</p></td>
 </tr>
 <tr class="row-odd"><td><p>--install_insightface</p></td>
 <td></td>
@@ -298,7 +299,7 @@
 </tbody>
 </table>
 <ul class="simple">
-<li><p>※1 : これらのオプションを何れも指定しない場合、 <cite>--install_mmcls</cite> <cite>--install_mmrotate</cite> <cite>--install_insightface</cite> 以外すべてをインストールします。</p></li>
+<li><p>※1 : これらのオプションを何れも指定しない場合、 <cite>--install_mmcls</cite> <cite>--install_insightface</cite> 以外すべてをインストールします。</p></li>
 <li><p>※2 : <cite>mmclassification</cite> と <cite>mmpretrain</cite> はバージョンによって共存できない場合があります。</p></li>
 </ul>
 </section>

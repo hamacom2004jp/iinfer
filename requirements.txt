@@ -16,4 +16,5 @@ sphinx
 sphinx-rtd-theme
 sphinx_fontawesome
 sphinx-intl
+sphinx-sitemap
 wheel

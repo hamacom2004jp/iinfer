@@ -20,11 +20,12 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.viewcode',
     'sphinx.ext.todo',
+    'sphinx_sitemap'
 ]
 
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
-
+html_baseurl = 'https://hamacom2004jp.github.io/iinfer/'
 language = 'en'
 
 # -- Options for HTML output -------------------------------------------------

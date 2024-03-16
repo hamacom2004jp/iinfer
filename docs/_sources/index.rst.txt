@@ -16,6 +16,7 @@ iinfer (Image Inference Application)
    コマンドリファレンス <docs/command.rst>
    動作確認済みモデル <docs/models.rst>
    物体検知 <docs/detection.rst>
+   領域検知 <docs/segmentation.rst>
    顔認識 <docs/face.rst>
    パイプライン <docs/pipeline.rst>
    カスタマイズ <docs/customize.rst>

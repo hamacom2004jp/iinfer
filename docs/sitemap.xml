@@ -1,14 +1,261 @@
-<urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
-	<url>
-		<loc>https://hamacom2004jp.github.io/iinfer/google41c309da13217fbe.html</loc>
-		<lastmod>2024-03-10T21:49:00+09:00</lastmod>
-	</url>
-	<url>
-		<loc>https://hamacom2004jp.github.io/iinfer/</loc>
-		<lastmod>2024-03-10T21:49:00+09:00</lastmod>
-	</url>
-	<url>
-		<loc>https://hamacom2004jp.github.io/iinfer/index.html</loc>
-		<lastmod>2024-03-10T21:49:00+09:00</lastmod>
-	</url>
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset
+      xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+<!-- created with Free Online Sitemap Generator www.xml-sitemaps.com -->
+
+<url>
+  <loc>https://hamacom2004jp.github.io/iinfer/google41c309da13217fbe.html</loc>
+  <lastmod>2024-03-10T21:49:00+09:00</lastmod>
+</url>
+
+<url>
+  <loc>https://hamacom2004jp.github.io/iinfer/</loc>
+  <lastmod>2024-03-11T14:48:03+00:00</lastmod>
+  <priority>1.00</priority>
+</url>
+<url>
+  <loc>https://hamacom2004jp.github.io/iinfer/docs/overview.html</loc>
+  <lastmod>2024-03-11T14:48:03+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://hamacom2004jp.github.io/iinfer/docs/install.html</loc>
+  <lastmod>2024-03-11T14:48:03+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://hamacom2004jp.github.io/iinfer/docs/gui.html</loc>
+  <lastmod>2024-03-11T14:48:03+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://hamacom2004jp.github.io/iinfer/docs/command.html</loc>
+  <lastmod>2024-03-11T14:48:03+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://hamacom2004jp.github.io/iinfer/docs/models.html</loc>
+  <lastmod>2024-03-11T14:48:03+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://hamacom2004jp.github.io/iinfer/docs/detection.html</loc>
+  <lastmod>2024-03-11T14:48:03+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://hamacom2004jp.github.io/iinfer/docs/face.html</loc>
+  <lastmod>2024-03-11T14:48:03+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://hamacom2004jp.github.io/iinfer/docs/pipeline.html</loc>
+  <lastmod>2024-03-11T14:48:03+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://hamacom2004jp.github.io/iinfer/docs/customize.html</loc>
+  <lastmod>2024-03-11T14:48:03+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://hamacom2004jp.github.io/iinfer/docs/developer.html</loc>
+  <lastmod>2024-03-11T14:48:03+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://hamacom2004jp.github.io/iinfer/docs/errors.html</loc>
+  <lastmod>2024-03-11T14:48:03+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://hamacom2004jp.github.io/iinfer/docs/license.html</loc>
+  <lastmod>2024-03-11T14:48:03+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://hamacom2004jp.github.io/iinfer/docs/cmd_common.html</loc>
+  <lastmod>2024-03-11T14:48:03+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://hamacom2004jp.github.io/iinfer/docs/cmd_install.html</loc>
+  <lastmod>2024-03-11T14:48:03+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://hamacom2004jp.github.io/iinfer/docs/cmd_redis.html</loc>
+  <lastmod>2024-03-11T14:48:03+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://hamacom2004jp.github.io/iinfer/docs/cmd_server.html</loc>
+  <lastmod>2024-03-11T14:48:03+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://hamacom2004jp.github.io/iinfer/docs/cmd_client.html</loc>
+  <lastmod>2024-03-11T14:48:03+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://hamacom2004jp.github.io/iinfer/docs/cmd_gui.html</loc>
+  <lastmod>2024-03-11T14:48:03+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://hamacom2004jp.github.io/iinfer/docs/cmd_postprocess.html</loc>
+  <lastmod>2024-03-11T14:48:03+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://hamacom2004jp.github.io/iinfer/genindex.html</loc>
+  <lastmod>2024-03-11T14:48:03+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://hamacom2004jp.github.io/iinfer/py-modindex.html</loc>
+  <lastmod>2024-03-11T14:48:03+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://hamacom2004jp.github.io/iinfer/index.html</loc>
+  <lastmod>2024-03-11T14:48:03+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://hamacom2004jp.github.io/iinfer/resources/iinfer.app.html</loc>
+  <lastmod>2024-03-11T14:48:03+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://hamacom2004jp.github.io/iinfer/resources/iinfer.app.predicts.html</loc>
+  <lastmod>2024-03-11T14:48:03+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://hamacom2004jp.github.io/iinfer/resources/iinfer.html</loc>
+  <lastmod>2024-03-11T14:48:03+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://hamacom2004jp.github.io/iinfer/resources/iinfer.docker.html</loc>
+  <lastmod>2024-03-11T14:48:03+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://hamacom2004jp.github.io/iinfer/_modules/iinfer/app/app.html</loc>
+  <lastmod>2024-03-11T14:48:03+00:00</lastmod>
+  <priority>0.51</priority>
+</url>
+<url>
+  <loc>https://hamacom2004jp.github.io/iinfer/_modules/iinfer/app/client.html</loc>
+  <lastmod>2024-03-11T14:48:03+00:00</lastmod>
+  <priority>0.51</priority>
+</url>
+<url>
+  <loc>https://hamacom2004jp.github.io/iinfer/_modules/iinfer/app/common.html</loc>
+  <lastmod>2024-03-11T14:48:03+00:00</lastmod>
+  <priority>0.51</priority>
+</url>
+<url>
+  <loc>https://hamacom2004jp.github.io/iinfer/_modules/iinfer/app/gui.html</loc>
+  <lastmod>2024-03-11T14:48:03+00:00</lastmod>
+  <priority>0.51</priority>
+</url>
+<url>
+  <loc>https://hamacom2004jp.github.io/iinfer/_modules/iinfer/app/injection.html</loc>
+  <lastmod>2024-03-11T14:48:03+00:00</lastmod>
+  <priority>0.51</priority>
+</url>
+<url>
+  <loc>https://hamacom2004jp.github.io/iinfer/_modules/iinfer/app/install.html</loc>
+  <lastmod>2024-03-11T14:48:03+00:00</lastmod>
+  <priority>0.51</priority>
+</url>
+<url>
+  <loc>https://hamacom2004jp.github.io/iinfer/_modules/iinfer/app/postprocess.html</loc>
+  <lastmod>2024-03-11T14:48:03+00:00</lastmod>
+  <priority>0.51</priority>
+</url>
+<url>
+  <loc>https://hamacom2004jp.github.io/iinfer/_modules/iinfer/app/predict.html</loc>
+  <lastmod>2024-03-11T14:48:03+00:00</lastmod>
+  <priority>0.51</priority>
+</url>
+<url>
+  <loc>https://hamacom2004jp.github.io/iinfer/_modules/iinfer/app/redis.html</loc>
+  <lastmod>2024-03-11T14:48:03+00:00</lastmod>
+  <priority>0.51</priority>
+</url>
+<url>
+  <loc>https://hamacom2004jp.github.io/iinfer/_modules/iinfer/app/server.html</loc>
+  <lastmod>2024-03-11T14:48:03+00:00</lastmod>
+  <priority>0.51</priority>
+</url>
+<url>
+  <loc>https://hamacom2004jp.github.io/iinfer/_modules/iinfer/app/predicts/insightface_det.html</loc>
+  <lastmod>2024-03-11T14:48:03+00:00</lastmod>
+  <priority>0.51</priority>
+</url>
+<url>
+  <loc>https://hamacom2004jp.github.io/iinfer/_modules/iinfer/app/predicts/mmdet_det_YoloX.html</loc>
+  <lastmod>2024-03-11T14:48:03+00:00</lastmod>
+  <priority>0.51</priority>
+</url>
+<url>
+  <loc>https://hamacom2004jp.github.io/iinfer/_modules/iinfer/app/predicts/mmdet_det_YoloX_Lite.html</loc>
+  <lastmod>2024-03-11T14:48:03+00:00</lastmod>
+  <priority>0.51</priority>
+</url>
+<url>
+  <loc>https://hamacom2004jp.github.io/iinfer/_modules/iinfer/app/predicts/mmpretrain_cls_swin.html</loc>
+  <lastmod>2024-03-11T14:48:03+00:00</lastmod>
+  <priority>0.51</priority>
+</url>
+<url>
+  <loc>https://hamacom2004jp.github.io/iinfer/_modules/iinfer/app/predicts/mmpretrain_cls_swin_Lite.html</loc>
+  <lastmod>2024-03-11T14:48:03+00:00</lastmod>
+  <priority>0.51</priority>
+</url>
+<url>
+  <loc>https://hamacom2004jp.github.io/iinfer/_modules/iinfer/app/predicts/mmrotate_det_ReDet.html</loc>
+  <lastmod>2024-03-11T14:48:03+00:00</lastmod>
+  <priority>0.51</priority>
+</url>
+<url>
+  <loc>https://hamacom2004jp.github.io/iinfer/_modules/iinfer/app/predicts/onnx_cls_EfficientNet_Lite4.html</loc>
+  <lastmod>2024-03-11T14:48:03+00:00</lastmod>
+  <priority>0.51</priority>
+</url>
+<url>
+  <loc>https://hamacom2004jp.github.io/iinfer/_modules/iinfer/app/predicts/onnx_det_TinyYoloV3.html</loc>
+  <lastmod>2024-03-11T14:48:03+00:00</lastmod>
+  <priority>0.51</priority>
+</url>
+<url>
+  <loc>https://hamacom2004jp.github.io/iinfer/_modules/iinfer/app/predicts/onnx_det_YoloV3.html</loc>
+  <lastmod>2024-03-11T14:48:03+00:00</lastmod>
+  <priority>0.51</priority>
+</url>
+<url>
+  <loc>https://hamacom2004jp.github.io/iinfer/_modules/iinfer/app/predicts/onnx_det_YoloX.html</loc>
+  <lastmod>2024-03-11T14:48:03+00:00</lastmod>
+  <priority>0.51</priority>
+</url>
+<url>
+  <loc>https://hamacom2004jp.github.io/iinfer/_modules/iinfer/app/predicts/onnx_det_YoloX_Lite.html</loc>
+  <lastmod>2024-03-11T14:48:03+00:00</lastmod>
+  <priority>0.51</priority>
+</url>
+<url>
+  <loc>https://hamacom2004jp.github.io/iinfer/_modules/index.html</loc>
+  <lastmod>2024-03-11T14:48:03+00:00</lastmod>
+  <priority>0.41</priority>
+</url>
+
+
 </urlset>
