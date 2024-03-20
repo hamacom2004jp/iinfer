@@ -24,6 +24,17 @@ class DetFaceStore(det_clip.DetClip):
     def post_json(self, json_session, outputs:Dict[str, Any], output_image:Image.Image):
         """
         outputsに対して後処理を行う関数です。
+        なおoutputsは、以下のような構造を持つDict[str, Any]です。
+        {
+            'success': {
+                'output_boxes': List[List[int]],
+                'output_embeddings': List[np.ndarray],
+                'output_embedding_dtypes': List[str],
+                'output_embedding_shapes': List[Tuple[int]],
+                'output_scores': List[float],
+                'output_image_name': str
+            }
+        }
 
         Args:
             json_session (任意): JSONセッション
@@ -55,11 +66,6 @@ class DetFaceStore(det_clip.DetClip):
             raise Exception('Invalid outputs. outputs[\'success\'][\'output_scores\'] must be set.')
         output_scores = data['output_scores']
         
-
-        #if output_image is None or "output_image_name" not in outputs:
-        #    raise Exception('Invalid outputs. outputs[\'success\'][\'output_image\'] and outputs[\'success\'][\'output_image_shape\'] and outputs[\'success\'][\'output_image_name\'] must be set.')
-        #output_image_name = Path(outputs["output_image_name"]).stem
-
         # 切り出し
         result = []
         for i, box in enumerate(output_boxes):
@@ -82,7 +88,7 @@ class DetFaceStore(det_clip.DetClip):
                 img_byte = convert.img2byte(cropped_image, format=self.image_type)
                 img_b64 = convert.bytes2b64str(img_byte)
             result.append(dict(face_label='', face_embedding=output_embeddings[i], face_embedding_dtype=output_embedding_dtypes[i], face_embedding_shape=output_embedding_shapes[i],
-                               face_image_type=self.image_type, face_image_shape=face_image_npy.shape, face_image=img_b64))
+                               face_score=output_scores[i], face_box=[x1, y1, x2, y2], face_image_type=self.image_type, face_image_shape=face_image_npy.shape, face_image=img_b64))
             #result.append(dict(face_idx=output_ids[i], face_label='', face_name=face_name, face_scores=output_scores, face_image_type=self.image_type, face_image_shape=face_image_npy.shape, face_embedding=output_embeddings[i], face_image=img_b64))
         return result
     

@@ -301,7 +301,7 @@ def test_12_02_postprocess_csv(capfd):
 @pytest.mark.run(order=12)
 def test_12_03_postprocess_csv(capfd):
     cmd = f"-m postprocess -c csv -i onnx_cls_EfficientNet_Lite4.json " \
-          f"--out_headers output_scores --out_headers output_labels".split(' ')
+          f"--out_headers output_scores".split(' ')
     _, result = app._main(args_list=cmd)
     out, err = capfd.readouterr()
     print(out)
@@ -310,7 +310,7 @@ def test_12_03_postprocess_csv(capfd):
 @pytest.mark.run(order=12)
 def test_12_04_postprocess_csv(capfd):
     cmd = f"-m postprocess -c csv -i mmpretrain_cls_swin_Lite.json " \
-          f"--out_headers output_scores --out_headers output_labels".split(' ')
+          f"--out_headers output_scores".split(' ')
     _, result = app._main(args_list=cmd)
     out, err = capfd.readouterr()
     print(out)

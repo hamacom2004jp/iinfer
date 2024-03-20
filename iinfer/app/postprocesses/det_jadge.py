@@ -29,11 +29,11 @@ class DetJadge(postprocess.Postprocess):
             output_preview (bool): プレビューを出力する
         """
         super().__init__(logger)
-        if ok_score_th is not None and ((ok_classes is not None and len(ok_classes)>0) or (ok_labels is not None and len(ok_labels)>0)):
+        if ok_score_th is not None and ((ok_classes is None or len(ok_classes)<=0) and (ok_labels is None or len(ok_labels)<=0)):
             raise Exception('If ok_score_th is specified, ok_classes or ok_labels must be set.')
-        if ng_score_th is not None and ((ng_classes is not None and len(ng_classes)>0) or (ng_labels is not None and len(ng_labels)>0)):
+        if ng_score_th is not None and ((ng_classes is None or len(ng_classes)<=0) and (ng_labels is None or len(ng_labels)<=0)):
             raise Exception('If ng_score_th is specified, ng_classes or ng_labels must be set.')
-        if ext_score_th is not None and ((ext_classes is not None and len(ext_classes)>0) or (ext_labels is not None and len(ext_labels)>0)):
+        if ext_score_th is not None and ((ext_classes is None or len(ext_classes)<=0) and (ext_labels is None or len(ext_labels)<=0)):
             raise Exception('If ext_score_th is specified, ext_classes or ext_labels must be set.')
 
         self.ok_score_th = ok_score_th
@@ -69,6 +69,17 @@ class DetJadge(postprocess.Postprocess):
     def post_json(self, json_session, outputs:Dict[str, Any], output_image:Image.Image):
         """
         outputsに対して後処理を行う関数です。
+        outputsは、以下のような構造を持つDict[str, Any]です。
+        {
+            'success': {
+                'output_ids': List[int],
+                'output_scores': List[float],
+                'output_classes': List[int],
+                'output_labels': List[str],
+                'output_boxes': List[List[int]],
+                'output_tracks': List[int]
+            }
+        }
 
         Args:
             json_session (任意): JSONセッション

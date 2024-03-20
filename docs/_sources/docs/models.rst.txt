@@ -7,6 +7,16 @@
 - 下記のモデルはiinferで推論実行できることを確認しています。
 - なお、以下に示すサイトの事前学習モデルは、配布元のライセンスに従って使用してください。
 
+Segmentation
+==================
+
+.. csv-table::
+
+    :header: "base","frameWork","input","model","predict_type","memo"
+    "`PSPNet_r18(mmseg) <https://github.com/open-mmlab/mmsegmentation/blob/main/configs/pspnet/pspnet_r18-d8_4xb2-80k_cityscapes-512x1024.py>`_ ","mmsegmentation","512x1024","pspnet_r18-d8","mmseg_seg_PSPNet",""
+    "`PSPNet_r50(mmseg) <https://github.com/open-mmlab/mmsegmentation/blob/main/configs/pspnet/pspnet_r50-d8_4xb2-80k_cityscapes-512x1024.py>`_ ","mmsegmentation","512x1024","pspnet_r50-d8","mmseg_seg_PSPNet",""
+    "`PSPNet_r101(mmseg) <https://github.com/open-mmlab/mmsegmentation/blob/main/configs/pspnet/pspnet_r101-d8_4xb2-80k_cityscapes-512x1024.py>`_ ","mmsegmentation","512x1024","pspnet_r101-d8","mmseg_seg_PSPNet",""
+
 Object Detection
 ==================
 

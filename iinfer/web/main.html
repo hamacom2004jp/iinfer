@@ -955,6 +955,9 @@ $(function(){
             }
             $.each(data, function(key, val){
                 if(table_head)table_head.append($('<th scope="col">' + key + '</th>'));
+                if ((typeof val === 'string' || val instanceof String) && val.length > 150) {
+                    val = val.substring(0, 150) + '...';
+                }
                 tr.append($('<td>' + val + '</td>'));
             });
             table_body.append(tr);

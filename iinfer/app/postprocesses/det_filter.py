@@ -51,6 +51,17 @@ class DetFilter(postprocess.Postprocess):
     def post_json(self, json_session, outputs:Dict[str, Any], output_image:Image.Image):
         """
         outputsに対して後処理を行う関数です。
+        outputsは、以下のような構造を持つDict[str, Any]です。
+        {
+            'success': {
+                'output_ids': List[int],
+                'output_scores': List[float],
+                'output_classes': List[int],
+                'output_labels': List[str],
+                'output_boxes': List[List[int]],
+                'output_tracks': List[int]
+            }
+        }
 
         Args:
             json_session (任意): JSONセッション

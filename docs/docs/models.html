@@ -53,6 +53,7 @@
 <li class="toctree-l1"><a class="reference internal" href="gui.html">GUIモード</a></li>
 <li class="toctree-l1"><a class="reference internal" href="command.html">コマンドリファレンス</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">動作確認済みモデル</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#segmentation">Segmentation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#object-detection">Object Detection</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#image-classification">Image Classification</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#face-detection-and-recognition">Face Detection and Recognition</a></li>
@@ -98,6 +99,46 @@
 <li><p>下記のモデルはiinferで推論実行できることを確認しています。</p></li>
 <li><p>なお、以下に示すサイトの事前学習モデルは、配布元のライセンスに従って使用してください。</p></li>
 </ul>
+<section id="segmentation">
+<h2>Segmentation<a class="headerlink" href="#segmentation" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><dl class="field-list simple">
+<dt class="field-odd">header<span class="colon">:</span></dt>
+<dd class="field-odd"><p>&quot;base&quot;</p>
+</dd>
+</dl>
+</td>
+<td><p>frameWork</p></td>
+<td><p>input</p></td>
+<td><p>model</p></td>
+<td><p>predict_type</p></td>
+<td><p>memo</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference external" href="https://github.com/open-mmlab/mmsegmentation/blob/main/configs/pspnet/pspnet_r18-d8_4xb2-80k_cityscapes-512x1024.py">PSPNet_r18(mmseg)</a></p></td>
+<td><p>mmsegmentation</p></td>
+<td><p>512x1024</p></td>
+<td><p>pspnet_r18-d8</p></td>
+<td><p>mmseg_seg_PSPNet</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="https://github.com/open-mmlab/mmsegmentation/blob/main/configs/pspnet/pspnet_r50-d8_4xb2-80k_cityscapes-512x1024.py">PSPNet_r50(mmseg)</a></p></td>
+<td><p>mmsegmentation</p></td>
+<td><p>512x1024</p></td>
+<td><p>pspnet_r50-d8</p></td>
+<td><p>mmseg_seg_PSPNet</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference external" href="https://github.com/open-mmlab/mmsegmentation/blob/main/configs/pspnet/pspnet_r101-d8_4xb2-80k_cityscapes-512x1024.py">PSPNet_r101(mmseg)</a></p></td>
+<td><p>mmsegmentation</p></td>
+<td><p>512x1024</p></td>
+<td><p>pspnet_r101-d8</p></td>
+<td><p>mmseg_seg_PSPNet</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</section>
 <section id="object-detection">
 <h2>Object Detection<a class="headerlink" href="#object-detection" title="Link to this heading"></a></h2>
 <table class="docutils align-default">

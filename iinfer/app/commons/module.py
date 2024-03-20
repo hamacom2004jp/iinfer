@@ -145,6 +145,15 @@ def load_after_injections(after_injection_py:List[Path], config:Dict[str,Any], l
     return injections
 
 def get_module_list(package_name) -> List[str]:
+    """
+    パッケージ内のモジュール名のリストを取得します。
+
+    Args:
+        package_name (str): パッケージ名
+
+    Returns:
+        List[str]: モジュール名のリスト
+    """
     package = __import__(package_name, fromlist=[''])
     return [name for _, name, _ in pkgutil.iter_modules(package.__path__)]
 

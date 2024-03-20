@@ -20,7 +20,9 @@
         <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../search.html" /> 
+    <link rel="search" title="Search" href="../../../search.html" />
+
+
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -555,9 +557,10 @@
         <span class="k">for</span> <span class="nb">dir</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="o">.</span><span class="n">iterdir</span><span class="p">():</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">dir</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
                 <span class="k">continue</span>
-            <span class="k">if</span> <span class="nb">dir</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;mmpretrain&#39;</span> <span class="ow">or</span> <span class="nb">dir</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;mmdetection&#39;</span> <span class="ow">or</span> <span class="nb">dir</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;mmrotate&#39;</span><span class="p">:</span>
-                <span class="k">continue</span>
             <span class="n">conf_path</span> <span class="o">=</span> <span class="nb">dir</span> <span class="o">/</span> <span class="s2">&quot;conf.json&quot;</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">conf_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Conf path </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">conf_path</span><span class="p">)</span><span class="si">}</span><span class="s2"> does not exist&quot;</span><span class="p">)</span>
+                <span class="k">continue</span>
             <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">conf_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">cf</span><span class="p">:</span>
                 <span class="n">conf</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">cf</span><span class="p">)</span>
                 <span class="n">model_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">conf</span><span class="p">[</span><span class="s2">&quot;model_file&quot;</span><span class="p">])</span>

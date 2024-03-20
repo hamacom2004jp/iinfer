@@ -150,7 +150,7 @@ class Client(object):
             return {"error": f"predict_type is empty."}
         if predict_type not in common.BASE_MODELS:
             self.logger.error(f"Unknown predict_type. {predict_type}")
-            return {"error": f"predict_type is empty."}
+            return {"error": f"Unknown predict_type. {predict_type}"}
         if model_img_width is None or model_img_width <= 0:
             model_img_width = common.BASE_MODELS[predict_type]['image_width']
         if model_img_height is None or model_img_height <= 0:

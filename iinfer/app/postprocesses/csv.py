@@ -49,16 +49,18 @@ class Csv(postprocess.Postprocess):
         Returns:
             Dict[str, Any]: 後処理結果
         """
-        def _to_csv(data, buffer):
+        def _to_csv(data, buffer, i):
             if type(data) == dict:
-                notfound = [] if self.out_headers is None else [h for h in self.out_headers if h not in data.keys()]
+                data_keys = data.keys()
+                notfound = [] if self.out_headers is None else [h for h in self.out_headers if h not in data_keys]
                 if len(notfound) > 0:
                     raise Exception(f"notfound headers: {notfound}")
-                headers = self.out_headers if self.out_headers is not None else data.keys()
-                if not self.noheader:
-                    csv.DictWriter(buffer, fieldnames=headers).writeheader()
-                else:
-                    csv.DictWriter(buffer).writerow(data)
+                headers = self.out_headers if self.out_headers is not None else list(data_keys)
+                row = {k:v for k, v in data.items() if k in headers}
+                w = csv.DictWriter(buffer, fieldnames=headers)
+                if not self.noheader and i<=0:
+                    w.writeheader()
+                w.writerow(row)
             elif type(data) == list:
                 csv.writer(buffer).writerow(data)
             else:
@@ -68,35 +70,33 @@ class Csv(postprocess.Postprocess):
         result = ''
         if 'success' in outputs and type(outputs['success']) == list:
             buffer = io.StringIO()
-            for data in outputs['success']:
-                _to_csv(data, buffer)
+            for i, data in enumerate(outputs['success']):
+                _to_csv(data, buffer, i)
             result = buffer.getvalue().strip()
             buffer.close()
 
         elif 'success' in outputs and type(outputs['success']) == dict:
             buffer = io.StringIO()
-            writer = csv.writer(buffer)
-            notfound = [] if self.out_headers is None else [h for h in self.out_headers if h not in outputs['success'].keys()]
-            if len(notfound) > 0:
-                raise Exception(f"notfound headers: {notfound}")
-            headers = self.out_headers if self.out_headers is not None else outputs['success'].keys()
-            if not self.noheader:
-                writer.writerow(headers)
-            rows = [v for k, v in outputs['success'].items() if k in headers]
-            writer.writerow(rows)
+            _to_csv(outputs['success'], buffer, 0)
             result = buffer.getvalue().strip()
             buffer.close()
 
         elif type(outputs) == list:
             buffer = io.StringIO()
-            for data in outputs:
-                _to_csv(data, buffer)
+            for i, data in enumerate(outputs):
+                _to_csv(data, buffer, i)
+            result = buffer.getvalue().strip()
+            buffer.close()
+
+        elif type(outputs) == dict:
+            buffer = io.StringIO()
+            _to_csv(outputs, buffer, 0)
             result = buffer.getvalue().strip()
             buffer.close()
 
         else:
             buffer = io.StringIO()
-            csv.writer(buffer).writerow(outputs)
+            _to_csv(outputs, buffer, 0)
             result = buffer.getvalue().strip()
             buffer.close()
 

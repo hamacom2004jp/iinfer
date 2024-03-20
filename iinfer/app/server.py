@@ -451,9 +451,10 @@ class Server(object):
         for dir in self.data_dir.iterdir():
             if not dir.is_dir():
                 continue
-            if dir.name == 'mmpretrain' or dir.name == 'mmdetection' or dir.name == 'mmrotate':
-                continue
             conf_path = dir / "conf.json"
+            if not conf_path.exists():
+                self.logger.warn(f"Conf path {str(conf_path)} does not exist")
+                continue
             with open(conf_path, "r") as cf:
                 conf = json.load(cf)
                 model_file = Path(conf["model_file"])
