@@ -227,6 +227,11 @@ class Install(object):
             self.logger.error(f"Failed to install ftfy.")
             return {"error": f"Failed to install ftfy."}
 
+        ret, _ = common.cmd('pip install regex', logger=self.logger)
+        if ret != 0:
+            self.logger.error(f"Failed to install regex.")
+            return {"error": f"Failed to install regex."}
+
         if srcdir.exists():
             return {"success": f"Please remove '{srcdir / 'mmsegmentation'}' manually."}
         return {"success": f"Success to install mmsegmentation."}
