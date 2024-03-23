@@ -724,11 +724,13 @@ class Server(object):
                 return output, output_image
 
             if output_image is not None:
-                output_image_npy = convert.img2npy(output_image)
-                output_image_b64 = convert.npy2b64str(output_image_npy)
-                output = dict(success=outputs, output_image=output_image_b64, output_image_shape=output_image_npy.shape, output_image_name=output_image_name)
+                output = dict(success=outputs, output_image_name=output_image_name)
                 # 後処理を実行
                 output, output_image = _after_injection(reskey, name, output, output_image, session)
+                output_image_npy = convert.img2npy(output_image)
+                output_image_b64 = convert.npy2b64str(output_image_npy)
+                output['output_image'] = output_image_b64
+                output['output_image_shape'] = output_image_npy.shape
                 self.responce(reskey, output)
                 return self.RESP_SCCESS
             output = dict(success=outputs)

@@ -3,9 +3,7 @@ from PIL import Image
 from iinfer.app import common, predict
 from iinfer.app.commons import convert
 from typing import List, Tuple
-import cv2
 import logging
-import numpy as np
 
 
 SITE = 'https://github.com/open-mmlab/mmsegmentation/tree/main/configs/pspnet'
@@ -73,17 +71,20 @@ class MMSegPSPNet(predict.TorchPredict):
             model = model.module
         
         segment = result.pred_sem_seg.numpy()
+        logits = result.seg_logits.numpy()
         output_labels = model.dataset_meta['classes']
         output_classes = [i for i in range(len(output_labels))]
         output_sem_seg = convert.npy2b64str(segment.data)
-        output_seg_logits = convert.npy2b64str(result.seg_logits.numpy().data)
-        output_bbox, contours = self.gen_bboxes(segment.data[0,], output_classes)
+        output_sem_seg_shape = segment.data.shape
+        output_sem_seg_dtype = str(segment.data.dtype)
+        output_seg_logits = convert.npy2b64str(logits.data)
+        output_seg_logits_shape = logits.data.shape
+        output_seg_logits_dtype = str(logits.data.dtype)
 
         if not nodraw:
             img = self.draw_mask(img_npy, result,
                                  labels if labels is not None else output_labels,
                                  colors if colors is not None else model.dataset_meta['palette'])
-            img = cv2.drawContours(img, [c.astype(np.int32) for c in contours], -1, (0,255,0), 1)
             output_image = convert.npy2img(img)
 
         else:
@@ -91,15 +92,16 @@ class MMSegPSPNet(predict.TorchPredict):
 
         return dict(output_classes=output_classes,
                     output_labels=output_labels,
-                    output_bbox=output_bbox,
                     output_sem_seg=output_sem_seg,
-                    output_seg_logits=output_seg_logits), output_image
-
-        return dict(output_ids=ids, output_scores=scores, output_classes=clses, output_labels=output_labels, output_boxes=boxes), output_image
+                    output_sem_seg_shape=output_sem_seg_shape,
+                    output_sem_seg_dtype=output_sem_seg_dtype,
+                    output_seg_logits=output_seg_logits,
+                    output_seg_logits_shape=output_seg_logits_shape,
+                    output_seg_logits_dtype=output_seg_logits_dtype), output_image
 
     def draw_mask(self, img_npy, result, classes, palette, alpha=0.5, with_labels=True):
         from mmseg.visualization import SegLocalVisualizer
-        visualizer = SegLocalVisualizer(vis_backends=[dict(type='LocalVisBackend')], alpha=alpha)
+        visualizer = SegLocalVisualizer(vis_backends=[dict(type='LocalVisBackend')], save_dir=None, alpha=alpha)
         visualizer.dataset_meta = dict(classes=classes, palette=palette)
         visualizer.add_datasample(
             name='input',
@@ -111,18 +113,3 @@ class MMSegPSPNet(predict.TorchPredict):
             with_labels=with_labels)
         img = visualizer.get_image()
         return img
-
-    def gen_bboxes(self, mask, classes):
-        ret = []
-        output_bbox = []
-        mask_npy = mask.astype(np.uint8)
-        for i in range(1, len(classes)):
-            m = np.where(mask_npy == i, 255, 0).astype(np.uint8)
-            contours, hierarchy = cv2.findContours(m, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-            if len(contours) < 1:
-                continue
-            rect = cv2.minAreaRect(contours[0])
-            box = cv2.boxPoints(rect)
-            output_bbox.append(box.astype(np.int32).tolist())
-            ret.append(box)
-        return output_bbox, ret

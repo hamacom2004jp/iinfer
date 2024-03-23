@@ -29,14 +29,14 @@
                             File
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="fileMenuLink">
-                            <li><a class="dropdown-item" href="#" onclick="$('.cmd_add').click();">New Command</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="$('.pipe_add').click();">New Pipeline</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="$(`.cmd_add`).click();">New Command</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="$(`.pipe_add`).click();">New Pipeline</a></li>
                             <li>
-                                <a class="dropdown-item" href="#" onclick="open_output_json_func('open_output_json_path')">Open output_json</a>
+                                <a class="dropdown-item" href="#" onclick="open_output_json_func(`open_output_json_path`)">Open output_json</a>
                                 <input type="hidden" id="open_output_json_path" value=""/>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="#" onclick="open_capture_func('open_capture_path')">Open capture</a>
+                                <a class="dropdown-item" href="#" onclick="open_capture_func(`open_capture_path`)">Open capture</a>
                                 <input type="hidden" id="open_capture_path" value=""/>
                             </li>
                         </ul>
@@ -47,7 +47,7 @@
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="viewMenuLink">
                             <li><a class="dropdown-item" href="#" onclick="change_dark_mode();">Change Dark Mode</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="$('#console_modal').modal('show');">Console log</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="$(`#console_modal`).modal(`show`);">Console log</a></li>
                         </ul>
                     </li>
                     
@@ -56,7 +56,7 @@
                             About
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="aboutMenuLink">
-                            <li><a class="dropdown-item" href="#" onclick="$('#versions_modal').modal('show');">Versions</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="$(`#versions_modal`).modal(`show`);">Versions</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -357,7 +357,7 @@
                     <textarea id="console_modal_log" class="form-control overflow-auto w-100" rows="10"></textarea>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-success" onclick="$('#console_modal_log').val('');">Clear</button>
+                    <button type="button" class="btn btn-success" onclick="$(`#console_modal_log`).val(``);">Clear</button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </form>
@@ -430,118 +430,118 @@
 <script type="text/javascript" src="assets/lightbox2/js/lightbox.min.js"></script>
 <script type="text/javascript">
 change_dark_mode = function(dark_mode){
-    html = $('html');
-    if(dark_mode) html.attr('data-bs-theme','dark');
-    else if(html.attr('data-bs-theme')=='dark') html.removeAttr('data-bs-theme');
-    else html.attr('data-bs-theme','dark');
+    html = $(`html`);
+    if(dark_mode) html.attr(`data-bs-theme`,`dark`);
+    else if(html.attr(`data-bs-theme`)==`dark`) html.removeAttr(`data-bs-theme`);
+    else html.attr(`data-bs-theme`,`dark`);
 }
 $(function(){
     // ダークモード対応
-    change_dark_mode(window.matchMedia('(prefers-color-scheme: dark)').matches);
+    change_dark_mode(window.matchMedia(`(prefers-color-scheme: dark)`).matches);
     // copyright情報取得
     copyright_func = async function(){
         copyright = await eel.copyright()();
-        $('.copyright').text(copyright);
+        $(`.copyright`).text(copyright);
     };
     copyright_func();
     // 保存済みコマンドファイル一覧の取得
     list_cmd_func = async function(){
-        $('#cmd_items').html('');
+        $(`#cmd_items`).html(``);
         py_list_cmd = await eel.list_cmd()();
         $.each(py_list_cmd, function(i, row){
-            elem = $($('#cmd_template').html());
-            elem.find('.cmd_title').text(row['title']);
-            elem.find('.cmd_mode').text(row['mode']);
-            elem.find('.cmd_cmd').text(row['cmd']);
-            $('#cmd_items').append(elem);
+            elem = $($(`#cmd_template`).html());
+            elem.find(`.cmd_title`).text(row[`title`]);
+            elem.find(`.cmd_mode`).text(row[`mode`]);
+            elem.find(`.cmd_cmd`).text(row[`cmd`]);
+            $(`#cmd_items`).append(elem);
         });
-        $('#cmd_items').append($($('#cmd_add').html()));
+        $(`#cmd_items`).append($($(`#cmd_add`).html()));
     }
     list_cmd_func().then(function(){
         // 配列をoptionタグに変換
         mkopt = function(arr) {
-            var opt = '';
+            var opt = ``;
             for (var i = 0; arr && i < arr.length; i++) {
-                opt += '<option value="' + arr[i] + '">' + arr[i] + '</option>';
+                opt += `<option value="${arr[i]}">${arr[i]}</option>`;
             }
             return opt;
         }
         // コマンドカードクリック時の処理（モーダルダイアログを開く）
         cmd_card_func = async function(){
             py_get_mode_opt = await eel.get_mode_opt()();
-            cmd_modal = $('#cmd_modal');
-            cmd_modal.find('[name="mode"]').html(mkopt(py_get_mode_opt));
+            cmd_modal = $(`#cmd_modal`);
+            cmd_modal.find(`[name="mode"]`).html(mkopt(py_get_mode_opt));
             // モード変更時の処理（モードに対するコマンド一覧を取得）
             mode_change = async function(){
-                mode = cmd_modal.find('[name="mode"]').val();
+                mode = cmd_modal.find(`[name="mode"]`).val();
                 py_get_cmd_opt = await eel.get_cmd_opt(mode)();
-                cmd_modal.find('[name="cmd"]').html(mkopt(py_get_cmd_opt));
+                cmd_modal.find(`[name="cmd"]`).html(mkopt(py_get_cmd_opt));
             }
-            cmd_modal.find('[name="mode"]').off('change');
-            cmd_modal.find('[name="mode"]').change(mode_change);
-            cmd_modal.find('.is-invalid, .is-valid').removeClass('is-invalid').removeClass('is-valid');
-            row_content = cmd_modal.find('.row_content');
-            row_content.html('');
+            cmd_modal.find(`[name="mode"]`).off(`change`);
+            cmd_modal.find(`[name="mode"]`).change(mode_change);
+            cmd_modal.find(`.is-invalid, .is-valid`).removeClass(`is-invalid`).removeClass(`is-valid`);
+            row_content = cmd_modal.find(`.row_content`);
+            row_content.html(``);
             // コマンド変更時の処理（コマンドに対するオプション一覧を取得）
             cmd_change = async function(){
-                mode = cmd_modal.find('[name="mode"]').val();
-                cmd = cmd_modal.find('[name="cmd"]').val();
+                mode = cmd_modal.find(`[name="mode"]`).val();
+                cmd = cmd_modal.find(`[name="cmd"]`).val();
                 py_get_opt_opt = await eel.get_opt_opt(mode, cmd)();
-                row_content.html('');
+                row_content.html(``);
                 // オプション一覧をフォームに追加
                 add_form_func = function(i, row, next_elem){
                     //dict(opt="host", type="str", default="localhost", required=True, multi=False, hide=True, choise=None),
-                    target_name = row['opt'];
-                    if(!row['choise']) {
-                        elem = $(cmd_modal.find('.row_content_template_str').html());
+                    target_name = row[`opt`];
+                    if(!row[`choise`]) {
+                        elem = $(cmd_modal.find(`.row_content_template_str`).html());
                         if (next_elem) next_elem.after(elem);
                         else row_content.append(elem);
-                        input_elem = elem.find('.row_content_template_input');
-                        input_elem.removeClass('row_content_template_input');
-                        input_elem.val(row['default']);
+                        input_elem = elem.find(`.row_content_template_input`);
+                        input_elem.removeClass(`row_content_template_input`);
+                        input_elem.val(row[`default`]);
                     }
                     else {
-                        elem = $(cmd_modal.find('.row_content_template_choice').html());
+                        elem = $(cmd_modal.find(`.row_content_template_choice`).html());
                         if (next_elem) next_elem.after(elem);
                         else row_content.append(elem);
-                        input_elem = elem.find('.row_content_template_select');
-                        input_elem.removeClass('row_content_template_select');
-                        input_elem.html(mkopt(row['choise']));
-                        input_elem.val(""+row['default']);
+                        input_elem = elem.find(`.row_content_template_select`);
+                        input_elem.removeClass(`row_content_template_select`);
+                        input_elem.html(mkopt(row[`choise`]));
+                        input_elem.val(`${row['default']}`);
                     }
                     index = 0;
-                    if (cmd_modal.find('[name="'+target_name+'"]').length > 0) {
+                    if (cmd_modal.find(`[name="${target_name}"]`).length > 0) {
                         index = 0;
-                        $.each(cmd_modal.find('[name="'+target_name+'"][param_data_index]'), function(i, val) {
-                            v = Number($(val).attr('param_data_index'));
+                        $.each(cmd_modal.find(`[name="${target_name}"][param_data_index]`), function(i, val) {
+                            v = Number($(val).attr(`param_data_index`));
                             if (index <= v) index = v + 1;
                         });
                     }
-                    input_elem.attr('name', target_name);
-                    input_elem.attr('id', target_name + index);
-                    input_elem.attr('param_data_index', index);
-                    input_elem.attr('required', row['required']);
-                    input_elem.attr('param_data_type', row['type']);
-                    input_elem.attr('param_data_multi', row['multi']);
+                    input_elem.attr(`name`, target_name);
+                    input_elem.attr(`id`, target_name + index);
+                    input_elem.attr(`param_data_index`, index);
+                    input_elem.attr(`required`, row[`required`]);
+                    input_elem.attr(`param_data_type`, row[`type`]);
+                    input_elem.attr(`param_data_multi`, row[`multi`]);
                     // ファイルタイプの場合はファイラーモーダルを開くボタンを追加
-                    if(row['type']=='file'){
-                        btn = $('<button class="btn btn-secondary" type="button">file</button>');
+                    if(row[`type`]==`file`){
+                        btn = $(`<button class="btn btn-secondary" type="button">file</button>`);
                         input_elem.parent().append(btn);
                         mk_func = function(tid, tn){
                             // tid, tnの値を残すためにクロージャーにする
                             return function(){
-                                current_path = $('[id="' + tid + '"]').val();
+                                current_path = $(`[id="${tid}"]`).val();
                                 filer_modal_func(tid, tn, current_path);
                             }
                         }
-                        btn.click(mk_func(input_elem.attr('id'), input_elem.attr('name')));
+                        btn.click(mk_func(input_elem.attr(`id`), input_elem.attr(`name`)));
                     }
                     // マルチの場合は追加ボタンを追加
-                    if(row['multi']){
-                        btn_a = $('<button class="btn btn-secondary add_buton" type="button"></button>');
-                        btn_a.append('<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">'
-                                    +'<path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>'
-                                    +'</svg>');
+                    if(row[`multi`]){
+                        btn_a = $(`<button class="btn btn-secondary add_buton" type="button"></button>`);
+                        btn_a.append(`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">`
+                                    +`<path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>`
+                                    +`</svg>`);
                         input_elem.parent().append(btn_a);
                         mk_func = function(row, next_elem){
                             // row, next_elemの値を残すためにクロージャーにする
@@ -549,101 +549,101 @@ $(function(){
                         }
                         btn_a.click(mk_func(row, input_elem.parent().parent()));
                         // 2個目以降は削除ボタンを追加
-                        if (cmd_modal.find('[name="'+target_name+'"]').length > 1) {
+                        if (cmd_modal.find(`[name="${target_name}"]`).length > 1) {
                             mk_func = function(del_elem, row){
                                 // del_elemの値を残すためにクロージャーにする
                                 return function(){del_elem.remove();}
                             }
-                            btn_t = $('<button class="btn btn-secondary" type="button"></button>');
-                            btn_t.append('<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">'
-                                    +'<path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>'
-                                    +'<path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>'
-                                    +'</svg>');
+                            btn_t = $(`<button class="btn btn-secondary" type="button"></button>`);
+                            btn_t.append(`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">`
+                                    +`<path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>`
+                                    +`<path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>`
+                                    +`</svg>`);
                             input_elem.parent().append(btn_t);
                             btn_t.click(mk_func(input_elem.parent().parent(), row));
                         }
                     }
-                    title = elem.find('.row_content_template_title');
-                    title.html('');
-                    if (row['required']) {
-                        title.append('<span class="text-danger">*</span>');
+                    title = elem.find(`.row_content_template_title`);
+                    title.html(``);
+                    if (row[`required`]) {
+                        title.append(`<span class="text-danger">*</span>`);
                     }
-                    title.append('<span>' + row['opt'] + '</span>');
-                    if (row['hide']) {
-                        elem.addClass('row_content_hide');
+                    title.append(`<span>${row['opt']}</span>`);
+                    if (row[`hide`]) {
+                        elem.addClass(`row_content_hide`);
                     } else {
-                        title.addClass('text-decoration-underline');
+                        title.addClass(`text-decoration-underline`);
                     }
                 }
                 $.each(py_get_opt_opt, add_form_func);
-                row_content.find('.row_content_hide').hide();
+                row_content.find(`.row_content_hide`).hide();
                 // 高度なオプションを表示するリンクを追加
-                if (row_content.children().is('.row_content_hide')) {
-                    show_link = $('<div class="text-center card-hover"><a href="#">[ advanced options ]</a></div>');
+                if (row_content.children().is(`.row_content_hide`)) {
+                    show_link = $(`<div class="text-center card-hover"><a href="#">[ advanced options ]</a></div>`);
                     show_link.click(function(){
-                        row_content.find('.row_content_hide').toggle();
+                        row_content.find(`.row_content_hide`).toggle();
                     });
                     row_content.append(show_link);
                 }
             }
-            //row_content.find('is-invalid, is-valid').removeClass('is-invalid').removeClass('is-valid');
-            cmd_modal.find('[name="cmd"]').off('change');
-            cmd_modal.find('[name="cmd"]').change(cmd_change);
-            modal_title = $(this).find('.cmd_title').text();
-            if(modal_title != '') {
+            //row_content.find(`is-invalid, is-valid`).removeClass(`is-invalid`).removeClass(`is-valid`);
+            cmd_modal.find(`[name="cmd"]`).off(`change`);
+            cmd_modal.find(`[name="cmd"]`).change(cmd_change);
+            modal_title = $(this).find(`.cmd_title`).text();
+            if(modal_title != ``) {
                 // コマンドファイルの読み込み
                 py_load_cmd = await eel.load_cmd(modal_title)();
-                cmd_modal.find('[name="mode"]').val(py_load_cmd['mode']);
+                cmd_modal.find(`[name="mode"]`).val(py_load_cmd[`mode`]);
                 await mode_change();
-                cmd_modal.find('[name="cmd"]').val(py_load_cmd['cmd']);
+                cmd_modal.find(`[name="cmd"]`).val(py_load_cmd[`cmd`]);
                 await cmd_change();
                 $.each(py_load_cmd, function(key, val){
-                    if (typeof val === 'boolean') {
+                    if (typeof val === `boolean`) {
                         val = val.toString();
                     }
                     // フォームに値をセット
                     if(Array.isArray(val)){
                         $.each(val, function(i, v){
-                            e = cmd_modal.find('[name="' + key + '"]').parent().find('.add_buton')[i];
+                            e = cmd_modal.find(`[name="${key}"]`).parent().find(`.add_buton`)[i];
                             $(e).click();
                         });
-                        cmd_modal.find('[name="' + key + '"]').each(function(i, e){
+                        cmd_modal.find(`[name="${key}"]`).each(function(i, e){
                             $(e).val(val[i]);
                         });
                     } else {
-                        cmd_modal.find('[name="' + key + '"]').val(val);
+                        cmd_modal.find(`[name="${key}"]`).val(val);
                     }
                 });
-                $('#cmd_del').show();
-                cmd_modal.find('[name="title"]').attr('readonly', true);
-                cmd_modal.find('[name="mode"]').css('pointer-events', 'none').css('background-color', '#e9ecef');
-                cmd_modal.find('[name="cmd"]').css('pointer-events', 'none').css('background-color', '#e9ecef');
-                cmd_modal.find('[name="name"]').attr('readonly', true);
+                $(`#cmd_del`).show();
+                cmd_modal.find(`[name="title"]`).attr(`readonly`, true);
+                cmd_modal.find(`[name="mode"]`).css(`pointer-events`, `none`).css(`background-color`, `#e9ecef`);
+                cmd_modal.find(`[name="cmd"]`).css(`pointer-events`, `none`).css(`background-color`, `#e9ecef`);
+                cmd_modal.find(`[name="name"]`).attr(`readonly`, true);
             } else {
                 // 新規コマンドファイルの作成
-                modal_title = 'New Command';
+                modal_title = `New Command`;
                 await mode_change();
-                $('#cmd_del').hide();
-                cmd_modal.find('[name="title"]').val('');
-                cmd_modal.find('[name="title"]').attr('readonly', false);
-                cmd_modal.find('[name="mode"]').css('pointer-events', 'auto').css('background-color', 'transparent');
-                cmd_modal.find('[name="cmd"]').css('pointer-events', 'auto').css('background-color', 'transparent');
-                cmd_modal.find('[name="name"]').attr('readonly', false);
+                $(`#cmd_del`).hide();
+                cmd_modal.find(`[name="title"]`).val(``);
+                cmd_modal.find(`[name="title"]`).attr(`readonly`, false);
+                cmd_modal.find(`[name="mode"]`).css(`pointer-events`, `auto`).css(`background-color`, `transparent`);
+                cmd_modal.find(`[name="cmd"]`).css(`pointer-events`, `auto`).css(`background-color`, `transparent`);
+                cmd_modal.find(`[name="name"]`).attr(`readonly`, false);
             }
-            cmd_modal.find('.modal-title').text('Command : ' + modal_title);
-            cmd_modal.find('.row_content_hide').hide();
-            cmd_modal.modal('show');
+            cmd_modal.find(`.modal-title`).text(`Command : ${modal_title}`);
+            cmd_modal.find(`.row_content_hide`).hide();
+            cmd_modal.modal(`show`);
         }
-        $('.cmd_card').off('click');
-        $('.cmd_card').click(cmd_card_func);
-        $('#cmd_save').off('click');
+        $(`.cmd_card`).off(`click`);
+        $(`.cmd_card`).click(cmd_card_func);
+        $(`#cmd_save`).off(`click`);
         // コマンドフォームからパラメータを取得
         get_param = function(modal_elem) {
-            modal_elem.find('.is-invalid, .is-valid').removeClass('is-invalid').removeClass('is-valid');
+            modal_elem.find(`.is-invalid, .is-valid`).removeClass(`is-invalid`).removeClass(`is-valid`);
             var opt = {};
-            var title = modal_elem.find('[name="title"]').val();
-            opt["mode"] = modal_elem.find('[name="mode"]').val();
-            opt["cmd"] = modal_elem.find('[name="cmd"]').val();
+            var title = modal_elem.find(`[name="title"]`).val();
+            opt["mode"] = modal_elem.find(`[name="mode"]`).val();
+            opt["cmd"] = modal_elem.find(`[name="cmd"]`).val();
             if(!opt["mode"]) delete opt["mode"];
             if(!opt["cmd"]) delete opt["cmd"];
             opt["title"] = title;
@@ -664,150 +664,150 @@ $(function(){
                 }
             }
             // フォームの入力値をチェック（不正な値があればフォームに`is-invalid`クラスを付加する）
-            modal_elem.find('.row_content, .row_content_common').find('input, select').each(function(i, elem){
-                data_name = $(elem).attr('name');
+            modal_elem.find(`.row_content, .row_content_common`).find(`input, select`).each(function(i, elem){
+                data_name = $(elem).attr(`name`);
                 data_val = $(elem).val();
-                data_type = $(elem).attr('param_data_type');
-                data_multi = $(elem).attr('param_data_multi');
-                if ($(elem).attr('required') && (!data_val || data_val=='')) {
-                    $(elem).addClass('is-invalid');
-                } else if (data_type=='int') {
-                    if(data_val && data_val!='') {
-                        if(!isInt(data_val)) $(elem).addClass('is-invalid');
+                data_type = $(elem).attr(`param_data_type`);
+                data_multi = $(elem).attr(`param_data_multi`);
+                if ($(elem).attr(`required`) && (!data_val || data_val==``)) {
+                    $(elem).addClass(`is-invalid`);
+                } else if (data_type==`int`) {
+                    if(data_val && data_val!=``) {
+                        if(!isInt(data_val)) $(elem).addClass(`is-invalid`);
                         else {
-                            $(elem).removeClass('is-invalid');
-                            $(elem).addClass('is-valid');
+                            $(elem).removeClass(`is-invalid`);
+                            $(elem).addClass(`is-valid`);
                             data_val = parseInt(data_val);
                         }
                     } else {
-                        $(elem).removeClass('is-invalid');
-                        $(elem).addClass('is-valid');
+                        $(elem).removeClass(`is-invalid`);
+                        $(elem).addClass(`is-valid`);
                     }
-                } else if (data_type=='float') {
-                    if(data_val && data_val!='') {
-                        if(!isFloat(data_val) && !isInt(data_val)) $(elem).addClass('is-invalid');
+                } else if (data_type==`float`) {
+                    if(data_val && data_val!=``) {
+                        if(!isFloat(data_val) && !isInt(data_val)) $(elem).addClass(`is-invalid`);
                         else {
-                            $(elem).removeClass('is-invalid');
-                            $(elem).addClass('is-valid');
+                            $(elem).removeClass(`is-invalid`);
+                            $(elem).addClass(`is-valid`);
                             data_val = parseFloat(data_val);
                         }
                     } else {
-                        $(elem).removeClass('is-invalid');
-                        $(elem).addClass('is-valid');
+                        $(elem).removeClass(`is-invalid`);
+                        $(elem).addClass(`is-valid`);
                     }
-                } else if (data_type=='bool') {
-                    if(data_val!='true' && data_val!='false') $(elem).addClass('is-invalid');
+                } else if (data_type==`bool`) {
+                    if(data_val!=`true` && data_val!=`false`) $(elem).addClass(`is-invalid`);
                     else {
-                        data_val = data_val=='true';
-                        $(elem).removeClass('is-invalid');
-                        $(elem).addClass('is-valid');
+                        data_val = data_val==`true`;
+                        $(elem).removeClass(`is-invalid`);
+                        $(elem).addClass(`is-valid`);
                     }
                 } else {
-                    $(elem).removeClass('is-invalid');
-                    $(elem).addClass('is-valid');
+                    $(elem).removeClass(`is-invalid`);
+                    $(elem).addClass(`is-valid`);
                 }
-                if(data_multi=='true'){
+                if(data_multi==`true`){
                     if(!opt[data_name]) opt[data_name] = [];
-                    if(data_val && data_val!='') opt[data_name].push(data_val);
+                    if(data_val && data_val!=``) opt[data_name].push(data_val);
                 } else {
-                    if(data_val && data_val!='') opt[data_name] = data_val;
+                    if(data_val && data_val!=``) opt[data_name] = data_val;
                 }
             });
             return [title, opt];
         }
         // コマンドファイルの保存
-        $('#cmd_save').click(async function(){
-            cmd_modal = $('#cmd_modal');
+        $(`#cmd_save`).click(async function(){
+            cmd_modal = $(`#cmd_modal`);
             var [title, opt] = get_param(cmd_modal);
-            if (cmd_modal.find('.row_content, .row_content_common').find('.is-invalid').length > 0) {
+            if (cmd_modal.find(`.row_content, .row_content_common`).find(`.is-invalid`).length > 0) {
                 return;
             }
-            $('#loading').removeClass('d-none');
+            $(`#loading`).removeClass(`d-none`);
             await eel.save_cmd(title, opt)();
             await list_cmd_func();
-            $('.cmd_card').click(cmd_card_func);
-            if (window.confirm('save success. close this window?')) {
-                cmd_modal.modal('hide');
+            $(`.cmd_card`).click(cmd_card_func);
+            if (window.confirm(`save success. close this window?`)) {
+                cmd_modal.modal(`hide`);
             }
-            $('#loading').addClass('d-none');
+            $(`#loading`).addClass(`d-none`);
         });
         // コマンドファイルの削除
-        $('#cmd_del').off('click');
-        $('#cmd_del').click(async function(){
-            cmd_modal = $('#cmd_modal');
-            var title = cmd_modal.find('[name="title"]').val();
-            $('#loading').removeClass('d-none');
-            if (window.confirm('delete "' + title + '"?')) {
+        $(`#cmd_del`).off(`click`);
+        $(`#cmd_del`).click(async function(){
+            cmd_modal = $(`#cmd_modal`);
+            var title = cmd_modal.find(`[name="title"]`).val();
+            $(`#loading`).removeClass(`d-none`);
+            if (window.confirm(`delete "${title}"?`)) {
                 await eel.del_cmd(title)();
-                cmd_modal.modal('hide');
+                cmd_modal.modal(`hide`);
                 await list_cmd_func();
-                $('.cmd_card').click(cmd_card_func);
+                $(`.cmd_card`).click(cmd_card_func);
             }
-            $('#loading').addClass('d-none');
+            $(`#loading`).addClass(`d-none`);
         });
         // コマンドファイルの実行
-        $('#cmd_exec').off('click');
-        $('#cmd_exec').click(async function(){
-            cmd_modal = $('#cmd_modal');
+        $(`#cmd_exec`).off(`click`);
+        $(`#cmd_exec`).click(async function(){
+            cmd_modal = $(`#cmd_modal`);
             var [title, opt] = get_param(cmd_modal);
-            if (cmd_modal.find('.row_content').find('.is-invalid').length > 0) {
+            if (cmd_modal.find(`.row_content`).find(`.is-invalid`).length > 0) {
                 return;
             }
-            $('#loading').removeClass('d-none');
+            $(`#loading`).removeClass(`d-none`);
             // コマンドの実行
             eel.exec_cmd(title, opt)().then(function(result){
-                cmd_modal.modal('hide');
+                cmd_modal.modal(`hide`);
                 view_result_func(title, result);
-                $('#loading').addClass('d-none');
+                $(`#loading`).addClass(`d-none`);
             });
         });
         // RAW表示の実行
-        $('#cmd_raw').off('click');
-        $('#cmd_raw').click(async function(){
-            cmd_modal = $('#cmd_modal');
+        $(`#cmd_raw`).off(`click`);
+        $(`#cmd_raw`).click(async function(){
+            cmd_modal = $(`#cmd_modal`);
             var [title, opt] = get_param(cmd_modal);
-            if (cmd_modal.find('.row_content').find('.is-invalid').length > 0) {
+            if (cmd_modal.find(`.row_content`).find(`.is-invalid`).length > 0) {
                 return;
             }
-            $('#loading').removeClass('d-none');
+            $(`#loading`).removeClass(`d-none`);
             // コマンドの実行
             eel.raw_cmd(title, opt)().then(function(result){
                 view_raw_func(title, result);
-                $('#loading').addClass('d-none');
+                $(`#loading`).addClass(`d-none`);
             });
         });
     });
     // ファイラーモーダル
     filer_modal_func = async function(target_id, modal_title, current_path, call_back_func) {
-        filer_modal = $('#filer_modal');
-        filer_modal.find('.modal-title').text(modal_title);
-        filer_modal.find('.modal-body').html('<ul class="tree-menu overflow-auto border col-4"></ul><div class="file-list overflow-auto col-8"></div>');
-        filer_modal.find('.tree-menu').css('height', 'calc(100vh - 180px)');
-        filer_modal.find('.file-list').css('height', 'calc(100vh - 180px)');
-        //filer_modal.find('.tree-menu').resizable({ghost:true});
-        filer_modal.find('.filer_address_bot').off('click');
-        filer_modal.find('.filer_address_bot').click(async function(){
-            current_path = filer_modal.find('.filer_address').val();
-            key = current_path.replace(/[\s\:\\\/\,\.\#\$\%\^\&\!\@\*\(\)\{\}\[\]\'\"\`]/g, '_');
-            current_node = $('#'+key);
+        filer_modal = $(`#filer_modal`);
+        filer_modal.find(`.modal-title`).text(modal_title);
+        filer_modal.find(`.modal-body`).html(`<ul class="tree-menu overflow-auto border col-4"></ul><div class="file-list overflow-auto col-8"></div>`);
+        filer_modal.find(`.tree-menu`).css(`height`, `calc(100vh - 180px)`);
+        filer_modal.find(`.file-list`).css(`height`, `calc(100vh - 180px)`);
+        //filer_modal.find(`.tree-menu`).resizable({ghost:true});
+        filer_modal.find(`.filer_address_bot`).off(`click`);
+        filer_modal.find(`.filer_address_bot`).click(async function(){
+            current_path = filer_modal.find(`.filer_address`).val();
+            key = current_path.replace(/[\s\:\\\/\,\.\#\$\%\^\&\!\@\*\(\)\{\}\[\]\'\"\`]/g, `_`);
+            current_node = $(`#${key}`);
             if (current_node.length <= 0) {
-                alert('invalid path:'+key);
+                alert(`invalid path:${key}`);
                 return;
             }
-            await reload_tree(target_id, filer_modal.find('.tree-menu'), current_path, filer_modal.find('.file-list'));
+            await reload_tree(target_id, filer_modal.find(`.tree-menu`), current_path, filer_modal.find(`.file-list`));
         });
 
         reload_tree = async function(target_id, current_node, current_path, file_list_elem){
             //dict(name=part, is_dir=path.is_dir(), path=str(path), children=children)
             py_list_tree = await eel.list_tree(current_path)();
-            current_node.html('');
+            current_node.html(``);
             $.each(py_list_tree, function(key, node){
-                if(!node['is_dir']) return;
-                li_elem = $('#'+key);
+                if(!node[`is_dir`]) return;
+                li_elem = $(`#${key}`);
                 if (li_elem.length > 0) {
-                    li_elem.html('<a href="#" class="folder-open">' + node['name'] + '</a>');
+                    li_elem.html(`<a href="#" class="folder-open">${node['name']}</a>`);
                 } else {
-                    li_elem = $('<li id="'+key+'"><a href="#" class="folder-open">' + node['name'] + '</a></li>');
+                    li_elem = $(`<li id="${key}"><a href="#" class="folder-open">${node['name']}</a></li>`);
                     current_node.append(li_elem);
                 }
                 mk_func = function(target_id, current_node, current_path){
@@ -816,14 +816,14 @@ $(function(){
                         reload_tree(target_id, current_node, current_path);
                     }
                 }
-                li_elem.find('a').click(mk_func(target_id, current_node, node['path']));
-                if(node['children']) {
-                    ul_elem = $('<ul/>');
+                li_elem.find(`a`).click(mk_func(target_id, current_node, node[`path`]));
+                if(node[`children`]) {
+                    ul_elem = $(`<ul/>`);
                     li_elem.append(ul_elem);
-                    $.each(node['children'], function(k, n){
-                        if(!n['is_dir']) return;
-                        li = $('<li id="'+k+'"><a href="#" class="folder-close">' + n['name'] + '</a></li>');
-                        li.find('a').click(mk_func(target_id, ul_elem, n['path']));
+                    $.each(node[`children`], function(k, n){
+                        if(!n[`is_dir`]) return;
+                        li = $(`<li id="${k}"><a href="#" class="folder-close">${n['name']}</a></li>`);
+                        li.find(`a`).click(mk_func(target_id, ul_elem, n[`path`]));
                         ul_elem.append(li);
                     });
                 }
@@ -831,181 +831,186 @@ $(function(){
             py_list_tree_keys = Object.keys(py_list_tree);
             if (py_list_tree_keys.length > 0) {
                 node = py_list_tree[py_list_tree_keys[py_list_tree_keys.length-1]];
-                table = $('<table class="table table-bordered table-hover table-sm"></table>');
-                filer_modal.find('.file-list').html('');
-                filer_modal.find('.file-list').append(table);
-                table_head = $('<thead class="table-dark bg-dark"></thead>');
-                table_head.append($('<tr><th scope="col">-</th><th scope="col">name</th><th scope="col">size</th><th scope="col">last</th></tr>'));
+                table = $(`<table class="table table-bordered table-hover table-sm"></table>`);
+                filer_modal.find(`.file-list`).html(``);
+                filer_modal.find(`.file-list`).append(table);
+                table_head = $(`<thead class="table-dark bg-dark"></thead>`);
+                table_head.append($(`<tr><th scope="col">-</th><th scope="col">name</th><th scope="col">size</th><th scope="col">last</th></tr>`));
                 table.append(table_head);
-                table_body = $('<tbody></tbody>');
+                table_body = $(`<tbody></tbody>`);
                 table.append(table_body);
-                filer_modal.find('.filer_address').val(node['path']);
-                if(node['children']) {
+                filer_modal.find(`.filer_address`).val(node[`path`]);
+                if(node[`children`]) {
                     mk_func = function(target_id, current_node, current_path){
                         // 右側ペインのフォルダを選択した時の処理
                         return function(){
                             reload_tree(target_id, current_node, current_path);
                         }
                     }
-                    $.each(node['children'], function(k, n){
-                        if(!n['is_dir']) return;
-                        tr_elem = $('<tr/>');
+                    $.each(node[`children`], function(k, n){
+                        if(!n[`is_dir`]) return;
+                        tr_elem = $(`<tr/>`);
                         table_body.append(tr_elem);
-                        td = $('<td><a href="#" class="folder-close">' + n['name'] + '</a></td>');
-                        td.find('a').click(mk_func(target_id, $('#'+k), n['path']));
-                        tr_elem.append($('<td><img src="/assets/tree-menu/image/folder-close.png"></td>'));
+                        td = $(`<td><a href="#" class="folder-close">${n['name']}</a></td>`);
+                        td.find(`a`).click(mk_func(target_id, $(`#${k}`), n[`path`]));
+                        tr_elem.append($(`<td><img src="/assets/tree-menu/image/folder-close.png"></td>`));
                         tr_elem.append(td);
-                        tr_elem.append($('<td>' + n['size'] + '</td>'));
-                        tr_elem.append($('<td>' + n['last'] + '</td>'));
+                        tr_elem.append($(`<td>${n['size']}</td>`));
+                        tr_elem.append($(`<td>${n['last']}</td>`));
                     });
                     mk_func = function(target_id, current_node, current_path){
                         // 右側ペインのファイルを選択した時の処理
                         return function(){
-                            $('[id="'+target_id+'"]').val(current_path);
-                            filer_modal.modal('hide');
+                            $(`[id="${target_id}"]`).val(current_path);
+                            filer_modal.modal(`hide`);
                             if(call_back_func) call_back_func(current_path);
                         }
                     }
-                    $.each(node['children'], function(k, n){
-                        if(n['is_dir']) return;
-                        tr_elem = $('<tr/>');
+                    $.each(node[`children`], function(k, n){
+                        if(n[`is_dir`]) return;
+                        tr_elem = $(`<tr/>`);
                         table_body.append(tr_elem);
-                        td = $('<td><a href="#" class="folder-close">' + n['name'] + '</a></td>');
-                        td.find('a').click(mk_func(target_id, $('#'+k), n['path']));
-                        tr_elem.append($('<td><img src="/assets/tree-menu/image/file.png"></td>'));
+                        td = $(`<td><a href="#" class="folder-close">${n['name']}</a></td>`);
+                        td.find(`a`).click(mk_func(target_id, $(`#${k}`), n[`path`]));
+                        tr_elem.append($(`<td><img src="/assets/tree-menu/image/file.png"></td>`));
                         tr_elem.append(td);
-                        tr_elem.append($('<td>' + n['size'] + '</td>'));
-                        tr_elem.append($('<td>' + n['last'] + '</td>'));
+                        tr_elem.append($(`<td>${n['size']}</td>`));
+                        tr_elem.append($(`<td>${n['last']}</td>`));
                     });
                 }
             }
         }
-        await reload_tree(target_id, filer_modal.find('.tree-menu'), current_path, filer_modal.find('.file-list'));
-        filer_modal.modal('show');
+        await reload_tree(target_id, filer_modal.find(`.tree-menu`), current_path, filer_modal.find(`.file-list`));
+        filer_modal.modal(`show`);
     };
     // 実行結果をモーダルダイアログに表示
     view_result_func = function(title, result){
-        result_modal = $('#result_modal');
-        result_modal.find('.modal-title').text(title);
-        result_modal.find('.modal-body').html('');
+        result_modal = $(`#result_modal`);
+        result_modal.find(`.modal-title`).text(title);
+        result_modal.find(`.modal-body`).html(``);
         mk_table_func = function() {
-            table = $('<table class="table table-bordered table-hover table-sm"></table>');
-            table_head = $('<thead class="table-dark bg-dark"></thead>');
-            table_body = $('<tbody></tbody>');
+            table = $(`<table class="table table-bordered table-hover table-sm"></table>`);
+            table_head = $(`<thead class="table-dark bg-dark"></thead>`);
+            table_body = $(`<tbody></tbody>`);
             table.append(table_head);
             table.append(table_body);
             return table;
         }
-        result_modal.find('.modal-body').append(mk_table_func());
+        result_modal.find(`.modal-body`).append(mk_table_func());
         // list型の結果をテーブルに変換
         list2table = function(data, table_head, table_body){
             $.each(data, function(i, row){
-                if(row['success'] && typeof row['success'] == "object" && !Array.isArray(row['success'])){
-                    dict2table(row['success'], i==0?table_head:null, table_body, row['output_image']);
+                if(row[`success`] && typeof row[`success`] == "object" && !Array.isArray(row[`success`])){
+                    dict2table(row[`success`], i==0?table_head:null, table_body, row[`output_image`]);
                     return;
                 }
-                if(typeof row == 'string' || row instanceof String){
-                    tr = $('<tr></tr>');
+                if(typeof row == `string` || row instanceof String){
+                    tr = $(`<tr></tr>`);
                     table_body.append(tr);
-                    tr.append($('<td>' + row + '</td>'));
+                    tr.append($(`<td>${row}</td>`));
                     return;
                 }
-                tr = $('<tr></tr>');
+                tr = $(`<tr></tr>`);
                 table_body.append(tr);
                 $.each(row, function(key, val){
                     if(i==0) {
-                        table_head.append($('<th scope="col">' + key + '</th>'));
+                        table_head.append($(`<th scope="col">${key}</th>`));
                     }
-                    if(val && val['success'] && Array.isArray(val['success'])){
+                    if(val && val[`success`] && Array.isArray(val[`success`])){
                         tbl = mk_table_func()
-                        td = $('<td></td>');
+                        td = $(`<td></td>`);
                         td.append(tbl);
                         tr.append(td);
-                        list2table(val['success'], tbl.find('thead'), tbl.find('tbody'));
+                        list2table(val[`success`], tbl.find(`thead`), tbl.find(`tbody`));
                     }
-                    else if(val && val['success'] && typeof val['success'] == "object"){
+                    else if(val && val[`success`] && typeof val[`success`] == "object"){
                         tbl = mk_table_func()
-                        td = $('<td></td>');
+                        td = $(`<td></td>`);
                         td.append(tbl);
                         tr.append(td);
-                        dict2table(val['success'], tbl.find('thead'), tbl.find('tbody'));
+                        dict2table(val[`success`], tbl.find(`thead`), tbl.find(`tbody`));
                     }
                     else if(val && Array.isArray(val) && val.length > 0 && typeof val[0] == "object"){
                         tbl = mk_table_func()
-                        td = $('<td></td>');
+                        td = $(`<td></td>`);
                         td.append(tbl);
                         tr.append(td);
-                        list2table(val, tbl.find('thead'), tbl.find('tbody'));
+                        list2table(val, tbl.find(`thead`), tbl.find(`tbody`));
                     }
                     else{
-                        tr.append($('<td>' + val + '</td>'));
+                        tr.append($(`<td>${val}</td>`));
                     }
                 });
             });
         }
         // dict型の結果をテーブルに変換
         dict2table = function(data, table_head, table_body, output_image){
-            tr = $('<tr></tr>');
+            tr = $(`<tr></tr>`);
             if(output_image){
-                if(table_head)table_head.append($('<th scope="col">output_image</th>'));
-                img = $('<img class="img-thumbnail">').attr('src', 'data:image/png;base64,' + output_image);
-                img.css('width','100px').css('height','auto');
-                anchor = $('<a href="data:image/jpeg;base64,' + output_image + '" data-lightbox="output_image"></a>').append(img);
-                tr.append($('<td></td>').append(anchor));
+                if(table_head)table_head.append($(`<th scope="col">output_image</th>`));
+                img = $(`<img class="img-thumbnail">`).attr(`src`, `data:image/png;base64,${output_image}`);
+                img.css(`width`,`100px`).css(`height`,`auto`);
+                anchor = $(`<a href="data:image/jpeg;base64,${output_image}" data-lightbox="output_image"></a>`).append(img);
+                tr.append($(`<td></td>`).append(anchor));
             }
             $.each(data, function(key, val){
-                if(table_head)table_head.append($('<th scope="col">' + key + '</th>'));
-                if ((typeof val === 'string' || val instanceof String) && val.length > 150) {
-                    val = val.substring(0, 150) + '...';
+                if(table_head)table_head.append($(`<th scope="col">${key}</th>`));
+                if (key != `warn` && val) {
+                    if (typeof value === 'object' || Array.isArray(val)) {
+                        val = JSON.stringify(val);
+                    }
+                    if ((typeof val === `string` || val instanceof String) && val.length > 150) {
+                        val = `${val.substring(0, 150)}...`;
+                    }
                 }
-                tr.append($('<td>' + val + '</td>'));
+                tr.append($(`<td>${val}</td>`));
             });
             table_body.append(tr);
         }
         // 結果をテーブルに変換
-        if(result['success'] && Array.isArray(result['success'])){
-            list2table(result['success'], table_head, table_body);
+        if(result[`success`] && Array.isArray(result[`success`])){
+            list2table(result[`success`], table_head, table_body);
         }
-        else if(result['success'] && typeof result['success'] == "object"){
-            dict2table(result['success'], table_head, table_body, result['output_image']);
+        else if(result[`success`] && typeof result[`success`] == "object"){
+            dict2table(result[`success`], table_head, table_body, result[`output_image`]);
         }
         else if(Array.isArray(result)){
             list2table(result, table_head, table_body);
         }
         else if(typeof result === "string" || result instanceof String){
-            $('#result_modal').find('.modal-body').html(result);
+            $(`#result_modal`).find(`.modal-body`).html(result);
         }
         else {
             dict2table(result, table_head, table_body);
         }
-        result_modal.modal('show');
+        result_modal.modal(`show`);
     }
     // RAW結果をモーダルダイアログに表示
     view_raw_func = function(title, result){
-        result_modal = $('#result_modal');
-        result_modal.find('.modal-title').text(title);
-        result_modal.find('.modal-body').html('');
-        table = $('<table class="table table-bordered table-hover table-sm"></table>');
-        table_head = $('<thead class="table-dark bg-dark"></thead>');
-        table_body = $('<tbody></tbody>');
+        result_modal = $(`#result_modal`);
+        result_modal.find(`.modal-title`).text(title);
+        result_modal.find(`.modal-body`).html(``);
+        table = $(`<table class="table table-bordered table-hover table-sm"></table>`);
+        table_head = $(`<thead class="table-dark bg-dark"></thead>`);
+        table_body = $(`<tbody></tbody>`);
         table.append(table_head);
         table.append(table_body);
-        result_modal.find('.modal-body').append(table);
+        result_modal.find(`.modal-body`).append(table);
         // list型の結果をテーブルに変換
         list2table = function(data, table_head, table_body){
             $.each(data, function(i, row){
-                tr = $('<tr></tr>');
+                tr = $(`<tr></tr>`);
                 $.each(row, function(key, val){
                     if(i==0) {
-                        table_head.append($('<th scope="col">' + key + '</th>'));
+                        table_head.append($(`<th scope="col">${key}</th>`));
                     }
-                    tr.append($('<td>' + val + '</td>'));
+                    tr.append($(`<td>${val}</td>`));
                 });
                 table_body.append(tr);
             });
         }
         list2table(result, table_head, table_body);
-        result_modal.modal('show');
+        result_modal.modal(`show`);
     }
     // output_jsonファイルを選択して表示する
     open_output_json_func = function(target_id){
@@ -1013,10 +1018,10 @@ $(function(){
         view_output_json_func = function(current_path){
             eel.load_result(current_path)().then(function(result){
                 view_result_func(current_path, result);
-                $('#loading').addClass('d-none');
+                $(`#loading`).addClass(`d-none`);
             });
         };
-        filer_modal_func(target_id, 'output_json', '', view_output_json_func);
+        filer_modal_func(target_id, `output_json`, ``, view_output_json_func);
     };
     // captureファイルを選択して表示する
     open_capture_func = function(target_id){
@@ -1024,174 +1029,174 @@ $(function(){
         view_capture_func = function(current_path){
             eel.load_capture(current_path)().then(function(result){
                 view_result_func(current_path, result);
-                $('#loading').addClass('d-none');
+                $(`#loading`).addClass(`d-none`);
             });
         };
-        filer_modal_func(target_id, 'capture', '', view_capture_func);
+        filer_modal_func(target_id, `capture`, ``, view_capture_func);
     };
     // 保存済みパイプラインファイル一覧の取得
     list_pipe_func = async function(){
-        $('#pipe_items').html('');
+        $(`#pipe_items`).html(``);
         py_list_pipe = await eel.list_pipe()();
         $.each(py_list_pipe, function(i, row){
-            elem = $($('#pipe_template').html());
-            elem.find('.pipe_title').text(row['title']);
-            elem.find('.pipe_desc').text(row['description']);
-            $('#pipe_items').append(elem);
+            elem = $($(`#pipe_template`).html());
+            elem.find(`.pipe_title`).text(row[`title`]);
+            elem.find(`.pipe_desc`).text(row[`description`]);
+            $(`#pipe_items`).append(elem);
         });
-        $('#pipe_items').append($($('#pipe_add').html()));
+        $(`#pipe_items`).append($($(`#pipe_add`).html()));
     }
     list_pipe_func().then(function(){
         // パイプラインカードクリック時の処理（モーダルダイアログを開く）
         pipe_card_func = async function(){
-            pipe_modal = $('#pipe_modal');
-            pipe_modal.find('.is-invalid, .is-valid').removeClass('is-invalid').removeClass('is-valid');
-            row_content = pipe_modal.find('.row_content');
-            row_content.html('');
-            modal_title = $(this).find('.pipe_title').text();
+            pipe_modal = $(`#pipe_modal`);
+            pipe_modal.find(`.is-invalid, .is-valid`).removeClass(`is-invalid`).removeClass(`is-valid`);
+            row_content = pipe_modal.find(`.row_content`);
+            row_content.html(``);
+            modal_title = $(this).find(`.pipe_title`).text();
             cmd_select_template_func = function(add_buton, py_list_cmd) {
-                cmd_select_template = $(pipe_modal.find('.cmd_select_template').html());
-                row_content = pipe_modal.find('.row_content');
-                if(row_content.find('.cmd_select_item').length > 0) {
-                    add_buton.parents('.cmd_select_item').after(cmd_select_template);
+                cmd_select_template = $(pipe_modal.find(`.cmd_select_template`).html());
+                row_content = pipe_modal.find(`.row_content`);
+                if(row_content.find(`.cmd_select_item`).length > 0) {
+                    add_buton.parents(`.cmd_select_item`).after(cmd_select_template);
                 } else {
                     row_content.append(cmd_select_template);
-                    cmd_select_template.find('[name="pipe_cmd"]').attr('required', true);
-                    cmd_select_template.find('.del_buton').hide();
+                    cmd_select_template.find(`[name="pipe_cmd"]`).attr(`required`, true);
+                    cmd_select_template.find(`.del_buton`).hide();
                 }
-                pipe_cmd_select = cmd_select_template.find('[name="pipe_cmd"]');
-                pipe_cmd_select.append('<option></option>');
+                pipe_cmd_select = cmd_select_template.find(`[name="pipe_cmd"]`);
+                pipe_cmd_select.append(`<option></option>`);
                 $.each(py_list_cmd, function(i, cmd){
-                    option = $('<option></option>');
+                    option = $(`<option></option>`);
                     pipe_cmd_select.append(option);
-                    option.attr('value', cmd['title']);
-                    option.text(cmd['title']+'(mode='+cmd['mode']+', cmd='+cmd['cmd']+')');
+                    option.attr(`value`, cmd[`title`]);
+                    option.text(`${cmd['title']}(mode=${cmd['mode']}, cmd=${cmd['cmd']})`);
                 });
-                cmd_select_template.find('.add_buton').click(function(e){
+                cmd_select_template.find(`.add_buton`).click(function(e){
                     cmd_select_template_func($(this), py_list_cmd);
                 });
-                cmd_select_template.find('.del_buton').click(function(e){
-                    $(this).parents('.cmd_select_item').remove();
+                cmd_select_template.find(`.del_buton`).click(function(e){
+                    $(this).parents(`.cmd_select_item`).remove();
                 });
                 return cmd_select_template;
             }
-            if(modal_title != '') {
+            if(modal_title != ``) {
                 // パイプラインファイルの読み込み
                 py_list_cmd = await eel.list_cmd()();
                 cmd_select = cmd_select_template_func($(this), py_list_cmd)
                 py_load_pipe = await eel.load_pipe(modal_title)();
                 $.each(py_load_pipe, function(key, val){
-                    if (typeof val === 'boolean') {
+                    if (typeof val === `boolean`) {
                         val = val.toString();
                     }
                     // フォームに値をセット
                     if(Array.isArray(val)){
                         $.each(val, function(i, v){
-                            e = pipe_modal.find('[name="' + key + '"]').parent().find('.add_buton')[i];
+                            e = pipe_modal.find(`[name="${key}"]`).parent().find(`.add_buton`)[i];
                             $(e).click();
                         });
-                        pipe_modal.find('[name="' + key + '"]').each(function(i, e){
+                        pipe_modal.find(`[name="${key}"]`).each(function(i, e){
                             $(e).val(val[i]);
                         });
                     } else {
-                        pipe_modal.find('[name="' + key + '"]').val(val);
+                        pipe_modal.find(`[name="${key}"]`).val(val);
                     }
                 });
-                $('#cmd_del').show();
-                pipe_modal.find('[name="title"]').attr('readonly', true);
+                $(`#cmd_del`).show();
+                pipe_modal.find(`[name="title"]`).attr(`readonly`, true);
             } else {
                 // 新規パイプラインファイルの作成
-                modal_title = 'New Pipeline';
-                $('#cmd_del').hide();
-                pipe_modal.find('[name="title"]').val('');
-                pipe_modal.find('[name="title"]').attr('readonly', false);
-                pipe_modal.find('[name="description"]').val('');
+                modal_title = `New Pipeline`;
+                $(`#cmd_del`).hide();
+                pipe_modal.find(`[name="title"]`).val(``);
+                pipe_modal.find(`[name="title"]`).attr(`readonly`, false);
+                pipe_modal.find(`[name="description"]`).val(``);
                 py_list_cmd = await eel.list_cmd()();
                 cmd_select = cmd_select_template_func($(this), py_list_cmd)
             }
-            pipe_modal.find('.modal-title').text('Pipeline : ' + modal_title);
-            pipe_modal.modal('show');
+            pipe_modal.find(`.modal-title`).text(`Pipeline : ${modal_title}`);
+            pipe_modal.modal(`show`);
         }
-        $('.pipe_card').off('click');
-        $('.pipe_card').click(pipe_card_func);
-        $('#pipe_save').off('click');
+        $(`.pipe_card`).off(`click`);
+        $(`.pipe_card`).click(pipe_card_func);
+        $(`#pipe_save`).off(`click`);
         // パイプラインファイルの保存
-        $('#pipe_save').click(async function(){
-            pipe_modal = $('#pipe_modal');
+        $(`#pipe_save`).click(async function(){
+            pipe_modal = $(`#pipe_modal`);
             var [title, opt] = get_param(pipe_modal);
-            if (pipe_modal.find('.row_content, .row_content_common').find('.is-invalid').length > 0) {
+            if (pipe_modal.find(`.row_content, .row_content_common`).find(`.is-invalid`).length > 0) {
                 return;
             }
-            $('#loading').removeClass('d-none');
+            $(`#loading`).removeClass(`d-none`);
             await eel.save_pipe(title, opt)();
             await list_pipe_func();
-            $('.pipe_card').click(pipe_card_func);
-            if (window.confirm('save success. close this window?')) {
-                pipe_modal.modal('hide');
+            $(`.pipe_card`).click(pipe_card_func);
+            if (window.confirm(`save success. close this window?`)) {
+                pipe_modal.modal(`hide`);
             }
-            $('#loading').addClass('d-none');
+            $(`#loading`).addClass(`d-none`);
         });
         // パイプラインファイルの削除
-        $('#pipe_del').off('click');
-        $('#pipe_del').click(async function(){
-            pipe_modal = $('#pipe_modal');
-            var title = pipe_modal.find('[name="title"]').val();
-            $('#loading').removeClass('d-none');
-            if (window.confirm('delete "' + title + '"?')) {
+        $(`#pipe_del`).off(`click`);
+        $(`#pipe_del`).click(async function(){
+            pipe_modal = $(`#pipe_modal`);
+            var title = pipe_modal.find(`[name="title"]`).val();
+            $(`#loading`).removeClass(`d-none`);
+            if (window.confirm(`delete "${title}"?`)) {
                 await eel.del_pipe(title)();
-                pipe_modal.modal('hide');
+                pipe_modal.modal(`hide`);
                 await list_pipe_func();
-                $('.pipe_card').click(pipe_card_func);
+                $(`.pipe_card`).click(pipe_card_func);
             }
-            $('#loading').addClass('d-none');
+            $(`#loading`).addClass(`d-none`);
         });
         // パイプラインファイルの実行
-        $('#pipe_exec').off('click');
-        $('#pipe_exec').click(async function(){
-            pipe_modal = $('#pipe_modal');
+        $(`#pipe_exec`).off(`click`);
+        $(`#pipe_exec`).click(async function(){
+            pipe_modal = $(`#pipe_modal`);
             var [title, opt] = get_param(pipe_modal);
-            if (pipe_modal.find('.row_content').find('.is-invalid').length > 0) {
+            if (pipe_modal.find(`.row_content`).find(`.is-invalid`).length > 0) {
                 return;
             }
-            $('#loading').removeClass('d-none');
+            $(`#loading`).removeClass(`d-none`);
             // コマンドの実行
             eel.exec_pipe(title, opt)().then(function(result){
-                pipe_modal.modal('hide');
+                pipe_modal.modal(`hide`);
                 view_result_func(title, result);
-                $('#loading').addClass('d-none');
+                $(`#loading`).addClass(`d-none`);
             });
         });
         // RAW表示の実行
-        $('#pipe_raw').off('click');
-        $('#pipe_raw').click(async function(){
-            pipe_modal = $('#pipe_modal');
+        $(`#pipe_raw`).off(`click`);
+        $(`#pipe_raw`).click(async function(){
+            pipe_modal = $(`#pipe_modal`);
             var [title, opt] = get_param(pipe_modal);
-            if (pipe_modal.find('.row_content').find('.is-invalid').length > 0) {
+            if (pipe_modal.find(`.row_content`).find(`.is-invalid`).length > 0) {
                 return;
             }
-            $('#loading').removeClass('d-none');
+            $(`#loading`).removeClass(`d-none`);
             // コマンドの実行
             eel.raw_pipe(title, opt)().then(function(result){
                 view_raw_func(title, result);
-                $('#loading').addClass('d-none');
+                $(`#loading`).addClass(`d-none`);
             });
         });
     });
-    $('#versions_modal').on('shown.bs.modal	', function(){
+    $(`#versions_modal`).on(`shown.bs.modal	`, function(){
         // iinferのバージョン情報取得
         versions_iinfer_func = async function(){
             versions_iinfer = await eel.versions_iinfer()();
-            $('#versions_iinfer').html('');
+            $(`#versions_iinfer`).html(``);
             $.each(versions_iinfer, function(i, v){
-                v = v.replace(/<([^>]+)>/g, '<a href="$1" target="_blank">$1</a>');
-                div = $('<div class="d-block"></div>');
-                $('#versions_iinfer').append(div);
+                v = v.replace(/<([^>]+)>/g, `<a href="$1" target="_blank">$1</a>`);
+                div = $(`<div class="d-block"></div>`);
+                $(`#versions_iinfer`).append(div);
                 if(i==0) {
-                    div.addClass('m-3');
-                    div.append('<h4>' + v + '</h4>');
+                    div.addClass(`m-3`);
+                    div.append(`<h4>${v}</h4>`);
                 } else {
-                    div.addClass('ms-5 me-5');
-                    div.append('<h6>' + v + '</h6>');
+                    div.addClass(`ms-5 me-5`);
+                    div.append(`<h6>${v}</h6>`);
                 }
             });
         };
@@ -1199,19 +1204,19 @@ $(function(){
         // usedのバージョン情報取得
         versions_used_func = async function(){
             versions_used = await eel.versions_used()();
-            $('#versions_used').html('');
-            div = $('<div class="overflow-auto" style="height:calc(100vh - 260px);"></div>');
-            table = $('<table class="table table-bordered table-hover table-sm"></table>');
-            table_head = $('<thead class="table-dark bg-dark"></thead>');
-            table_body = $('<tbody></tbody>');
+            $(`#versions_used`).html(``);
+            div = $(`<div class="overflow-auto" style="height:calc(100vh - 260px);"></div>`);
+            table = $(`<table class="table table-bordered table-hover table-sm"></table>`);
+            table_head = $(`<thead class="table-dark bg-dark"></thead>`);
+            table_body = $(`<tbody></tbody>`);
             table.append(table_head);
             table.append(table_body);
             div.append(table);
-            $('#versions_used').append(div);
+            $(`#versions_used`).append(div);
             $.each(versions_used, function(i, row){
-                tr = $('<tr></tr>');
+                tr = $(`<tr></tr>`);
                 $.each(row, function(j, cel){
-                    td = $('<td></td>').text(cel);
+                    td = $(`<td></td>`).text(cel);
                     tr.append(td);
                 });
                 if(i==0) table_head.append(tr);
@@ -1222,23 +1227,23 @@ $(function(){
     })
 
     // modal setting
-    $('.modal-dialog').draggable({cursor:"move",cancel:".modal-body"});
-    $('#filer_modal .modal-dialog').draggable({cursor:"move",cancel:".modal-body, .filer_address"});
-    $('.btn_window_stack').click(function(){
-        $('.btn_window_stack').css('margin-left', '0px').hide();
-        $('.btn_window').css('margin-left', 'auto').show();
-        $(this).parents('.modal-dialog').removeClass('modal-fullscreen');
+    $(`.modal-dialog`).draggable({cursor:"move",cancel:".modal-body"});
+    $(`#filer_modal .modal-dialog`).draggable({cursor:"move",cancel:".modal-body, .filer_address"});
+    $(`.btn_window_stack`).click(function(){
+        $(`.btn_window_stack`).css(`margin-left`, `0px`).hide();
+        $(`.btn_window`).css(`margin-left`, `auto`).show();
+        $(this).parents(`.modal-dialog`).removeClass(`modal-fullscreen`);
     });
-    $('.btn_window').click(function(){
-        $('.btn_window_stack').css('margin-left', 'auto').show();
-        $('.btn_window').css('margin-left', '0px').hide();
-        $(this).parents('.modal-dialog').addClass('modal-fullscreen');
+    $(`.btn_window`).click(function(){
+        $(`.btn_window_stack`).css(`margin-left`, `auto`).show();
+        $(`.btn_window`).css(`margin-left`, `0px`).hide();
+        $(this).parents(`.modal-dialog`).addClass(`modal-fullscreen`);
     });
-    $('.btn_window_stack').css('margin-left', '0px').hide();
-    $('.btn_window').css('margin-left', 'auto').show();
+    $(`.btn_window_stack`).css(`margin-left`, `0px`).hide();
+    $(`.btn_window`).css(`margin-left`, `auto`).show();
 
     // disable F5 and Ctrl+R
-    $(document).on('keydown', function(e){
+    $(document).on(`keydown`, function(e){
         if ((e.which || e.keyCode) == 116) {
             return false;
         } else if ((e.which || e.keyCode) == 82 && e.ctrlKey) {
@@ -1247,11 +1252,11 @@ $(function(){
     });
     $(window).on("beforeunload", function () {
         event.preventDefault();
-        event.returnValue = 'Check';
+        event.returnValue = `Check`;
     });
     eel.expose(js_console_modal_log_func);
     function js_console_modal_log_func(line) {
-        elem = $('#console_modal_log');
+        elem = $(`#console_modal_log`);
         text = elem.val() + line;
         elem.val(text);
         elem.get(0).setSelectionRange(text.length-1, text.length-1);

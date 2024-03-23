@@ -4,6 +4,7 @@ from iinfer.app.commons import convert
 from pathlib import Path
 import datetime
 import glob
+import html
 import iinfer
 import io
 import json
@@ -427,7 +428,7 @@ class Web(object):
                 app._main(opt_list)
                 output = captured_output.getvalue()
             except Exception as e:
-                output = dict(warn=f'<pre>{traceback.format_exc()}</pre>')
+                output = dict(warn=f'<pre>{html.escape(traceback.format_exc())}</pre>')
             sys.stdout = old_stdout
             if 'stdout_log' in opt and opt['stdout_log']:
                 eel.js_console_modal_log_func(output)
