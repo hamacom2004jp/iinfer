@@ -42,7 +42,7 @@ def test_01_01_version(capfd):
 @pytest.mark.run(order=4)
 def test_04_01_client_deploy(capfd):
     cmd = f"-m client -c deploy --svname server1 -n onnx_det_YoloX_Lite --model_img_width 416 --model_img_width 416 --overwrite " \
-          f"--model_file models/yolox_nano.onnx " \
+          f"--model_file models/onnx/yolox_nano.onnx " \
           f"--label_file iinfer/datasets/label_coco.txt " \
           f"--predict_type onnx_det_YoloX_Lite".split(' ')
     _, result = app._main(args_list=cmd)
@@ -53,10 +53,10 @@ def test_04_01_client_deploy(capfd):
 @pytest.mark.run(order=4)
 def test_04_02_client_deploy(capfd):
     cmd = f"-m client -c deploy --svname server2 -n mmdet_det_YoloX_Lite --model_img_width 416 --model_img_width 416 --overwrite " \
-          f"--model_file models/yolox_tiny_8x8_300e_coco_20211124_171234-b4047906.pth " \
-          f"--model_conf_file models/yolox_tiny_8xb8-300e_coco.py " \
-          f"--model_conf_file models/yolox_s_8xb8-300e_coco.py " \
-          f"--model_conf_file models/yolox_tta.py " \
+          f"--model_file models/mmdet/yolox_tiny_8x8_300e_coco_20211124_171234-b4047906.pth " \
+          f"--model_conf_file models/mmdet/yolox_tiny_8xb8-300e_coco.py " \
+          f"--model_conf_file models/mmdet/yolox_s_8xb8-300e_coco.py " \
+          f"--model_conf_file models/mmdet/yolox_tta.py " \
           f"--label_file iinfer/datasets/label_coco.txt " \
           f"--predict_type mmdet_det_YoloX_Lite".split(' ')
     _, result = app._main(args_list=cmd)
@@ -67,7 +67,7 @@ def test_04_02_client_deploy(capfd):
 @pytest.mark.run(order=4)
 def test_04_03_client_deploy(capfd):
     cmd = f"-m client -c deploy --svname server1 -n onnx_cls_EfficientNet_Lite4 --model_img_width 224 --model_img_width 224 --overwrite " \
-          f"--model_file models/efficientnet-lite4-11-qdq.onnx " \
+          f"--model_file models/onnx/efficientnet-lite4-11-qdq.onnx " \
           f"--predict_type onnx_cls_EfficientNet_Lite4".split(' ')
     _, result = app._main(args_list=cmd)
     out, err = capfd.readouterr()
@@ -77,8 +77,8 @@ def test_04_03_client_deploy(capfd):
 @pytest.mark.run(order=4)
 def test_04_04_client_deploy(capfd):
     cmd = f"-m client -c deploy --svname server3 -n mmpretrain_cls_swin_Lite --model_img_width 224 --model_img_width 224 --overwrite " \
-          f"--model_file models/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth " \
-          f"--model_conf_file models/swin-tiny_16xb64_in1k.py " \
+          f"--model_file models/mmpretrain/swin_tiny_224_b16x64_300e_imagenet_20210616_090925-66df6be6.pth " \
+          f"--model_conf_file models/mmpretrain/swin-tiny_16xb64_in1k.py " \
           f"--predict_type mmpretrain_cls_swin_Lite".split(' ')
     _, result = app._main(args_list=cmd)
     out, err = capfd.readouterr()
