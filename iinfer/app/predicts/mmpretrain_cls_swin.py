@@ -9,7 +9,8 @@ import numpy as np
 SITE = 'https://github.com/open-mmlab/mmpretrain/tree/master/configs/swin_transformer'
 IMAGE_WIDTH = 384
 IMAGE_HEIGHT = 384
-USE_MODEL_CONF = True
+REQUIREd_MODEL_CONF = True
+REQUIREd_MODEL_WEIGHT = False
 
 class MMPretrainClsSwin(predict.TorchPredict):
     def __init__(self, logger:logging.Logger) -> None:

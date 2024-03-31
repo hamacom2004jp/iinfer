@@ -8,7 +8,8 @@ import logging
 SITE = 'https://github.com/Megvii-BaseDetection/YOLOX/'
 IMAGE_WIDTH = 416
 IMAGE_HEIGHT = 416
-USE_MODEL_CONF = False
+REQUIREd_MODEL_CONF = False
+REQUIREd_MODEL_WEIGHT = True
 
 class OnnxdetYoloXLite(onnx_det_YoloX.OnnxDetYoloX):
     def __init__(self, logger:logging.Logger) -> None:

@@ -11,7 +11,8 @@ import numpy as np
 SITE = 'https://github.com/Megvii-BaseDetection/YOLOX/'
 IMAGE_WIDTH = 640
 IMAGE_HEIGHT = 640
-USE_MODEL_CONF = False
+REQUIREd_MODEL_CONF = False
+REQUIREd_MODEL_WEIGHT = True
 
 class OnnxDetYoloX(predict.OnnxPredict):
     def __init__(self, logger:logging.Logger) -> None:

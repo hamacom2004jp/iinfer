@@ -10,7 +10,8 @@ import numpy as np
 SITE = 'https://github.com/onnx/models/tree/main/vision/classification/efficientnet-lite4'
 IMAGE_WIDTH = 224
 IMAGE_HEIGHT = 224
-USE_MODEL_CONF = False
+REQUIREd_MODEL_CONF = False
+REQUIREd_MODEL_WEIGHT = True
 
 class OnnxClsEfficientNetLite4(predict.OnnxPredict):
     def __init__(self, logger:logging.Logger) -> None:

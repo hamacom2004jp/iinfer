@@ -9,7 +9,8 @@ import logging
 SITE = 'https://github.com/open-mmlab/mmdetection/tree/main/configs/yolox'
 IMAGE_WIDTH = 640
 IMAGE_HEIGHT = 640
-USE_MODEL_CONF = True
+REQUIREd_MODEL_CONF = True
+REQUIREd_MODEL_WEIGHT = False
 
 class MMDetYoloX(predict.TorchPredict):
     def __init__(self, logger:logging.Logger) -> None:

@@ -60,7 +60,7 @@ class Web(object):
                         dict(opt="model_conf_file", type="file", default="", required=False, multi=True, hide=False, choise=None),
                         dict(opt="model_img_width", type="int", default="", required=False, multi=False, hide=True, choise=None),
                         dict(opt="model_img_height ", type="int", default="", required=False, multi=False, hide=True, choise=None),
-                        dict(opt="predict_type", type="str", default="", required=False, multi=False, hide=False, choise=[key for key in common.BASE_MODELS.keys()]),
+                        dict(opt="predict_type", type="str", default="", required=False, multi=False, hide=False, choise=['']+[key for key in common.BASE_MODELS.keys()]),
                         dict(opt="custom_predict_py", type="file", default="", required=False, multi=False, hide=True, choise=None),
                         dict(opt="label_file", type="file", default="", required=False, multi=False, hide=False, choise=None),
                         dict(opt="color_file", type="file", default="", required=False, multi=False, hide=True, choise=None),
@@ -372,8 +372,10 @@ class Web(object):
             return ['-']
 
         @eel.expose
-        def list_cmd():
-            paths = glob.glob(str(self.data / "cmd-*.json"))
+        def list_cmd(kwd):
+            if kwd is None or kwd == '':
+                kwd = '*'
+            paths = glob.glob(str(self.data / f"cmd-{kwd}.json"))
             ret = [common.loadopt(path) for path in paths]
             return ret
 
@@ -539,8 +541,10 @@ class Web(object):
             return ret
 
         @eel.expose
-        def list_pipe():
-            paths = glob.glob(str(self.data / "pipe-*.json"))
+        def list_pipe(kwd):
+            if kwd is None or kwd == '':
+                kwd = '*'
+            paths = glob.glob(str(self.data / f"pipe-{kwd}.json"))
             return [common.loadopt(path) for path in paths]
 
         @eel.expose

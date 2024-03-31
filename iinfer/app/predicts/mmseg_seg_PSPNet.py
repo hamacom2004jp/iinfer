@@ -9,7 +9,8 @@ import logging
 SITE = 'https://github.com/open-mmlab/mmsegmentation/tree/main/configs/pspnet'
 IMAGE_WIDTH = 1024
 IMAGE_HEIGHT = 512
-USE_MODEL_CONF = True
+REQUIREd_MODEL_CONF = True
+REQUIREd_MODEL_WEIGHT = False
 
 class MMSegPSPNet(predict.TorchPredict):
     def __init__(self, logger:logging.Logger) -> None:

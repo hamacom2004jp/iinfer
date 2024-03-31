@@ -1,9 +1,9 @@
 import datetime
 
 
-dt_now = datetime.datetime(2024, 3, 23)
+dt_now = datetime.datetime(2024, 3, 31)
 __title__ = 'iinfer (Image Inference Application)'
-__version__ = '0.6.6'
+__version__ = '0.6.7'
 __copyright__ = f'Copyright © 2023-{dt_now.strftime("%Y")} hamacom2004jp'
 __pypiurl__ = 'https://pypi.org/project/iinfer/'
 __srcurl__ = 'https://github.com/hamacom2004jp/iinfer'

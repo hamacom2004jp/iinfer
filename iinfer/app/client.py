@@ -155,9 +155,6 @@ class Client(object):
             model_img_width = common.BASE_MODELS[predict_type]['image_width']
         if model_img_height is None or model_img_height <= 0:
             model_img_height = common.BASE_MODELS[predict_type]['image_height']
-        if not model_file.exists():
-            self.logger.error(f"model_file {str(model_file)} does not exist")
-            return {"error": f"model_file {str(model_file)} does not exist"}
         if predict_type == 'Custom':
             if custom_predict_py is None or not custom_predict_py.exists():
                 self.logger.error(f"custom_predict_py path {str(custom_predict_py)} does not exist")
@@ -196,8 +193,15 @@ class Client(object):
         if not ret: return before_injection_conf_b64
         ret, after_injection_conf_b64 = _conf_b64("after_injection_conf", after_injection_conf)
         if not ret: return after_injection_conf_b64
-        with open(model_file, "rb") as mf:
-            model_bytes_b64 = base64.b64encode(mf.read()).decode('utf-8')
+        if model_file is not None:
+            if model_file.exists():
+                with open(model_file, "rb") as mf:
+                    model_bytes_b64 = base64.b64encode(mf.read()).decode('utf-8')
+            else:
+                self.logger.error(f"model_file {model_file} does not exist")
+                return {"error": f"model_file {model_file} does not exist"}
+        else:
+            model_bytes_b64 = None
         def _name_b64(aname:str, files:List[Path]):
             if files is not None:
                 b64s = []

@@ -164,13 +164,16 @@ for mod in get_module_list('iinfer.app.predicts'):
     site = None
     width = None
     height = None
-    use_model_conf = False
+    required_model_conf = False
+    required_model_weight = False
     for f in dir(m):
         if f == 'SITE': site = getattr(m, f)
         elif f == 'IMAGE_WIDTH': width = getattr(m, f)
         elif f == 'IMAGE_HEIGHT': height = getattr(m, f)
-        elif f == 'USE_MODEL_CONF': use_model_conf = getattr(m, f)
-    common.BASE_MODELS[mod] = dict(site=site, image_width=width, image_height=height, use_model_conf=use_model_conf)
+        elif f == 'REQUIREd_MODEL_CONF': required_model_conf = getattr(m, f)
+        elif f == 'REQUIREd_MODEL_WEIGHT': required_model_weight = getattr(m, f)
+    common.BASE_MODELS[mod] = dict(site=site, image_width=width, image_height=height,
+                                   required_model_conf=required_model_conf, required_model_weight=required_model_weight)
 
 for mod in get_module_list('iinfer.app.injections'):
     if mod.startswith('__'):

@@ -28,3 +28,4 @@
     "`iinfer -m client -c start` ","AssertionError: test_cfg specified in both outer field and model field","`mmdet` と `mmrotate` のバージョンの互換性がありません","両方使用する場合は `iinfer -m install -c server --install_mmrotate --install_tag mmrotate` のように別のイメージを作成してください"
     "`iinfer -m client -c predict` ","Failed to run inference: riroi_align_rotated_forward_impl: implementation for device cpu not found.","`mmrotate` を使用するときはGPUが使用できるPCが必要です","GPUが使用できるPCで実行"
     "`iinfer -m client -c predict` ","The function is not implemented. Rebuild the library with Windows, GTK+ 2.x or Cocoa support. If you are on Ubuntu or Debian, install libgtk2.0-dev and pkg-config, then re-run cmake or configure script in function 'cvShowImage'","ライブラリが不足しています","`pip uninstall -y opencv-python` で一度削除してから `pip install opencv-python` で再インストール"
+    "`iinfer -m gui -c start` ","ModuleNotFoundError: No module named 'bottle.ext.websocket'","bottleモジュールの不具合です。python3.12以上だと発生します。","python3.11以下を使用してください。"

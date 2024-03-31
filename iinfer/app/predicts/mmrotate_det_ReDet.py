@@ -11,7 +11,8 @@ import numpy as np
 SITE = 'https://github.com/open-mmlab/mmrotate/tree/main/configs/redet'
 IMAGE_WIDTH = 1024
 IMAGE_HEIGHT = 1024
-USE_MODEL_CONF = True
+REQUIREd_MODEL_CONF = True
+REQUIREd_MODEL_WEIGHT = False
 
 class MMRotateReDet(predict.TorchPredict):
     def __init__(self, logger:logging.Logger) -> None:

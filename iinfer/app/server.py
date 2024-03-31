@@ -140,7 +140,10 @@ class Server(object):
                 self.redis_cli.hset(self.hbname, 'recive_cnt', str(recive_cnt))
 
                 if msg[0] == 'deploy':
-                    model_bin = base64.b64decode(msg[7])
+                    if msg[7] == 'None':
+                        model_bin = None
+                    else:
+                        model_bin = base64.b64decode(msg[7])
                     if msg[8] == 'None':
                         model_conf_file = None
                     else:
@@ -332,25 +335,28 @@ class Server(object):
             self.logger.warn(f"Incorrect predict_type. '{predict_type}'")
             self.responce(reskey, {"warn": f"Incorrect predict_type. '{predict_type}'"})
             return self.RESP_WARN
-        if common.BASE_MODELS[predict_type]['use_model_conf']==True and model_conf_file is None:
+        if common.BASE_MODELS[predict_type]['required_model_conf']==True and model_conf_file is None:
             self.logger.warn(f"model_conf_file is None.")
             self.responce(reskey, {"warn": f"model_conf_file is None."})
             return self.RESP_WARN
 
         common.mkdirs(deploy_dir)
         def _save_s(file:str, data:bytes):
-            if data is None:
+            if file is None or data is None:
                 return False, None
             file = deploy_dir / file
             with open(file, "wb") as f:
                 f.write(data)
                 self.logger.info(f"Save {file} to {str(deploy_dir)}")
             return True, file
-        ret, model_file = _save_s(model_file, model_bin)
-        if not ret:
+
+        if common.BASE_MODELS[predict_type]['required_model_weight']==True and (model_file is None or model_bin is None):
             self.logger.warn(f"model_file is None.")
             self.responce(reskey, {"warn": f"model_file is None."})
             return self.RESP_WARN
+        else:
+            ret, model_file = _save_s(model_file, model_bin)
+
         ret, before_injection_conf = _save_s("before_injection_conf.json", before_injection_conf)
         ret, after_injection_conf = _save_s("after_injection_conf.json", after_injection_conf)
 

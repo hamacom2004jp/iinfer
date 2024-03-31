@@ -16,6 +16,9 @@ Segmentation
     "`PSPNet_r18(mmseg) <https://github.com/open-mmlab/mmsegmentation/blob/main/configs/pspnet/pspnet_r18-d8_4xb2-80k_cityscapes-512x1024.py>`_ ","mmsegmentation","512x1024","pspnet_r18-d8","mmseg_seg_PSPNet",""
     "`PSPNet_r50(mmseg) <https://github.com/open-mmlab/mmsegmentation/blob/main/configs/pspnet/pspnet_r50-d8_4xb2-80k_cityscapes-512x1024.py>`_ ","mmsegmentation","512x1024","pspnet_r50-d8","mmseg_seg_PSPNet",""
     "`PSPNet_r101(mmseg) <https://github.com/open-mmlab/mmsegmentation/blob/main/configs/pspnet/pspnet_r101-d8_4xb2-80k_cityscapes-512x1024.py>`_ ","mmsegmentation","512x1024","pspnet_r101-d8","mmseg_seg_PSPNet",""
+    "`Swin-T(mmseg) <https://github.com/open-mmlab/mmsegmentation/blob/main/configs/swin/swin-tiny-patch4-window7-in1k-pre_upernet_8xb2-160k_ade20k-512x512.py>`_ ","mmsegmentation","512x512","upernet_swin_tiny","mmseg_seg_SwinUpernet",""
+    "`Swin-S(mmseg) <https://github.com/open-mmlab/mmsegmentation/blob/main/configs/swin/swin-small-patch4-window7-in1k-pre_upernet_8xb2-160k_ade20k-512x512.py>`_ ","mmsegmentation","512x512","upernet_swin_small","mmseg_seg_SwinUpernet",""
+    "`Swin-B(mmseg) <https://github.com/open-mmlab/mmsegmentation/blob/main/configs/swin/swin-base-patch4-window12-in22k-384x384-pre_upernet_8xb2-160k_ade20k-512x512.py>`_ ","mmsegmentation","512x512","upernet_swin_small","mmseg_seg_SwinUpernet",""
 
 Object Detection
 ==================

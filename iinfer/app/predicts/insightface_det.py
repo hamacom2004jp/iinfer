@@ -12,7 +12,8 @@ import shutil
 SITE = 'https://github.com/deepinsight/insightface/tree/master/python-package'
 IMAGE_WIDTH = 640
 IMAGE_HEIGHT = 640
-USE_MODEL_CONF = False
+REQUIREd_MODEL_CONF = False
+REQUIREd_MODEL_WEIGHT = True
 
 class InsightfaceDet(predict.OnnxPredict):
     def __init__(self, logger:logging.Logger) -> None:

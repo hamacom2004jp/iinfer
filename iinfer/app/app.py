@@ -360,7 +360,8 @@ def _main(args_list:list=None):
                 except:
                     pass
         elif cmd == 'predict_type_list':
-            type_list = [dict(predict_type=key, site=val['site'], image_width=val['image_width'], image_height=val['image_height'], use_model_conf=val['use_model_conf']) for key,val in common.BASE_MODELS.items()]
+            type_list = [dict(predict_type=key, site=val['site'], image_width=val['image_width'], image_height=val['image_height'],
+                              required_model_conf=val['required_model_conf'], required_model_weight=val['required_model_weight']) for key,val in common.BASE_MODELS.items()]
             type_list.append(dict(predict_type='Custom', site='Custom', image_width=None, image_height=None))
             ret = type_list
             common.print_format(ret, format, tm, output_json, output_json_append)

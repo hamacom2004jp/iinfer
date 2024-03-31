@@ -10,7 +10,8 @@ import numpy as np
 SITE = 'https://github.com/onnx/models/tree/main/vision/object_detection_segmentation/tiny-yolov3'
 IMAGE_WIDTH = 416
 IMAGE_HEIGHT = 416
-USE_MODEL_CONF = False
+REQUIREd_MODEL_CONF = False
+REQUIREd_MODEL_WEIGHT = True
 
 class OnnxDetTinyYoloV3(predict.OnnxPredict):
     def __init__(self, logger:logging.Logger) -> None:
