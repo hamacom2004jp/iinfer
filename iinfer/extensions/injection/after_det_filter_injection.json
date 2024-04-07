@@ -1,4 +1,5 @@
 {
+    "nodraw": false,
     "score_th": 0.5,
     "width_th": 10,
     "height_th": 10,

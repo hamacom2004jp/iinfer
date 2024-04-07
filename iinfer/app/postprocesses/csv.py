@@ -1,8 +1,7 @@
 from iinfer.app import postprocess
+from iinfer.app.injections import after_csv_injection
 from PIL import Image
 from typing import Dict, List, Any
-import csv
-import io
 import logging
 
 class Csv(postprocess.Postprocess):
@@ -16,8 +15,8 @@ class Csv(postprocess.Postprocess):
             noheader (bool, optional): ヘッダーを出力しない. Defaults to False.
         """
         super().__init__(logger)
-        self.out_headers = out_headers
-        self.noheader = noheader
+        self.config = dict(out_headers=out_headers, noheader=noheader)
+        self.injection = after_csv_injection.AfterCSVInjection(self.config, self.logger)
 
     def create_session(self, json_connectstr:str, img_connectstr:str, text_connectstr:str):
         """
@@ -49,56 +48,6 @@ class Csv(postprocess.Postprocess):
         Returns:
             Dict[str, Any]: 後処理結果
         """
-        def _to_csv(data, buffer, i):
-            if type(data) == dict:
-                data_keys = data.keys()
-                notfound = [] if self.out_headers is None else [h for h in self.out_headers if h not in data_keys]
-                if len(notfound) > 0:
-                    raise Exception(f"notfound headers: {notfound}")
-                headers = self.out_headers if self.out_headers is not None else list(data_keys)
-                row = {k:v for k, v in data.items() if k in headers}
-                w = csv.DictWriter(buffer, fieldnames=headers)
-                if not self.noheader and i<=0:
-                    w.writeheader()
-                w.writerow(row)
-            elif type(data) == list:
-                csv.writer(buffer).writerow(data)
-            else:
-                buffer.write(str(data))
-                buffer.write("\n")
-
-        result = ''
-        if 'success' in outputs and type(outputs['success']) == list:
-            buffer = io.StringIO()
-            for i, data in enumerate(outputs['success']):
-                _to_csv(data, buffer, i)
-            result = buffer.getvalue().strip()
-            buffer.close()
-
-        elif 'success' in outputs and type(outputs['success']) == dict:
-            buffer = io.StringIO()
-            _to_csv(outputs['success'], buffer, 0)
-            result = buffer.getvalue().strip()
-            buffer.close()
-
-        elif type(outputs) == list:
-            buffer = io.StringIO()
-            for i, data in enumerate(outputs):
-                _to_csv(data, buffer, i)
-            result = buffer.getvalue().strip()
-            buffer.close()
-
-        elif type(outputs) == dict:
-            buffer = io.StringIO()
-            _to_csv(outputs, buffer, 0)
-            result = buffer.getvalue().strip()
-            buffer.close()
-
-        else:
-            buffer = io.StringIO()
-            _to_csv(outputs, buffer, 0)
-            result = buffer.getvalue().strip()
-            buffer.close()
-
-        self.noheader = True
+        result = self.injection.write_csv(outputs, self.config['out_headers'], self.config['noheader'])
+        self.config['noheader'] = True
         return result

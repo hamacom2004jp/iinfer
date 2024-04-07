@@ -4,6 +4,7 @@ from iinfer.app import common, predict
 from iinfer.app.commons import convert
 from typing import List, Tuple
 import logging
+import numpy as np
 
 
 SITE = 'https://github.com/open-mmlab/mmsegmentation/tree/main/configs/pspnet'
@@ -73,8 +74,10 @@ class MMSegPSPNet(predict.TorchPredict):
         
         segment = result.pred_sem_seg.numpy()
         logits = result.seg_logits.numpy()
-        output_labels = model.dataset_meta['classes']
-        output_classes = [i for i in range(len(output_labels))]
+        output_catalog = model.dataset_meta['classes']
+        output_palette = model.dataset_meta['palette']
+        output_classes = np.unique(segment.data)
+        output_labels = [output_catalog[i] for i in output_classes]
         output_sem_seg = convert.npy2b64str(segment.data)
         output_sem_seg_shape = segment.data.shape
         output_sem_seg_dtype = str(segment.data.dtype)
@@ -84,14 +87,16 @@ class MMSegPSPNet(predict.TorchPredict):
 
         if not nodraw:
             img = self.draw_mask(img_npy, result,
-                                 labels if labels is not None else output_labels,
+                                 labels if labels is not None else output_catalog,
                                  colors if colors is not None else model.dataset_meta['palette'])
             output_image = convert.npy2img(img)
 
         else:
             output_image = image
 
-        return dict(output_classes=output_classes,
+        return dict(output_catalog=output_catalog,
+                    output_palette=output_palette,
+                    output_classes=output_classes,
                     output_labels=output_labels,
                     output_sem_seg=output_sem_seg,
                     output_sem_seg_shape=output_sem_seg_shape,

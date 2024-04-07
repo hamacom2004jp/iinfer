@@ -1,28 +1,14 @@
 from iinfer.app import injection
-from iinfer.app.postprocesses import csv
 from PIL import Image
 from typing import Tuple, Dict, Any
-import logging
+import csv
+import io
 
 
 class AfterCSVInjection(injection.AfterInjection):
     """
     このクラスは推論実行後の後処理のインジェクションクラスです。
     """
-    def __init__(self, config:Dict[str,Any], logger:logging.Logger):
-        """
-        このクラスのインスタンスを初期化します。
-        継承時は、このコンストラクタを呼び出すようにしてください。
-            super().__init__(logger)
-        Args:
-            config (Dict[str,Any]): 設定
-            logger (logging.Logger): ロガー
-        """
-        super().__init__(config, logger)
-        out_headers = self.get_config("out_headers", default=None)
-        noheader = self.get_config("noheader", default=True)
-        self.csv = csv.Csv(logger, out_headers=out_headers, noheader=noheader)
-        self.csv_session = self.csv.create_session(None, None, None)
 
     def action(self, reskey:str, name:str, outputs:Dict[str, Any], output_image:Image.Image, session:Dict[str, Any]) -> Tuple[Dict[str, Any], Image.Image]:
         """
@@ -48,6 +34,62 @@ class AfterCSVInjection(injection.AfterInjection):
         Returns:
             Tuple[Dict[str, Any], Image.Image]: 後処理後の推論結果と画像データのタプル
         """
-        csv_str = self.csv.post_json(self.csv_session, outputs, output_image)
-        self.add_success(outputs, csv_str)
+        out_headers = self.get_config("out_headers", default=None)
+        noheader = self.get_config("noheader", default=True)
+        result = self.write_csv(outputs, out_headers, noheader)
+        self.add_success(outputs, result)
         return outputs, output_image
+    
+    def write_csv(self, outputs, out_headers, noheader):
+        result = ''
+        if 'success' in outputs and type(outputs['success']) == list:
+            buffer = io.StringIO()
+            for i, data in enumerate(outputs['success']):
+                self._to_csv(data, buffer, i, out_headers, noheader)
+            result = buffer.getvalue().strip()
+            buffer.close()
+
+        elif 'success' in outputs and type(outputs['success']) == dict:
+            buffer = io.StringIO()
+            self._to_csv(outputs['success'], buffer, 0, out_headers, noheader)
+            result = buffer.getvalue().strip()
+            buffer.close()
+
+        elif type(outputs) == list:
+            buffer = io.StringIO()
+            for i, data in enumerate(outputs):
+                self._to_csv(data, buffer, i, out_headers, noheader)
+            result = buffer.getvalue().strip()
+            buffer.close()
+
+        elif type(outputs) == dict:
+            buffer = io.StringIO()
+            self._to_csv(outputs, buffer, 0, out_headers, noheader)
+            result = buffer.getvalue().strip()
+            buffer.close()
+
+        else:
+            buffer = io.StringIO()
+            self._to_csv(outputs, buffer, 0, out_headers, noheader)
+            result = buffer.getvalue().strip()
+            buffer.close()
+        
+        return result
+
+    def _to_csv(self, data, buffer, i, out_headers, noheader):
+        if type(data) == dict:
+            data_keys = data.keys()
+            notfound = [] if out_headers is None else [h for h in out_headers if h not in data_keys]
+            if len(notfound) > 0:
+                raise Exception(f"notfound headers: {notfound}")
+            headers = out_headers if out_headers is not None else list(data_keys)
+            row = {k:v for k, v in data.items() if k in headers}
+            w = csv.DictWriter(buffer, fieldnames=headers)
+            if not noheader and i<=0:
+                w.writeheader()
+            w.writerow(row)
+        elif type(data) == list:
+            csv.writer(buffer).writerow(data)
+        else:
+            buffer.write(str(data))
+            buffer.write("\n")

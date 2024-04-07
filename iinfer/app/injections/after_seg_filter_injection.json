@@ -1,0 +1,7 @@
+{
+    "nodraw": false,
+    "logits_th": -100.0,
+    "classes": [],
+    "labels": [],
+    "del_logits": true
+}

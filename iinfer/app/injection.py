@@ -53,6 +53,15 @@ class Injection(object):
         """
         return self.config.get(key, default)
 
+    def _set_config(self, key:str, val:Any=None) -> Any:
+        """
+        設定を設定します。
+        Args:
+            key (str): キー
+            val (Any): 値
+        """
+        self.config[key] = val
+
 class BeforeInjection(Injection):
     """
     サーバーサイドで実行する前処理を実装するためのクラスです。

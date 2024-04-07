@@ -48,5 +48,5 @@ def test_post_json():
 
     # 結果を検証
     assert result['output_jadge_score'] == [0.7, 0.4, 0.0]
-    assert result['output_jadge_label'] == ('ok', 'ng', 'gray')
+    assert result['output_jadge_label'] == ['ok', 'ng', 'gray']
     assert result['output_jadge'] == 'ng'

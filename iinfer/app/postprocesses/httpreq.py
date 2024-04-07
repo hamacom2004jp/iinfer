@@ -1,9 +1,13 @@
 from iinfer.app import postprocess
 from iinfer.app.commons import convert
+from iinfer.app.injections import after_http_injection
 from PIL import Image
 from typing import Dict, Any
+from urllib3.exceptions import InsecureRequestWarning
 import logging
 import requests
+import urllib3
+urllib3.disable_warnings(InsecureRequestWarning)
 
 class Httpreq(postprocess.Postprocess):
     def __init__(self, logger:logging.Logger, fileup_name:str='file'):
@@ -15,9 +19,8 @@ class Httpreq(postprocess.Postprocess):
         """
         super().__init__(logger)
         self.fileup_name = fileup_name
-        import urllib3
-        from urllib3.exceptions import InsecureRequestWarning
-        urllib3.disable_warnings(InsecureRequestWarning)
+        self.config = dict(fileup_name=fileup_name)
+        self.injection = after_http_injection.AfterHttpInjection(self.config, self.logger)
 
     def create_session(self, json_connectstr:str, img_connectstr:str, text_connectstr:str):
         """
@@ -35,10 +38,10 @@ class Httpreq(postprocess.Postprocess):
             可視化画像後処理のセッション
             テキストデータ処理のセッション
         """
-        json_session = (requests.Session(), json_connectstr)
-        img_session = (requests.Session(), img_connectstr)
-        text_session = (requests.Session(), text_connectstr)
-        return json_session, img_session, text_session
+        self.injection._set_config('outputs_url', json_connectstr)
+        self.injection._set_config('output_image_url', img_connectstr)
+        self.req_session = requests.Session()
+        return json_connectstr, img_connectstr, text_connectstr
 
     def post_text(self, text_session, res_str:str):
         """
@@ -51,16 +54,10 @@ class Httpreq(postprocess.Postprocess):
         Returns:
             str: 後処理結果
         """
-        if text_session is None or text_session[1] == "":
+        if text_session is None:
             return res_str
-        res = text_session[0].post(text_session[1], data=res_str, verify=False)
-        if res.status_code != 200:
-            raise Exception(f"Failed to postprocess. status_code={res.status_code}. res.reason={res.reason} res.text={res.text}")
-        try:
-            outputs = res.json()
-        except:
-            outputs = dict(success=res.text)
-        return outputs
+        result = self.injection.post_text(text_session, self.req_session, res_str)
+        return result
 
     def post_json(self, json_session, outputs:Dict[str, Any], output_image:Image.Image):
         """
@@ -74,16 +71,10 @@ class Httpreq(postprocess.Postprocess):
         Returns:
             Dict[str, Any]: 後処理結果
         """
-        if json_session is None or json_session[1] == "":
+        if json_session is None:
             return outputs
-        res = json_session[0].post(json_session[1], json=outputs, verify=False)
-        if res.status_code != 200:
-            raise Exception(f"Failed to postprocess. status_code={res.status_code}. res.reason={res.reason} res.text={res.text}")
-        try:
-            outputs = res.json()
-        except:
-            outputs = dict(success=res.text)
-        return outputs
+        result = self.injection.post_json(json_session, self.req_session, outputs)
+        return result
 
     def post_img(self, img_session, result:Dict[str, Any], output_image:Image.Image):
         """
@@ -98,14 +89,7 @@ class Httpreq(postprocess.Postprocess):
         Returns:
             Image: 後処理結果
         """
-        if img_session is None or img_session[1] == "":
+        if img_session is None:
             return output_image
-        if self.fileup_name is None:
-            raise Exception(f"fileup_name is empty.")
-        files = {self.fileup_name: convert.img2byte(output_image, "JPEG")}
-        res = img_session[0].post(img_session[1], files=files, verify=False)
-        if res.status_code != 200:
-            raise Exception(f"Failed to postprocess. status_code={res.status_code}. res.reason={res.reason} res.text={res.text}")
-        output_image = convert.imgbytes2npy(res.content)
-        return output_image
-
+        result = self.injection.post_img(img_session, self.req_session, result, output_image)
+        return result

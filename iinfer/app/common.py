@@ -3,11 +3,12 @@ from PIL import Image, ImageDraw
 from pkg_resources import resource_string
 from tabulate import tabulate
 from typing import List, Tuple, Dict, Any
-import json
-import os
+import cv2
 import logging
 import logging.config
+import json
 import numpy as np
+import os
 import platform
 import random
 import shutil
@@ -254,6 +255,34 @@ def cmd(cmd:str, logger:logging.Logger, strip:bool=False):
 
     return proc.returncode, output
 
+def draw_segment(img_npy:np.ndarray, segment:np.ndarray, colors:List[Tuple[int]], nodraw:bool=False) -> np.ndarray:
+    """
+    画像にマスクを描画します。
+
+    Args:
+        img_npy (np.ndarray): 元画像
+        segment (np.ndarray): セグメンテーションのクラスマップ
+        colors (List[Tuple[int]]): クラスごとの色のリスト
+        nodraw (bool, optional): 描画しない場合はTrue. Defaults to False.
+
+    Returns:
+        Image: マスクが描画された画像
+    """
+    img_npy = cv2.cvtColor(img_npy, cv2.COLOR_RGB2BGR)
+    masked_image = np.zeros_like(img_npy)
+
+    for c in np.unique(segment):
+        color = colors[int(c)] if colors is not None else make_color(str(int(c)))
+        m = segment == c
+        r = np.where(m, color[0], 0).astype(np.uint8)
+        g = np.where(m, color[1], 0).astype(np.uint8)
+        b = np.where(m, color[2], 0).astype(np.uint8)
+        mask = cv2.merge([r, g, b])
+        masked_image = cv2.addWeighted(masked_image, 1, mask[0], 1, 0)
+    img_npy = cv2.addWeighted(img_npy, 0.5, masked_image, 0.5, 0)
+    img_npy = cv2.cvtColor(img_npy, cv2.COLOR_BGR2RGB)
+    return img_npy
+
 def draw_boxes(image:Image.Image, boxes:List[List[float]], scores:List[float], classes:List[int], ids:List[str]=None, labels:List[str]=None, colors:List[Tuple[int]]=None,
                nodraw:bool=False, nolookup:bool=False) -> Tuple[Image.Image, List[str]]:
     """
@@ -285,10 +314,10 @@ def draw_boxes(image:Image.Image, boxes:List[List[float]], scores:List[float], c
         y2 = min(image.height, np.floor(y2 + 0.5).astype(int))
         if not nolookup:
             color = colors[int(cl)] if colors is not None and len(colors) > cl else make_color(str(int(cl)))
-            label = labels[int(cl)] if labels is not None else str(id) if id is not None else None
+            label = str(labels[int(cl)]) if labels is not None else str(id) if id is not None else None
         else:
             color = colors[i] if colors is not None and len(colors) > i else make_color(str(int(cl)))
-            label = labels[i] if labels is not None and len(labels) > i else None
+            label = str(labels[i]) if labels is not None and len(labels) > i else None
         if not nodraw:
             if x2 - x1 > 0 and y2 - y1 > 0:
                 draw.rectangle(((x1, y1), (x2, y2)), outline=color)

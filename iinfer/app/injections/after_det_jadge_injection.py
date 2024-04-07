@@ -29,6 +29,44 @@ class AfterDetJadgeInjection(injection.AfterInjection):
         Returns:
             Tuple[Dict[str, Any], Image.Image]: 後処理後の推論結果と画像データのタプル
         """
+        nodraw = self.get_config('nodraw', False)
+
+        try:
+            outputs = self.post_json(outputs)
+        except Exception as e:
+            self.add_warning(outputs, str(e))
+            return outputs, output_image
+
+        try:
+            if not nodraw:
+                output_image = self.post_img(outputs, output_image)
+        except Exception as e:
+            self.add_warning(outputs, str(e))
+            return outputs, output_image
+
+        self.add_success(outputs, outputs['success']['output_jadge'])
+
+        return outputs, output_image
+
+    def post_json(self, outputs:Dict[str, Any]) -> Dict[str, Any]:
+        """
+        outputsに対して後処理を行う関数です。
+        outputsは、以下のような構造を持つDict[str, Any]です。
+        {
+            'success': {
+                'output_ids': List[int],
+                'output_scores': List[float],
+                'output_classes': List[int],
+                'output_labels': List[str],
+                'output_boxes': List[List[int]],
+                'output_tracks': List[int]
+            }
+        }
+        Args:
+            outputs (Dict[str, Any]): 推論結果
+        Returns:
+            Dict[str, Any]: 後処理後の推論結果
+        """
         ok_score_th = self.get_config('ok_score_th', None)
         ok_classes = self.get_config('ok_classes', [])
         ok_labels = self.get_config('ok_labels', [])
@@ -38,25 +76,26 @@ class AfterDetJadgeInjection(injection.AfterInjection):
         ext_score_th = self.get_config('ext_score_th', None)
         ext_classes = self.get_config('ext_classes', [])
         ext_labels = self.get_config('ext_labels', [])
-        nodraw = self.get_config('nodraw', False)
 
+        if ok_score_th is not None and ((ok_classes is None or len(ok_classes)<=0) and (ok_labels is None or len(ok_labels)<=0)):
+            raise Exception('If ok_score_th is specified, ok_classes or ok_labels must be set.')
+        if ng_score_th is not None and ((ng_classes is None or len(ng_classes)<=0) and (ng_labels is None or len(ng_labels)<=0)):
+            raise Exception('If ng_score_th is specified, ng_classes or ng_labels must be set.')
+        if ext_score_th is not None and ((ext_classes is None or len(ext_classes)<=0) and (ext_labels is None or len(ext_labels)<=0)):
+            raise Exception('If ext_score_th is specified, ext_classes or ext_labels must be set.')
+        """
         if ok_score_th is not None and (not(ok_classes is not None and len(ok_classes)>0) or (ok_labels is not None and len(ok_labels)>0)):
-            self.add_warning(outputs, 'If ok_score_th is specified, ok_classes or ok_labels must be set.')
-            return outputs, output_image
+            raise Exception('If ok_score_th is specified, ok_classes or ok_labels must be set.')
         if ng_score_th is not None and (not(ng_classes is not None and len(ng_classes)>0) or (ng_labels is not None and len(ng_labels)>0)):
-            self.add_warning(outputs, 'If ng_score_th is specified, ng_classes or ng_labels must be set.')
-            return outputs, output_image
+            raise Exception(outputs, 'If ng_score_th is specified, ng_classes or ng_labels must be set.')
         if ext_score_th is not None and (not(ext_classes is not None and len(ext_classes)>0) or (ext_labels is not None and len(ext_labels)>0)):
-            self.add_warning(outputs, 'If ext_score_th is specified, ext_classes or ext_labels must be set.')
-            return outputs, output_image
-
+            raise Exception(outputs, 'If ext_score_th is specified, ext_classes or ext_labels must be set.')
+        """
         if 'success' not in outputs or type(outputs['success']) != dict:
-            self.add_warning(outputs, 'Invalid outputs. outputs[\'success\'] must be dict.')
-            return outputs, output_image
+            raise Exception('Invalid outputs. outputs[\'success\'] must be dict.')
         data = outputs['success']
         if 'output_scores' not in data or 'output_classes' not in data:
-            self.add_warning(outputs, 'Invalid outputs. outputs[\'success\'][\'output_scores\'] and outputs[\'success\'][\'output_classes\'] must be set.')
-            return outputs, output_image
+            raise Exception('Invalid outputs. outputs[\'success\'][\'output_scores\'] and outputs[\'success\'][\'output_classes\'] must be set.')
 
         output_jadge_score = [0.0, 0.0, 0.0] # ok, ng, ext
         for i, cls in enumerate(data['output_classes']):
@@ -82,13 +121,33 @@ class AfterDetJadgeInjection(injection.AfterInjection):
         data['output_jadge_score'] = output_jadge_score
         data['output_jadge_label'] = output_jadge_label
         data['output_jadge'] = output_jadge
-        self.add_success(outputs, output_jadge)
+
+        return outputs
+
+    def post_img(self, outputs:Dict[str, Any], output_image:Image.Image) -> Image.Image:
+        """
+        output_imageに対して後処理を行う関数です。
+        Args:
+            outputs (Dict[str, Any]): 後処理結果
+            output_image (Image.Image): 推論後の画像データ
+        Returns:    
+            Image: 後処理結果
+        """
+        if 'success' not in outputs or type(outputs['success']) != dict:
+            raise Exception('Invalid outputs. outputs[\'success\'] must be dict.')
+        data = outputs['success']
+        if 'output_jadge_score' not in data:
+            raise Exception('Invalid outputs. outputs[\'success\'][\'output_jadge_score\'] must be set.')
+        if 'output_jadge' not in data:
+            raise Exception('Invalid outputs. outputs[\'success\'][\'output_jadge\'] must be set.')
+        output_jadge_score = data['output_jadge_score']
+        output_jadge = data['output_jadge']
 
         jadge_score = output_jadge_score[output_jadge_score.index(max(output_jadge_score))]
         draw = ImageDraw.Draw(output_image)
-        if not nodraw:
-            color = common.make_color(str(jadge_score*1000))
-            draw.rectangle(((0, 0), (output_image.width, 10)), outline=color, fill=color)
-            draw.text((0, 0), f"{output_jadge}:{jadge_score}", tuple([int(255-c) for c in color]))
 
-        return outputs, output_image
+        color = common.make_color(str(jadge_score*1000))
+        draw.rectangle(((0, 0), (output_image.width, 10)), outline=color, fill=color)
+        draw.text((0, 0), f"{output_jadge}:{jadge_score}", tuple([int(255-c) for c in color]))
+
+        return output_image

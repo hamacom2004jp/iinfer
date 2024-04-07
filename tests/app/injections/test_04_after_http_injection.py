@@ -44,4 +44,4 @@ def test_after_http_injection_action():
     assert "output_labels" in result_outputs["success"]
     assert "output_tracks" in result_outputs["success"]
 
-    assert result_outputs["injection_success"] == ["response", "response"]
+    assert result_outputs["injection_success"] == [{'success': 'response'}]

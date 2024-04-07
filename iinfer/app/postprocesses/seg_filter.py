@@ -1,40 +1,28 @@
-from iinfer.app import postprocess
+from iinfer.app import common, postprocess
 from iinfer.app.commons import convert
-from iinfer.app.injections import after_det_jadge_injection
+from iinfer.app.injections import after_seg_filter_injection
 from PIL import Image
 from typing import Dict, Any, List
 import cv2
 import logging
 
-class DetJadge(postprocess.Postprocess):
-    def __init__(self, logger:logging.Logger,
-                 ok_score_th:float=None, ok_classes:List[int]=None, ok_labels:List[str]=None,
-                 ng_score_th:float=None, ng_classes:List[int]=None, ng_labels:List[str]=None,
-                 ext_score_th:float=None, ext_classes:List[int]=None, ext_labels:List[str]=None,
-                 nodraw:bool=False, output_preview:bool=False):
+class SegFilter(postprocess.Postprocess):
+    def __init__(self, logger:logging.Logger, logits_th:float=-100.0, classes:List[int]=None, labels:List[str]=None, nodraw:bool=False, del_logits:bool=True):
         """
-        Object Detection推論結果のクラススコア元に、この画像としてOK/NG/Grayの判定結果を追加する後処理クラスです。
-
+        Segmentationの推論結果をフィルタリングする後処理クラスです。
+        閾値に満たない推論結果を除外します。
+        
         Args:
             logger (logging.Logger): ロガー
-            ok_score_th (float): ok判定確定のスコアの閾値
-            ok_classes (List[int]): ok判定確定のクラスのリスト
-            ok_labels (List[str]): ok判定確定のラベルのリスト
-            ng_score_th (float): ng判定確定のスコアの閾値
-            ng_classes (List[int]): ng判定確定のクラスのリスト
-            ng_labels (List[str]): ng判定確定のラベルのリスト
-            ext_score_th (float): gray判定確定のスコアの閾値
-            ext_classes (List[int]): gray判定確定のクラスのリスト
-            ext_labels (List[str]): gray判定確定のラベルのリスト
+            logits_th (float): スコアの閾値
+            classes (List[int]): クラスのリスト
+            labels (List[str]): ラベルのリスト
             nodraw (bool): 描画しない
-            output_preview (bool): プレビューを出力する
+            del_logits (bool): スコア要素を削除する
         """
         super().__init__(logger)
-        self.config = dict(ok_score_th=ok_score_th, ok_classes=ok_classes, ok_labels=ok_labels,
-                           ng_score_th=ng_score_th, ng_classes=ng_classes, ng_labels=ng_labels,
-                           ext_score_th=ext_score_th, ext_classes=ext_classes, ext_labels=ext_labels,
-                           nodraw=nodraw, output_preview=output_preview)
-        self.injection = after_det_jadge_injection.AfterDetJadgeInjection(self.config, self.logger)
+        self.config = dict(logits_th=logits_th, classes=classes, labels=labels, nodraw=nodraw, del_logits=del_logits)
+        self.injection = after_seg_filter_injection.AfterSegFilterInjection(self.config, self.logger)
 
     def create_session(self, json_connectstr:str, img_connectstr:str, text_connectstr:str):
         """
@@ -77,7 +65,7 @@ class DetJadge(postprocess.Postprocess):
         Returns:
             Dict[str, Any]: 後処理結果
         """
-        outputs = self.injection.post_json(outputs)
+        outputs, output_image = self.injection.post_json(outputs, output_image)
         data = outputs['success']
         return data
 
@@ -95,6 +83,7 @@ class DetJadge(postprocess.Postprocess):
             Image: 後処理結果
         """
         output_image = self.injection.post_img(dict(success=result), output_image)
+
         output_preview = self.injection.get_config('output_preview', False)
         if output_preview:
             # RGB画像をBGR画像に変換

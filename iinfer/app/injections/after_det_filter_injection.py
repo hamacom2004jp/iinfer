@@ -1,4 +1,4 @@
-from iinfer.app import injection
+from iinfer.app import common, injection
 from PIL import Image
 from typing import Tuple, Dict, Any
 
@@ -29,6 +29,44 @@ class AfterDetFilterInjection(injection.AfterInjection):
         Returns:
             Tuple[Dict[str, Any], Image.Image]: 後処理後の推論結果と画像データのタプル
         """
+        nodraw = self.get_config('nodraw', False)
+
+        try:
+            outputs = self.post_json(outputs)
+        except Exception as e:
+            self.add_warning(outputs, str(e))
+            return outputs, output_image
+
+        try:
+            if not nodraw:
+                output_image = self.post_img(outputs, output_image)
+        except Exception as e:
+            self.add_warning(outputs, str(e))
+            return outputs, output_image
+
+        self.add_success(outputs, "filterd")
+
+        return outputs, output_image
+
+    def post_json(self, outputs:Dict[str, Any]) -> Dict[str, Any]:
+        """
+        outputsに対して後処理を行う関数です。
+        outputsは、以下のような構造を持つDict[str, Any]です。
+        {
+            'success': {
+                'output_ids': List[int],
+                'output_scores': List[float],
+                'output_classes': List[int],
+                'output_labels': List[str],
+                'output_boxes': List[List[int]],
+                'output_tracks': List[int]
+            }
+        }
+        Args:
+            outputs (Dict[str, Any]): 推論結果。
+        Returns:
+            Dict[str, Any]: 後処理後の推論結果
+        """
         score_th = self.get_config('score_th', 0.0)
         width_th = self.get_config('width_th', 0)
         height_th = self.get_config('height_th', 0)
@@ -36,12 +74,10 @@ class AfterDetFilterInjection(injection.AfterInjection):
         labels = self.get_config('labels', [])
 
         if 'success' not in outputs or type(outputs['success']) != dict:
-            self.add_warning(outputs, 'Invalid outputs. outputs[\'success\'] must be dict.')
-            return outputs, output_image
+            raise Exception('Invalid outputs. outputs[\'success\'] must be dict.')
         data = outputs['success']
         if 'output_scores' not in data or 'output_classes' not in data:
-            self.add_warning(outputs, 'Invalid outputs. outputs[\'success\'][\'output_scores\'] and outputs[\'success\'][\'output_classes\'] must be set.')
-            return outputs, output_image
+            raise Exception('Invalid outputs. outputs[\'success\'][\'output_scores\'] and outputs[\'success\'][\'output_classes\'] must be set.')
         output_boxes = []
         output_scores = []
         output_classes = []
@@ -75,6 +111,26 @@ class AfterDetFilterInjection(injection.AfterInjection):
         if 'output_tracks' in data:
             data['output_tracks'] = output_tracks
 
-        self.add_success(outputs, "filterd")
+        return outputs
 
-        return outputs, output_image
+    def post_img(self, outputs:Dict[str, Any], output_image:Image.Image) -> Image.Image:
+        """
+        output_imageに対して後処理を行う関数です。
+        Args:
+            outputs (Dict[str, Any]): 後処理結果
+            output_image (Image.Image): 推論後の画像データ
+        Returns:
+            Image.Image: 後処理後の画像データ
+        """
+        if 'success' not in outputs or type(outputs['success']) != dict:
+            raise Exception(outputs, 'Invalid outputs. outputs[\'success\'] must be dict.')
+
+        nodraw = self.get_config('nodraw', False)
+
+        data = outputs['success']
+        output_labels = data["output_labels"] if "output_labels" in data else None
+        output_tracks = data["output_tracks"] if "output_tracks" in data else None
+        image, output_labels = common.draw_boxes(output_image, data["output_boxes"], data["output_scores"], data["output_classes"],
+                                                 ids=output_labels, labels=output_tracks, nodraw=nodraw, nolookup=True)
+
+        return image

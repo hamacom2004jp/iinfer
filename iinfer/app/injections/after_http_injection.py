@@ -32,30 +32,65 @@ class AfterHttpInjection(injection.AfterInjection):
         Returns:
             Tuple[Dict[str, Any], Image.Image]: 後処理後の推論結果と画像データのタプル
         """
-        outputs_url = self.get_config('outputs_url', None)
-        if outputs_url is not None:
-            resp = requests.post(outputs_url, json=outputs)
-            if resp.status_code != 200:
-                self.add_warning(outputs, f"HTTP POST request failed with status code {resp.status_code}. {outputs_url}")
+        req_session = requests.Session()
+        try:
+            url = self.get_config('outputs_url', None)
+            if url is None:
+                self.add_warning(outputs, "No outputs_url in config")
             else:
-                self.add_success(outputs, resp.text)
-        else:
-            self.add_warning(outputs, f"No outputs_url in config")
+                result = self.post_json(url, req_session, outputs)
+                self.add_success(outputs, result)
+        except Exception as e:
+            self.add_warning(outputs, str(e))
 
-        output_image_url = self.get_config('output_image_url', None)
-        if output_image_url is not None:
-            ext = self.get_config('output_image_ext', 'jpeg')
-            prefix = self.get_config('output_image_prefix', 'output_')
-            img_bytes = convert.img2byte(output_image, format=ext)
-            finename = f'{prefix}{datetime.datetime.now().strftime("%Y%m%d%H%M%S")}.{ext}'
-            finename = finename if 'output_image_name' not in outputs else outputs['output_image_name']
-            file = {'file': (finename, io.BytesIO(img_bytes))}
-            resp = requests.post(output_image_url, files=file)
-            if resp.status_code != 200:
-                self.add_warning(outputs, f"HTTP POST request failed with status code {resp.status_code}. {output_image_url}")
+        try:
+            url = self.get_config('output_image_url', None)
+            if url is None:
+                self.add_warning(outputs, "No output_image_url in config")
             else:
-                self.add_success(outputs, resp.text)
-        else:
-            self.add_warning(outputs, "No output_image_url in config")
+                result = self.post_img(req_session, outputs, output_image)
+                self.add_success(outputs, result)
+        except Exception as e:
+            self.add_warning(outputs, str(e))
 
         return outputs, output_image
+
+    def post_text(self, url, req_session:requests.Session, res_str:str):
+        res = req_session.post(url, data=res_str, verify=False)
+        if res.status_code != 200:
+            raise Exception(f"HTTP POST request failed. status_code={res.status_code} res.reason={res.reason} res.text={res.text} url={url}")
+        try:
+            result = res.json()
+        except:
+            result = dict(success=res.text)
+        return result
+
+    def post_json(self, url, req_session:requests.Session, outputs:Dict[str, Any]):
+        res = req_session.post(url, json=outputs, verify=False)
+        if res.status_code != 200:
+            raise Exception(f"HTTP POST request failed. status_code={res.status_code} res.reason={res.reason} res.text={res.text} url={url}")
+        try:
+            result = res.json()
+        except:
+            result = dict(success=res.text)
+        return result
+
+    def post_img(self, url, req_session:requests.Session, outputs:Dict[str, Any], output_image:Image.Image):
+        finename = self.get_config('fileup_name', None)
+        ext = self.get_config('output_image_ext', 'jpeg')
+        if finename is None:
+            prefix = self.get_config('output_image_prefix', 'output_')
+            finename = f'{prefix}{datetime.datetime.now().strftime("%Y%m%d%H%M%S")}.{ext}'
+
+        finename = finename if 'output_image_name' not in outputs else outputs['output_image_name']
+        img_bytes = convert.img2byte(output_image, format=ext)
+        file = {'file': (finename, io.BytesIO(img_bytes))}
+
+        res = req_session.post(url, files=file, verify=False)
+        if res.status_code != 200:
+            raise Exception(f"HTTP POST request failed. status_code={res.status_code} res.reason={res.reason} res.text={res.text} url={url}")
+        try:
+            result = res.json()
+        except:
+            result = dict(success=res.text)
+        return result

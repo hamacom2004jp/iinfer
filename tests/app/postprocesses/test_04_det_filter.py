@@ -1,9 +1,7 @@
-import pytest
 from PIL import Image
 from iinfer.app.postprocesses.det_filter import DetFilter
-
-# DetFilterクラスのインスタンスを作成
-det_filter = DetFilter(score_th=0.5, width_th=10, height_th=10, classes=[0, 1, 2], labels=['label1', 'label2', 'label3'])
+import pytest
+import logging
 
 def test_post_json():
     """
@@ -25,6 +23,9 @@ def test_post_json():
         }
     }
     output_image = Image.new('RGB', (100, 100))
+
+    # DetFilterクラスのインスタンスを作成
+    det_filter = DetFilter(logging.getLogger(), score_th=0.5, width_th=10, height_th=10, classes=[0, 1, 2], labels=['label1', 'label2', 'label3'])
 
     # post_jsonメソッドをテスト
     result = det_filter.post_json(json_session, outputs, output_image)

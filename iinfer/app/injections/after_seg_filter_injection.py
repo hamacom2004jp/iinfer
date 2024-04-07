@@ -1,12 +1,11 @@
-from iinfer.app import injection
+from iinfer.app import common, injection
 from iinfer.app.commons import convert
-from PIL import Image, ImageDraw
+from PIL import Image
 from typing import Tuple, Dict, Any
-import cv2
 import numpy as np
 
 
-class AfterSegBBoxInjection(injection.AfterInjection):
+class AfterSegFilterInjection(injection.AfterInjection):
 
     def action(self, reskey:str, name:str, outputs:Dict[str, Any], output_image:Image.Image, session:Dict[str, Any]) -> Tuple[Dict[str, Any], Image.Image]:
         """
@@ -34,17 +33,16 @@ class AfterSegBBoxInjection(injection.AfterInjection):
         """
         try:
             outputs = self.post_json(outputs)
-            self.add_success(outputs, "calc bboxes.")
+            self.add_success(outputs, "filterd segment.")
         except Exception as e:
             self.add_warning(outputs, f'Error: {str(e)}')
         try:
             output_image = self.post_img(outputs, output_image)
-            self.add_success(outputs, "draw bboxes.")
+            self.add_success(outputs, "draw segment.")
         except Exception as e:
             self.add_warning(outputs, f'Error: {str(e)}')
 
         return outputs, output_image
-
 
     def post_json(self, outputs:Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -55,16 +53,25 @@ class AfterSegBBoxInjection(injection.AfterInjection):
                 'output_sem_seg': str,
                 'output_sem_seg_shape': List[int],
                 'output_sem_seg_dtype': str,
+                'output_seg_logits': str,
+                'output_seg_logits_shape': List[int],
+                'output_seg_logits_dtype': str,
+                'output_catalog': List[str],
+                'output_palette': List[int],
                 'output_classes': List[int],
-                'output_labels': List[str],
-                'output_palette': List[int]
+                'output_labels': List[str]
             }
         }
         Args:
             outputs (Dict[str, Any]): 推論結果
         Returns:
-            Dict[str, Any]: 後処理結果
+            Dict[str, Any]: 後処理後の推論結果
         """
+        logits_th = self.get_config('logits_th', -100.0)
+        classes = self.get_config('classes', [])
+        labels = self.get_config('labels', [])
+        del_logits = self.get_config('del_logits', True)
+
         if 'success' not in outputs or type(outputs['success']) != dict:
             raise Exception('Invalid outputs. outputs[\'success\'] must be dict.')
         data = outputs['success']
@@ -74,23 +81,52 @@ class AfterSegBBoxInjection(injection.AfterInjection):
             raise Exception('Invalid outputs. outputs[\'success\'][\'output_sem_seg_shape\'] must be set.')
         if 'output_sem_seg_dtype' not in data:
             raise Exception('Invalid outputs. outputs[\'success\'][\'output_sem_seg_dtype\'] must be set.')
+        if 'output_seg_logits' not in data:
+            raise Exception('Invalid outputs. outputs[\'success\'][\'output_seg_logits\'] must be set.')
+        if 'output_seg_logits_shape' not in data:
+            raise Exception('Invalid outputs. outputs[\'success\'][\'output_seg_logits_shape\'] must be set.')
+        if 'output_seg_logits_dtype' not in data:
+            raise Exception('Invalid outputs. outputs[\'success\'][\'output_seg_logits_dtype\'] must be set.')
+        if 'output_catalog' not in data:
+            raise Exception('Invalid outputs. outputs[\'success\'][\'output_catalog\'] must be set.')
         if 'output_classes' not in data:
             raise Exception('Invalid outputs. outputs[\'success\'][\'output_classes\'] must be set.')
         if 'output_labels' not in data:
             raise Exception('Invalid outputs. outputs[\'success\'][\'output_labels\'] must be set.')
-        output_classes = data['output_classes']
+
+        output_catalog = data['output_catalog']
         output_labels = data['output_labels']
+        chk_classes = [c for c in classes if c >= len(output_catalog)]
+        if len(chk_classes) > 0:
+            raise Exception(f'Invalid config classes. "{chk_classes}" not included in output_catalog index is specified.')
+        if len(labels) == 0:
+            labels = [output_catalog[c] for c in classes]
+        chk_labels = [c for c in labels if c not in output_catalog]
+        if len(chk_labels) > 0:
+            raise Exception(f'Invalid config labels. "{chk_labels}" not included in output_catalog is specified.')
+        cls_list = []
+        for i, lbl in enumerate(output_catalog):
+            if lbl in labels:
+                cls_list.append(i)
+        classes = list(set(cls_list+classes))
+
         segment = convert.b64str2npy(data['output_sem_seg'], data['output_sem_seg_shape'], data['output_sem_seg_dtype'])
-        output_boxes, output_rbboxes, output_rounds, class_int = self.gen_bboxes(segment[0,], output_classes, output_labels)
-        del_segments = self.get_config('del_segments', True)
-        data['output_boxes'] = output_boxes
-        data['output_boxes_classes'] = class_int
-        data['output_rounds'] = output_rounds
-        data['output_rbboxes'] = output_rbboxes
-        if del_segments:
-            del data['output_sem_seg']
-            del data['output_sem_seg_shape']
-            del data['output_sem_seg_dtype']
+        logits = convert.b64str2npy(data['output_seg_logits'], data['output_seg_logits_shape'], data['output_seg_logits_dtype'])
+
+        if len(classes) > 0:
+            data['output_classes'] = classes
+            data['output_labels'] = labels
+            segment = np.where(np.isin(segment, classes), segment, 0)
+            logits = np.where(logits>logits_th, logits, 0)
+            for c in classes:
+                segment = np.where(logits[c]>logits_th, segment, 0)
+
+        data['output_sem_seg'] = convert.npy2b64str(segment)
+        if del_logits:
+            del data['output_seg_logits']
+            del data['output_seg_logits_shape']
+            del data['output_seg_logits_dtype']
+
         return outputs
 
     def post_img(self, outputs:Dict[str, Any], output_image:Image.Image) -> Image.Image:
@@ -103,65 +139,25 @@ class AfterSegBBoxInjection(injection.AfterInjection):
         Returns:
             Image: 後処理結果
         """
-        nodraw = self.get_config('nodraw', False)
-        nodraw_bbox = self.get_config('nodraw_bbox', True)
-        nodraw_rbbox = self.get_config('nodraw_rbbox', False)
 
+        nodraw = self.get_config('nodraw', False)
         if not nodraw:
             if 'success' not in outputs or type(outputs['success']) != dict:
                 raise Exception('Invalid outputs. outputs[\'success\'] must be dict.')
             data = outputs['success']
+            if 'output_sem_seg' not in data:
+                raise Exception('Invalid outputs. outputs[\'success\'][\'output_sem_seg\'] must be set.')
+            if 'output_sem_seg_shape' not in data:
+                raise Exception('Invalid outputs. outputs[\'success\'][\'output_sem_seg_shape\'] must be set.')
+            if 'output_sem_seg_dtype' not in data:
+                raise Exception('Invalid outputs. outputs[\'success\'][\'output_sem_seg_dtype\'] must be set.')
             if 'output_palette' not in data:
                 raise Exception('Invalid outputs. outputs[\'success\'][\'output_palette\'] must be set.')
-            if 'output_boxes' not in data:
-                raise Exception('Invalid outputs. outputs[\'success\'][\'output_boxes\'] must be set.')
-            if 'output_boxes_classes' not in data:
-                raise Exception('Invalid outputs. outputs[\'success\'][\'output_boxes_classes\'] must be set.')
-            if 'output_labels' not in data:
-                raise Exception('Invalid outputs. outputs[\'success\'][\'output_labels\'] must be set.')
-            if 'output_rounds' not in data:
-                raise Exception('Invalid outputs. outputs[\'success\'][\'output_rounds\'] must be set.')
-            if 'output_rbboxes' not in data:
-                raise Exception('Invalid outputs. outputs[\'success\'][\'output_rbboxes\'] must be set.')
+            segment = convert.b64str2npy(data['output_sem_seg'], data['output_sem_seg_shape'], data['output_sem_seg_dtype'])
             output_palette = data['output_palette']
-            output_boxes = data['output_boxes']
-            output_boxes_classes = data['output_boxes_classes']
-            output_labels = data['output_labels']
-            output_rounds = data['output_rounds']
-            output_rbboxes = data['output_rbboxes']
 
-            draw = ImageDraw.Draw(output_image)
-            if not nodraw_bbox:
-                for box, cls, lbl in zip(output_boxes, output_boxes_classes, output_labels):
-                    color = tuple(output_palette[cls])
-                    draw.rectangle(box, outline=color)
-                    draw.text((box[0], box[1]), lbl, fill=color)
-            if not nodraw_rbbox:
-                for rbox, cls, lbl, r in zip(output_rbboxes, output_boxes_classes, output_labels, output_rounds):
-                    color = tuple(output_palette[cls])
-                    draw.polygon([(p[0],p[1]) for p in rbox], outline=color, width=1)
-                    draw.text((rbox[0][0], rbox[0][1]), f'{lbl}:{r:.2f}', fill=color)
+            img_npy = convert.img2npy(output_image)
+            img_npy = common.draw_segment(img_npy, segment, output_palette, nodraw)
+            output_image = convert.npy2img(img_npy)
+
         return output_image
-
-
-    def gen_bboxes(self, mask, classes, labels):
-        class_int = []
-        bbox_int = []
-        rbbox_int = []
-        rbbox_round = []
-        mask_npy = mask.astype(np.uint8)
-        for c, l in zip(classes, labels):
-            seg = np.where(mask_npy == c, 255, 0).astype(np.uint8)
-            contours, hierarchy = cv2.findContours(seg, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-            for cont in contours:
-                rect = cv2.minAreaRect(cont)
-                box = cv2.boxPoints(rect)
-                x_min = np.min(cont[:,:,0])
-                x_max = np.max(cont[:,:,0])
-                y_min = np.min(cont[:,:,1])
-                y_max = np.max(cont[:,:,1])
-                bbox_int.append([x_min.astype(int), y_min.astype(int), x_max.astype(int), y_max.astype(int)])
-                rbbox_int.append(box.astype(np.int32).tolist())
-                class_int.append(c)
-                rbbox_round.append(rect[2])
-        return bbox_int, rbbox_int, rbbox_round, class_int

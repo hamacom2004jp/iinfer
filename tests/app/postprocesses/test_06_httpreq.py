@@ -1,51 +1,76 @@
-import pytest
-from unittest.mock import Mock, patch
-from PIL import Image
+# FILEPATH: /c:/Users/hama/OneDrive/デスクトップ/devenv/iinfer/tests/app/postprocesses/test_httpreq.py
+
 from iinfer.app.postprocesses.httpreq import Httpreq
-from iinfer.app.postprocesses import convert
+from PIL import Image
+from unittest.mock import Mock
+import pytest
+import logging
+import numpy as np
+import requests_mock
+
+def test_post_text():
+    """
+    このテストコードは、HttpReqクラスのpost_textメソッドが期待通りに動作することを確認します。
+    """
+    # テスト用の res_str を作成
+    res_str = "テストテキスト"
+
+    # HttpReq インスタンスを作成
+    http = Httpreq(logging.getLogger(), "test_file.jpg")
+    http.create_session("http://outputs_url", "http://output_image_url", "http://outputs_text_url")
+    with requests_mock.Mocker() as m:
+        m.post('http://outputs_url', text='期待する結果')
+        m.post('http://output_image_url', text='期待する結果')
+        m.post('http://outputs_text_url', text='期待する結果')
+
+        # post_text メソッドを呼び出す
+        result = http.post_text("http://outputs_text_url", res_str)
+
+        # 結果を検証する
+        assert result == {'success': '期待する結果'}
+
+def test_post_json():
+    """
+    このテストコードは、HttpReqクラスのpost_jsonメソッドが期待通りに動作することを確認します。
+    """
+    # HttpReq インスタンスを作成
+    http = Httpreq(logging.getLogger(), "test_file.jpg")
+    http.create_session("http://outputs_url", "http://output_image_url", "http://outputs_text_url")
+    with requests_mock.Mocker() as m:
+        m.post('http://outputs_url', text='期待する結果')
+        m.post('http://output_image_url', text='期待する結果')
+        m.post('http://outputs_text_url', text='期待する結果')
+
+        # テスト用の res_json を作成
+        res_json = {"res_key": "res_value"}
+        # テスト用の res_img を作成
+        res_img = Image.fromarray(np.zeros((100, 100, 3), dtype=np.uint8))
+
+        # post_json メソッドを呼び出す
+        result = http.post_json("http://outputs_text_url", res_json, res_img)
+
+        # 結果を検証する
+        assert result == {'success': '期待する結果'}
 
 def test_post_img():
     """
-    このテストコードは、Httpreqクラスのpost_imgメソッドが期待通りに動作することを確認します。
+    このテストコードは、HttpReqクラスのpost_imgメソッドが期待通りに動作することを確認します。
     """
-    # Httpreq インスタンスを作成
-    httpreq = Httpreq()
+    # HttpReq インスタンスを作成
+    http = Httpreq(logging.getLogger(), "test_file.jpg")
+    http.create_session("http://outputs_url", "http://output_image_url", "http://outputs_text_url")
+    with requests_mock.Mocker() as m:
+        m.post('http://outputs_url', text='期待する結果')
+        m.post('http://output_image_url', text='期待する結果')
+        m.post('http://outputs_text_url', text='期待する結果')
 
-    # テスト用の画像を作成
-    output_image = Image.new('RGB', (60, 30), color = 'red')
+        # テスト用の res_json を作成
+        res_json = {"res_key": "res_value"}
+        # テスト用の res_img を作成
+        res_img = Image.fromarray(np.zeros((100, 100, 3), dtype=np.uint8))
 
-    # テスト用の result を作成
-    result = {"key": "value"}
+        # post_img メソッドを呼び出す
+        result = http.post_img("http://outputs_text_url", res_json, res_img)
 
-    # テスト用の img_session を作成
-    mock_session = Mock()
-    img_session = (mock_session, "http://testsite.com")
-
-    # fileup_name を設定
-    httpreq.fileup_name = "test_file"
-
-    # post メソッドが 200 を返すように設定
-    mock_response = Mock()
-    mock_response.status_code = 200
-    mock_response.content = convert.img2byte(output_image, "JPEG")
-    mock_session.post.return_value = mock_response
-
-    # post_img メソッドを実行
-    returned_image = httpreq.post_img(img_session, result, output_image)
-
-    # post メソッドが期待通りに呼び出されたことを確認
-    mock_session.post.assert_called_once_with(img_session[1], files={"test_file": convert.img2byte(output_image, "JPEG")}, verify=False)
-
-    # 期待する画像が返されたことを確認
-    assert returned_image == output_image
-
-    # fileup_name が None の場合に Exception がスローされることを確認
-    httpreq.fileup_name = None
-    with pytest.raises(Exception, match="fileup_name is empty."):
-        httpreq.post_img(img_session, result, output_image)
-
-    # post メソッドが 200 以外を返す場合に Exception がスローされることを確認
-    httpreq.fileup_name = "test_file"
-    mock_response.status_code = 404
-    with pytest.raises(Exception, match="Failed to postprocess. status_code=404."):
-        httpreq.post_img(img_session, result, output_image)
+        # 結果を検証する
+        assert result == {'success': '期待する結果'}

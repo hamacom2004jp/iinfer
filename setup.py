@@ -21,6 +21,7 @@ INSTALL_REQUIRES = [
     'redis',
     'requests',
     'tabulate',
+    'urllib3',
     'wheel'
 ]
 PACKAGES = [

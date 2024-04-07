@@ -9,6 +9,7 @@ pytest-order
 pyyaml
 redis
 requests
+requests_mock
 tabulate
 twine
 six
