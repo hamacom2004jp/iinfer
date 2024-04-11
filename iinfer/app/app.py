@@ -1,6 +1,6 @@
 from iinfer import version
 from iinfer.app import common, client, gui, install, postprocess, redis, server
-from iinfer.app.postprocesses import csv, det_clip, det_face_store, det_filter, det_jadge, cls_jadge, httpreq
+from iinfer.app.postprocesses import cls_jadge, csv, det_clip, det_face_store, det_filter, det_jadge, httpreq, seg_bbox, seg_filter
 from pathlib import Path
 import argparse
 import argcomplete
@@ -36,7 +36,7 @@ def _main(args_list:list=None):
                                  'start', 'stop', # server or client or gui mode
                                  'list' , # server mode
                                  'deploy', 'deploy_list', 'undeploy', 'predict', 'predict_type_list', 'capture', # client mode
-                                 'det_filter', 'det_jadge', 'det_clip', 'det_face_store', 'cls_jadge', 'csv', 'httpreq', # postprocess mode
+                                 'cls_jadge', 'csv', 'det_clip', 'det_face_store', 'det_filter', 'det_jadge', 'httpreq', 'seg_bbox', 'seg_filter', # postprocess mode
                                 ])
     parser.add_argument('-T','--use_track', help='Setting the multi object tracking enable for Object Detection.', action='store_true')
     parser.add_argument('--model_img_width', help='Setting the cmd deploy model_img_width.', type=int)
@@ -103,6 +103,12 @@ def _main(args_list:list=None):
     parser.add_argument('--ext_classes', help='Setting the postprocess ext_classes.', type=int, action='append')
     parser.add_argument('--ext_labels', help='Setting the postprocess ext_labels.', type=str, action='append')
     parser.add_argument('--face_threshold', help='Setting the postprocess face_threshold.', type=float, default=0.0)
+
+    parser.add_argument('--del_segments', help='Setting the postprocess del_segments.', action='store_true')
+    parser.add_argument('--nodraw_bbox', help='Setting the postprocess nodraw_bbox.', action='store_true')
+    parser.add_argument('--nodraw_rbbox', help='Setting the postprocess nodraw_rbbox.', action='store_true')
+    parser.add_argument('--logits_th', help='Setting the postprocess logits_th.', type=float, default=0.0)
+    parser.add_argument('--del_logits', help='Setting the postprocess del_logits.', action='store_true')
 
     parser.add_argument('--install_iinfer', help='Setting the install server install_iinfer.', type=str, default='iinfer')
     parser.add_argument('--install_onnx', help='Setting the install server install_onnx.', action='store_true')
@@ -195,6 +201,12 @@ def _main(args_list:list=None):
     ext_classes = common.getopt(opt, 'ext_classes', preval=args_dict, withset=True)
     ext_labels = common.getopt(opt, 'ext_labels', preval=args_dict, withset=True)
     face_threshold = common.getopt(opt, 'face_threshold', preval=args_dict, withset=True)
+
+    del_segments = common.getopt(opt, 'del_segments', preval=args_dict, withset=True)
+    nodraw_bbox = common.getopt(opt, 'nodraw_bbox', preval=args_dict, withset=True)
+    nodraw_rbbox = common.getopt(opt, 'nodraw_rbbox', preval=args_dict, withset=True)
+    logits_th = common.getopt(opt, 'logits_th', preval=args_dict, withset=True)
+    del_logits = common.getopt(opt, 'del_logits', preval=args_dict, withset=True)
 
     install_iinfer = common.getopt(opt, 'install_iinfer', preval=args_dict, withset=True)
     install_onnx = common.getopt(opt, 'install_onnx', preval=args_dict, withset=True)
@@ -423,17 +435,70 @@ def _main(args_list:list=None):
                 except:
                     pass
 
-        if cmd == 'det_filter':
-            proc = det_filter.DetFilter(logger, score_th=score_th, width_th=width_th, height_th=height_th, classes=classes, labels=labels, nodraw=nodraw, output_preview=output_preview)
+        def _exec_proc(input_file, stdin, proc:postprocess.Postprocess, json_connectstr, img_connectstr, text_connectstr, timeout, format, tm, output_json, output_json_append, output_csv=None):
             if input_file is not None:
                 with open(input_file, 'r', encoding="UTF-8") as f:
-                    ret = _to_proc(f.readlines(), proc, json_connectstr, img_connectstr, None, timeout, format, tm, output_json, output_json_append)
+                    ret = _to_proc(f.readlines(), proc, json_connectstr, img_connectstr, None, timeout, format, tm, output_json, output_json_append, output_csv=output_csv)
             elif stdin:
-                ret = _to_proc(sys.stdin, proc, json_connectstr, img_connectstr, None, timeout, format, tm, output_json, output_json_append)
+                ret = _to_proc(sys.stdin, proc, json_connectstr, img_connectstr, None, timeout, format, tm, output_json, output_json_append, output_csv=output_csv)
             else:
                 msg = {"warn":f"Image file or stdin is empty."}
                 common.print_format(msg, format, tm, output_json, output_json_append)
                 return 1, msg
+            return 0, ret
+
+        if cmd == 'cls_jadge':
+            try:
+                proc = cls_jadge.ClaJadge(logger, ok_score_th=ok_score_th, ok_classes=ok_classes, ok_labels=ok_labels,
+                                        ng_score_th=ng_score_th, ng_classes=ng_classes, ng_labels=ng_labels,
+                                        ext_score_th=ext_score_th, ext_classes=ext_classes, ext_labels=ext_labels,
+                                        nodraw=nodraw, output_preview=output_preview)
+            except Exception as e:
+                common.print_format({"warn":f"Invalid options. {e}"}, format, tm, output_json, output_json_append)
+                return 1, msg
+            code, ret = _exec_proc(input_file, stdin, proc, json_connectstr, img_connectstr, None, timeout, format, tm, output_json, output_json_append)
+            if code != 0:
+                return code, ret
+
+        elif cmd == 'csv':
+            try:
+                proc = csv.Csv(logger, out_headers=out_headers, noheader=noheader)
+            except Exception as e:
+                common.print_format({"warn":f"Invalid options. {e}"}, format, tm, output_json, output_json_append)
+                return 1, msg
+            code, ret = _exec_proc(input_file, stdin, proc, json_connectstr, img_connectstr, None, timeout, False, tm, None, False, output_csv=output_csv)
+            if code != 0:
+                return code, ret
+
+        elif cmd == 'det_clip':
+            try:
+                proc = det_clip.DetClip(logger, image_type=image_type, clip_margin=clip_margin)
+            except Exception as e:
+                common.print_format({"warn":f"Invalid options. {e}"}, format, tm, output_json, output_json_append)
+                return 1, msg
+            code, ret = _exec_proc(input_file, stdin, proc, json_connectstr, img_connectstr, None, timeout, False, tm, None, False, output_csv=output_csv)
+            if code != 0:
+                return code, ret
+
+        elif cmd == 'det_face_store':
+            try:
+                proc = det_face_store.DetFaceStore(logger, face_threshold=face_threshold, image_type=image_type, clip_margin=clip_margin)
+            except Exception as e:
+                common.print_format({"warn":f"Invalid options. {e}"}, format, tm, output_json, output_json_append)
+                return 1, msg
+            code, ret = _exec_proc(input_file, stdin, proc, json_connectstr, img_connectstr, None, timeout, False, tm, output_json, output_json_append)
+            if code != 0:
+                return code, ret
+
+        elif cmd == 'det_filter':
+            try:
+                proc = det_filter.DetFilter(logger, score_th=score_th, width_th=width_th, height_th=height_th, classes=classes, labels=labels, nodraw=nodraw, output_preview=output_preview)
+            except Exception as e:
+                common.print_format({"warn":f"Invalid options. {e}"}, format, tm, output_json, output_json_append)
+                return 1, msg
+            code, ret = _exec_proc(input_file, stdin, proc, json_connectstr, img_connectstr, None, timeout, format, tm, output_json, output_json_append)
+            if code != 0:
+                return code, ret
 
         elif cmd == 'det_jadge':
             try:
@@ -442,81 +507,43 @@ def _main(args_list:list=None):
                                         ext_score_th=ext_score_th, ext_classes=ext_classes, ext_labels=ext_labels,
                                         nodraw=nodraw, output_preview=output_preview)
             except Exception as e:
-                msg = {"warn":f"Invalid options. {e}"}
-                common.print_format(msg, format, tm, output_json, output_json_append)
+                common.print_format({"warn":f"Invalid options. {e}"}, format, tm, output_json, output_json_append)
                 return 1, msg
-            if input_file is not None:
-                with open(input_file, 'r', encoding="UTF-8") as f:
-                    ret = _to_proc(f.readlines(), proc, json_connectstr, img_connectstr, None, timeout, format, tm, output_json, output_json_append)
-            elif stdin:
-                ret = _to_proc(sys.stdin, proc, json_connectstr, img_connectstr, None, timeout, format, tm, output_json, output_json_append)
-            else:
-                msg = {"warn":f"Image file or stdin is empty."}
-                common.print_format(msg, format, tm, output_json, output_json_append)
-                return 1, msg
-
-        elif cmd == 'cls_jadge':
-            proc = cls_jadge.ClaJadge(logger, ok_score_th=ok_score_th, ok_classes=ok_classes, ok_labels=ok_labels,
-                                      ng_score_th=ng_score_th, ng_classes=ng_classes, ng_labels=ng_labels,
-                                      ext_score_th=ext_score_th, ext_classes=ext_classes, ext_labels=ext_labels,
-                                      nodraw=nodraw, output_preview=output_preview)
-            if input_file is not None:
-                with open(input_file, 'r', encoding="UTF-8") as f:
-                    ret = _to_proc(f.readlines(), proc, json_connectstr, img_connectstr, None, timeout, format, tm, output_json, output_json_append)
-            elif stdin:
-                ret = _to_proc(sys.stdin, proc, json_connectstr, img_connectstr, None, timeout, format, tm, output_json, output_json_append)
-            else:
-                msg = {"warn":f"Image file or stdin is empty."}
-                common.print_format(msg, format, tm, output_json, output_json_append)
-                return 1, msg
-
-        elif cmd == 'det_clip':
-            proc = det_clip.DetClip(logger, image_type=image_type, clip_margin=clip_margin)
-            if input_file is not None:
-                with open(input_file, 'r') as f:
-                    ret = _to_proc(f.readlines(), proc, json_connectstr, img_connectstr, None, timeout, False, tm, None, False, output_csv=output_csv)
-            elif stdin:
-                ret = _to_proc(sys.stdin, proc, json_connectstr, img_connectstr, None, timeout, False, tm, None, False, output_csv=output_csv)
-            else:
-                msg = {"warn":f"Image file or stdin is empty."}
-                common.print_format(msg, format, tm, None, False)
-                return 1, msg
-
-        elif cmd == 'det_face_store':
-            proc = det_face_store.DetFaceStore(logger, face_threshold=face_threshold, image_type=image_type, clip_margin=clip_margin)
-            if input_file is not None:
-                with open(input_file, 'r') as f:
-                    ret = _to_proc(f.readlines(), proc, json_connectstr, img_connectstr, None, timeout, False, tm, output_json, output_json_append)
-            elif stdin:
-                ret = _to_proc(sys.stdin, proc, json_connectstr, img_connectstr, None, timeout, False, tm, output_json, output_json_append)
-            else:
-                msg = {"warn":f"Image file or stdin is empty."}
-                common.print_format(msg, format, tm, None, False)
-                return 1, msg
-
-        elif cmd == 'csv':
-            proc = csv.Csv(logger, out_headers=out_headers, noheader=noheader)
-            if input_file is not None:
-                with open(input_file, 'r') as f:
-                    ret = _to_proc(f.readlines(), proc, json_connectstr, img_connectstr, None, timeout, False, tm, None, False, output_csv=output_csv)
-            elif stdin:
-                ret = _to_proc(sys.stdin, proc, json_connectstr, img_connectstr, None, timeout, False, tm, None, False, output_csv=output_csv)
-            else:
-                msg = {"warn":f"Image file or stdin is empty."}
-                common.print_format(msg, format, tm, None, False)
-                return 1, msg
+            code, ret = _exec_proc(input_file, stdin, proc, json_connectstr, img_connectstr, None, timeout, format, tm, output_json, output_json_append)
+            if code != 0:
+                return code, ret
 
         elif cmd == 'httpreq':
-            proc = httpreq.Httpreq(logger, fileup_name=fileup_name)
-            if input_file is not None:
-                with open(input_file, 'r') as f:
-                    ret = _to_proc(f.readlines(), proc, json_connectstr, img_connectstr, text_connectstr, timeout, format, tm, None, False)
-            elif stdin:
-                ret = _to_proc(sys.stdin, proc, json_connectstr, img_connectstr, text_connectstr, timeout, format, tm, None, False)
-            else:
-                msg = {"warn":f"Image file or stdin is empty."}
-                common.print_format(msg, format, tm, output_json, output_json_append)
+            try:
+                proc = httpreq.Httpreq(logger, fileup_name=fileup_name)
+            except Exception as e:
+                common.print_format({"warn":f"Invalid options. {e}"}, format, tm, output_json, output_json_append)
                 return 1, msg
+            code, ret = _exec_proc(input_file, stdin, proc, json_connectstr, img_connectstr, text_connectstr, timeout, format, tm, None, False)
+            if code != 0:
+                return code, ret
+
+        elif cmd == 'seg_bbox':
+            try:
+                proc = seg_bbox.SegBBox(logger, del_segments=del_segments, nodraw=nodraw, nodraw_bbox=nodraw_bbox, nodraw_rbbox=nodraw_rbbox,
+                                        output_preview=output_preview)
+            except Exception as e:
+                common.print_format({"warn":f"Invalid options. {e}"}, format, tm, output_json, output_json_append)
+                return 1, msg
+            code, ret = _exec_proc(input_file, stdin, proc, json_connectstr, img_connectstr, None, timeout, format, tm, output_json, output_json_append)
+            if code != 0:
+                return code, ret
+
+        elif cmd == 'seg_filter':
+            try:
+                proc = seg_filter.SegFilter(logger, logits_th=logits_th, classes=classes, labels=labels, nodraw=nodraw, del_logits=del_logits)
+            except Exception as e:
+                common.print_format({"warn":f"Invalid options. {e}"}, format, tm, output_json, output_json_append)
+                return 1, msg
+            code, ret = _exec_proc(input_file, stdin, proc, json_connectstr, img_connectstr, None, timeout, format, tm, output_json, output_json_append)
+            if code != 0:
+                return code, ret
+
         else:
             msg = {"warn":f"Unkown command."}
             common.print_format(msg, format, tm, output_json, output_json_append)

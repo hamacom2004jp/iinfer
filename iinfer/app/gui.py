@@ -38,7 +38,7 @@ class Web(object):
             elif mode == "server":
                 return ['', 'start', 'stop', 'list']
             elif mode == "postprocess":
-                return ['', 'det_filter', 'det_jadge', 'det_clip', 'det_face_store', 'cls_jadge', 'csv', 'httpreq']
+                return ['', 'cls_jadge', 'csv', 'det_clip', 'det_face_store', 'det_filter', 'det_jadge', 'httpreq', 'seg_bbox', 'seg_filter']
             elif mode == "redis":
                 return ['', 'docker_run', 'docker_stop']
             elif mode == "install":
@@ -199,7 +199,55 @@ class Web(object):
                     ]
                 return []
             elif mode == "postprocess":
-                if cmd == "det_filter":
+                if cmd == "cls_jadge":
+                    return [
+                        dict(opt="input_file", type="file", default="", required=False, multi=False, hide=False, choise=None),
+                        dict(opt="stdin", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False]),
+                        dict(opt="ok_score_th", type="float", default=None, required=False, multi=False, hide=False, choise=None),
+                        dict(opt="ok_classes", type="str", default="", required=False, multi=True, hide=False, choise=None),
+                        dict(opt="ok_labels", type="str", default="", required=False, multi=True, hide=False, choise=None),
+                        dict(opt="ng_score_th", type="float", default=None, required=False, multi=False, hide=False, choise=None),
+                        dict(opt="ng_classes", type="str", default="", required=False, multi=True, hide=False, choise=None),
+                        dict(opt="ng_labels", type="str", default="", required=False, multi=True, hide=False, choise=None),
+                        dict(opt="ext_score_th", type="float", default=None, required=False, multi=False, hide=False, choise=None),
+                        dict(opt="ext_classes", type="str", default="", required=False, multi=True, hide=False, choise=None),
+                        dict(opt="ext_labels", type="str", default="", required=False, multi=True, hide=False, choise=None),
+                        dict(opt="nodraw", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False]),
+                        dict(opt="output_preview", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False]),
+                        dict(opt="output_json", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json_append", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False]),
+                        dict(opt="stdout_log", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False])
+                    ]
+                elif cmd == "csv":
+                    return [
+                        dict(opt="input_file", type="file", default="", required=False, multi=False, hide=False, choise=None),
+                        dict(opt="stdin", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False]),
+                        dict(opt="out_headers", type="str", default="", required=False, multi=True, hide=False, choise=None),
+                        dict(opt="noheader", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False]),
+                        dict(opt="output_csv", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="stdout_log", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False])
+                    ]
+                elif cmd == "det_clip":
+                    return [
+                        dict(opt="input_file", type="file", default="", required=False, multi=False, hide=False, choise=None),
+                        dict(opt="stdin", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False]),
+                        dict(opt="image_type", type="str", default="capture", required=False, multi=False, hide=False, choise=['bmp', 'png', 'jpeg', 'capture']),
+                        dict(opt="clip_margin", type="int", default=0, required=False, multi=False, hide=False, choise=None),
+                        dict(opt="output_csv", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="stdout_log", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False])
+                    ]
+                elif cmd == "det_face_store":
+                    return [
+                        dict(opt="input_file", type="file", default="", required=False, multi=False, hide=False, choise=None),
+                        dict(opt="stdin", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False]),
+                        dict(opt="image_type", type="str", default="capture", required=False, multi=False, hide=False, choise=['bmp', 'png', 'jpeg', 'capture']),
+                        dict(opt="face_threshold", type="float", default=0.0, required=False, multi=False, hide=False, choise=None),
+                        dict(opt="clip_margin", type="int", default=0, required=False, multi=False, hide=False, choise=None),
+                        dict(opt="output_json", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json_append", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False]),
+                        dict(opt="stdout_log", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False])
+                    ]
+                elif cmd == "det_filter":
                     return [
                         dict(opt="input_file", type="file", default="", required=False, multi=False, hide=False, choise=None),
                         dict(opt="stdin", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False]),
@@ -233,54 +281,6 @@ class Web(object):
                         dict(opt="output_json_append", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False]),
                         dict(opt="stdout_log", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False])
                     ]
-                elif cmd == "cls_jadge":
-                    return [
-                        dict(opt="input_file", type="file", default="", required=False, multi=False, hide=False, choise=None),
-                        dict(opt="stdin", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False]),
-                        dict(opt="ok_score_th", type="float", default=None, required=False, multi=False, hide=False, choise=None),
-                        dict(opt="ok_classes", type="str", default="", required=False, multi=True, hide=False, choise=None),
-                        dict(opt="ok_labels", type="str", default="", required=False, multi=True, hide=False, choise=None),
-                        dict(opt="ng_score_th", type="float", default=None, required=False, multi=False, hide=False, choise=None),
-                        dict(opt="ng_classes", type="str", default="", required=False, multi=True, hide=False, choise=None),
-                        dict(opt="ng_labels", type="str", default="", required=False, multi=True, hide=False, choise=None),
-                        dict(opt="ext_score_th", type="float", default=None, required=False, multi=False, hide=False, choise=None),
-                        dict(opt="ext_classes", type="str", default="", required=False, multi=True, hide=False, choise=None),
-                        dict(opt="ext_labels", type="str", default="", required=False, multi=True, hide=False, choise=None),
-                        dict(opt="nodraw", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False]),
-                        dict(opt="output_preview", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False]),
-                        dict(opt="output_json", type="file", default="", required=False, multi=False, hide=True, choise=None),
-                        dict(opt="output_json_append", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False]),
-                        dict(opt="stdout_log", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False])
-                    ]
-                elif cmd == "det_clip":
-                    return [
-                        dict(opt="input_file", type="file", default="", required=False, multi=False, hide=False, choise=None),
-                        dict(opt="stdin", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False]),
-                        dict(opt="image_type", type="str", default="capture", required=False, multi=False, hide=False, choise=['bmp', 'png', 'jpeg', 'capture']),
-                        dict(opt="clip_margin", type="int", default=0, required=False, multi=False, hide=False, choise=None),
-                        dict(opt="output_csv", type="file", default="", required=False, multi=False, hide=True, choise=None),
-                        dict(opt="stdout_log", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False])
-                    ]
-                elif cmd == "det_face_store":
-                    return [
-                        dict(opt="input_file", type="file", default="", required=False, multi=False, hide=False, choise=None),
-                        dict(opt="stdin", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False]),
-                        dict(opt="image_type", type="str", default="capture", required=False, multi=False, hide=False, choise=['bmp', 'png', 'jpeg', 'capture']),
-                        dict(opt="face_threshold", type="float", default=0.0, required=False, multi=False, hide=False, choise=None),
-                        dict(opt="clip_margin", type="int", default=0, required=False, multi=False, hide=False, choise=None),
-                        dict(opt="output_json", type="file", default="", required=False, multi=False, hide=True, choise=None),
-                        dict(opt="output_json_append", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False]),
-                        dict(opt="stdout_log", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False])
-                    ]
-                elif cmd == "csv":
-                    return [
-                        dict(opt="input_file", type="file", default="", required=False, multi=False, hide=False, choise=None),
-                        dict(opt="stdin", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False]),
-                        dict(opt="out_headers", type="str", default="", required=False, multi=True, hide=False, choise=None),
-                        dict(opt="noheader", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False]),
-                        dict(opt="output_csv", type="file", default="", required=False, multi=False, hide=True, choise=None),
-                        dict(opt="stdout_log", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False])
-                    ]
                 elif cmd == "httpreq":
                     return [
                         dict(opt="input_file", type="file", default="", required=False, multi=False, hide=False, choise=None),
@@ -288,6 +288,33 @@ class Web(object):
                         dict(opt="json_connectstr", type="str", default="", required=True, multi=False, hide=False, choise=None),
                         dict(opt="img_connectstr", type="str", default="", required=False, multi=False, hide=False, choise=None),
                         dict(opt="fileup_name", type="str", default="file", required=True, multi=False, hide=False, choise=None),
+                        dict(opt="stdout_log", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False])
+                    ]
+                elif cmd == "seg_bbox":
+                    return [
+                        dict(opt="input_file", type="file", default="", required=False, multi=False, hide=False, choise=None),
+                        dict(opt="stdin", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False]),
+                        dict(opt="del_segments", type="bool", default=True, required=False, multi=False, hide=False, choise=[True, False]),
+                        dict(opt="nodraw", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False]),
+                        dict(opt="nodraw_bbox", type="bool", default=True, required=False, multi=False, hide=False, choise=[True, False]),
+                        dict(opt="nodraw_rbbox", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False]),
+                        dict(opt="output_preview", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False]),
+                        dict(opt="output_json", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json_append", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False]),
+                        dict(opt="stdout_log", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False])
+                    ]
+                elif cmd == "seg_filter":
+                    return [
+                        dict(opt="input_file", type="file", default="", required=False, multi=False, hide=False, choise=None),
+                        dict(opt="stdin", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False]),
+                        dict(opt="logits_th", type="float", default="-100.0", required=False, multi=False, hide=False, choise=None),
+                        dict(opt="classes", type="int", default="", required=False, multi=True, hide=True, choise=None),
+                        dict(opt="labels", type="str", default="", required=False, multi=True, hide=False, choise=None),
+                        dict(opt="nodraw", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False]),
+                        dict(opt="del_logits", type="bool", default=True, required=False, multi=False, hide=False, choise=[True, False]),
+                        dict(opt="output_preview", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False]),
+                        dict(opt="output_json", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json_append", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False]),
                         dict(opt="stdout_log", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False])
                     ]
                 return []

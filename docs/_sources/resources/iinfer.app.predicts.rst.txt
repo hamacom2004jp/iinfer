@@ -52,6 +52,22 @@ iinfer.app.predicts.mmrotate\_det\_ReDet module
    :undoc-members:
    :show-inheritance:
 
+iinfer.app.predicts.mmseg\_seg\_PSPNet module
+---------------------------------------------
+
+.. automodule:: iinfer.app.predicts.mmseg_seg_PSPNet
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+iinfer.app.predicts.mmseg\_seg\_SwinUpernet module
+--------------------------------------------------
+
+.. automodule:: iinfer.app.predicts.mmseg_seg_SwinUpernet
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 iinfer.app.predicts.onnx\_cls\_EfficientNet\_Lite4 module
 ---------------------------------------------------------
 

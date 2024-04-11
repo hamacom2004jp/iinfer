@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>iinfer.app.predicts.mmdet_det_YoloX_Lite &mdash; iinfer 2024/04/11 documentation</title>
+  <title>iinfer.app.predicts.mmseg_seg_SwinUpernet &mdash; iinfer 2024/04/11 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=3fafac33" />
@@ -75,7 +75,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
-      <li class="breadcrumb-item active">iinfer.app.predicts.mmdet_det_YoloX_Lite</li>
+      <li class="breadcrumb-item active">iinfer.app.predicts.mmseg_seg_SwinUpernet</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -84,19 +84,19 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <h1>Source code for iinfer.app.predicts.mmdet_det_YoloX_Lite</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">iinfer.app.predicts</span> <span class="kn">import</span> <span class="n">mmdet_det_YoloX</span>
+  <h1>Source code for iinfer.app.predicts.mmseg_seg_SwinUpernet</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">iinfer.app.predicts.mmseg_seg_PSPNet</span> <span class="kn">import</span> <span class="n">MMSegPSPNet</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 
-<span class="n">SITE</span> <span class="o">=</span> <span class="s1">&#39;https://github.com/open-mmlab/mmdetection/tree/main/configs/yolox&#39;</span>
-<span class="n">IMAGE_WIDTH</span> <span class="o">=</span> <span class="mi">416</span>
-<span class="n">IMAGE_HEIGHT</span> <span class="o">=</span> <span class="mi">416</span>
+<span class="n">SITE</span> <span class="o">=</span> <span class="s1">&#39;https://github.com/open-mmlab/mmsegmentation/tree/main/configs/swin&#39;</span>
+<span class="n">IMAGE_WIDTH</span> <span class="o">=</span> <span class="mi">512</span>
+<span class="n">IMAGE_HEIGHT</span> <span class="o">=</span> <span class="mi">512</span>
 <span class="n">REQUIREd_MODEL_CONF</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="n">REQUIREd_MODEL_WEIGHT</span> <span class="o">=</span> <span class="kc">False</span>
 
-<div class="viewcode-block" id="MMDetYoloXLite">
-<a class="viewcode-back" href="../../../../resources/iinfer.app.predicts.html#iinfer.app.predicts.mmdet_det_YoloX_Lite.MMDetYoloXLite">[docs]</a>
-<span class="k">class</span> <span class="nc">MMDetYoloXLite</span><span class="p">(</span><span class="n">mmdet_det_YoloX</span><span class="o">.</span><span class="n">MMDetYoloX</span><span class="p">):</span>
+<div class="viewcode-block" id="MMSegSwinUpernet">
+<a class="viewcode-back" href="../../../../resources/iinfer.app.predicts.html#iinfer.app.predicts.mmseg_seg_SwinUpernet.MMSegSwinUpernet">[docs]</a>
+<span class="k">class</span> <span class="nc">MMSegSwinUpernet</span><span class="p">(</span><span class="n">MMSegPSPNet</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">logger</span><span class="p">)</span></div>
 

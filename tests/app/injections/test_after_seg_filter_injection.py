@@ -32,14 +32,15 @@ def test_action():
     session = {}
 
     # action メソッドをテストします。
-    result = injection.action(reskey, name, outputs, output_image, session)
+    result_outputs, result_image = injection.action(reskey, name, outputs, output_image, session)
 
     # 得られた結果が期待通りであることを確認します。
-    assert 'success' in result
-    assert 'output_boxes' in result['success']
-    assert 'output_boxes_classes' in result['success']
-    assert 'output_rounds' in result['success']
-    assert 'output_rbboxes' in result['success']
-    assert 'output_sem_seg' not in result['success']
-    assert 'output_sem_seg_shape' not in result['success']
-    assert 'output_sem_seg_dtype' not in result['success']
+    assert 'success' in result_outputs
+    assert 'output_classes' in result_outputs['success']
+    assert 'output_labels' in result_outputs['success']
+    assert 'output_sem_seg' in result_outputs['success']
+    assert 'output_sem_seg_shape' in result_outputs['success']
+    assert 'output_sem_seg_dtype' in result_outputs['success']
+    assert 'output_seg_logits' not in result_outputs['success']
+    assert 'output_seg_logits_shape' not in result_outputs['success']
+    assert 'output_seg_logits_dtype' not in result_outputs['success']

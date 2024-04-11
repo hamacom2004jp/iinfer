@@ -81,12 +81,13 @@ class AfterSegBBoxInjection(injection.AfterInjection):
         output_classes = data['output_classes']
         output_labels = data['output_labels']
         segment = convert.b64str2npy(data['output_sem_seg'], data['output_sem_seg_shape'], data['output_sem_seg_dtype'])
-        output_boxes, output_rbboxes, output_rounds, class_int = self.gen_bboxes(segment[0,], output_classes, output_labels)
+        output_boxes, output_rbboxes, output_rbboxes_rounds, output_boxes_classes, output_boxes_labels = self.gen_bboxes(segment[0,], output_classes, output_labels)
         del_segments = self.get_config('del_segments', True)
         data['output_boxes'] = output_boxes
-        data['output_boxes_classes'] = class_int
-        data['output_rounds'] = output_rounds
+        data['output_boxes_classes'] = output_boxes_classes
+        data['output_boxes_labels'] = output_boxes_labels
         data['output_rbboxes'] = output_rbboxes
+        data['output_rbboxes_rounds'] = output_rbboxes_rounds
         if del_segments:
             del data['output_sem_seg']
             del data['output_sem_seg_shape']
@@ -104,7 +105,7 @@ class AfterSegBBoxInjection(injection.AfterInjection):
             Image: 後処理結果
         """
         nodraw = self.get_config('nodraw', False)
-        nodraw_bbox = self.get_config('nodraw_bbox', True)
+        nodraw_bbox = self.get_config('nodraw_bbox', False)
         nodraw_rbbox = self.get_config('nodraw_rbbox', False)
 
         if not nodraw:
@@ -117,27 +118,27 @@ class AfterSegBBoxInjection(injection.AfterInjection):
                 raise Exception('Invalid outputs. outputs[\'success\'][\'output_boxes\'] must be set.')
             if 'output_boxes_classes' not in data:
                 raise Exception('Invalid outputs. outputs[\'success\'][\'output_boxes_classes\'] must be set.')
-            if 'output_labels' not in data:
-                raise Exception('Invalid outputs. outputs[\'success\'][\'output_labels\'] must be set.')
-            if 'output_rounds' not in data:
-                raise Exception('Invalid outputs. outputs[\'success\'][\'output_rounds\'] must be set.')
+            if 'output_boxes_labels' not in data:
+                raise Exception('Invalid outputs. outputs[\'success\'][\'output_boxes_labels\'] must be set.')
             if 'output_rbboxes' not in data:
                 raise Exception('Invalid outputs. outputs[\'success\'][\'output_rbboxes\'] must be set.')
+            if 'output_rbboxes_rounds' not in data:
+                raise Exception('Invalid outputs. outputs[\'success\'][\'output_rbboxes_rounds\'] must be set.')
             output_palette = data['output_palette']
             output_boxes = data['output_boxes']
             output_boxes_classes = data['output_boxes_classes']
-            output_labels = data['output_labels']
-            output_rounds = data['output_rounds']
+            output_boxes_labels = data['output_boxes_labels']
             output_rbboxes = data['output_rbboxes']
+            output_rbboxes_rounds = data['output_rbboxes_rounds']
 
             draw = ImageDraw.Draw(output_image)
             if not nodraw_bbox:
-                for box, cls, lbl in zip(output_boxes, output_boxes_classes, output_labels):
+                for box, cls, lbl in zip(output_boxes, output_boxes_classes, output_boxes_labels):
                     color = tuple(output_palette[cls])
                     draw.rectangle(box, outline=color)
                     draw.text((box[0], box[1]), lbl, fill=color)
             if not nodraw_rbbox:
-                for rbox, cls, lbl, r in zip(output_rbboxes, output_boxes_classes, output_labels, output_rounds):
+                for rbox, cls, lbl, r in zip(output_rbboxes, output_boxes_classes, output_boxes_labels, output_rbboxes_rounds):
                     color = tuple(output_palette[cls])
                     draw.polygon([(p[0],p[1]) for p in rbox], outline=color, width=1)
                     draw.text((rbox[0][0], rbox[0][1]), f'{lbl}:{r:.2f}', fill=color)
@@ -146,6 +147,7 @@ class AfterSegBBoxInjection(injection.AfterInjection):
 
     def gen_bboxes(self, mask, classes, labels):
         class_int = []
+        label_str = []
         bbox_int = []
         rbbox_int = []
         rbbox_round = []
@@ -163,5 +165,6 @@ class AfterSegBBoxInjection(injection.AfterInjection):
                 bbox_int.append([x_min.astype(int), y_min.astype(int), x_max.astype(int), y_max.astype(int)])
                 rbbox_int.append(box.astype(np.int32).tolist())
                 class_int.append(c)
+                label_str.append(l)
                 rbbox_round.append(rect[2])
-        return bbox_int, rbbox_int, rbbox_round, class_int
+        return bbox_int, rbbox_int, rbbox_round, class_int, label_str

@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>iinfer.app package &mdash; iinfer 2024/03/20 documentation</title>
+  <title>iinfer.app package &mdash; iinfer 2024/04/11 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -16,7 +16,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=faf68b2d"></script>
+        <script src="../_static/documentation_options.js?v=8f8ccbbe"></script>
         <script src="../_static/doctools.js?v=888ff710"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -138,6 +138,19 @@
 <li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.mmrotate_det_ReDet.MMRotateReDet.preprocess"><code class="docutils literal notranslate"><span class="pre">MMRotateReDet.preprocess()</span></code></a></li>
 </ul>
 </li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="iinfer.app.predicts.html#module-iinfer.app.predicts.mmseg_seg_PSPNet">iinfer.app.predicts.mmseg_seg_PSPNet module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.mmseg_seg_PSPNet.MMSegPSPNet"><code class="docutils literal notranslate"><span class="pre">MMSegPSPNet</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.mmseg_seg_PSPNet.MMSegPSPNet.create_session"><code class="docutils literal notranslate"><span class="pre">MMSegPSPNet.create_session()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.mmseg_seg_PSPNet.MMSegPSPNet.draw_mask"><code class="docutils literal notranslate"><span class="pre">MMSegPSPNet.draw_mask()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.mmseg_seg_PSPNet.MMSegPSPNet.predict"><code class="docutils literal notranslate"><span class="pre">MMSegPSPNet.predict()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="iinfer.app.predicts.html#module-iinfer.app.predicts.mmseg_seg_SwinUpernet">iinfer.app.predicts.mmseg_seg_SwinUpernet module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.mmseg_seg_SwinUpernet.MMSegSwinUpernet"><code class="docutils literal notranslate"><span class="pre">MMSegSwinUpernet</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="iinfer.app.predicts.html#module-iinfer.app.predicts.onnx_cls_EfficientNet_Lite4">iinfer.app.predicts.onnx_cls_EfficientNet_Lite4 module</a><ul>
@@ -452,6 +465,28 @@
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>バウンディングボックスが描画された画像
 List[str]: 各バウンディングボックスのラベルリスト</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Image</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="iinfer.app.common.draw_segment">
+<span class="sig-prename descclassname"><span class="pre">iinfer.app.common.</span></span><span class="sig-name descname"><span class="pre">draw_segment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img_npy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segment</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodraw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="../_modules/iinfer/app/common.html#draw_segment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.common.draw_segment" title="Link to this definition"></a></dt>
+<dd><p>画像にマスクを描画します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>img_npy</strong> (<em>np.ndarray</em>) -- 元画像</p></li>
+<li><p><strong>segment</strong> (<em>np.ndarray</em>) -- セグメンテーションのクラスマップ</p></li>
+<li><p><strong>colors</strong> (<em>List</em><em>[</em><em>Tuple</em><em>[</em><em>int</em><em>]</em><em>]</em>) -- クラスごとの色のリスト</p></li>
+<li><p><strong>nodraw</strong> (<em>bool</em><em>, </em><em>optional</em>) -- 描画しない場合はTrue. Defaults to False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>マスクが描画された画像</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Image</p>

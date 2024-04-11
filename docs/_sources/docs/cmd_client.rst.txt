@@ -61,6 +61,40 @@ clientモードのコマンド一覧です。
 後処理タイプ設定項目一覧（ `--after_injection_type` で指定可能な値）
 --------------------------------------------------------------------
 
+- `after_cls_jadge_injection`
+
+    .. csv-table::
+        :widths: 20, 10, 70
+        :header-rows: 1
+
+        "Option","Type","Description"
+        "ok_score_th","float","OK判定するbboxのスコア閾値。この値より高いスコアのbboxがあればOK判定とする"
+        "ok_classes","List[str]","OK判定するbboxのクラス名。このクラスのスコアをOK判定に使用する"
+        "ok_labels","List[str]","OK判定するbboxのラベル名。このラベルのスコアをOK判定に使用する"
+        "ng_score_th","float","NG判定するbboxのスコア閾値。この値より高いスコアのbboxがあればNG判定とする"
+        "ng_classes","List[str]","NG判定するbboxのクラス名。このクラスのスコアをNG判定に使用する"
+        "ng_labels","List[str]","NG判定するbboxのラベル名。このラベルのスコアをNG判定に使用する"
+        "ext_score_th","float","Gray判定するbboxのスコア閾値。この値より高いスコアのbboxがあればGray判定とする"
+        "ext_classes","List[str]","Gray判定するbboxのクラス名。このクラスのスコアをGray判定に使用する"
+        "ext_labels","List[str]","Gray判定するbboxのラベル名。このラベルのスコアをGray判定に使用する"
+        "nodraw","bool","output_imageに描画を行わない場合True"
+
+    .. code-block:: json
+
+        /** サンプル設定ファイル **/
+        {
+            "ok_score_th": 0.9,
+            "ok_classes": [1],
+            "ok_labels": [],
+            "ng_score_th": 0.9,
+            "ng_classes": [],
+            "ng_labels": [],
+            "ext_score_th": 0.9,
+            "ext_classes": [],
+            "ext_labels": [],
+            "nodraw": false
+        }
+
 - `after_csv_injection`
 
     .. csv-table::
@@ -126,7 +160,7 @@ clientモードのコマンド一覧です。
         /** サンプル設定ファイル **/
         {
             "ok_score_th": 0.9,
-            "ok_classes": [0],
+            "ok_classes": [1],
             "ok_labels": [],
             "ng_score_th": 0.9,
             "ng_classes": [],
@@ -157,6 +191,52 @@ clientモードのコマンド一覧です。
             "output_image_url": "http://localhost:5000/output_image",
             "output_image_ext": "jpeg",
             "output_image_prefix": "output_image_"
+        }
+
+- `after_seg_bbox_injection`
+
+    .. csv-table::
+        :widths: 20, 10, 70
+        :header-rows: 1
+
+        "Option","Type","Description"
+        "del_segments","bool","推論結果画像にbbox等の描き込みを行わない場合True"
+        "nodraw","bool","output_imageにbbox等の描画を行わない場合True"
+        "nodraw","bool","output_imageにbboxの描画を行わない場合True"
+        "nodraw","bool","output_imageに回転bboxの描画を行わない場合True"
+
+    .. code-block:: json
+
+        /** サンプル設定ファイル **/
+        {
+            "nodraw": false,
+            "nodraw_bbox": false,
+            "nodraw_rbbox": false,
+            "del_segments": true
+        }
+
+- `after_seg_filter_injection`
+
+    .. csv-table::
+        :widths: 20, 10, 70
+        :header-rows: 1
+
+        "Option","Type","Description"
+        "logits_th","int","ピクセルごとのクラススコア閾値。この値以下のものは除去される"
+        "classes","List[int]","bboxのクラス。この値のみのbboxが出力される"
+        "labels","List[str]","bboxのラベル名。この値のみのbboxが出力される"
+        "nodraw","bool","output_imageに描画を行わない場合True"
+        "del_logits","bool","セグメンテーションスコアを結果から削除する場合True"
+
+    .. code-block:: json
+
+        /** サンプル設定ファイル **/
+        {
+            "nodraw": false,
+            "logits_th": -100.0,
+            "classes": [],
+            "labels": [],
+            "del_logits": true
         }
 
 クライアント(AIモデルの配備一覧) : `iinfer -m client -c deploy_list <Option>`

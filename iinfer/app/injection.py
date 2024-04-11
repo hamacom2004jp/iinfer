@@ -51,7 +51,8 @@ class Injection(object):
         Returns:
             Any: 設定値
         """
-        return self.config.get(key, default)
+        ret = self.config.get(key, default)
+        return ret if ret is not None else default
 
     def _set_config(self, key:str, val:Any=None) -> Any:
         """

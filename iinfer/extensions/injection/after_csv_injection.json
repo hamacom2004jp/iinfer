@@ -1,1 +1,4 @@
-{}
+{
+    "out_headers": ["output_scores", "output_labels", "image_name"],
+    "noheader": false
+}

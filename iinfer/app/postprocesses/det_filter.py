@@ -68,7 +68,7 @@ class DetFilter(postprocess.Postprocess):
         Returns:
             Dict[str, Any]: 後処理結果
         """
-        outputs, output_image = self.injection.post_json(outputs, output_image)
+        outputs = self.injection.post_json(outputs)
         data = outputs['success']
         return data
 

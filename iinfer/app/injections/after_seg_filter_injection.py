@@ -59,7 +59,8 @@ class AfterSegFilterInjection(injection.AfterInjection):
                 'output_catalog': List[str],
                 'output_palette': List[int],
                 'output_classes': List[int],
-                'output_labels': List[str]
+                'output_labels': List[str],
+                'output_palette': List[Tuple[int, int, int]]
             }
         }
         Args:

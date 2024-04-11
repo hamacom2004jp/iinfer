@@ -7,7 +7,7 @@ import cv2
 import logging
 
 class SegBBox(postprocess.Postprocess):
-    def __init__(self, logger:logging.Logger, del_segments:bool=True, nodraw:bool=False, nodraw_bbox:bool=True, nodraw_rbbox:bool=False):
+    def __init__(self, logger:logging.Logger, del_segments:bool=True, nodraw:bool=False, nodraw_bbox:bool=False, nodraw_rbbox:bool=False, output_preview:bool=False):
         """
         Segmentationの推論結果をフィルタリングする後処理クラスです。
         閾値に満たない推論結果を除外します。
@@ -18,9 +18,10 @@ class SegBBox(postprocess.Postprocess):
             nodraw (bool): 描画しない
             nodraw_bbox (bool): バウンディングボックスを描画しない
             nodraw_rbbox (bool): 回転バウンディングボックスを描画しない
+            output_preview (bool): プレビューを出力する
         """
         super().__init__(logger)
-        self.config = dict(nodraw=nodraw, nodraw_bbox=nodraw_bbox, nodraw_rbbox=nodraw_rbbox, del_segments=del_segments)
+        self.config = dict(nodraw=nodraw, nodraw_bbox=nodraw_bbox, nodraw_rbbox=nodraw_rbbox, del_segments=del_segments, output_preview=output_preview)
         self.injection = after_seg_bbox_injection.AfterSegBBoxInjection(self.config, self.logger)
 
     def create_session(self, json_connectstr:str, img_connectstr:str, text_connectstr:str):
@@ -41,7 +42,7 @@ class SegBBox(postprocess.Postprocess):
         """
         return 'json_connectstr', 'img_connectstr', None
 
-    def post_json(self, json_session, outputs:Dict[str, Any], output_image:Image.Image):
+    def post_json(self, json_session, outputs:Dict[str, Any], output_image:Image.Image) -> Dict[str, Any]:
         """
         outputsに対して後処理を行う関数です。
         outputsは、以下のような構造を持つDict[str, Any]です。
@@ -68,7 +69,7 @@ class SegBBox(postprocess.Postprocess):
         data = outputs['success']
         return data
 
-    def post_img(self, img_session, result:Dict[str, Any], output_image:Image.Image):
+    def post_img(self, img_session, result:Dict[str, Any], output_image:Image.Image) -> Image.Image:
         """
         output_imageに対して後処理を行う関数です。
         引数のimageはRGBですので、戻り値の出力画像もRGBにしてください。

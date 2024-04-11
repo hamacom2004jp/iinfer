@@ -42,7 +42,7 @@ class SegFilter(postprocess.Postprocess):
         """
         return 'json_connectstr', 'img_connectstr', None
 
-    def post_json(self, json_session, outputs:Dict[str, Any], output_image:Image.Image):
+    def post_json(self, json_session, outputs:Dict[str, Any], output_image:Image.Image) -> Dict[str, Any]:
         """
         outputsに対して後処理を行う関数です。
         outputsは、以下のような構造を持つDict[str, Any]です。
@@ -65,11 +65,11 @@ class SegFilter(postprocess.Postprocess):
         Returns:
             Dict[str, Any]: 後処理結果
         """
-        outputs, output_image = self.injection.post_json(outputs, output_image)
+        outputs = self.injection.post_json(outputs)
         data = outputs['success']
         return data
 
-    def post_img(self, img_session, result:Dict[str, Any], output_image:Image.Image):
+    def post_img(self, img_session, result:Dict[str, Any], output_image:Image.Image) -> Image.Image:
         """
         output_imageに対して後処理を行う関数です。
         引数のimageはRGBですので、戻り値の出力画像もRGBにしてください。

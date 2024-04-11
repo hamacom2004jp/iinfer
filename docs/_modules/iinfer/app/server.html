@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>iinfer.app.server &mdash; iinfer 2024/03/16 documentation</title>
+  <title>iinfer.app.server &mdash; iinfer 2024/04/11 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -15,7 +15,7 @@
   
         <script src="../../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=3857ef35"></script>
+        <script src="../../../_static/documentation_options.js?v=8f8ccbbe"></script>
         <script src="../../../_static/doctools.js?v=888ff710"></script>
         <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -235,7 +235,10 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">redis_cli</span><span class="o">.</span><span class="n">hset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hbname</span><span class="p">,</span> <span class="s1">&#39;recive_cnt&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">recive_cnt</span><span class="p">))</span>
 
                 <span class="k">if</span> <span class="n">msg</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;deploy&#39;</span><span class="p">:</span>
-                    <span class="n">model_bin</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64decode</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="mi">7</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="n">msg</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;None&#39;</span><span class="p">:</span>
+                        <span class="n">model_bin</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">model_bin</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64decode</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="mi">7</span><span class="p">])</span>
                     <span class="k">if</span> <span class="n">msg</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;None&#39;</span><span class="p">:</span>
                         <span class="n">model_conf_file</span> <span class="o">=</span> <span class="kc">None</span>
                     <span class="k">else</span><span class="p">:</span>
@@ -435,25 +438,28 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Incorrect predict_type. &#39;</span><span class="si">{</span><span class="n">predict_type</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">responce</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;warn&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Incorrect predict_type. &#39;</span><span class="si">{</span><span class="n">predict_type</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">})</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span>
-        <span class="k">if</span> <span class="n">common</span><span class="o">.</span><span class="n">BASE_MODELS</span><span class="p">[</span><span class="n">predict_type</span><span class="p">][</span><span class="s1">&#39;use_model_conf&#39;</span><span class="p">]</span><span class="o">==</span><span class="kc">True</span> <span class="ow">and</span> <span class="n">model_conf_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">common</span><span class="o">.</span><span class="n">BASE_MODELS</span><span class="p">[</span><span class="n">predict_type</span><span class="p">][</span><span class="s1">&#39;required_model_conf&#39;</span><span class="p">]</span><span class="o">==</span><span class="kc">True</span> <span class="ow">and</span> <span class="n">model_conf_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;model_conf_file is None.&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">responce</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;warn&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;model_conf_file is None.&quot;</span><span class="p">})</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span>
 
         <span class="n">common</span><span class="o">.</span><span class="n">mkdirs</span><span class="p">(</span><span class="n">deploy_dir</span><span class="p">)</span>
         <span class="k">def</span> <span class="nf">_save_s</span><span class="p">(</span><span class="n">file</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span><span class="nb">bytes</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">file</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">None</span>
             <span class="n">file</span> <span class="o">=</span> <span class="n">deploy_dir</span> <span class="o">/</span> <span class="n">file</span>
             <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                 <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Save </span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">deploy_dir</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="n">file</span>
-        <span class="n">ret</span><span class="p">,</span> <span class="n">model_file</span> <span class="o">=</span> <span class="n">_save_s</span><span class="p">(</span><span class="n">model_file</span><span class="p">,</span> <span class="n">model_bin</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">ret</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">common</span><span class="o">.</span><span class="n">BASE_MODELS</span><span class="p">[</span><span class="n">predict_type</span><span class="p">][</span><span class="s1">&#39;required_model_weight&#39;</span><span class="p">]</span><span class="o">==</span><span class="kc">True</span> <span class="ow">and</span> <span class="p">(</span><span class="n">model_file</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">model_bin</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;model_file is None.&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">responce</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;warn&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;model_file is None.&quot;</span><span class="p">})</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ret</span><span class="p">,</span> <span class="n">model_file</span> <span class="o">=</span> <span class="n">_save_s</span><span class="p">(</span><span class="n">model_file</span><span class="p">,</span> <span class="n">model_bin</span><span class="p">)</span>
+
         <span class="n">ret</span><span class="p">,</span> <span class="n">before_injection_conf</span> <span class="o">=</span> <span class="n">_save_s</span><span class="p">(</span><span class="s2">&quot;before_injection_conf.json&quot;</span><span class="p">,</span> <span class="n">before_injection_conf</span><span class="p">)</span>
         <span class="n">ret</span><span class="p">,</span> <span class="n">after_injection_conf</span> <span class="o">=</span> <span class="n">_save_s</span><span class="p">(</span><span class="s2">&quot;after_injection_conf.json&quot;</span><span class="p">,</span> <span class="n">after_injection_conf</span><span class="p">)</span>
 
@@ -842,11 +848,13 @@
                 <span class="k">return</span> <span class="n">output</span><span class="p">,</span> <span class="n">output_image</span>
 
             <span class="k">if</span> <span class="n">output_image</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">output_image_npy</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">img2npy</span><span class="p">(</span><span class="n">output_image</span><span class="p">)</span>
-                <span class="n">output_image_b64</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">npy2b64str</span><span class="p">(</span><span class="n">output_image_npy</span><span class="p">)</span>
-                <span class="n">output</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">success</span><span class="o">=</span><span class="n">outputs</span><span class="p">,</span> <span class="n">output_image</span><span class="o">=</span><span class="n">output_image_b64</span><span class="p">,</span> <span class="n">output_image_shape</span><span class="o">=</span><span class="n">output_image_npy</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">output_image_name</span><span class="o">=</span><span class="n">output_image_name</span><span class="p">)</span>
+                <span class="n">output</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">success</span><span class="o">=</span><span class="n">outputs</span><span class="p">,</span> <span class="n">output_image_name</span><span class="o">=</span><span class="n">output_image_name</span><span class="p">)</span>
                 <span class="c1"># 後処理を実行</span>
                 <span class="n">output</span><span class="p">,</span> <span class="n">output_image</span> <span class="o">=</span> <span class="n">_after_injection</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="n">output_image</span><span class="p">,</span> <span class="n">session</span><span class="p">)</span>
+                <span class="n">output_image_npy</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">img2npy</span><span class="p">(</span><span class="n">output_image</span><span class="p">)</span>
+                <span class="n">output_image_b64</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">npy2b64str</span><span class="p">(</span><span class="n">output_image_npy</span><span class="p">)</span>
+                <span class="n">output</span><span class="p">[</span><span class="s1">&#39;output_image&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">output_image_b64</span>
+                <span class="n">output</span><span class="p">[</span><span class="s1">&#39;output_image_shape&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">output_image_npy</span><span class="o">.</span><span class="n">shape</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">responce</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="n">output</span><span class="p">)</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_SCCESS</span>
             <span class="n">output</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">success</span><span class="o">=</span><span class="n">outputs</span><span class="p">)</span>

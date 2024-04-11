@@ -710,8 +710,10 @@ $(() => {
                 if(data_multi==`true`){
                     if(!opt[data_name]) opt[data_name] = [];
                     if(data_val && data_val!=``) opt[data_name].push(data_val);
+                    else if(data_val==false) opt[data_name].push(data_val);
                 } else {
                     if(data_val && data_val!=``) opt[data_name] = data_val;
+                    else if(data_val==false) opt[data_name] = data_val;
                 }
             });
             return [title, opt];
