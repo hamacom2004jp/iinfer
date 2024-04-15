@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>iinfer.app.server &mdash; iinfer 2024/04/11 documentation</title>
+  <title>iinfer.app.server &mdash; iinfer 2024/04/15 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -15,7 +15,7 @@
   
         <script src="../../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=8f8ccbbe"></script>
+        <script src="../../../_static/documentation_options.js?v=73fdd119"></script>
         <script src="../../../_static/doctools.js?v=888ff710"></script>
         <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -90,11 +90,13 @@
 <span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
 <span class="kn">from</span> <span class="nn">iinfer.app</span> <span class="kn">import</span> <span class="n">common</span><span class="p">,</span> <span class="n">predict</span><span class="p">,</span> <span class="n">injection</span>
 <span class="kn">from</span> <span class="nn">iinfer.app.commons</span> <span class="kn">import</span> <span class="n">convert</span><span class="p">,</span> <span class="n">module</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Tuple</span>
 <span class="kn">import</span> <span class="nn">base64</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">redis</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">time</span>
@@ -103,9 +105,9 @@
 <div class="viewcode-block" id="Server">
 <a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.server.Server">[docs]</a>
 <span class="k">class</span> <span class="nc">Server</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="n">RESP_SCCESS</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">RESP_WARN</span> <span class="o">=</span> <span class="mi">1</span>
-    <span class="n">RESP_ERROR</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">RESP_SCCESS</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">RESP_WARN</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">RESP_ERROR</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">redis_host</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;localhost&quot;</span><span class="p">,</span> <span class="n">redis_port</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">6379</span><span class="p">,</span> <span class="n">redis_password</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">svname</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;server&#39;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Redisサーバーに接続し、クライアントからのコマンドを受信し実行する</span>
@@ -322,6 +324,19 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">is_running</span> <span class="o">=</span> <span class="kc">False</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">responce</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">{</span><span class="s2">&quot;success&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Successful stop server. svname=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">svname</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">})</span>
                     <span class="k">break</span>
+                <span class="k">elif</span> <span class="n">msg</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;file_list&#39;</span><span class="p">:</span>
+                    <span class="n">st</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_list</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">msg</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+                <span class="k">elif</span> <span class="n">msg</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;file_mkdir&#39;</span><span class="p">:</span>
+                    <span class="n">st</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_mkdir</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">msg</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+                <span class="k">elif</span> <span class="n">msg</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;file_rmdir&#39;</span><span class="p">:</span>
+                    <span class="n">st</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_rmdir</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">msg</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+                <span class="k">elif</span> <span class="n">msg</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;file_download&#39;</span><span class="p">:</span>
+                    <span class="n">st</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_download</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">msg</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+                <span class="k">elif</span> <span class="n">msg</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;file_upload&#39;</span><span class="p">:</span>
+                    <span class="n">file_data</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">b64str2bytes</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span>
+                    <span class="n">st</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_upload</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">msg</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">msg</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">file_data</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">msg</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;file_remove&#39;</span><span class="p">:</span>
+                    <span class="n">st</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_remove</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">msg</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown command </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                     <span class="n">st</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span>
@@ -866,8 +881,233 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to run inference: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">responce</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;warn&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Failed to run inference: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">})</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_file_exists</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reskey</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">current_path</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">not_exists</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">exists_chk</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">Path</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        パスが存在するかどうかを確認する</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            reskey (str): レスポンスキー</span>
+<span class="sd">            current_path (str): パス</span>
+<span class="sd">            not_exists (bool, optional): パスが存在しないことを確認するかどうか, by default False</span>
+<span class="sd">            exists_chk (bool, optional): パス存在チェックを行うかどうか, by default True</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: not_existsがFalseの時パスが存在すればTrue、存在しなければFalse。not_existsがTrueの時パスが存在しなければTrue、存在すればFalse。</span>
+<span class="sd">            Path: データフォルダ以下のcurrent_pathを含めた絶対パス</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">current_path</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">current_path</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;current_path is empty.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">responce</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;warn&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;current_path is empty.&quot;</span><span class="p">})</span>
+            <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="n">current_path</span> <span class="o">=</span> <span class="n">current_path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span><span class="p">,</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+        <span class="n">cp</span> <span class="o">=</span> <span class="n">current_path</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="k">if</span> <span class="n">current_path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="n">current_path</span>
+        <span class="n">abspath</span><span class="p">:</span><span class="n">Path</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span> <span class="o">/</span> <span class="n">cp</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">str</span><span class="p">(</span><span class="n">abspath</span><span class="p">)</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Path </span><span class="si">{</span><span class="n">abspath</span><span class="si">}</span><span class="s2"> is out of data directory. current_path=</span><span class="si">{</span><span class="n">current_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">responce</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;warn&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Path </span><span class="si">{</span><span class="n">abspath</span><span class="si">}</span><span class="s2"> is out of data directory. current_path=</span><span class="si">{</span><span class="n">current_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">})</span>
+            <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">exists_chk</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="n">abspath</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">not_exists</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">abspath</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Path </span><span class="si">{</span><span class="n">abspath</span><span class="si">}</span><span class="s2"> does not exist. param=</span><span class="si">{</span><span class="n">current_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">responce</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;warn&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Path </span><span class="si">{</span><span class="n">abspath</span><span class="si">}</span><span class="s2"> does not exist. param=</span><span class="si">{</span><span class="n">current_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">})</span>
+            <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">not_exists</span> <span class="ow">and</span> <span class="n">abspath</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Path </span><span class="si">{</span><span class="n">abspath</span><span class="si">}</span><span class="s2"> exist. param=</span><span class="si">{</span><span class="n">current_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">responce</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;warn&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Path </span><span class="si">{</span><span class="n">abspath</span><span class="si">}</span><span class="s2"> exist. param=</span><span class="si">{</span><span class="n">current_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">})</span>
+            <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="n">abspath</span>
+
+<div class="viewcode-block" id="Server.file_list">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.server.Server.file_list">[docs]</a>
+    <span class="k">def</span> <span class="nf">file_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reskey</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">current_path</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        ファイルリストを取得する</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            reskey (str): レスポンスキー</span>
+<span class="sd">            path (str): ファイルパス</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: レスポンスコード</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">chk</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_exists</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="n">current_path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">chk</span><span class="p">:</span> <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span>
+        
+        <span class="k">def</span> <span class="nf">_mk_key</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s1">&#39;[\s:</span><span class="se">\\\\</span><span class="s1">/,\.#$%^&amp;!@*\(\)\{\}\[\]</span><span class="se">\&#39;\&quot;</span><span class="s1">\`]&#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+        <span class="k">def</span> <span class="nf">_ts2str</span><span class="p">(</span><span class="n">ts</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+
+        <span class="n">current_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;/</span><span class="si">{</span><span class="n">current_path</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">current_path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="n">current_path</span>
+        <span class="n">current_path_parts</span> <span class="o">=</span> <span class="n">current_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+        <span class="n">current_path_parts</span> <span class="o">=</span> <span class="n">current_path_parts</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="k">if</span> <span class="n">current_path</span><span class="o">==</span><span class="s1">&#39;/&#39;</span> <span class="k">else</span> <span class="n">current_path_parts</span>
+        <span class="n">path_tree</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">data_dir_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">cpart</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">current_path_parts</span><span class="p">):</span>
+            <span class="n">cpath</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">current_path_parts</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">file_list</span><span class="p">:</span><span class="n">Path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span> <span class="o">/</span> <span class="n">cpath</span>
+            <span class="n">children</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">file_list</span><span class="o">.</span><span class="n">iterdir</span><span class="p">():</span>
+                <span class="n">parts</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">f</span><span class="p">)[</span><span class="n">data_dir_len</span><span class="p">:]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span><span class="p">,</span><span class="s2">&quot;/&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+                <span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">[:</span><span class="n">i</span><span class="o">+</span><span class="mi">2</span><span class="p">])</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="n">_mk_key</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">children</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">children</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">is_dir</span><span class="o">=</span><span class="n">f</span><span class="o">.</span><span class="n">is_dir</span><span class="p">(),</span> <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">f</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span> <span class="p">,</span> <span class="n">last</span><span class="o">=</span><span class="n">_ts2str</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_mtime</span><span class="p">))</span>
+
+            <span class="n">tpath</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">current_path_parts</span><span class="p">[:</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">tpath</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span> <span class="k">if</span> <span class="n">tpath</span><span class="o">==</span><span class="s1">&#39;&#39;</span> <span class="k">else</span> <span class="n">tpath</span>
+            <span class="n">tpath_key</span> <span class="o">=</span> <span class="n">_mk_key</span><span class="p">(</span><span class="n">tpath</span><span class="p">)</span>
+            <span class="n">cpart</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span> <span class="k">if</span> <span class="n">cpart</span><span class="o">==</span><span class="s1">&#39;&#39;</span> <span class="k">else</span> <span class="n">cpart</span>
+            <span class="n">path_tree</span><span class="p">[</span><span class="n">tpath_key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">cpart</span><span class="p">,</span> <span class="n">is_dir</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">tpath</span><span class="p">,</span> <span class="n">children</span><span class="o">=</span><span class="n">children</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">last</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">responce</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;success&quot;</span><span class="p">:</span> <span class="n">path_tree</span><span class="p">})</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_SCCESS</span></div>
+
+
+<div class="viewcode-block" id="Server.file_mkdir">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.server.Server.file_mkdir">[docs]</a>
+    <span class="k">def</span> <span class="nf">file_mkdir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reskey</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">current_path</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        ディレクトリを作成する</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            reskey (str): レスポンスキー</span>
+<span class="sd">            current_path (str): ディレクトリパス</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: レスポンスコード</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">chk</span><span class="p">,</span> <span class="n">abspath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_exists</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="n">current_path</span><span class="p">,</span> <span class="n">not_exists</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">chk</span><span class="p">:</span> <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span>
+
+        <span class="n">abspath</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">ret_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">current_path</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span><span class="p">,</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">responce</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;success&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;path&quot;</span><span class="p">:</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ret_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span><span class="s2">&quot;msg&quot;</span><span class="p">:</span><span class="sa">f</span><span class="s2">&quot;Created </span><span class="si">{</span><span class="n">abspath</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">}})</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_SCCESS</span></div>
+
+    
+<div class="viewcode-block" id="Server.file_rmdir">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.server.Server.file_rmdir">[docs]</a>
+    <span class="k">def</span> <span class="nf">file_rmdir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reskey</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">current_path</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        ディレクトリを削除する</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            reskey (str): レスポンスキー</span>
+<span class="sd">            current_path (str): ディレクトリパス</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: レスポンスコード</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">chk</span><span class="p">,</span> <span class="n">abspath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_exists</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="n">current_path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">chk</span><span class="p">:</span> <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span>
+        <span class="k">if</span> <span class="n">abspath</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Path </span><span class="si">{</span><span class="n">abspath</span><span class="si">}</span><span class="s2"> is root directory.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">responce</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;warn&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Path </span><span class="si">{</span><span class="n">abspath</span><span class="si">}</span><span class="s2"> is root directory.&quot;</span><span class="p">})</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span>
+
+        <span class="n">common</span><span class="o">.</span><span class="n">rmdirs</span><span class="p">(</span><span class="n">abspath</span><span class="p">)</span>
+        <span class="n">ret_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">current_path</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span><span class="p">,</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">responce</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;success&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;path&quot;</span><span class="p">:</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ret_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span><span class="s2">&quot;msg&quot;</span><span class="p">:</span><span class="sa">f</span><span class="s2">&quot;Removed </span><span class="si">{</span><span class="n">abspath</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">}})</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_SCCESS</span></div>
+
+
+<div class="viewcode-block" id="Server.file_download">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.server.Server.file_download">[docs]</a>
+    <span class="k">def</span> <span class="nf">file_download</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reskey</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">current_path</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        ファイルをダウンロードする</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            reskey (str): レスポンスキー</span>
+<span class="sd">            current_path (str): ファイルパス</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: レスポンスコード</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">chk</span><span class="p">,</span> <span class="n">abspath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_exists</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="n">current_path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">chk</span><span class="p">:</span> <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span>
+        <span class="k">if</span> <span class="n">abspath</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Path </span><span class="si">{</span><span class="n">abspath</span><span class="si">}</span><span class="s2"> is directory.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">responce</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;warn&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Path </span><span class="si">{</span><span class="n">abspath</span><span class="si">}</span><span class="s2"> is directory.&quot;</span><span class="p">})</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">abspath</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">bytes2b64str</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">responce</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;success&quot;</span><span class="p">:{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span><span class="n">abspath</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">:</span><span class="n">data</span><span class="p">}})</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_SCCESS</span></div>
+
+    
+<div class="viewcode-block" id="Server.file_upload">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.server.Server.file_upload">[docs]</a>
+    <span class="k">def</span> <span class="nf">file_upload</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reskey</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">current_path</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">file_data</span><span class="p">:</span><span class="nb">bytes</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        ファイルをアップロードする</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            reskey (str): レスポンスキー</span>
+<span class="sd">            current_path (str): ファイルパス</span>
+<span class="sd">            file_name (str): ファイル名</span>
+<span class="sd">            file_data (bytes): ファイルデータ</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: レスポンスコード</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">chk</span><span class="p">,</span> <span class="n">abspath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_exists</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="n">current_path</span><span class="p">,</span> <span class="n">exists_chk</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">chk</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span>
+
+        <span class="k">if</span> <span class="n">abspath</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">abspath</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+                <span class="n">abspath</span> <span class="o">=</span> <span class="n">abspath</span> <span class="o">/</span> <span class="n">file_name</span>
+            <span class="k">if</span> <span class="n">abspath</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Path </span><span class="si">{</span><span class="n">abspath</span><span class="si">}</span><span class="s2"> already exist. param=</span><span class="si">{</span><span class="n">current_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">responce</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;warn&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Path </span><span class="si">{</span><span class="n">abspath</span><span class="si">}</span><span class="s2"> already exist. param=</span><span class="si">{</span><span class="n">current_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">})</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span>
+            <span class="n">save_path</span> <span class="o">=</span> <span class="n">abspath</span>
+        <span class="k">elif</span> <span class="n">abspath</span><span class="o">.</span><span class="n">suffix</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">abspath</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">save_path</span> <span class="o">=</span> <span class="n">abspath</span> <span class="o">/</span> <span class="n">file_name</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">save_path</span> <span class="o">=</span> <span class="n">abspath</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">save_path</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">file_data</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">responce</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;success&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Uploaded </span><span class="si">{</span><span class="n">save_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">})</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_SCCESS</span></div>
+
+
+<div class="viewcode-block" id="Server.file_remove">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.server.Server.file_remove">[docs]</a>
+    <span class="k">def</span> <span class="nf">file_remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reskey</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">current_path</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        ファイルを削除する</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            reskey (str): レスポンスキー</span>
+<span class="sd">            current_path (str): ファイルパス</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: レスポンスコード</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">chk</span><span class="p">,</span> <span class="n">abspath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_exists</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="n">current_path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">chk</span><span class="p">:</span> <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span>
+        <span class="k">if</span> <span class="n">abspath</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Path </span><span class="si">{</span><span class="n">abspath</span><span class="si">}</span><span class="s2"> is directory.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">responce</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;warn&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Path </span><span class="si">{</span><span class="n">abspath</span><span class="si">}</span><span class="s2"> is directory.&quot;</span><span class="p">})</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_WARN</span>
+
+        <span class="n">abspath</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span>
+        <span class="n">ret_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">current_path</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span><span class="p">,</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">responce</span><span class="p">(</span><span class="n">reskey</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;success&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;path&quot;</span><span class="p">:</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ret_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span><span class="s2">&quot;msg&quot;</span><span class="p">:</span><span class="sa">f</span><span class="s2">&quot;Removed </span><span class="si">{</span><span class="n">abspath</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">}})</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">RESP_SCCESS</span></div>
 </div>
 
+    
 </pre></div>
 
            </div>
