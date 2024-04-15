@@ -2,6 +2,7 @@ from iinfer import version
 from iinfer.app import app, common
 from iinfer.app.commons import convert
 from pathlib import Path
+import bottle
 import datetime
 import glob
 import html
@@ -13,6 +14,7 @@ import os
 import re
 import sys
 import traceback
+import tempfile
 
 
 class Web(object):
@@ -34,7 +36,7 @@ class Web(object):
         @eel.expose
         def get_cmd_opt(mode):
             if mode == "client":
-                return ['', 'deploy', 'start', 'stop', 'predict', 'deploy_list', 'undeploy', 'predict_type_list', 'capture']
+                return ['', 'deploy', 'start', 'stop', 'predict', 'deploy_list', 'undeploy', 'predict_type_list', 'capture', 'file_list', 'file_mkdir', 'file_rmdir', 'file_download', 'file_upload', 'file_remove',]
             elif mode == "server":
                 return ['', 'start', 'stop', 'list']
             elif mode == "postprocess":
@@ -146,6 +148,80 @@ class Web(object):
                         dict(opt="image_type", type="str", default="jpeg", required=True, multi=False, hide=False, choise=['bmp', 'png', 'jpeg', 'capture', 'output_json']),
                         dict(opt="output_image", type="file", default="", required=False, multi=False, hide=False, choise=None),
                         dict(opt="output_preview", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False]),
+                        dict(opt="timeout", type="int", default="15", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json_append", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False]),
+                        dict(opt="stdout_log", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False])
+                    ]
+                elif cmd == "file_list":
+                    return [
+                        dict(opt="host", type="str", default="localhost", required=True, multi=False, hide=True, choise=None),
+                        dict(opt="port", type="int", default=6379, required=True, multi=False, hide=True, choise=None),
+                        dict(opt="password", type="str", default="password", required=True, multi=False, hide=True, choise=None),
+                        dict(opt="svname", type="str", default="server", required=True, multi=False, hide=True, choise=None),
+                        dict(opt="svpath", type="str", default="/", required=True, multi=False, hide=False, choise=None),
+                        dict(opt="timeout", type="int", default="15", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json_append", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False]),
+                        dict(opt="stdout_log", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False])
+                    ]
+                elif cmd == "file_mkdir":
+                    return [
+                        dict(opt="host", type="str", default="localhost", required=True, multi=False, hide=True, choise=None),
+                        dict(opt="port", type="int", default=6379, required=True, multi=False, hide=True, choise=None),
+                        dict(opt="password", type="str", default="password", required=True, multi=False, hide=True, choise=None),
+                        dict(opt="svname", type="str", default="server", required=True, multi=False, hide=True, choise=None),
+                        dict(opt="svpath", type="str", default="/", required=True, multi=False, hide=False, choise=None),
+                        dict(opt="timeout", type="int", default="15", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json_append", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False]),
+                        dict(opt="stdout_log", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False])
+                    ]
+                elif cmd == "file_rmdir":
+                    return [
+                        dict(opt="host", type="str", default="localhost", required=True, multi=False, hide=True, choise=None),
+                        dict(opt="port", type="int", default=6379, required=True, multi=False, hide=True, choise=None),
+                        dict(opt="password", type="str", default="password", required=True, multi=False, hide=True, choise=None),
+                        dict(opt="svname", type="str", default="server", required=True, multi=False, hide=True, choise=None),
+                        dict(opt="svpath", type="str", default="/", required=True, multi=False, hide=False, choise=None),
+                        dict(opt="timeout", type="int", default="15", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json_append", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False]),
+                        dict(opt="stdout_log", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False])
+                    ]
+                elif cmd == "file_download":
+                    return [
+                        dict(opt="host", type="str", default="localhost", required=True, multi=False, hide=True, choise=None),
+                        dict(opt="port", type="int", default=6379, required=True, multi=False, hide=True, choise=None),
+                        dict(opt="password", type="str", default="password", required=True, multi=False, hide=True, choise=None),
+                        dict(opt="svname", type="str", default="server", required=True, multi=False, hide=True, choise=None),
+                        dict(opt="svpath", type="str", default="/", required=True, multi=False, hide=False, choise=None),
+                        dict(opt="download_file", type="file", default="", required=False, multi=False, hide=False, choise=None),
+                        dict(opt="timeout", type="int", default="15", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json_append", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False]),
+                        dict(opt="stdout_log", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False])
+                    ]
+                elif cmd == "file_upload":
+                    return [
+                        dict(opt="host", type="str", default="localhost", required=True, multi=False, hide=True, choise=None),
+                        dict(opt="port", type="int", default=6379, required=True, multi=False, hide=True, choise=None),
+                        dict(opt="password", type="str", default="password", required=True, multi=False, hide=True, choise=None),
+                        dict(opt="svname", type="str", default="server", required=True, multi=False, hide=True, choise=None),
+                        dict(opt="svpath", type="str", default="/", required=True, multi=False, hide=False, choise=None),
+                        dict(opt="upload_file", type="file", default="", required=True, multi=False, hide=False, choise=None),
+                        dict(opt="timeout", type="int", default="15", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json", type="file", default="", required=False, multi=False, hide=True, choise=None),
+                        dict(opt="output_json_append", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False]),
+                        dict(opt="stdout_log", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False])
+                    ]
+                elif cmd == "file_remove":
+                    return [
+                        dict(opt="host", type="str", default="localhost", required=True, multi=False, hide=True, choise=None),
+                        dict(opt="port", type="int", default=6379, required=True, multi=False, hide=True, choise=None),
+                        dict(opt="password", type="str", default="password", required=True, multi=False, hide=True, choise=None),
+                        dict(opt="svname", type="str", default="server", required=True, multi=False, hide=True, choise=None),
+                        dict(opt="svpath", type="str", default="/", required=True, multi=False, hide=False, choise=None),
                         dict(opt="timeout", type="int", default="15", required=False, multi=False, hide=True, choise=None),
                         dict(opt="output_json", type="file", default="", required=False, multi=False, hide=True, choise=None),
                         dict(opt="output_json_append", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False]),
@@ -423,7 +499,7 @@ class Web(object):
             self.logger.info(f"del_cmd: opt_path={opt_path}")
             opt_path.unlink()
 
-        def mk_opt_list(opt):
+        def mk_opt_list(opt:dict):
             opt_schema = get_opt_opt(opt['mode'], opt['cmd'])
             opt_list = ['-m', opt['mode'], '-c', opt['cmd']]
             for key, val in opt.items():
@@ -476,28 +552,6 @@ class Web(object):
                 return ret
             except:
                 return output
-            """
-            captured_output = io.StringIO()
-            def main_call(opt_list, captured_output):
-                old_stdout = sys.stdout
-                sys.stdout = captured_output
-                app.main(opt_list)
-                sys.stdout = old_stdout
-            th = threading.Thread(target=main_call, args=(opt_list, captured_output))
-            th.start()
-
-            output = ''
-            while th.is_alive():
-                line = captured_output.getvalue()
-                if line.strip() == '':
-                    continue
-                output += line
-                eel.js_console_modal_log_func(line)
-            try:
-                return json.loads(output)
-            except:
-                return output
-            """
 
         @eel.expose
         def raw_cmd(title, opt):
@@ -629,6 +683,26 @@ class Web(object):
                     parts = line.strip().split('\t')
                     ret.append(parts)
             return ret
+        
+        @bottle.route('/filer/upload', method='POST')
+        def filer_upload():
+            q = bottle.request.query
+            svpath = q['svpath']
+            opt = dict(mode='client', cmd='file_upload',
+                       host=q['host'], port=q['port'], password=q['password'], svname=q['svname'])
+            for file in bottle.request.files.getall('files'):
+                with tempfile.TemporaryDirectory() as tmpdir:
+                    upload_file:Path = Path(tmpdir) / file.raw_filename
+                    if not upload_file.parent.exists():
+                        upload_file.parent.mkdir(parents=True)
+                    opt['svpath'] = str(svpath / Path(file.raw_filename).parent).replace('\\','/')
+                    opt['upload_file'] = str(upload_file)
+                    file.save(opt['upload_file'])
+                    ret = exec_cmd("file_upload", opt)
+                    if len(ret) == 0 or 'success' not in ret[0]:
+                        return str(ret)
+            return 'upload success'
+            #return f'upload {upload.filename}'
 
         eel.js_console_modal_log_func('== console log start ==\n')
         eel.start("main.html", size=(width, height), block=True, port=web_port, host=web_host, close_callback=self.stop)

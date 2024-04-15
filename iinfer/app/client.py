@@ -442,6 +442,113 @@ class Client(object):
                 except KeyboardInterrupt:
                     pass
         return res_json
+    
+    def file_list(self, svpath:str, timeout:int = 60):
+        """
+        サーバー上のファイルリストを取得する
+
+        Args:
+            svpath (Path): サーバー上のファイルパス
+            timeout (int, optional): タイムアウト時間. Defaults to 60.
+
+        Returns:
+            dict: Redisサーバーからの応答
+        """
+        res_json = self._proc(self.svname, 'file_list', [str(svpath)], timeout=timeout)
+        return res_json
+
+    def file_mkdir(self, svpath:str, timeout:int = 60):
+        """
+        サーバー上にディレクトリを作成する
+
+        Args:
+            svpath (Path): サーバー上のディレクトリパス
+            timeout (int, optional): タイムアウト時間. Defaults to 60.
+
+        Returns:
+            dict: Redisサーバーからの応答
+        """
+        res_json = self._proc(self.svname, 'file_mkdir', [str(svpath)], timeout=timeout)
+        return res_json
+    
+    def file_rmdir(self, svpath:str, timeout:int = 60):
+        """
+        サーバー上のディレクトリを削除する
+
+        Args:
+            svpath (Path): サーバー上のディレクトリパス
+            timeout (int, optional): タイムアウト時間. Defaults to 60.
+
+        Returns:
+            dict: Redisサーバーからの応答
+        """
+        res_json = self._proc(self.svname, 'file_rmdir', [str(svpath)], timeout=timeout)
+        return res_json
+    
+    def file_download(self, svpath:str, download_file:Path, timeout:int = 60):
+        """
+        サーバー上のファイルをダウンロードする
+
+        Args:
+            svpath (Path): サーバー上のファイルパス
+            download_file (Path): ローカルのファイルパス
+            timeout (int, optional): タイムアウト時間. Defaults to 60.
+
+        Returns:
+            bytes: ダウンロードファイルの内容
+        """
+        res_json = self._proc(self.svname, 'file_download', [str(svpath)], timeout=timeout)
+        if "success" in res_json:
+            if download_file is not None:
+                if download_file.is_dir():
+                    download_file = download_file / res_json["success"]["name"]
+                if download_file.exists():
+                    self.logger.error(f"download_file {download_file} already exists.")
+                    return {"error": f"download_file {download_file} already exists."}
+                with open(download_file, "wb") as f:
+                    f.write(base64.b64decode(res_json["success"]["data"]))
+                    del res_json["success"]["data"]
+                    res_json["success"]["download_file"] = str(download_file.absolute())
+        return res_json
+    
+    def file_upload(self, svpath:str, upload_file:Path, timeout:int = 60):
+        """
+        サーバー上にファイルをアップロードする
+
+        Args:
+            svpath (Path): サーバー上のファイルパス
+            upload_file (Path): ローカルのファイルパス
+            timeout (int, optional): タイムアウト時間. Defaults to 60.
+
+        Returns:
+            dict: Redisサーバーからの応答
+        """
+        if upload_file is None:
+            self.logger.error(f"upload_file is empty.")
+            return {"error": f"upload_file is empty."}
+        if not upload_file.exists():
+            self.logger.error(f"input_file {upload_file} does not exist.")
+            return {"error": f"input_file {upload_file} does not exist."}
+        if upload_file.is_dir():
+            self.logger.error(f"input_file {upload_file} is directory.")
+            return {"error": f"input_file {upload_file} is directory."}
+        with open(upload_file, "rb") as f:
+            res_json = self._proc(self.svname, 'file_upload', [str(svpath), upload_file.name, base64.b64encode(f.read()).decode('utf-8')], timeout=timeout)
+            return res_json
+
+    def file_remove(self, svpath:str, timeout:int = 60):
+        """
+        サーバー上のファイルを削除する
+
+        Args:
+            svpath (Path): サーバー上のファイルパス
+            timeout (int, optional): タイムアウト時間. Defaults to 60.
+
+        Returns:
+            dict: Redisサーバーからの応答
+        """
+        res_json = self._proc(self.svname, 'file_remove', [str(svpath)], timeout=timeout)
+        return res_json
 
     def capture(self, capture_device='0', image_type:str='capture', capture_frame_width:int=None, capture_frame_height:int=None, capture_fps:int=1000, output_preview:bool=False):
         """

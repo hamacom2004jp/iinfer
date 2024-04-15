@@ -4,6 +4,7 @@ from pkg_resources import resource_string
 from tabulate import tabulate
 from typing import List, Tuple, Dict, Any
 import cv2
+import datetime
 import logging
 import logging.config
 import json
@@ -53,6 +54,8 @@ def default_json_enc(o) -> Any:
         return int(o)
     if isinstance(o, Path):
         return str(o)
+    if isinstance(o, datetime.datetime):
+        return o.strftime('%Y-%m-%dT%H:%M:%S')
     raise TypeError(f"Type {type(o)} not serializable")
 
 def saveopt(opt:dict, opt_path:Path) -> None:

@@ -3,20 +3,22 @@ from pathlib import Path
 from PIL import Image
 from iinfer.app import common, predict, injection
 from iinfer.app.commons import convert, module
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Tuple
 import base64
+import datetime
 import logging
 import json
 import numpy as np
+import re
 import redis
 import shutil
 import time
 
 
 class Server(object):
-    RESP_SCCESS = 0
-    RESP_WARN = 1
-    RESP_ERROR = 2
+    RESP_SCCESS:int = 0
+    RESP_WARN:int = 1
+    RESP_ERROR:int = 2
     def __init__(self, data_dir: Path, logger: logging.Logger, redis_host: str = "localhost", redis_port: int = 6379, redis_password: str = None, svname: str = 'server'):
         """
         Redisサーバーに接続し、クライアントからのコマンドを受信し実行する
@@ -227,6 +229,19 @@ class Server(object):
                     self.is_running = False
                     self.responce(msg[1], {"success": f"Successful stop server. svname={self.svname}"})
                     break
+                elif msg[0] == 'file_list':
+                    st = self.file_list(msg[1], msg[2])
+                elif msg[0] == 'file_mkdir':
+                    st = self.file_mkdir(msg[1], msg[2])
+                elif msg[0] == 'file_rmdir':
+                    st = self.file_rmdir(msg[1], msg[2])
+                elif msg[0] == 'file_download':
+                    st = self.file_download(msg[1], msg[2])
+                elif msg[0] == 'file_upload':
+                    file_data = convert.b64str2bytes(msg[4])
+                    st = self.file_upload(msg[1], msg[2], msg[3], file_data)
+                elif msg[0] == 'file_remove':
+                    st = self.file_remove(msg[1], msg[2])
                 else:
                     self.logger.warn(f"Unknown command {msg}")
                     st = self.RESP_WARN
@@ -748,3 +763,210 @@ class Server(object):
             self.logger.warn(f"Failed to run inference: {e}", exc_info=True)
             self.responce(reskey, {"warn": f"Failed to run inference: {e}"})
             return self.RESP_WARN
+
+    def _file_exists(self, reskey:str, current_path:str, not_exists:bool=False, exists_chk:bool=True) -> Tuple[bool, Path]:
+        """
+        パスが存在するかどうかを確認する
+
+        Args:
+            reskey (str): レスポンスキー
+            current_path (str): パス
+            not_exists (bool, optional): パスが存在しないことを確認するかどうか, by default False
+            exists_chk (bool, optional): パス存在チェックを行うかどうか, by default True
+        
+        Returns:
+            bool: not_existsがFalseの時パスが存在すればTrue、存在しなければFalse。not_existsがTrueの時パスが存在しなければTrue、存在すればFalse。
+            Path: データフォルダ以下のcurrent_pathを含めた絶対パス
+        """
+        if current_path is None or current_path == "":
+            self.logger.warn(f"current_path is empty.")
+            self.responce(reskey, {"warn": f"current_path is empty."})
+            return False, None
+        current_path = current_path.replace("\\","/")
+        cp = current_path[1:] if current_path.startswith('/') else current_path
+        abspath:Path = (self.data_dir / cp).resolve()
+        if not str(abspath).startswith(str(self.data_dir)):
+            self.logger.warn(f"Path {abspath} is out of data directory. current_path={current_path}")
+            self.responce(reskey, {"warn": f"Path {abspath} is out of data directory. current_path={current_path}"})
+            return False, None
+        if not exists_chk:
+            return True, abspath
+        if not not_exists and not abspath.exists():
+            self.logger.warn(f"Path {abspath} does not exist. param={current_path}")
+            self.responce(reskey, {"warn": f"Path {abspath} does not exist. param={current_path}"})
+            return False, None
+        if not_exists and abspath.exists():
+            self.logger.warn(f"Path {abspath} exist. param={current_path}")
+            self.responce(reskey, {"warn": f"Path {abspath} exist. param={current_path}"})
+            return False, None
+        return True, abspath
+
+    def file_list(self, reskey:str, current_path:str):
+        """
+        ファイルリストを取得する
+
+        Args:
+            reskey (str): レスポンスキー
+            path (str): ファイルパス
+
+        Returns:
+            int: レスポンスコード
+        """
+        chk, _ = self._file_exists(reskey, current_path)
+        if not chk: return self.RESP_WARN
+        
+        def _mk_key(path):
+            return re.sub('[\s:\\\\/,\.#$%^&!@*\(\)\{\}\[\]\'\"\`]', '_',str(path))
+        def _ts2str(ts):
+            return datetime.datetime.fromtimestamp(ts)
+
+        current_path = f'/{current_path}' if not current_path.startswith('/') else current_path
+        current_path_parts = current_path.split("/")
+        current_path_parts = current_path_parts[1:] if current_path=='/' else current_path_parts
+        path_tree = {}
+        data_dir_len = len(str(self.data_dir))
+        for i, cpart in enumerate(current_path_parts):
+            cpath = '/'.join(current_path_parts[1:i+1])
+            file_list:Path = self.data_dir / cpath
+            children = dict()
+            for f in file_list.iterdir():
+                parts = str(f)[data_dir_len:].replace("\\","/").split("/")
+                path = "/".join(parts[:i+2])
+                key = _mk_key(path)
+                if key in children:
+                    continue
+                children[key] = dict(name=f.name, is_dir=f.is_dir(), path=path, size=f.stat().st_size , last=_ts2str(f.stat().st_mtime))
+
+            tpath = '/'.join(current_path_parts[:i+1])
+            tpath = '/' if tpath=='' else tpath
+            tpath_key = _mk_key(tpath)
+            cpart = '/' if cpart=='' else cpart
+            path_tree[tpath_key] = dict(name=cpart, is_dir=True, path=tpath, children=children, size=0, last="")
+
+        self.responce(reskey, {"success": path_tree})
+        return self.RESP_SCCESS
+
+    def file_mkdir(self, reskey:str, current_path:str):
+        """
+        ディレクトリを作成する
+
+        Args:
+            reskey (str): レスポンスキー
+            current_path (str): ディレクトリパス
+
+        Returns:
+            int: レスポンスコード
+        """
+        chk, abspath = self._file_exists(reskey, current_path, not_exists=True)
+        if not chk: return self.RESP_WARN
+
+        abspath.mkdir(parents=True)
+        ret_path = str(Path(current_path).parent).replace("\\","/")
+        self.responce(reskey, {"success": {"path":f"{ret_path}","msg":f"Created {abspath}"}})
+        return self.RESP_SCCESS
+    
+    def file_rmdir(self, reskey:str, current_path:str):
+        """
+        ディレクトリを削除する
+
+        Args:
+            reskey (str): レスポンスキー
+            current_path (str): ディレクトリパス
+
+        Returns:
+            int: レスポンスコード
+        """
+        chk, abspath = self._file_exists(reskey, current_path)
+        if not chk: return self.RESP_WARN
+        if abspath == self.data_dir:
+            self.logger.warn(f"Path {abspath} is root directory.")
+            self.responce(reskey, {"warn": f"Path {abspath} is root directory."})
+            return self.RESP_WARN
+
+        common.rmdirs(abspath)
+        ret_path = str(Path(current_path).parent).replace("\\","/")
+        self.responce(reskey, {"success": {"path":f"{ret_path}","msg":f"Removed {abspath}"}})
+        return self.RESP_SCCESS
+
+    def file_download(self, reskey:str, current_path:str):
+        """
+        ファイルをダウンロードする
+
+        Args:
+            reskey (str): レスポンスキー
+            current_path (str): ファイルパス
+
+        Returns:
+            int: レスポンスコード
+        """
+        chk, abspath = self._file_exists(reskey, current_path)
+        if not chk: return self.RESP_WARN
+        if abspath.is_dir():
+            self.logger.warn(f"Path {abspath} is directory.")
+            self.responce(reskey, {"warn": f"Path {abspath} is directory."})
+            return self.RESP_WARN
+
+        with open(abspath, "rb") as f:
+            data = convert.bytes2b64str(f.read())
+            self.responce(reskey, {"success":{"name":abspath.name, "data":data}})
+        return self.RESP_SCCESS
+    
+    def file_upload(self, reskey:str, current_path:str, file_name:str, file_data:bytes):
+        """
+        ファイルをアップロードする
+
+        Args:
+            reskey (str): レスポンスキー
+            current_path (str): ファイルパス
+            file_name (str): ファイル名
+            file_data (bytes): ファイルデータ
+
+        Returns:
+            int: レスポンスコード
+        """
+        chk, abspath = self._file_exists(reskey, current_path, exists_chk=False)
+        if not chk:
+            return self.RESP_WARN
+
+        if abspath.exists():
+            if abspath.is_dir():
+                abspath = abspath / file_name
+            if abspath.is_file():
+                self.logger.warn(f"Path {abspath} already exist. param={current_path}")
+                self.responce(reskey, {"warn": f"Path {abspath} already exist. param={current_path}"})
+                return self.RESP_WARN
+            save_path = abspath
+        elif abspath.suffix == '':
+            abspath.mkdir(parents=True, exist_ok=True)
+            save_path = abspath / file_name
+        else:
+            save_path = abspath
+
+        with open(save_path, "wb") as f:
+            f.write(file_data)
+            self.responce(reskey, {"success": f"Uploaded {save_path}"})
+        return self.RESP_SCCESS
+
+    def file_remove(self, reskey:str, current_path:str) -> int:
+        """
+        ファイルを削除する
+
+        Args:
+            reskey (str): レスポンスキー
+            current_path (str): ファイルパス
+
+        Returns:
+            int: レスポンスコード
+        """
+        chk, abspath = self._file_exists(reskey, current_path)
+        if not chk: return self.RESP_WARN
+        if abspath.is_dir():
+            self.logger.warn(f"Path {abspath} is directory.")
+            self.responce(reskey, {"warn": f"Path {abspath} is directory."})
+            return self.RESP_WARN
+
+        abspath.unlink()
+        ret_path = str(Path(current_path).parent).replace("\\","/")
+        self.responce(reskey, {"success": {"path":f"{ret_path}","msg":f"Removed {abspath}"}})
+        return self.RESP_SCCESS
+    

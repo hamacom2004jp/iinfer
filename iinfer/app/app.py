@@ -36,6 +36,7 @@ def _main(args_list:list=None):
                                  'start', 'stop', # server or client or gui mode
                                  'list' , # server mode
                                  'deploy', 'deploy_list', 'undeploy', 'predict', 'predict_type_list', 'capture', # client mode
+                                 'file_list', 'file_mkdir', 'file_rmdir', 'file_download', 'file_upload', 'file_remove', # client mode
                                  'cls_jadge', 'csv', 'det_clip', 'det_face_store', 'det_filter', 'det_jadge', 'httpreq', 'seg_bbox', 'seg_filter', # postprocess mode
                                 ])
     parser.add_argument('-T','--use_track', help='Setting the multi object tracking enable for Object Detection.', action='store_true')
@@ -76,6 +77,10 @@ def _main(args_list:list=None):
     parser.add_argument('--capture_frame_height', help='Setting the capture input frame height.', type=int, default=None)
     parser.add_argument('--capture_fps', help='Setting the capture input fps.', type=int, default=1000)
     parser.add_argument('--capture_count', help='Setting the capture count.', type=int, default=-1)
+
+    parser.add_argument('--svpath', help='Setting the server file path.', type=str, default='/')
+    parser.add_argument('--download_file', help='Setting the download file path.', type=str, default=None)
+    parser.add_argument('--upload_file', help='Setting the upload file path.', type=str, default=None)
 
     parser.add_argument('--fileup_name', help='Setting the param name of file upload.', type=str, default='file')
     parser.add_argument('--img_connectstr', help='Setting the postprocess img_connectstr.', type=str, default=None)
@@ -173,6 +178,10 @@ def _main(args_list:list=None):
     capture_frame_height = common.getopt(opt, 'capture_frame_height', preval=args_dict, withset=True)
     capture_fps = common.getopt(opt, 'capture_fps', preval=args_dict, withset=True)
     capture_count = common.getopt(opt, 'capture_count', preval=args_dict, withset=True)
+
+    svpath = common.getopt(opt, 'svpath', preval=args_dict, withset=True)
+    download_file = common.getopt(opt, 'download_file', preval=args_dict, withset=True)
+    upload_file = common.getopt(opt, 'upload_file', preval=args_dict, withset=True)
 
     json_connectstr = common.getopt(opt, 'json_connectstr', preval=args_dict, withset=True)
     img_connectstr = common.getopt(opt, 'img_connectstr', preval=args_dict, withset=True)
@@ -371,6 +380,45 @@ def _main(args_list:list=None):
                     cv2.destroyWindow('preview')
                 except:
                     pass
+
+        elif cmd == 'file_list':
+            ret = cl.file_list(svpath, timeout=timeout)
+            common.print_format(ret, format, tm, output_json, output_json_append)
+            if 'success' not in ret:
+                return 1, ret
+        
+        elif cmd == 'file_mkdir':
+            ret = cl.file_mkdir(svpath, timeout=timeout)
+            common.print_format(ret, format, tm, output_json, output_json_append)
+            if 'success' not in ret:
+                return 1, ret
+        
+        elif cmd == 'file_rmdir':
+            ret = cl.file_rmdir(svpath, timeout=timeout)
+            common.print_format(ret, format, tm, output_json, output_json_append)
+            if 'success' not in ret:
+                return 1, ret
+        
+        elif cmd == 'file_download':
+            download_file = Path(download_file) if download_file is not None else None
+            ret = cl.file_download(svpath, download_file, timeout=timeout)
+            common.print_format(ret, format, tm, output_json, output_json_append)
+            if 'success' not in ret:
+                return 1, ret
+        
+        elif cmd == 'file_upload':
+            upload_file = Path(upload_file) if upload_file is not None else None
+            ret = cl.file_upload(svpath, upload_file, timeout=timeout)
+            common.print_format(ret, format, tm, output_json, output_json_append)
+            if 'success' not in ret:
+                return 1, ret
+
+        elif cmd == 'file_remove':
+            ret = cl.file_remove(svpath, timeout=timeout)
+            common.print_format(ret, format, tm, output_json, output_json_append)
+            if 'success' not in ret:
+                return 1, ret
+
         elif cmd == 'predict_type_list':
             type_list = [dict(predict_type=key, site=val['site'], image_width=val['image_width'], image_height=val['image_height'],
                               required_model_conf=val['required_model_conf'], required_model_weight=val['required_model_weight']) for key,val in common.BASE_MODELS.items()]

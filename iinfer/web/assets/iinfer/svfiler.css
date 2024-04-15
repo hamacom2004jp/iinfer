@@ -1,0 +1,5 @@
+.dragover {
+  border: 3px dashed #C8C8C8 !important;
+  background-color: #F0F0F0 !important;
+  border-radius: 5px;
+}
