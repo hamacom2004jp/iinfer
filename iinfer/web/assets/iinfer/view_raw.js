@@ -13,12 +13,17 @@ view_raw_func = (title, result) => {
     list2table = (data, table_head, table_body) => {
         $.each(data, (i, row) => {
             tr = $(`<tr></tr>`);
-            $.each(row, (key, val) => {
-                if(i==0) {
-                    table_head.append($(`<th scope="col">${key}</th>`));
-                }
-                tr.append($(`<td>${val}</td>`));
-            });
+            if (typeof row === `string`){
+                tr.append($(`<td>${row}</td>`));
+            }
+            else {
+                $.each(row, (key, val) => {
+                    if(i==0) {
+                        table_head.append($(`<th scope="col">${key}</th>`));
+                    }
+                    tr.append($(`<td>${val}</td>`));
+                });
+            }
             table_body.append(tr);
         });
     }

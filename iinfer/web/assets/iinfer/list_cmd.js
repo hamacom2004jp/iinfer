@@ -298,22 +298,18 @@ list_cmd_func_then = () => {
     $(`#cmd_exec`).off(`click`).on('click', async () => {
         cmd_modal = $(`#cmd_modal`);
         var [title, opt] = get_param(cmd_modal);
-        if (cmd_modal.find(`.row_content`).find(`.is-invalid`).length > 0) {
+        if (cmd_modal.find(`.row_content, .row_content_common`).find(`.is-invalid`).length > 0) {
             return;
         }
         $(`#loading`).removeClass(`d-none`);
         // コマンドの実行
-        eel.exec_cmd(title, opt)().then((result) => {
-            cmd_modal.modal(`hide`);
-            view_result_func(title, result);
-            $(`#loading`).addClass(`d-none`);
-        });
+        eel.exec_cmd(title, opt)().then((result) => {});
     });
     // RAW表示の実行
     $(`#cmd_raw`).off(`click`).on('click', async () => {
         cmd_modal = $(`#cmd_modal`);
         var [title, opt] = get_param(cmd_modal);
-        if (cmd_modal.find(`.row_content`).find(`.is-invalid`).length > 0) {
+        if (cmd_modal.find(`.row_content, .row_content_common`).find(`.is-invalid`).length > 0) {
             return;
         }
         $(`#loading`).removeClass(`d-none`);

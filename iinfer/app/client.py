@@ -33,6 +33,7 @@ class Client(object):
         self.svname = f"sv-{svname}"
         self.hbname = f"hb-{svname}"
         self.redis_cli = redis.Redis(host=self.redis_host, port=self.redis_port, db=0, password=redis_password)
+        self.is_running = False
 
     def __exit__(self, a, b, c):
         pass
@@ -67,8 +68,21 @@ class Client(object):
             self.check_server()
             reskey = common.random_string()
             self.redis_cli.rpush(key, f"{cmd} {reskey} {' '.join([str(p) for p in params])}")
-            res = self.redis_cli.blpop([reskey], timeout=timeout)
-            return self._response(reskey, res)
+            self.is_running = True
+            stime = time.time()
+            while self.is_running:
+                ctime = time.time()
+                if ctime - stime > timeout:
+                    raise Exception(f"Response timed out.")
+                res = self.redis_cli.blpop([reskey], timeout=1)
+                if res is None or len(res) <= 0:
+                    time.sleep(1)
+                    continue
+                return self._response(reskey, res)
+            raise KeyboardInterrupt(f"Stop command.")
+        except KeyboardInterrupt as e:
+            self.logger.error(f"Stop command. cmd={cmd}, params={params}", exc_info=True)
+            return {"error": f"Stop command. cmd={cmd}, params={params}"}
         except Exception as e:
             self.logger.error(f"fail to execute command. cmd={cmd}, params={params}, msg={e}", exc_info=True)
             return {"error": f"fail to execute command. cmd={cmd}, params={params}, msg={e}"}
@@ -433,7 +447,9 @@ class Client(object):
             #img_npy = np.load(byteio)
             img_npy = convert.b64str2npy(res_json["output_image"], res_json["output_image_shape"])
             if output_image_file is not None:
-                convert.npy2imgfile(img_npy, output_image_file=output_image_file, image_type=image_type)
+                exp = Path(output_image_file).suffix
+                exp = exp[1:] if exp[0] == '.' else exp
+                convert.npy2imgfile(img_npy, output_image_file=output_image_file, image_type=exp)
             if output_preview:
                 # RGB画像をBGR画像に変換
                 try:
@@ -573,11 +589,14 @@ class Client(object):
             cap.set(cv2.CAP_PROP_FPS, capture_fps)
         try:
             interval = float(1 / capture_fps)
-            while True:
+            self.is_running = True
+            while self.is_running:
                 start = time.perf_counter()
                 ret, frame = cap.read()
                 output_image_name = datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")
                 if ret:
+                    if capture_frame_width is not None and capture_frame_height is not None:
+                        frame = cv2.resize(frame, (capture_frame_width, capture_frame_height), interpolation=cv2.INTER_NEAREST)
                     img_npy = convert.bgr2rgb(frame)
                     if output_preview:
                         # RGB画像をBGR画像に変換

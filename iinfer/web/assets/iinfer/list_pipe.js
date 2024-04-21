@@ -119,11 +119,8 @@ list_pipe_func_then = () => {
         }
         $(`#loading`).removeClass(`d-none`);
         // コマンドの実行
-        eel.exec_pipe(title, opt)().then((result) => {
-            pipe_modal.modal(`hide`);
-            view_result_func(title, result);
-            $(`#loading`).addClass(`d-none`);
-        });
+        $(`#loading`).find(`.bbforce`).addClass(`pipe_executed`);
+        eel.exec_pipe(title, opt)().then((result) => {});
     });
     // RAW表示の実行
     $(`#pipe_raw`).off(`click`).on('click', async () => {

@@ -81,6 +81,17 @@ $(() => {
     });
     $(`.btn_window_stack`).css(`margin-left`, `0px`).hide();
     $(`.btn_window`).css(`margin-left`, `auto`).show();
+    $(`.bbforce`).off(`click`).on('click', async () => {
+        if ($(`#loading`).find(`.bbforce`).hasClass(`pipe_executed`) && 
+            window.confirm(`Executing this action in pipeline will stop the gui mode itself. Are you sure?`)) {
+            await eel.bbforce_cmd()();
+            $(`#loading`).addClass(`d-none`);
+            window.close();
+            return;
+        }
+        await eel.bbforce_cmd()();
+        $(`#loading`).addClass(`d-none`);
+    });
 
     // disable F5 and Ctrl+R
     $(document).on(`keydown`, (e) => {
@@ -101,4 +112,19 @@ $(() => {
         elem.val(text);
         elem.get(0).setSelectionRange(text.length-1, text.length-1);
     };
+    eel.expose(js_return_cmd_exec_func);
+    function js_return_cmd_exec_func(title, result) {
+        cmd_modal = $(`#cmd_modal`);
+        cmd_modal.modal(`hide`);
+        view_result_func(title, result);
+        $(`#loading`).addClass(`d-none`);
+    }
+    eel.expose(js_return_pipe_exec_func);
+    function js_return_pipe_exec_func(title, result) {
+        pipe_modal = $(`#pipe_modal`);
+        pipe_modal.modal(`hide`);
+        view_result_func(title, result);
+        $(`#loading`).addClass(`d-none`);
+    }
+    
 });
