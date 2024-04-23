@@ -284,7 +284,7 @@ class IinferApp:
                     msg = {"warn":f"Please specify the --data option."}
                     common.print_format(msg, format, tm, output_json, output_json_append)
                     return 1, msg
-                self.web = gui.Web(logger, Path(data))
+                self.web = gui.Gui(logger, Path(data))
                 self.web.start()
                 msg = {"success":"eel web complate."}
                 common.print_format(msg, format, tm, output_json, output_json_append)

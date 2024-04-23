@@ -1,76 +1,76 @@
 const filer = (svpath) => {
-  const modal = $("#svfiler_modal").length ? $("#svfiler_modal") : $(
-    `<div id="svfiler_modal" class="modal" tabindex="-1">`
-      + `<div class="modal-dialog modal-lg">`
-        + `<div id="result_form" class="modal-content novalidate">`
-          + `<div class="modal-header">`
-            + `<div class="input-group p-1">`
-              + `<button class="btn btn-outline-secondary dropdown-toggle filer_server_bot" type="button" data-bs-toggle="dropdown" aria-expanded="false">Server</button>`
-              + `<ul class="dropdown-menu filer_server"><li class="mb-3 p-3">`
-                + `<div class="col-12">`
-                  + `<div class="input-group">`
-                    + `<label class="input-group-text text-decoration-underline"><span class="text-danger">*</span>host</label>`
-                    + `<input name="filer_host" type="text" class="form-control filer_host" param_data_type="str" param_data_multi="false" required>`
-                  + `</div>`
-                + `</div>`
-                + `<div class="col-12">`
-                  + `<div class="input-group">`
-                    + `<label class="input-group-text text-decoration-underline"><span class="text-danger">*</span>port</label>`
-                    + `<input name="filer_port" type="text" class="form-control filer_port" param_data_type="int" param_data_multi="false" required>`
-                  + `</div>`
-                + `</div>`
-                + `<div class="col-12">`
-                  + `<div class="input-group">`
-                    + `<label class="input-group-text text-decoration-underline"><span class="text-danger">*</span>password</label>`
-                    + `<input name="filer_password" type="text" class="form-control filer_password" param_data_type="str" param_data_multi="false" required>`
-                    + `<input name="filer_svname" type="hidden" class="filer_svname">`
-                  + `</div>`
-                + `</div>`
-              + `</li><li><hr class="dropdown-divider"></li></ul>`
-              + `<input type="text" class="form-control filer_address" aria-describedby="button-addon2">`
-              + `<button class="btn btn-outline-secondary filer_address_bot" type="button" id="button-addon2">`
-                + `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right-circle" viewBox="0 0 16 16">`
-                  + `<path fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8zm15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z"/>`
-                + `</svg>`
-              + `</button>`
-            + `</div>`
-            + `<button type="button" class="btn btn_window_stack">`
-              + `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-window-stack" viewBox="0 0 16 16">`
-                + `<path d="M4.5 6a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1ZM6 6a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1Zm2-.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0Z"/>`
-                + `<path d="M12 1a2 2 0 0 1 2 2 2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2 2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h10ZM2 12V5a2 2 0 0 1 2-2h9a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1Zm1-4v5a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V8H3Zm12-1V5a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v2h12Z"/>`
-              + `</svg>`
-            + `</button>`
-            + `<button type="button" class="btn btn_window">`
-                + `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-window" viewBox="0 0 16 16">`
-                  + `<path d="M2.5 4a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1zm2-.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zm1 .5a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>`
-                  + `<path d="M2 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2H2zm13 2v2H1V3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1zM2 14a1 1 0 0 1-1-1V6h14v7a1 1 0 0 1-1 1H2z"/>`
-                + `</svg>`
-            + `</button>`
-            + `<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="margin-left: 0px;"></button>`
-          + `</div>`
-          + `<div class="modal-body row">`
-            + `<ul class="tree-menu tree_ul overflow-auto border col-4" style="height:calc(100vh - 240px)"></ul>`
-            + `<div class="file-list drop-area overflow-auto col-8 p-1" style="height:calc(100vh - 240px)"></div>`
-            + `<div class="progress p-0 d-none" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">`
-              + `<div class="progress-bar progress-bar-striped progress-bar-animated bg-success" style="width: 0%"></div>`
-            + `</div>`
-            + `<a class="filer_download d-none" href="#">.</a>`
-          + `</div>`
-          + `<div class="modal-footer">`
-            + `<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>`
-          + `</div>`
-        + `</div>`
-      + `</div>`
-    + `</div>`
+  const modal = $('#svfiler_modal').length ? $('#svfiler_modal') : $(
+    '<div id="svfiler_modal" class="modal" tabindex="-1">'
+      + '<div class="modal-dialog modal-lg">'
+        + '<div id="result_form" class="modal-content novalidate">'
+          + '<div class="modal-header">'
+            + '<div class="input-group p-1">'
+              + '<button class="btn btn-outline-secondary dropdown-toggle filer_server_bot" type="button" data-bs-toggle="dropdown" aria-expanded="false">Server</button>'
+              + '<ul class="dropdown-menu filer_server"><li class="mb-3 p-3">'
+                + '<div class="col-12">'
+                  + '<div class="input-group">'
+                    + '<label class="input-group-text text-decoration-underline"><span class="text-danger">*</span>host</label>'
+                    + '<input name="filer_host" type="text" class="form-control filer_host" param_data_type="str" param_data_multi="false" required>'
+                  + '</div>'
+                + '</div>'
+                + '<div class="col-12">'
+                  + '<div class="input-group">'
+                    + '<label class="input-group-text text-decoration-underline"><span class="text-danger">*</span>port</label>'
+                    + '<input name="filer_port" type="text" class="form-control filer_port" param_data_type="int" param_data_multi="false" required>'
+                  + '</div>'
+                + '</div>'
+                + '<div class="col-12">'
+                  + '<div class="input-group">'
+                    + '<label class="input-group-text text-decoration-underline"><span class="text-danger">*</span>password</label>'
+                    + '<input name="filer_password" type="text" class="form-control filer_password" param_data_type="str" param_data_multi="false" required>'
+                    + '<input name="filer_svname" type="hidden" class="filer_svname">'
+                  + '</div>'
+                + '</div>'
+              + '</li><li><hr class="dropdown-divider"></li></ul>'
+              + '<input type="text" class="form-control filer_address" aria-describedby="button-addon2">'
+              + '<button class="btn btn-outline-secondary filer_address_bot" type="button" id="button-addon2">'
+                + '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right-circle" viewBox="0 0 16 16">'
+                  + '<path fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8zm15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z"/>'
+                + '</svg>'
+              + '</button>'
+            + '</div>'
+            + '<button type="button" class="btn btn_window_stack">'
+              + '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-window-stack" viewBox="0 0 16 16">'
+                + '<path d="M4.5 6a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1ZM6 6a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1Zm2-.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0Z"/>'
+                + '<path d="M12 1a2 2 0 0 1 2 2 2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2 2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h10ZM2 12V5a2 2 0 0 1 2-2h9a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1Zm1-4v5a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V8H3Zm12-1V5a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v2h12Z"/>'
+              + '</svg>'
+            + '</button>'
+            + '<button type="button" class="btn btn_window">'
+                + '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-window" viewBox="0 0 16 16">'
+                  + '<path d="M2.5 4a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1zm2-.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zm1 .5a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>'
+                  + '<path d="M2 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2H2zm13 2v2H1V3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1zM2 14a1 1 0 0 1-1-1V6h14v7a1 1 0 0 1-1 1H2z"/>'
+                + '</svg>'
+            + '</button>'
+            + '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="margin-left: 0px;"></button>'
+          + '</div>'
+          + '<div class="modal-body row">'
+            + '<ul class="tree-menu tree_ul overflow-auto border col-4" style="height:calc(100vh - 240px)"></ul>'
+            + '<div class="file-list drop-area overflow-auto col-8 p-1" style="height:calc(100vh - 240px)"></div>'
+            + '<div class="progress p-0 d-none" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">'
+              + '<div class="progress-bar progress-bar-striped progress-bar-animated bg-success" style="width: 0%"></div>'
+            + '</div>'
+            + '<a class="filer_download d-none" href="#">.</a>'
+          + '</div>'
+          + '<div class="modal-footer">'
+            + '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>'
+          + '</div>'
+        + '</div>'
+      + '</div>'
+    + '</div>'
   );
-  const loading = $("#loading").length ? $("#loading") : $(
-    `<div id="loading" class="position-absolute top-0 start-0 w-100 h-100 d-none" style="background:rgba(0, 0, 0, 0.3);z-index:10000;">`
-      + `<div class="text-center position-absolute top-50 start-50 w-100 translate-middle">`
-        + `<div class="spinner-border text-light" role="status">`
-          + `<span class="sr-only"></span>`
-        + `</div>`
-      + `</div>`
-    + `</div>`
+  const loading = $('#loading').length ? $('#loading') : $(
+    '<div id="loading" class="position-absolute top-0 start-0 w-100 h-100 d-none" style="background:rgba(0, 0, 0, 0.3);z-index:10000;">'
+      + '<div class="text-center position-absolute top-50 start-50 w-100 translate-middle">'
+        + '<div class="spinner-border text-light" role="status">'
+          + '<span class="sr-only"></span>'
+        + '</div>'
+      + '</div>'
+    + '</div>'
   );
   const show_loading = () => {loading.removeClass('d-none');}
   const hide_loading = () => {
@@ -104,13 +104,14 @@ const filer = (svpath) => {
   const tree = (svpath, current_ul_elem) => {
     show_loading();
     opt = get_server_opt();
-    opt["mode"] = "client";
-    opt["cmd"] = "file_list";
-    opt["svpath"] = svpath;
-    eel.exec_cmd("file_list", opt)().then(async res => {
+    opt['mode'] = 'client';
+    opt['cmd'] = 'file_list';
+    opt['capture_stdout'] = true;
+    opt['svpath'] = svpath;
+    eel.exec_cmd('file_list', opt, true)().then(async res => {
       current_ul_elem.html('');
-      if(res["warn"]) {
-        alert(res["warn"]);
+      if(res['warn']) {
+        alert(res['warn']);
         hide_loading();
         return;
       }
@@ -134,25 +135,25 @@ const filer = (svpath) => {
           tree(_p, _e);
           event.stopPropagation();
         }}
-        current_a_elem.off("click").on("click", mk_func(node['path'], current_ul_elem));
+        current_a_elem.off('click').on('click', mk_func(node['path'], current_ul_elem));
         Object.keys(children).map((k, i) => {
           n = children[k];
           if(!n['is_dir']) return;
-          ul_elem = $(`<ul class="tree_ul"/>`).append(`<li id="${k}" data_path="${n['path']}"><a href="#" class="folder-close">${n['name']}</a></li>`);
+          ul_elem = $('<ul class="tree_ul"/>').append(`<li id="${k}" data_path="${n['path']}"><a href="#" class="folder-close">${n['name']}</a></li>`);
           current_li_elem.append(ul_elem);
-          modal.find(`#${k}`).off("click");
-          modal.find(`#${k}`).on("click", mk_func(n['path'], current_ul_elem));
+          modal.find(`#${k}`).off('click');
+          modal.find(`#${k}`).on('click', mk_func(n['path'], current_ul_elem));
         });
       });
       // 右側ペイン
       list_tree_keys = Object.keys(list_tree);
       if (list_tree_keys.length > 0) {
         node = list_tree[list_tree_keys[list_tree_keys.length-1]];
-        modal.find(".filer_address").val(node['path']);
-        table = $(`<table class="table table-bordered table-hover table-sm">`
-            + `<thead class="table-dark bg-dark"><tr><th scope="col">-</th><th scope="col">name</th><th scope="col">size</th><th scope="col">last</th></tr></thead>`
-          + `</table>`);
-        table_body = $(`<tbody></tbody>`);
+        modal.find('.filer_address').val(node['path']);
+        table = $('<table class="table table-bordered table-hover table-sm">'
+            + '<thead class="table-dark bg-dark"><tr><th scope="col">-</th><th scope="col">name</th><th scope="col">size</th><th scope="col">last</th></tr></thead>'
+          + '</table>');
+        table_body = $('<tbody></tbody>');
         modal.find('.file-list').html('');
         modal.find('.file-list').append(table);
         table.append(table_body);
@@ -166,17 +167,18 @@ const filer = (svpath) => {
               remote = is_dir ? 'file_rmdir' : 'file_remove';
               show_loading();
               opt = get_server_opt();
-              opt["mode"] = "client";
-              opt["cmd"] = remote;
-              opt["svpath"] = _p;
-              eel.exec_cmd(remote, opt)().then(async res => {
-                if(res["warn"]) {
-                  alert(res["warn"]);
+              opt['mode'] = 'client';
+              opt['cmd'] = remote;
+              opt['capture_stdout'] = true;
+              opt['svpath'] = _p;
+              eel.exec_cmd(remote, opt, true)().then(async res => {
+                if(res['warn']) {
+                  alert(res['warn']);
                   hide_loading();
                   return;
                 }
                 hide_loading();
-                tree(res[0]["success"]["path"], _e);
+                tree(res[0]['success']['path'], _e);
               }).then(() => {
                 hide_loading();
               }, (error) => {
@@ -196,12 +198,13 @@ const filer = (svpath) => {
           mk_download = (_p) => {return ()=>{
             show_loading();
             opt = get_server_opt();
-            opt["mode"] = "client";
-            opt["cmd"] = "file_download";
-            opt["svpath"] = _p;
-            eel.exec_cmd("file_download", opt)().then(async res => {
-              if(res["warn"]) {
-                alert(res["warn"]);
+            opt['mode'] = 'client';
+            opt['cmd'] = 'file_download';
+            opt['capture_stdout'] = true;
+            opt['svpath'] = _p;
+            eel.exec_cmd('file_download', opt, true)().then(async res => {
+              if(res['warn']) {
+                alert(res['warn']);
                 hide_loading();
                 return;
               }
@@ -221,21 +224,22 @@ const filer = (svpath) => {
           // フォルダ作成関数の生成
           mk_mkdir = (_p, _e, is_dir) => {return ()=>{
             _p = _p.substring(0, _p.lastIndexOf('/')+1);
-            prompt_text = prompt("Enter a new folder name.");
+            prompt_text = prompt('Enter a new folder name.');
             if(prompt_text) {
               show_loading();
               opt = get_server_opt();
-              opt["mode"] = "client";
-              opt["cmd"] = "file_mkdir";
-              opt["svpath"] = `${_p}/${prompt_text}`;
-              eel.exec_cmd("file_mkdir", opt)().then(async res => {
-                if(res["warn"]) {
-                  alert(res["warn"]);
+              opt['mode'] = 'client';
+              opt['cmd'] = 'file_mkdir';
+              opt['capture_stdout'] = true;
+              opt['svpath'] = `${_p}/${prompt_text}`;
+              eel.exec_cmd('file_mkdir', opt, true)().then(async res => {
+                if(res['warn']) {
+                  alert(res['warn']);
                   hide_loading();
                   return;
                 }
                 hide_loading();
-                tree(res[0]["success"]["path"], _e);
+                tree(res[0]['success']['path'], _e);
               }).then(() => {
                 hide_loading();
               }, (error) => {
@@ -247,28 +251,28 @@ const filer = (svpath) => {
           // ファイルリストの生成
           mk_tr = (_p, _e, is_dir) => {
             png = is_dir ? 'folder-close.png' : 'file.png';
-            dt = is_dir ? '-' : new Date(n['last']).toLocaleDateString("ja-JP", {
-              year:"numeric", month:"2-digit", day:"2-digit", hour:"2-digit", minute:"2-digit", second:"2-digit"
+            dt = is_dir ? '-' : new Date(n['last']).toLocaleDateString('ja-JP', {
+              year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit'
             });
-            tr = $(`<tr>`
+            tr = $('<tr>'
                 + `<td><img src="/assets/tree-menu/image/${png}"></td>`
-                + `<td>`
-                  + `<div class="droudown">`
+                + '<td>'
+                  + '<div class="droudown">'
                     + `<a class="dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">${n['name']}</a>`
-                    + `<ul class="dropdown-menu"/>`
-                  + `</div>`
-                + `</td>`
+                    + '<ul class="dropdown-menu"/>'
+                  + '</div>'
+                + '</td>'
                 + `<td class="text-end">${calc_size(n['size'])}</td>`
                 + `<td class="text-end">${dt}</td>`
-              + `</tr>`);
+              + '</tr>');
             if (is_dir) {
-              tr.find('.dropdown-menu').append(`<li><a class="dropdown-item open" href="#">Open</a></li>`);
-              tr.find('.dropdown-menu').append(`<li><a class="dropdown-item mkdir" href="#">Create Folder</a></li>`);
-              tr.find('.dropdown-menu').append(`<li><a class="dropdown-item delete" href="#">Delete</a></li>`);
+              tr.find('.dropdown-menu').append('<li><a class="dropdown-item open" href="#">Open</a></li>');
+              tr.find('.dropdown-menu').append('<li><a class="dropdown-item mkdir" href="#">Create Folder</a></li>');
+              tr.find('.dropdown-menu').append('<li><a class="dropdown-item delete" href="#">Delete</a></li>');
             } else {
-              tr.find('.dropdown-menu').append(`<li><a class="dropdown-item download" href="#">Download</a></li>`);
-              tr.find('.dropdown-menu').append(`<li><a class="dropdown-item mkdir" href="#">Create Folder</a></li>`);
-              tr.find('.dropdown-menu').append(`<li><a class="dropdown-item delete" href="#">Delete</a></li>`);
+              tr.find('.dropdown-menu').append('<li><a class="dropdown-item download" href="#">Download</a></li>');
+              tr.find('.dropdown-menu').append('<li><a class="dropdown-item mkdir" href="#">Create Folder</a></li>');
+              tr.find('.dropdown-menu').append('<li><a class="dropdown-item delete" href="#">Delete</a></li>');
             }
             tr.find('.open').off('click').on('click', mk_tree(_p, _e));
             tr.find('.delete').off('click').on('click', mk_delete(_p, _e, is_dir));
@@ -333,18 +337,19 @@ const filer = (svpath) => {
     opt = get_server_opt();
     opt['mode'] = 'server';
     opt['cmd'] = 'list';
+    opt["capture_stdout"] = true;
     delete opt['svname'];
-    eel.exec_cmd("server_list", opt)().then(async res => {
+    eel.exec_cmd("server_list", opt, true)().then(async res => {
       if(res["warn"]) {
         alert(res["warn"]);
         hide_loading();
         return;
       }
-      if(res.length<=0 || !res[0][`success`]) {
+      if(res.length<=0 || !res[0]['success']) {
         hide_loading();
         return;
       }
-      res[0][`success`].forEach(elem => {
+      res[0]['success'].forEach(elem => {
         a_elem = $(`<a class="dropdown-item" href="#" data-host="${opt['host']}" data-port="${opt['port']}" data-password="${opt['password']}" data-svname="${elem['svname']}">${elem['svname']} ( ${opt['host']}:${opt['port']} )</a>`);
         mk_func = (elem) => {return ()=>{
           modal.find('.filer_host').val(elem.attr('data-host'));
@@ -358,7 +363,7 @@ const filer = (svpath) => {
           tree("/", modal.find('.tree-menu'))
         }};
         a_elem.off("click").on("click", mk_func(a_elem));
-        li_elem = $(`<li class="filer_svnames"></li>`).append(a_elem);
+        li_elem = $('<li class="filer_svnames"></li>').append(a_elem);
         modal.find('.filer_server').append(li_elem);
       });
       modal.find('.filer_server').find('.dropdown-item:first').click();
@@ -393,8 +398,8 @@ const filer = (svpath) => {
         else left = parseInt(left.replace('px', ''));
         if (left > maxwidth) left = -200;
         left += 2;
-        bar_elem.css('width', `200px`).css('position', 'relative').css('left', `${left}px`);
-        bar_elem.text(`Server processing...`);
+        bar_elem.css('width', '200px').css('position', 'relative').css('left', `${left}px`);
+        bar_elem.text('Server processing...');
         var progress_handle = setTimeout(() => {
           if (!loading.is('.d-none')) progress(_min, _max, _now, _text, _show, _cycle);
         }, 20);

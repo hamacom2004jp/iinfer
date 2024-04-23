@@ -4,8 +4,8 @@ open_capture_func = (target_id) => {
     view_capture_func = (current_path) => {
         eel.load_capture(current_path)().then((result) =>{
             view_result_func(current_path, result);
-            $(`#loading`).addClass(`d-none`);
+            $('#loading').addClass('d-none');
         });
     };
-    filer_modal_func(target_id, `capture`, ``, view_capture_func);
+    filer_modal_func(target_id, 'capture', '', view_capture_func);
 };
