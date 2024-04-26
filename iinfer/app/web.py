@@ -29,7 +29,7 @@ class Web(object):
         common.mkdirs(self.data)
 
     def get_mode_opt(self):
-        return ['', 'client', 'postprocess', 'server', 'redis', 'install']
+        return ['', 'client', 'postprocess', 'server', 'redis', 'install', 'web']
 
     def get_cmd_opt(self, mode):
         if mode == "client":
@@ -42,6 +42,8 @@ class Web(object):
             return ['', 'docker_run', 'docker_stop']
         elif mode == "install":
             return ['', 'redis', 'server', 'onnx', 'mmdet', 'mmseg', 'mmcls', 'mmpretrain']
+        elif mode == "web":
+            return ['', 'start', 'stop']
         else:
             return ['Please select mode.']
 
@@ -503,6 +505,17 @@ class Web(object):
                     dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False])
                 ]
             return []
+        elif mode == "web":
+            if cmd == "start":
+                return [
+                    dict(opt="data", type="file", default=None, required=False, multi=False, hide=False, choise=None),
+                    dict(opt="allow_host", type="str", default="0.0.0.0", required=False, multi=False, hide=False, choise=None),
+                    dict(opt="listen_port", type="int", default="8081", required=False, multi=False, hide=False, choise=None),
+                    dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False])
+                ]
+            elif cmd == "stop":
+                pass
+            return []
         return ['-']
 
     def list_cmd(self, kwd):
@@ -561,10 +574,11 @@ class Web(object):
         except Exception as e:
             pass
         try:
-            #self.container['pipe_proc'].kill()
-            #self.container['pipe_proc'].terminate()
+            self.container['iinfer_app'].web.is_running = False
+        except Exception as e:
+            pass
+        try:
             self.container['pipe_proc'].send_signal(signal.CTRL_C_EVENT)
-            #self.container['pipe_proc'].send_signal(signal.CTRL_BREAK_EVENT)
         except Exception as e:
             pass
 
@@ -618,11 +632,16 @@ class Web(object):
     def callback_return_cmd_exec_func(self, title, output:dict):
         raise NotImplementedError('callback_return_cmd_exec_func is not implemented.')
 
-    def raw_cmd(self, title, opt):
+    def raw_cmd(self, title:str, opt:dict):
         self.logger.info(f"raw_cmd: title={title}, opt={opt}")
         opt_list = self.mk_opt_list(opt)
+        if 'stdout_log' in opt.keys(): del opt['stdout_log']
+        if 'capture_stdout' in opt.keys(): del opt['capture_stdout']
+        curl_opt = json.dumps(dict(title=title, opt=opt), default=common.default_json_enc)
+        curl_opt = curl_opt.replace('"', '\\"')
         return [dict(type='cmdline',raw=' '.join(['iinfer']+opt_list)),
-                dict(type='optjson',raw=json.dumps(opt, default=common.default_json_enc))]
+                dict(type='optjson',raw=json.dumps(opt, default=common.default_json_enc)),
+                dict(type='curlcmd',raw=f'curl -X POST -H "Content-Type: application/json" -d "{curl_opt}" http://localhost:8081/exec_cmd')]
 
     def list_tree(self, current_path):
         current_path = Path.cwd() if current_path is None or current_path=='' else Path(current_path)
@@ -803,3 +822,195 @@ class Web(object):
                     return str(ret)
         return 'upload success'
         #return f'upload {upload.filename}'
+    
+    def to_str(self, o):
+        if type(o) == dict:
+            return json.dumps(o, default=common.default_json_enc)
+        return str(o)
+
+    def start(self, allow_host:str="0.0.0.0", listen_port:int=8081):
+        self.allow_host = allow_host
+        self.listen_port = listen_port
+        self.logger.info(f"Start bottle web. allow_host={self.allow_host} listen_port={self.listen_port}")
+        app = bottle.Bottle()
+
+        @app.post('/get_mode_opt')
+        def get_mode_opt():
+            return self.to_str(self.get_mode_opt())
+
+        @app.post('/get_cmd_opt')
+        def get_cmd_opt():
+            req = bottle.request.json
+            mode = req['mode'] if 'mode' in req else None
+            return self.to_str(self.get_cmd_opt(mode))
+
+        @app.post('/get_opt_opt')
+        def get_opt_opt(mode, cmd):
+            req = bottle.request.json
+            mode = req['mode'] if 'mode' in req else None
+            cmd = req['cmd'] if 'cmd' in req else None
+            return self.to_str(self.get_opt_opt(mode, cmd))
+
+        @app.post('/list_cmd')
+        def list_cmd():
+            req = bottle.request.json
+            kwd = req['kwd'] if 'kwd' in req else None
+            return self.to_str(self.list_cmd(kwd))
+        """
+        @app.post('/save_cmd')
+        def save_cmd():
+            req = bottle.request.json
+            title = req['title'] if 'title' in req else None
+            opt = req['opt'] if 'opt' in req else None
+            self.save_cmd(title, opt)
+
+        @app.post('/load_cmd')
+        def load_cmd():
+            req = bottle.request.json
+            title = req['title'] if 'title' in req else None
+            return self.load_cmd(title)
+
+        @app.post('/del_cmd')
+        def del_cmd():
+            req = bottle.request.json
+            title = req['title'] if 'title' in req else None
+            self.del_cmd(title)
+
+        @app.post('/bbforce_cmd')
+        def bbforce_cmd():
+            self.bbforce_cmd()
+        """
+        @app.post('/exec_cmd')
+        def exec_cmd():
+            req = bottle.request.json
+            title = req['title'] if 'title' in req else None
+            opt = req['opt'] if 'opt' in req else None
+            opt['capture_stdout'] = nothread = req['nothread'] if 'nothread' in req else True
+            return self.to_str(self.exec_cmd(title, opt, nothread))
+        """
+        @app.post('/raw_cmd')
+        def raw_cmd():
+            req = bottle.request.json
+            title = req['title'] if 'title' in req else None
+            opt = req['opt'] if 'opt' in req else None
+            return self.to_str(self.raw_cmd(title, opt))
+
+        @app.post('/list_tree')
+        def list_tree():
+            req = bottle.request.json
+            current_path = req['current_path'] if 'current_path' in req else None
+            return self.list_tree(current_path)
+        
+        @app.post('/load_result')
+        def load_result():
+            req = bottle.request.json
+            current_path = req['current_path'] if 'current_path' in req else None
+            return self.load_result(current_path)
+
+        @app.post('/load_capture')
+        def load_capture():
+            req = bottle.request.json
+            current_path = req['current_path'] if 'current_path' in req else None
+            return self.load_capture(current_path)
+
+        @app.post('/list_pipe')
+        def list_pipe():
+            req = bottle.request.json
+            kwd = req['kwd'] if 'current_path' in req else None
+            return self.list_pipe(kwd)
+
+        @app.post('/exec_pipe')
+        def exec_pipe():
+            req = bottle.request.json
+            title = req['title'] if 'title' in req else None
+            opt = req['opt'] if 'opt' in req else None
+            return self.exec_pipe(title, opt)
+
+        @app.post('/raw_pipe')
+        def raw_pipe():
+            req = bottle.request.json
+            title = req['title'] if 'title' in req else None
+            opt = req['opt'] if 'opt' in req else None
+            return self.raw_pipe(title, opt)
+
+        @app.post('/save_pipe')
+        def save_pipe():
+            req = bottle.request.json
+            title = req['title'] if 'title' in req else None
+            opt = req['opt'] if 'opt' in req else None
+            self.save_pipe(title, opt)
+
+        @app.post('/del_pipe')
+        def del_pipe():
+            req = bottle.request.json
+            title = req['title'] if 'title' in req else None
+            self.del_pipe(title)
+
+        @app.post('/load_pipe')
+        def load_pipe(title):
+            req = bottle.request.json
+            title = req['title'] if 'title' in req else None
+            return self.load_pipe(title)
+
+        @app.get('/copyright')
+        def copyright():
+            return self.copyright()
+
+        @app.get('/versions_iinfer')
+        def versions_iinfer():
+            return self.versions_iinfer()
+
+        @app.get('/versions_used')
+        def versions_used():
+            return self.versions_used()
+        
+        @app.post('/filer/upload')
+        def filer_upload():
+            return self.filer_upload(bottle.request)
+        """
+        with open("iinfer_web.pid", mode="w", encoding="utf-8") as f:
+            pid = os.getpid()
+            f.write(str(pid))
+            self.is_running = True
+            server = _WSGIRefServer(host=self.allow_host, port=self.listen_port)
+            th = threading.Thread(target=bottle.run, kwargs=dict(app=app, server=server))
+            th.start()
+            while self.is_running:
+                time.sleep(0.01)
+            server.srv.shutdown()
+
+    def stop(self):
+        with open("iinfer_web.pid", mode="r", encoding="utf-8") as f:
+            pid = f.read()
+            os.kill(int(pid), signal.CTRL_C_EVENT)
+            self.logger.info(f"Stop bottle web. allow_host={self.allow_host} listen_port={self.listen_port}")
+
+class _WSGIRefServer(bottle.WSGIRefServer):
+    """
+    runメソッドでWSGIRefServerを起動する際に、make_serverの戻り値をインスタンス変数にするためのクラス
+    """
+    def __init__(self, host='127.0.0.1', port=8080, **options):
+        super().__init__(host, port, **options)
+
+    def run(self, app): # pragma: no cover
+        from wsgiref.simple_server import WSGIRequestHandler, WSGIServer
+        from wsgiref.simple_server import make_server
+        import socket
+
+        class FixedHandler(WSGIRequestHandler):
+            def address_string(self): # Prevent reverse DNS lookups please.
+                return self.client_address[0]
+            def log_request(*args, **kw):
+                if not self.quiet:
+                    return WSGIRequestHandler.log_request(*args, **kw)
+
+        handler_cls = self.options.get('handler_class', FixedHandler)
+        server_cls  = self.options.get('server_class', WSGIServer)
+
+        if ':' in self.host: # Fix wsgiref for IPv6 addresses.
+            if getattr(server_cls, 'address_family') == socket.AF_INET:
+                class server_cls(server_cls):
+                    address_family = socket.AF_INET6
+        # self.srvに代入することで、shutdownを実行できるようにする
+        self.srv = make_server(self.host, self.port, app, server_cls, handler_cls)
+        self.srv.serve_forever()

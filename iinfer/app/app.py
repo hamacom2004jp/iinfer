@@ -1,5 +1,5 @@
 from iinfer import version
-from iinfer.app import common, client, gui, install, postprocess, redis, server
+from iinfer.app import common, client, gui, install, postprocess, redis, server, web
 from iinfer.app.postprocesses import cls_jadge, csv, det_clip, det_face_store, det_filter, det_jadge, httpreq, seg_bbox, seg_filter
 from pathlib import Path
 import argparse
@@ -28,14 +28,14 @@ class IinferApp:
         parser.add_argument('-u', '--useopt', help=f'Use options file.')
         parser.add_argument('-s', '--saveopt', help=f'save options file. with --useopt option.', action='store_true')
         parser.add_argument('-f', '--format', help='Setting the cmd format.', action='store_true')
-        parser.add_argument('-m', '--mode', help='Setting the boot mode.', choices=['redis', 'install', 'server', 'client', 'postprocess', 'gui'])
+        parser.add_argument('-m', '--mode', help='Setting the boot mode.', choices=['redis', 'install', 'server', 'client', 'postprocess', 'gui', 'web'])
         parser.add_argument('--data', help='Setting the data directory.', default=common.HOME_DIR / ".iinfer")
         parser.add_argument('-n', '--name', help='Setting the cmd name.')
         parser.add_argument('--timeout', help='Setting the cmd timeout.', type=int, default=60)
         parser.add_argument('-c', '--cmd', help='Setting the cmd type.',
                             choices=['redis', 'server', 'onnx', 'mmdet', 'mmseg', 'mmcls', 'mmpretrain', 'insightface', # install mode
                                     'docker_run', 'docker_stop', # redis mode
-                                    'start', 'stop', # server or client or gui mode
+                                    'start', 'stop', # server or client or gui mode or web mode
                                     'list' , # server mode
                                     'deploy', 'deploy_list', 'undeploy', 'predict', 'predict_type_list', 'capture', # client mode
                                     'file_list', 'file_mkdir', 'file_rmdir', 'file_download', 'file_upload', 'file_remove', # client mode
@@ -126,6 +126,9 @@ class IinferApp:
         parser.add_argument('--install_insightface', help='Setting the install server install_insightface.', action='store_true')
         parser.add_argument('--install_tag', help='Setting the install server install_tag.', type=str, default=None)
         parser.add_argument('--install_use_gpu', help='Setting the install use gpu.', action='store_true')
+
+        parser.add_argument('--allow_host', help='Setting the web mode allow_host.', type=str, default='0.0.0.0')
+        parser.add_argument('--listen_port', help='Setting the web mode listen_port.', type=int, default=8081)
 
         argcomplete.autocomplete(parser)
         if args_list is not None:
@@ -229,6 +232,9 @@ class IinferApp:
         install_tag = common.getopt(opt, 'install_tag', preval=args_dict, withset=True)
         install_use_gpu = common.getopt(opt, 'install_use_gpu', preval=args_dict, withset=True)
 
+        allow_host = common.getopt(opt, 'allow_host', preval=args_dict, withset=True)
+        listen_port = common.getopt(opt, 'listen_port', preval=args_dict, withset=True)
+
         tm = time.time()
         ret = {"success":f"Start command. {args}"}
 
@@ -294,6 +300,29 @@ class IinferApp:
                 common.print_format(msg, format, tm, output_json, output_json_append)
                 return 1, msg
 
+        elif mode == 'web':
+            logger, _ = common.load_config(mode)
+            if cmd == 'start':
+                if data is None:
+                    msg = {"warn":f"Please specify the --data option."}
+                    common.print_format(msg, format, tm, output_json, output_json_append)
+                    return 1, msg
+                self.web = web.Web(logger, Path(data))
+                self.web.start(allow_host, listen_port)
+                msg = {"success":"web complate."}
+                common.print_format(msg, format, tm, output_json, output_json_append)
+                return 0, msg
+            elif cmd == 'stop':
+                self.web = web.Web(logger, Path(data))
+                self.web.stop()
+                msg = {"success":"web complate."}
+                common.print_format(msg, format, tm, output_json, output_json_append)
+                return 0, msg
+            else:
+                msg = {"warn":f"Unkown command."}
+                common.print_format(msg, format, tm, output_json, output_json_append)
+                return 1, msg
+            
         elif mode == 'client':
             logger, _ = common.load_config(mode)
             if svname is None:

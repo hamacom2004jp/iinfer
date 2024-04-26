@@ -107,7 +107,7 @@ class Gui(web.Web):
             return self.filer_upload(bottle.request)
 
         eel.js_console_modal_log_func('== console log start ==\n')
-        eel.start("main.html", size=(width, height), block=True, port=web_port, host=web_host, close_callback=self.stop)
+        eel.start("gui.html", size=(width, height), block=True, port=web_port, host=web_host, close_callback=self.stop)
 
     def callback_console_modal_log_func(self, output:dict):
         eel.js_console_modal_log_func(output)
@@ -119,6 +119,7 @@ class Gui(web.Web):
         eel.js_return_pipe_exec_func(title, output)
 
     def stop(self, route, websockets):
+        self.bbforce_cmd()
         self.logger.info(f"Stop eel web. {route}")
         exit(0)
 
