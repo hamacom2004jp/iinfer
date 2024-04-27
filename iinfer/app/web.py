@@ -26,6 +26,7 @@ class Web(object):
         self.logger = logger
         self.data = data
         self.container = dict()
+        self.output_size_th = 1024*1024*5
         common.mkdirs(self.data)
 
     def get_mode_opt(self):
@@ -589,12 +590,30 @@ class Web(object):
             self.logger.info(f"exec_cmd: title={title}, opt={opt}")
             opt_list = self.mk_opt_list(opt)
             old_stdout = sys.stdout
+
+            if 'capture_stdout' in opt and opt['capture_stdout'] and 'stdin' in opt and opt['stdin']:
+                output = dict(warn=f'The "stdin" and "capture_stdout" options cannot be enabled at the same time. This is because it may cause a memory squeeze.')
+                if nothread: return output
+                self.callback_return_pipe_exec_func(title, output)
+                return
             if 'capture_stdout' in opt and opt['capture_stdout']:
                 sys.stdout = captured_output = io.StringIO()
             try:
                 iinfer_app.main(args_list=opt_list, input_file=input_file)
                 if 'capture_stdout' in opt and opt['capture_stdout']:
-                    output = captured_output.getvalue()
+                    output = captured_output.getvalue().strip()
+                    output_size = len(output)
+                    if output_size > self.output_size_th:
+                        o = output.split('\n')
+                        if len(o) > 0:
+                            osize = len(o[0])
+                            oidx = int(self.output_size_th / osize)
+                            if oidx > 0:
+                                output = '\n'.join(o[-oidx:])
+                            else:
+                                output = [dict(warn=f'The captured stdout was discarded because its size was larger than {self.output_size_th} bytes.')]
+                        else:
+                            output = [dict(warn=f'The captured stdout was discarded because its size was larger than {self.output_size_th} bytes.')]
                 else:
                     output = [dict(warn='capture_stdout is off.')]
             except Exception as e:
@@ -717,18 +736,49 @@ class Web(object):
                     capture_stdout = cmd_opt['capture_stdout']
                 else:
                     capture_stdout = True
+                if 'output_csv' in cmd_opt and cmd_opt['output_csv'] != '':
+                    output = dict(warn=f'The "output_csv" option is not supported in pipe. ({cmd_title})')
+                    if nothread: return output
+                    self.callback_return_pipe_exec_func(title, output)
+                    return
+                if i>0 and ('stdin' not in cmd_opt or not cmd_opt['stdin']):
+                    output = dict(warn=f'The "stdin" option must be specified for the second and subsequent commands. ({cmd_title})')
+                    if nothread: return output
+                    self.callback_return_pipe_exec_func(title, output)
+                    return
+                if i>0 and 'input_file' in cmd_opt and cmd_opt['input_file'] != '':
+                    output = dict(warn=f'The "input_file" option must not be specified in a second or subsequent command. ({cmd_title})')
+                    if nothread: return output
+                    self.callback_return_pipe_exec_func(title, output)
+                    return
+
             cmdline = self.raw_pipe(title, opt)[0]['raw']
             try:
                 container['pipe_proc'] = subprocess.Popen(cmdline, shell=True, text=True, encoding='utf-8', 
                                                         stdout=(subprocess.PIPE if capture_stdout else None),
                                                         stderr=(subprocess.STDOUT if capture_stdout else None))
                 output = ""
+                output_size = 0
                 while container['pipe_proc'].poll() is None:
                     time.sleep(0.1)
                     if capture_stdout:
-                        output += container['pipe_proc'].stdout.read()
+                        o = container['pipe_proc'].stdout.read()
+                        output += o.strip()
+                        output_size += len(o)
+                    if output_size > self.output_size_th:
+                        o = output.split('\n')
+                        if len(o) > 0:
+                            osize = len(o[0])
+                            oidx = int(self.output_size_th / osize)
+                            if oidx > 0:
+                                output = '\n'.join(o[-oidx:])
+                            else:
+                                output = [dict(warn=f'The captured stdout was discarded because its size was larger than {self.output_size_th} bytes.')]
+                        else:
+                            output = [dict(warn=f'The captured stdout was discarded because its size was larger than {self.output_size_th} bytes.')]
+                        output_size = len(output)
                 if capture_stdout:
-                    output += container['pipe_proc'].stdout.read()
+                    container['pipe_proc'].stdout.read() # 最後のストリームは読み捨て
                 else:
                     output = [dict(warn='capture_stdout is off.')]
             except Exception as e:
@@ -766,24 +816,28 @@ class Web(object):
     def raw_pipe(self, title, opt):
         self.logger.info(f"raw_pipe: title={title}, opt={opt}")
         cmdlines = []
+        errormsg = []
         for i, cmd_title in enumerate(opt['pipe_cmd']):
             if cmd_title == '':
                 continue
             cmd_opt = self.load_cmd(cmd_title)
-            if 'output_csv' in cmd_opt:
-                del cmd_opt['output_csv']
-            if i>0:
-                cmd_opt['stdin'] = True
-                if 'input_file' in cmd_opt:
-                    del cmd_opt['input_file']
+
+            if 'output_csv' in cmd_opt and cmd_opt['output_csv'] != '':
+                errormsg.append(f'The "output_csv" option is not supported in pipe. ({cmd_title})')
+            if i>0 and ('stdin' not in cmd_opt or not cmd_opt['stdin']):
+                errormsg.append(f'The "stdin" option must be specified for the second and subsequent commands. ({cmd_title})')
+            if i>0 and 'input_file' in cmd_opt and cmd_opt['input_file'] != '':
+                errormsg.append(f'The "input_file" option must not be specified in a second or subsequent command. ({cmd_title})')
             cmd_output = self.raw_cmd(cmd_title, cmd_opt)
             cmdlines.append(f'python -m {cmd_output[0]["raw"]}')
 
         curl_opt = json.dumps(opt, default=common.default_json_enc)
         curl_opt = curl_opt.replace('"', '\\"')
-        return [dict(type='cmdline', raw=' | '.join(cmdlines)),
+        ret = [dict(type='cmdline', raw=' | '.join(cmdlines)),
                 dict(type='curlcmd', raw=f'curl -X POST -H "Content-Type: application/json" -d "{curl_opt}" http://localhost:8081/exec_pipe')]
-        
+        ret += [dict(type='warn', raw=em) for em in errormsg]
+        return ret
+
     def save_pipe(self, title, opt):
         opt_path = self.data / f"pipe-{title}.json"
         self.logger.info(f"save_pipe: opt_path={opt_path}, opt={opt}")
