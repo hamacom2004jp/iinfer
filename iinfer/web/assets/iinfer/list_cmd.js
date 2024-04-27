@@ -160,7 +160,10 @@ list_cmd_func_then = () => {
                         e = cmd_modal.find(`[name="${key}"]`).parent().find('.add_buton')[i];
                         $(e).click();
                     });
-                    cmd_modal.find(`[name="${key}"]`).each((i, e) => $(e).val(val[i]));
+                    cmd_modal.find(`[name="${key}"]`).each((i, e) => {
+                        if (val[i] && val[i]!="" || i==0) $(e).val(val[i]);
+                        else $(e).parent().parent().remove();
+                    });
                 } else {
                     cmd_modal.find(`[name="${key}"]`).val(val);
                 }

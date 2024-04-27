@@ -579,10 +579,11 @@ class Web(object):
             pass
         try:
             self.container['pipe_proc'].send_signal(signal.CTRL_C_EVENT)
+            self.container['pipe_proc'].terminate()
         except Exception as e:
             pass
 
-    def exec_cmd(self, title, opt, nothread=False):
+    def exec_cmd(self, title, opt, nothread=False, input_file=None):
         self.container['iinfer_app'] = app.IinferApp()
         def _exec_cmd(iinfer_app:app.IinferApp, title, opt, nothread=False):
             self.logger.info(f"exec_cmd: title={title}, opt={opt}")
@@ -591,7 +592,7 @@ class Web(object):
             if 'capture_stdout' in opt and opt['capture_stdout']:
                 sys.stdout = captured_output = io.StringIO()
             try:
-                iinfer_app.main(opt_list)
+                iinfer_app.main(args_list=opt_list, input_file=input_file)
                 if 'capture_stdout' in opt and opt['capture_stdout']:
                     output = captured_output.getvalue()
                 else:
@@ -704,9 +705,9 @@ class Web(object):
         paths = glob.glob(str(self.data / f"pipe-{kwd}.json"))
         return [common.loadopt(path) for path in paths]
 
-    def exec_pipe(self, title, opt):
+    def exec_pipe(self, title, opt, nothread=False):
         self.logger.info(f"exec_pipe: title={title}, opt={opt}")
-        def _exec_pipe(title, opt, container):
+        def _exec_pipe(title, opt, container, nothread=False):
             capture_stdout = True
             for i, cmd_title in enumerate(opt['pipe_cmd']):
                 if cmd_title == '':
@@ -716,15 +717,18 @@ class Web(object):
                     capture_stdout = cmd_opt['capture_stdout']
                 else:
                     capture_stdout = True
-            cmdline = self.raw_pipe(title, opt)['cmdlines']
+            cmdline = self.raw_pipe(title, opt)[0]['raw']
             try:
                 container['pipe_proc'] = subprocess.Popen(cmdline, shell=True, text=True, encoding='utf-8', 
                                                         stdout=(subprocess.PIPE if capture_stdout else None),
                                                         stderr=(subprocess.STDOUT if capture_stdout else None))
+                output = ""
                 while container['pipe_proc'].poll() is None:
                     time.sleep(0.1)
+                    if capture_stdout:
+                        output += container['pipe_proc'].stdout.read()
                 if capture_stdout:
-                    output = container['pipe_proc'].stdout.read()
+                    output += container['pipe_proc'].stdout.read()
                 else:
                     output = [dict(warn='capture_stdout is off.')]
             except Exception as e:
@@ -743,9 +747,15 @@ class Web(object):
                     ret = [to_json(o) for o in output.split('\n') if o.strip() != '']
                 except:
                     ret = to_json(output)
+                if nothread:
+                    return ret
                 self.callback_return_pipe_exec_func(title, ret)
             except:
+                if nothread:
+                    return output
                 self.callback_return_pipe_exec_func(title, output)
+        if nothread:
+            return _exec_pipe(title, opt, self.container, True)
         th = threading.Thread(target=_exec_pipe, args=(title, opt, self.container))
         th.start()
         return dict(success='start_pipe')
@@ -755,7 +765,6 @@ class Web(object):
         
     def raw_pipe(self, title, opt):
         self.logger.info(f"raw_pipe: title={title}, opt={opt}")
-        #pipe_outputs = []
         cmdlines = []
         for i, cmd_title in enumerate(opt['pipe_cmd']):
             if cmd_title == '':
@@ -768,12 +777,12 @@ class Web(object):
                 if 'input_file' in cmd_opt:
                     del cmd_opt['input_file']
             cmd_output = self.raw_cmd(cmd_title, cmd_opt)
-            #cmdline = cmd_output[0]['raw']
-            #optjson = cmd_output[1]['raw']
             cmdlines.append(f'python -m {cmd_output[0]["raw"]}')
-            #pipe_outputs.append(dict(no=i, title=cmd_title, cmdline=cmdline, optjson=optjson))
-        #return pipe_outputs
-        return dict(cmdlines=' | '.join(cmdlines))
+
+        curl_opt = json.dumps(opt, default=common.default_json_enc)
+        curl_opt = curl_opt.replace('"', '\\"')
+        return [dict(type='cmdline', raw=' | '.join(cmdlines)),
+                dict(type='curlcmd', raw=f'curl -X POST -H "Content-Type: application/json" -d "{curl_opt}" http://localhost:8081/exec_pipe')]
         
     def save_pipe(self, title, opt):
         opt_path = self.data / f"pipe-{title}.json"
@@ -834,52 +843,11 @@ class Web(object):
         self.logger.info(f"Start bottle web. allow_host={self.allow_host} listen_port={self.listen_port}")
         app = bottle.Bottle()
 
-        @app.post('/get_mode_opt')
-        def get_mode_opt():
-            return self.to_str(self.get_mode_opt())
-
-        @app.post('/get_cmd_opt')
-        def get_cmd_opt():
-            req = bottle.request.json
-            mode = req['mode'] if 'mode' in req else None
-            return self.to_str(self.get_cmd_opt(mode))
-
-        @app.post('/get_opt_opt')
-        def get_opt_opt(mode, cmd):
-            req = bottle.request.json
-            mode = req['mode'] if 'mode' in req else None
-            cmd = req['cmd'] if 'cmd' in req else None
-            return self.to_str(self.get_opt_opt(mode, cmd))
-
-        @app.post('/list_cmd')
-        def list_cmd():
-            req = bottle.request.json
-            kwd = req['kwd'] if 'kwd' in req else None
-            return self.to_str(self.list_cmd(kwd))
-        """
-        @app.post('/save_cmd')
-        def save_cmd():
-            req = bottle.request.json
-            title = req['title'] if 'title' in req else None
-            opt = req['opt'] if 'opt' in req else None
-            self.save_cmd(title, opt)
-
-        @app.post('/load_cmd')
-        def load_cmd():
-            req = bottle.request.json
-            title = req['title'] if 'title' in req else None
-            return self.load_cmd(title)
-
-        @app.post('/del_cmd')
-        def del_cmd():
-            req = bottle.request.json
-            title = req['title'] if 'title' in req else None
-            self.del_cmd(title)
-
         @app.post('/bbforce_cmd')
         def bbforce_cmd():
             self.bbforce_cmd()
-        """
+            return dict(success='bbforce_cmd')
+
         @app.post('/exec_cmd')
         def exec_cmd():
             req = bottle.request.json
@@ -887,87 +855,18 @@ class Web(object):
             opt = req['opt'] if 'opt' in req else None
             opt['capture_stdout'] = nothread = req['nothread'] if 'nothread' in req else True
             return self.to_str(self.exec_cmd(title, opt, nothread))
-        """
-        @app.post('/raw_cmd')
-        def raw_cmd():
-            req = bottle.request.json
-            title = req['title'] if 'title' in req else None
-            opt = req['opt'] if 'opt' in req else None
-            return self.to_str(self.raw_cmd(title, opt))
-
-        @app.post('/list_tree')
-        def list_tree():
-            req = bottle.request.json
-            current_path = req['current_path'] if 'current_path' in req else None
-            return self.list_tree(current_path)
-        
-        @app.post('/load_result')
-        def load_result():
-            req = bottle.request.json
-            current_path = req['current_path'] if 'current_path' in req else None
-            return self.load_result(current_path)
-
-        @app.post('/load_capture')
-        def load_capture():
-            req = bottle.request.json
-            current_path = req['current_path'] if 'current_path' in req else None
-            return self.load_capture(current_path)
-
-        @app.post('/list_pipe')
-        def list_pipe():
-            req = bottle.request.json
-            kwd = req['kwd'] if 'current_path' in req else None
-            return self.list_pipe(kwd)
 
         @app.post('/exec_pipe')
         def exec_pipe():
             req = bottle.request.json
             title = req['title'] if 'title' in req else None
-            opt = req['opt'] if 'opt' in req else None
-            return self.exec_pipe(title, opt)
-
-        @app.post('/raw_pipe')
-        def raw_pipe():
-            req = bottle.request.json
-            title = req['title'] if 'title' in req else None
-            opt = req['opt'] if 'opt' in req else None
-            return self.raw_pipe(title, opt)
-
-        @app.post('/save_pipe')
-        def save_pipe():
-            req = bottle.request.json
-            title = req['title'] if 'title' in req else None
-            opt = req['opt'] if 'opt' in req else None
-            self.save_pipe(title, opt)
-
-        @app.post('/del_pipe')
-        def del_pipe():
-            req = bottle.request.json
-            title = req['title'] if 'title' in req else None
-            self.del_pipe(title)
-
-        @app.post('/load_pipe')
-        def load_pipe(title):
-            req = bottle.request.json
-            title = req['title'] if 'title' in req else None
-            return self.load_pipe(title)
-
-        @app.get('/copyright')
-        def copyright():
-            return self.copyright()
+            req['capture_stdout'] = nothread = req['nothread'] if 'nothread' in req else True
+            return self.to_str(self.exec_pipe(title, req, nothread))
 
         @app.get('/versions_iinfer')
         def versions_iinfer():
             return self.versions_iinfer()
 
-        @app.get('/versions_used')
-        def versions_used():
-            return self.versions_used()
-        
-        @app.post('/filer/upload')
-        def filer_upload():
-            return self.filer_upload(bottle.request)
-        """
         with open("iinfer_web.pid", mode="w", encoding="utf-8") as f:
             pid = os.getpid()
             f.write(str(pid))

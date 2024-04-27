@@ -718,16 +718,19 @@ class Server(object):
             nodraw = False
         session = self.sessions[name]
         try:
+            predict_process_start = time.perf_counter()
             # 前処理を実行
             if session['before_injections'] is not None:
                 injections:List[injection.BeforeInjection] = session['before_injections']
                 for inject in injections:
                     image = inject.action(reskey, name, image, session)
+            before_injections_end = time.perf_counter()
             # 推論を実行
             predict_obj:predict.Predict = session['predict_obj']
             outputs, output_image = predict_obj.predict(session['session'], session['model_img_width'], session['model_img_height'], image,
                                                         labels=session['labels'], colors=session['colors'], nodraw=nodraw)
             outputs['image_name'] = output_image_name
+            predict_end = time.perf_counter()
             if session['tracker'] is not None:
                 if 'output_boxes' in outputs and 'output_scores' in outputs and 'output_classes' in outputs:
                     detections = [Detection(box, score, cls) for box, score, cls in zip(outputs['output_boxes'], outputs['output_scores'], outputs['output_classes'])]
@@ -736,6 +739,7 @@ class Server(object):
                     outputs['output_tracks'] = [t.id for t in tracks]
                     if image is not None:
                         image = common.draw_boxes(image, outputs['output_boxes'], outputs['output_scores'], outputs['output_classes'], ids=outputs['output_tracks'])
+            tracker_end = time.perf_counter()
 
             def _after_injection(reskey:str, name:str, output:dict, output_image:Image.Image, session:dict):
                 if session['after_injections'] is not None:
@@ -744,19 +748,35 @@ class Server(object):
                         output, output_image = inject.action(reskey, name, output, output_image, session)
                 return output, output_image
 
+            def _set_perftime(output, predict_process_start, before_injections_end, predict_end, tracker_end, after_injections_end, predict_process_end):
+                performance = f"before={(before_injections_end-predict_process_start):.3f}s" \
+                              f", predict={(predict_end-before_injections_end):.3f}s" \
+                              f", track={(tracker_end-predict_end):.3f}s" \
+                              f", after={(after_injections_end-tracker_end):.3f}s" \
+                              f", process={(predict_process_end-predict_process_start):.3f}s"
+                if 'success' in output:
+                    output['success']['performance'] = performance
+
             if output_image is not None:
                 output = dict(success=outputs, output_image_name=output_image_name)
                 # 後処理を実行
                 output, output_image = _after_injection(reskey, name, output, output_image, session)
+                after_injections_end = time.perf_counter()
                 output_image_npy = convert.img2npy(output_image)
                 output_image_b64 = convert.npy2b64str(output_image_npy)
+                predict_process_end = time.perf_counter()
                 output['output_image'] = output_image_b64
                 output['output_image_shape'] = output_image_npy.shape
+                _set_perftime(output, predict_process_start, before_injections_end, predict_end,
+                             tracker_end, after_injections_end, predict_process_end)
                 self.responce(reskey, output)
                 return self.RESP_SCCESS
             output = dict(success=outputs)
             # 後処理を実行
-            output, output_image = _after_injection(reskey, name, output, None, session)
+            output, _ = _after_injection(reskey, name, output, None, session)
+            after_injections_end = predict_process_end = time.perf_counter()
+            _set_perftime(output, predict_process_start, before_injections_end, predict_end,
+                            tracker_end, after_injections_end, predict_process_end)
             self.responce(reskey, output)
             return self.RESP_SCCESS
         except Exception as e:

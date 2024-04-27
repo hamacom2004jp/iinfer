@@ -15,7 +15,7 @@ def main(args_list:list=None):
     return app.main(args_list)[0]
 
 class IinferApp:
-    def main(self, args_list:list=None):
+    def main(self, args_list:list=None, input_file=None):
         """
         コマンドライン引数を処理し、サーバーまたはクライアントを起動し、コマンドを実行する。
         """
@@ -165,7 +165,7 @@ class IinferApp:
 
         model_provider = common.getopt(opt, 'model_provider', preval=args_dict, withset=True)
         gpuid = common.getopt(opt, 'gpuid', preval=args_dict, withset=True)
-        input_file = common.getopt(opt, 'input_file', preval=args_dict, withset=True)
+        input_file = input_file if input_file is not None else common.getopt(opt, 'input_file', preval=args_dict, withset=True)
         output_image = common.getopt(opt, 'output_image', preval=args_dict, withset=True)
         output_json = common.getopt(opt, 'output_json', preval=args_dict, withset=True)
         output_json_append = common.getopt(opt, 'output_json_append', preval=args_dict, withset=True)
