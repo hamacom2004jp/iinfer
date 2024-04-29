@@ -277,10 +277,11 @@ list_cmd_func_then = () => {
             return;
         }
         $('#loading').removeClass('d-none');
-        await eel.save_cmd(title, opt)();
+        result = await eel.save_cmd(title, opt)();
         await list_cmd_func();
         $('.cmd_card').off('click').on('click', cmd_card_func);
-        window.alert('save success.');
+        if (result['success']) alert(result['success']);
+        else if (result['warn']) alert(result['warn']);
         $('#loading').addClass('d-none');
     });
     // コマンドファイルの削除

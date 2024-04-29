@@ -32,7 +32,7 @@ class Gui(web.Web):
 
         @eel.expose
         def save_cmd(title, opt):
-            self.save_cmd(title, opt)
+            return self.save_cmd(title, opt)
 
         @eel.expose
         def load_cmd(title):
@@ -80,7 +80,7 @@ class Gui(web.Web):
 
         @eel.expose
         def save_pipe(title, opt):
-            self.save_pipe(title, opt)
+            return self.save_pipe(title, opt)
 
         @eel.expose
         def del_pipe(title):

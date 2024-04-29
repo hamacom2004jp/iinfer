@@ -9,7 +9,6 @@ import datetime
 import logging
 import json
 import numpy as np
-import re
 import redis
 import shutil
 import time
@@ -835,8 +834,6 @@ class Server(object):
         chk, _ = self._file_exists(reskey, current_path)
         if not chk: return self.RESP_WARN
         
-        def _mk_key(path):
-            return re.sub('[\s:\\\\/,\.#$%^&!@*\(\)\{\}\[\]\'\"\`]', '_',str(path))
         def _ts2str(ts):
             return datetime.datetime.fromtimestamp(ts)
 
@@ -852,14 +849,14 @@ class Server(object):
             for f in file_list.iterdir():
                 parts = str(f)[data_dir_len:].replace("\\","/").split("/")
                 path = "/".join(parts[:i+2])
-                key = _mk_key(path)
+                key = common.safe_fname(path)
                 if key in children:
                     continue
                 children[key] = dict(name=f.name, is_dir=f.is_dir(), path=path, size=f.stat().st_size , last=_ts2str(f.stat().st_mtime))
 
             tpath = '/'.join(current_path_parts[:i+1])
             tpath = '/' if tpath=='' else tpath
-            tpath_key = _mk_key(tpath)
+            tpath_key = common.safe_fname(tpath)
             cpart = '/' if cpart=='' else cpart
             path_tree[tpath_key] = dict(name=cpart, is_dir=True, path=tpath, children=children, size=0, last="")
 

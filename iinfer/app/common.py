@@ -14,8 +14,10 @@ import platform
 import random
 import shutil
 import string
+import re
 import requests
 import subprocess
+import tempfile
 import time
 import yaml
 
@@ -53,6 +55,8 @@ def default_json_enc(o) -> Any:
     if isinstance(o, np.intc):
         return int(o)
     if isinstance(o, Path):
+        return str(o)
+    if isinstance(o, tempfile._TemporaryFileWrapper):
         return str(o)
     if isinstance(o, datetime.datetime):
         return o.strftime('%Y-%m-%dT%H:%M:%S')
@@ -117,6 +121,30 @@ def getopt(opt:dict, key:str, preval=None, defval=None, withset=False) -> any:
         if withset:
             opt[key] = defval
         return defval
+
+def safe_fname(fname:str) -> str:
+    """
+    ファイル名に使えない文字を置換します。
+
+    Args:
+        fname (str): ファイル名
+
+    Returns:
+        str: 置換後のファイル名
+    """
+    return re.sub('[\s:\\\\/,\.\?\#\$\%\^\&\!\@\*\~\|\<\>\(\)\{\}\[\]\'\"\`]', '_',str(fname))
+
+def check_fname(fname:str) -> bool:
+    """
+    ファイル名に使えない文字が含まれているかどうかをチェックします。
+
+    Args:
+        fname (str): ファイル名
+
+    Returns:
+        bool: Trueの場合は使えない文字が含まれている
+    """
+    return re.search('[\s:\\\\/,\.\?\#\$\%\^\&\!\@\*\~\|\<\>\(\)\{\}\[\]\'\"\`]',str(fname)) is not None
 
 def mkdirs(dir_path:Path):
     """

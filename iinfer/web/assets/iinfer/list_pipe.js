@@ -61,7 +61,8 @@ list_pipe_func_then = () => {
                         $(e).click();
                     });
                     pipe_modal.find(`[name="${key}"]`).each((i, e) => {
-                        $(e).val(val[i]);
+                        if (val[i] && val[i]!="" || i==0) $(e).val(val[i]);
+                        else $(e).parent().find('.del_buton').click();
                     });
                 } else {
                     pipe_modal.find(`[name="${key}"]`).val(val);
@@ -91,10 +92,11 @@ list_pipe_func_then = () => {
             return;
         }
         $('#loading').removeClass('d-none');
-        await eel.save_pipe(title, opt)();
+        result = await eel.save_pipe(title, opt)();
         await list_pipe_func();
         $('.pipe_card').off('click').on('click', pipe_card_func);
-        window.alert('save success.');
+        if (result['success']) alert(result['success']);
+        else if (result['warn']) alert(result['warn']);
         $('#loading').addClass('d-none');
     });
     // パイプラインファイルの削除

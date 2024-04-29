@@ -15,7 +15,7 @@ def main(args_list:list=None):
     return app.main(args_list)[0]
 
 class IinferApp:
-    def main(self, args_list:list=None, input_file=None):
+    def main(self, args_list:list=None, file_dict:dict=dict()):
         """
         コマンドライン引数を処理し、サーバーまたはクライアントを起動し、コマンドを実行する。
         """
@@ -136,6 +136,9 @@ class IinferApp:
         else:
             args = parser.parse_args()
         args_dict = vars(args)
+        for key, val in file_dict.items():
+            args_dict[key] = val
+
         opt = common.loadopt(args.useopt)
         host = common.getopt(opt, 'host', preval=args_dict, withset=True)
         port = common.getopt(opt, 'port', preval=args_dict, withset=True)
@@ -165,7 +168,7 @@ class IinferApp:
 
         model_provider = common.getopt(opt, 'model_provider', preval=args_dict, withset=True)
         gpuid = common.getopt(opt, 'gpuid', preval=args_dict, withset=True)
-        input_file = input_file if input_file is not None else common.getopt(opt, 'input_file', preval=args_dict, withset=True)
+        input_file = common.getopt(opt, 'input_file', preval=args_dict, withset=True)
         output_image = common.getopt(opt, 'output_image', preval=args_dict, withset=True)
         output_json = common.getopt(opt, 'output_json', preval=args_dict, withset=True)
         output_json_append = common.getopt(opt, 'output_json_append', preval=args_dict, withset=True)
@@ -379,7 +382,9 @@ class IinferApp:
             elif cmd == 'predict':
                 try:
                     if input_file is not None:
-                        ret = self.cl.predict(name, image_file=Path(input_file), image_type=image_type, output_image_file=output_image, output_preview=output_preview, nodraw=nodraw, timeout=timeout)
+                        ret = self.cl.predict(name, image_file=input_file, image_type=image_type,
+                                                output_image_file=output_image, output_preview=output_preview,
+                                                nodraw=nodraw, timeout=timeout)
                         if type(ret) is list:
                             for r in ret:
                                 common.print_format(r, format, tm, output_json, output_json_append)

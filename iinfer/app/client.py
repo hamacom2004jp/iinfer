@@ -326,14 +326,14 @@ class Client(object):
         res_json = self._proc(self.svname, 'stop_server', [], timeout=timeout)
         return res_json
 
-    def predict(self, name:str, image = None, image_file:Path = None, image_file_enable:bool=True, image_type:str = 'jpeg', output_image_file:Path = None, output_preview:bool=False, nodraw:bool=False, timeout:int = 60):
+    def predict(self, name:str, image = None, image_file = None, image_file_enable:bool=True, image_type:str = 'jpeg', output_image_file:Path = None, output_preview:bool=False, nodraw:bool=False, timeout:int = 60):
         """
         画像をRedisサーバーに送信し、推論結果を取得する
 
         Args:
             name (str): モデル名
             image (np.ndarray | bytes, optional): 画像データ. Defaults to None. np.ndarray型の場合はデコードしない(RGBであること).
-            image_file (Path, optional): 画像ファイルのパス. Defaults to None.
+            image_file (str|file-like object, optional): 画像ファイルのパス. Defaults to None.
             image_file_enable (bool, optional): 画像ファイルを使用するかどうか. Defaults to True. image_fileがNoneでなく、このパラメーターがTrueの場合はimage_fileを使用する.
             image_type (str, optional): 画像の形式. Defaults to 'jpeg'.
             output_image_file (Path, optional): 予測結果の画像ファイルのパス. Defaults to None.
@@ -355,16 +355,25 @@ class Client(object):
             return {"error": f"image and image_file is empty."}
         npy_b64 = None
         if image_file is not None and image_file_enable:
-            if not image_file.exists():
-                self.logger.error(f"Not found image_file. {image_file}.")
-                return {"error": f"Not found image_file. {image_file}."}
+            if type(image_file) == str:
+                if not Path(image_file).exists():
+                    self.logger.error(f"Not found image_file. {image_file}.")
+                    return {"error": f"Not found image_file. {image_file}."}
             if image_type == 'jpeg' or image_type == 'png' or image_type == 'bmp':
-                with open(image_file, "rb") as f:
+                f = None
+                try:
+                    f = image_file if type(image_file) is not str else open(image_file, "rb")
                     img_npy = convert.imgfile2npy(f)
+                finally:
+                    if f is not None: f.close()
             elif image_type == 'capture':
-                with open(image_file, "r", encoding='utf-8') as f:
+                f = None
+                try:
+                    f = image_file if type(image_file) is not str else open(image_file, "r", encoding='utf-8')
                     res_list = []
                     for line in f:
+                        if type(line) is bytes:
+                            line = line.decode('utf-8').strip()
                         capture_data = line.split(',')
                         t = capture_data[0]
                         img = capture_data[1]
@@ -383,8 +392,12 @@ class Client(object):
                     elif len(res_list) == 1:
                         return res_list[0]
                     return res_list
+                finally:
+                    if f is not None: f.close()
             elif image_type == 'output_json':
-                with open(image_file, "r", encoding='utf-8') as f:
+                f = None
+                try:
+                    f = image_file if type(image_file) is not str else open(image_file, "r", encoding='utf-8')
                     res_list = []
                     for line in f:
                         res_json = json.loads(line)
@@ -400,13 +413,15 @@ class Client(object):
                     elif len(res_list) == 1:
                         return res_list[0]
                     return res_list
+                finally:
+                    if f is not None: f.close()
             else:
                 self.logger.error(f"image_type is invalid. {image_type}.")
                 return {"error": f"image_type is invalid. {image_type}."}
         else:
             if type(image) == np.ndarray:
                 img_npy = image
-                if image_file is None: image_file = Path(f'{datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")}.capture')
+                if image_file is None: image_file = f'{datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")}.capture'
                 image_file_enable = False
             elif image_type == 'capture':
                 capture_data = image.split(',')
@@ -416,7 +431,7 @@ class Client(object):
                 h = int(capture_data[2])
                 w = int(capture_data[3])
                 c = int(capture_data[4])
-                if image_file is None: image_file = Path(capture_data[5])
+                if image_file is None: image_file = capture_data[5]
                 image_file_enable = False
                 if t == 'capture':
                     img_npy = convert.b64str2npy(img, shape=(h, w, c) if c > 0 else (h, w))
@@ -428,11 +443,11 @@ class Client(object):
                     self.logger.error(f"image_file data is invalid. Not found output_image or output_image_shape or output_image_name key.")
                     return {"error": f"image_file data is invalid. Not found output_image or output_image_shape or output_image_name key."}
                 img_npy = convert.b64str2npy(res_json["output_image"], shape=res_json["output_image_shape"])
-                if image_file is None: image_file = Path(res_json["output_image_name"])
+                if image_file is None: image_file = res_json["output_image_name"]
                 image_file_enable = False
             elif image_type == 'jpeg' or image_type == 'png' or image_type == 'bmp':
                 img_npy = convert.imgbytes2npy(image)
-                if image_file is None: image_file = Path(f'{datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")}.{image_type}')
+                if image_file is None: image_file = f'{datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")}.{image_type}'
                 image_file_enable = False
             else:
                 self.logger.error(f"image_type is invalid. {image_type}.")
@@ -441,7 +456,9 @@ class Client(object):
         npy_b64 = convert.npy2b64str(img_npy)
         #img_npy2 = np.frombuffer(base64.b64decode(npy_b64), dtype='uint8').reshape(img_npy.shape)
 
-        res_json = self._proc(self.svname, 'predict', [name, npy_b64, str(nodraw), str(img_npy.shape[0]), str(img_npy.shape[1]), str(img_npy.shape[2] if len(img_npy.shape) > 2 else '-1'), image_file.name], timeout=timeout)
+        res_json = self._proc(self.svname, 'predict',
+                              [name, npy_b64, str(nodraw), str(img_npy.shape[0]), str(img_npy.shape[1]),
+                               str(img_npy.shape[2] if len(img_npy.shape) > 2 else '-1'), image_file], timeout=timeout)
         if "output_image" in res_json and "output_image_shape" in res_json:
             #byteio = BytesIO(base64.b64decode(res_json["output_image"]))
             #img_npy = np.load(byteio)

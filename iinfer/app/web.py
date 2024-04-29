@@ -519,6 +519,19 @@ class Web(object):
             return []
         return ['-']
 
+    def mk_curl_fileup(self, cmd_opt):
+        if 'mode' not in cmd_opt or 'cmd' not in cmd_opt:
+            return ""
+        curl_fileup = set()
+        for ref in self.get_opt_opt(cmd_opt['mode'], cmd_opt['cmd']):
+            if ref['type'] != 'file':
+                continue
+            if ref['opt'] in cmd_opt and cmd_opt[ref['opt']] != '':
+                curl_fileup.add(f'-F "{ref["opt"]}=@&lt;{ref["opt"]}&gt;"')
+        if 'stdin' in cmd_opt and cmd_opt['stdin']:
+            curl_fileup.add(f'-F "input_file=@&lt;input_file&gt;"')
+        return " ".join(curl_fileup)
+
     def list_cmd(self, kwd):
         if kwd is None or kwd == '':
             kwd = '*'
@@ -527,9 +540,12 @@ class Web(object):
         return ret
 
     def save_cmd(self, title, opt):
+        if common.check_fname(title):
+            return dict(warn=f'The title contains invalid characters."{title}"')
         opt_path = self.data / f"cmd-{title}.json"
         self.logger.info(f"save_cmd: opt_path={opt_path}, opt={opt}")
         common.saveopt(opt, opt_path)
+        return dict(success=f'Command "{title}" saved in "{opt_path}".')
 
     def load_cmd(self, title):
         opt_path = self.data / f"cmd-{title}.json"
@@ -543,6 +559,7 @@ class Web(object):
     def mk_opt_list(self, opt:dict):
         opt_schema = self.get_opt_opt(opt['mode'], opt['cmd'])
         opt_list = ['-m', opt['mode'], '-c', opt['cmd']]
+        file_dict = dict()
         for key, val in opt.items():
             if key in ['stdout_log', 'capture_stdout']:
                 continue
@@ -562,7 +579,9 @@ class Web(object):
             elif val is not None and val != '':
                 opt_list.append(f"--{key}")
                 opt_list.append(str(val))
-        return opt_list
+            if schema[0]['type'] == 'file' and type(val) != str:
+                file_dict[key] = val
+        return opt_list, file_dict
 
     def bbforce_cmd(self):
         self.logger.info(f"bbforce_cmd")
@@ -584,11 +603,11 @@ class Web(object):
         except Exception as e:
             pass
 
-    def exec_cmd(self, title, opt, nothread=False, input_file=None):
+    def exec_cmd(self, title, opt, nothread=False):
         self.container['iinfer_app'] = app.IinferApp()
         def _exec_cmd(iinfer_app:app.IinferApp, title, opt, nothread=False):
             self.logger.info(f"exec_cmd: title={title}, opt={opt}")
-            opt_list = self.mk_opt_list(opt)
+            opt_list, file_dict = self.mk_opt_list(opt)
             old_stdout = sys.stdout
 
             if 'capture_stdout' in opt and opt['capture_stdout'] and 'stdin' in opt and opt['stdin']:
@@ -599,7 +618,7 @@ class Web(object):
             if 'capture_stdout' in opt and opt['capture_stdout']:
                 sys.stdout = captured_output = io.StringIO()
             try:
-                iinfer_app.main(args_list=opt_list, input_file=input_file)
+                iinfer_app.main(args_list=opt_list, file_dict=file_dict)
                 if 'capture_stdout' in opt and opt['capture_stdout']:
                     output = captured_output.getvalue().strip()
                     output_size = len(output)
@@ -654,14 +673,13 @@ class Web(object):
 
     def raw_cmd(self, title:str, opt:dict):
         self.logger.info(f"raw_cmd: title={title}, opt={opt}")
-        opt_list = self.mk_opt_list(opt)
-        if 'stdout_log' in opt.keys(): del opt['stdout_log']
-        if 'capture_stdout' in opt.keys(): del opt['capture_stdout']
-        curl_opt = json.dumps(dict(title=title, opt=opt), default=common.default_json_enc)
-        curl_opt = curl_opt.replace('"', '\\"')
+        opt_list, _ = self.mk_opt_list(opt)
+        if 'stdout_log' in opt: del opt['stdout_log']
+        if 'capture_stdout' in opt: del opt['capture_stdout']
+        curl_cmd_file = self.mk_curl_fileup(opt)
         return [dict(type='cmdline',raw=' '.join(['iinfer']+opt_list)),
                 dict(type='optjson',raw=json.dumps(opt, default=common.default_json_enc)),
-                dict(type='curlcmd',raw=f'curl -X POST -H "Content-Type: application/json" -d "{curl_opt}" http://localhost:8081/exec_cmd')]
+                dict(type='curlcmd',raw=f'curl {curl_cmd_file} http://localhost:8081/exec_cmd/{title}')]
 
     def list_tree(self, current_path):
         current_path = Path.cwd() if current_path is None or current_path=='' else Path(current_path)
@@ -817,6 +835,7 @@ class Web(object):
         self.logger.info(f"raw_pipe: title={title}, opt={opt}")
         cmdlines = []
         errormsg = []
+        curl_cmd_file = ""
         for i, cmd_title in enumerate(opt['pipe_cmd']):
             if cmd_title == '':
                 continue
@@ -828,20 +847,30 @@ class Web(object):
                 errormsg.append(f'The "stdin" option must be specified for the second and subsequent commands. ({cmd_title})')
             if i>0 and 'input_file' in cmd_opt and cmd_opt['input_file'] != '':
                 errormsg.append(f'The "input_file" option must not be specified in a second or subsequent command. ({cmd_title})')
+            if i==0:
+                if 'request_files' in opt and len(opt['request_files']) > 0:
+                    for fn in opt['request_files']:
+                        if fn in cmd_opt:
+                            cmd_opt[fn] = opt['request_files'][fn]
+                curl_cmd_file = self.mk_curl_fileup(cmd_opt)
+
             cmd_output = self.raw_cmd(cmd_title, cmd_opt)
             cmdlines.append(f'python -m {cmd_output[0]["raw"]}')
 
         curl_opt = json.dumps(opt, default=common.default_json_enc)
         curl_opt = curl_opt.replace('"', '\\"')
         ret = [dict(type='cmdline', raw=' | '.join(cmdlines)),
-                dict(type='curlcmd', raw=f'curl -X POST -H "Content-Type: application/json" -d "{curl_opt}" http://localhost:8081/exec_pipe')]
+                dict(type='curlcmd', raw=f'curl {curl_cmd_file} http://localhost:8081/exec_pipe/{title}')]
         ret += [dict(type='warn', raw=em) for em in errormsg]
         return ret
 
     def save_pipe(self, title, opt):
+        if common.check_fname(title):
+            return dict(warn=f'The title contains invalid characters."{title}"')
         opt_path = self.data / f"pipe-{title}.json"
         self.logger.info(f"save_pipe: opt_path={opt_path}, opt={opt}")
         common.saveopt(opt, opt_path)
+        return dict(success=f'Pipeline "{title}" saved in "{opt_path}".')
 
     def del_pipe(self, title):
         opt_path = self.data / f"pipe-{title}.json"
@@ -897,27 +926,62 @@ class Web(object):
         self.logger.info(f"Start bottle web. allow_host={self.allow_host} listen_port={self.listen_port}")
         app = bottle.Bottle()
 
-        @app.post('/bbforce_cmd')
+        @app.route('/bbforce_cmd')
         def bbforce_cmd():
             self.bbforce_cmd()
             return dict(success='bbforce_cmd')
 
-        @app.post('/exec_cmd')
-        def exec_cmd():
-            req = bottle.request.json
-            title = req['title'] if 'title' in req else None
-            opt = req['opt'] if 'opt' in req else None
-            opt['capture_stdout'] = nothread = req['nothread'] if 'nothread' in req else True
-            return self.to_str(self.exec_cmd(title, opt, nothread))
+        @app.route('/exec_cmd/<title>')
+        @app.route('/exec_cmd/<title>', method='POST')
+        def exec_cmd(title):
+            try:
+                opt = None
+                if bottle.request.content_type.startswith('multipart/form-data'):
+                    opt = self.load_cmd(title)
+                    for fn in bottle.request.files.keys():
+                        opt[fn] = bottle.request.files[fn].file
+                        if fn == 'input_file': opt['stdin'] = False
+                else:
+                    opt = self.load_cmd(title)
+                opt['capture_stdout'] = nothread = True
+                opt['stdout_log'] = False
+                return self.to_str(self.exec_cmd(title, opt, nothread))
+            except:
+                return dict(warn=f'Command "{title}" failed. {traceback.format_exc()}')
 
-        @app.post('/exec_pipe')
-        def exec_pipe():
-            req = bottle.request.json
-            title = req['title'] if 'title' in req else None
-            req['capture_stdout'] = nothread = req['nothread'] if 'nothread' in req else True
-            return self.to_str(self.exec_pipe(title, req, nothread))
+        @app.route('/exec_pipe/<title>')
+        @app.route('/exec_pipe/<title>', method='POST')
+        def exec_pipe(title):
+            upfiles = dict()
+            try:
+                opt = None
+                if bottle.request.content_type.startswith('multipart/form-data'):
+                    opt = self.load_pipe(title)
+                    opt['request_files'] = dict()
+                    for cmd_title in opt['pipe_cmd']:
+                        if cmd_title == '':
+                            continue
+                        cmd_opt = self.load_cmd(cmd_title)
+                        for fn in bottle.request.files.keys():
+                            if fn in cmd_opt:
+                                with tempfile.NamedTemporaryFile(delete=False, suffix=Path(bottle.request.files[fn].filename).suffix) as tf:
+                                    upfiles[fn] = tf.name
+                                    tf.write(bottle.request.files[fn].file.read())
+                                    tf.flush()
+                                    opt['request_files'][fn] = tf.name
+                                    if fn == 'input_file': opt['request_files']['stdin'] = False
+                else:
+                    opt = self.load_pipe(title)
+                opt['capture_stdout'] = nothread = True
+                opt['stdout_log'] = False
+                return self.to_str(self.exec_pipe(title, opt, nothread))
+            except:
+                return dict(warn=f'Pipeline "{title}" failed. {traceback.format_exc()}')
+            finally:
+                for tfname in upfiles.values():
+                    os.unlink(tfname)
 
-        @app.get('/versions_iinfer')
+        @app.route('/versions_iinfer')
         def versions_iinfer():
             return self.versions_iinfer()
 
@@ -967,3 +1031,4 @@ class _WSGIRefServer(bottle.WSGIRefServer):
         # self.srvに代入することで、shutdownを実行できるようにする
         self.srv = make_server(self.host, self.port, app, server_cls, handler_cls)
         self.srv.serve_forever()
+        self.srv.server_close()

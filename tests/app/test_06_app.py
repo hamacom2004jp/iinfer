@@ -43,7 +43,7 @@ def test_01_01_version(capfd):
 def test_04_01_client_deploy(capfd):
     cmd = f"-m client -c deploy --svname server1 -n onnx_det_YoloX_Lite --model_img_width 416 --model_img_width 416 --overwrite " \
           f"--model_file models/onnx/yolox_nano.onnx " \
-          f"--label_file iinfer/datasets/label_coco.txt " \
+          f"--label_file models/label_coco.txt " \
           f"--predict_type onnx_det_YoloX_Lite".split(' ')
     _, result = app.IinferApp().main(args_list=cmd)
     out, err = capfd.readouterr()
@@ -57,7 +57,7 @@ def test_04_02_client_deploy(capfd):
           f"--model_conf_file models/mmdet/yolox_tiny_8xb8-300e_coco.py " \
           f"--model_conf_file models/mmdet/yolox_s_8xb8-300e_coco.py " \
           f"--model_conf_file models/mmdet/yolox_tta.py " \
-          f"--label_file iinfer/datasets/label_coco.txt " \
+          f"--label_file models/label_coco.txt " \
           f"--predict_type mmdet_det_YoloX_Lite".split(' ')
     _, result = app.IinferApp().main(args_list=cmd)
     out, err = capfd.readouterr()
