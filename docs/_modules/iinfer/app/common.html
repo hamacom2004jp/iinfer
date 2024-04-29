@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>iinfer.app.common &mdash; iinfer 2024/04/15 documentation</title>
+  <title>iinfer.app.common &mdash; iinfer 2024/04/29 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -15,7 +15,7 @@
   
         <script src="../../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=73fdd119"></script>
+        <script src="../../../_static/documentation_options.js?v=014f887d"></script>
         <script src="../../../_static/doctools.js?v=888ff710"></script>
         <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -48,12 +48,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/overview.html">iinferの概要</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/install.html">インストール</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/gui.html">GUIモード</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/web.html">Webモード</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/command.html">コマンドリファレンス</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/models.html">動作確認済みモデル</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/detection.html">物体検知</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/segmentation.html">領域検知</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/face.html">顔認識</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/pipeline.html">パイプライン</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/injections.html">インジェクション</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/customize.html">カスタマイズ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/developer.html">開発者向け情報</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/errors.html">よくあるエラー</a></li>
@@ -101,8 +103,10 @@
 <span class="kn">import</span> <span class="nn">random</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">string</span>
+<span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">requests</span>
 <span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">yaml</span>
 
@@ -145,6 +149,8 @@
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">intc</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">Path</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">_TemporaryFileWrapper</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">o</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">T%H:%M:%S&#39;</span><span class="p">)</span>
@@ -218,6 +224,36 @@
         <span class="k">if</span> <span class="n">withset</span><span class="p">:</span>
             <span class="n">opt</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">defval</span>
         <span class="k">return</span> <span class="n">defval</span></div>
+
+
+<div class="viewcode-block" id="safe_fname">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.common.safe_fname">[docs]</a>
+<span class="k">def</span> <span class="nf">safe_fname</span><span class="p">(</span><span class="n">fname</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    ファイル名に使えない文字を置換します。</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        fname (str): ファイル名</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: 置換後のファイル名</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s1">&#39;[\s:</span><span class="se">\\\\</span><span class="s1">/,\.\?\#\$\%\^\&amp;\!\@\*\~\|\&lt;\&gt;\(\)\{\}\[\]</span><span class="se">\&#39;\&quot;</span><span class="s1">\`]&#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="n">fname</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="check_fname">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.common.check_fname">[docs]</a>
+<span class="k">def</span> <span class="nf">check_fname</span><span class="p">(</span><span class="n">fname</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    ファイル名に使えない文字が含まれているかどうかをチェックします。</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        fname (str): ファイル名</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool: Trueの場合は使えない文字が含まれている</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;[\s:</span><span class="se">\\\\</span><span class="s1">/,\.\?\#\$\%\^\&amp;\!\@\*\~\|\&lt;\&gt;\(\)\{\}\[\]</span><span class="se">\&#39;\&quot;</span><span class="s1">\`]&#39;</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="n">fname</span><span class="p">))</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span></div>
 
 
 <div class="viewcode-block" id="mkdirs">

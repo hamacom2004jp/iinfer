@@ -384,7 +384,7 @@ class Server(object):
                 self.responce(reskey, {"warn": f"{name}_file is None but {name}_bin is not None."})
                 return False, files
             if files is not None:
-                files = [deploy_dir / cf for cf in files]
+                files = [deploy_dir / cf for cf in files if cf is not None and cf != '']
                 for i, cf in enumerate(files):
                     with open(cf, "wb") as f:
                         f.write(datas[i])

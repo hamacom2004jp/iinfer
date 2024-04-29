@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>iinfer (Image Inference Application) &mdash; iinfer 2024/04/21 documentation</title>
+  <title>iinfer (Image Inference Application) &mdash; iinfer 2024/04/29 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="_static/custom.css?v=3fafac33" />
@@ -16,7 +16,7 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=22dcbb72"></script>
+        <script src="_static/documentation_options.js?v=014f887d"></script>
         <script src="_static/doctools.js?v=888ff710"></script>
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
@@ -50,12 +50,14 @@
 <li class="toctree-l1"><a class="reference internal" href="docs/overview.html">iinferの概要</a></li>
 <li class="toctree-l1"><a class="reference internal" href="docs/install.html">インストール</a></li>
 <li class="toctree-l1"><a class="reference internal" href="docs/gui.html">GUIモード</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/web.html">Webモード</a></li>
 <li class="toctree-l1"><a class="reference internal" href="docs/command.html">コマンドリファレンス</a></li>
 <li class="toctree-l1"><a class="reference internal" href="docs/models.html">動作確認済みモデル</a></li>
 <li class="toctree-l1"><a class="reference internal" href="docs/detection.html">物体検知</a></li>
 <li class="toctree-l1"><a class="reference internal" href="docs/segmentation.html">領域検知</a></li>
 <li class="toctree-l1"><a class="reference internal" href="docs/face.html">顔認識</a></li>
 <li class="toctree-l1"><a class="reference internal" href="docs/pipeline.html">パイプライン</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/injections.html">インジェクション</a></li>
 <li class="toctree-l1"><a class="reference internal" href="docs/customize.html">カスタマイズ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="docs/developer.html">開発者向け情報</a></li>
 <li class="toctree-l1"><a class="reference internal" href="docs/errors.html">よくあるエラー</a></li>
@@ -112,6 +114,11 @@
 <li class="toctree-l2"><a class="reference internal" href="docs/gui.html#id1">GUIモードのチュートリアル</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="docs/web.html">Webモード</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="docs/web.html#http-exec-cmd-title">コマンド実行 : <cite>http://&lt;ホスト&gt;:&lt;ポート&gt;/exec_cmd/&lt;title&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="docs/web.html#http-exec-pipe-title">パイプライン実行 : <cite>http://&lt;ホスト&gt;:&lt;ポート&gt;/exec_pipe/&lt;title&gt;</cite></a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="docs/command.html">コマンドリファレンス</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="docs/cmd_common.html">共通オプション</a></li>
 <li class="toctree-l2"><a class="reference internal" href="docs/cmd_install.html">インストール</a></li>
@@ -119,6 +126,7 @@
 <li class="toctree-l2"><a class="reference internal" href="docs/cmd_server.html">推論サーバー</a></li>
 <li class="toctree-l2"><a class="reference internal" href="docs/cmd_client.html">クライアント</a></li>
 <li class="toctree-l2"><a class="reference internal" href="docs/cmd_gui.html">GUI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="docs/cmd_web.html">Web</a></li>
 <li class="toctree-l2"><a class="reference internal" href="docs/cmd_postprocess.html">後処理</a></li>
 </ul>
 </li>
@@ -155,6 +163,10 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="docs/pipeline.html">パイプライン</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/injections.html">インジェクション</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="docs/injections.html#ai-iinfer-m-client-c-deploy-option">クライアント(AIモデルの配備) ※抜粋 : <cite>iinfer -m client -c deploy &lt;Option&gt;</cite></a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="docs/customize.html">カスタマイズ</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="docs/customize.html#id2">カスタム推論モジュールについて</a></li>
 <li class="toctree-l2"><a class="reference internal" href="docs/customize.html#id3">前処理、後処理モジュールについて</a></li>

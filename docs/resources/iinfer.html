@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>iinfer package &mdash; iinfer 2024/04/21 documentation</title>
+  <title>iinfer package &mdash; iinfer 2024/04/29 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -16,7 +16,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=22dcbb72"></script>
+        <script src="../_static/documentation_options.js?v=014f887d"></script>
         <script src="../_static/doctools.js?v=888ff710"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -49,12 +49,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../docs/overview.html">iinferの概要</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../docs/install.html">インストール</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../docs/gui.html">GUIモード</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/web.html">Webモード</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../docs/command.html">コマンドリファレンス</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../docs/models.html">動作確認済みモデル</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../docs/detection.html">物体検知</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../docs/segmentation.html">領域検知</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../docs/face.html">顔認識</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../docs/pipeline.html">パイプライン</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/injections.html">インジェクション</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../docs/customize.html">カスタマイズ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../docs/developer.html">開発者向け情報</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../docs/errors.html">よくあるエラー</a></li>
@@ -144,6 +146,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="iinfer.app.html#module-iinfer.app.common">iinfer.app.common module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="iinfer.app.html#iinfer.app.common.check_fname"><code class="docutils literal notranslate"><span class="pre">check_fname()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="iinfer.app.html#iinfer.app.common.cmd"><code class="docutils literal notranslate"><span class="pre">cmd()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="iinfer.app.html#iinfer.app.common.default_json_enc"><code class="docutils literal notranslate"><span class="pre">default_json_enc()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="iinfer.app.html#iinfer.app.common.download_file"><code class="docutils literal notranslate"><span class="pre">download_file()</span></code></a></li>
@@ -157,13 +160,17 @@
 <li class="toctree-l3"><a class="reference internal" href="iinfer.app.html#iinfer.app.common.print_format"><code class="docutils literal notranslate"><span class="pre">print_format()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="iinfer.app.html#iinfer.app.common.random_string"><code class="docutils literal notranslate"><span class="pre">random_string()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="iinfer.app.html#iinfer.app.common.rmdirs"><code class="docutils literal notranslate"><span class="pre">rmdirs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="iinfer.app.html#iinfer.app.common.safe_fname"><code class="docutils literal notranslate"><span class="pre">safe_fname()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="iinfer.app.html#iinfer.app.common.saveopt"><code class="docutils literal notranslate"><span class="pre">saveopt()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="iinfer.app.html#module-iinfer.app.gui">iinfer.app.gui module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="iinfer.app.html#iinfer.app.gui.Web"><code class="docutils literal notranslate"><span class="pre">Web</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.gui.Web.start"><code class="docutils literal notranslate"><span class="pre">Web.start()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.gui.Web.stop"><code class="docutils literal notranslate"><span class="pre">Web.stop()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="iinfer.app.html#iinfer.app.gui.Gui"><code class="docutils literal notranslate"><span class="pre">Gui</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.gui.Gui.callback_console_modal_log_func"><code class="docutils literal notranslate"><span class="pre">Gui.callback_console_modal_log_func()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.gui.Gui.callback_return_cmd_exec_func"><code class="docutils literal notranslate"><span class="pre">Gui.callback_return_cmd_exec_func()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.gui.Gui.callback_return_pipe_exec_func"><code class="docutils literal notranslate"><span class="pre">Gui.callback_return_pipe_exec_func()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.gui.Gui.start"><code class="docutils literal notranslate"><span class="pre">Gui.start()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.gui.Gui.stop"><code class="docutils literal notranslate"><span class="pre">Gui.stop()</span></code></a></li>
 </ul>
 </li>
 </ul>

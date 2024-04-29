@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GUIモード &mdash; iinfer 2024/04/21 documentation</title>
+  <title>GUIモード &mdash; iinfer 2024/04/29 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -16,13 +16,13 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=22dcbb72"></script>
+        <script src="../_static/documentation_options.js?v=014f887d"></script>
         <script src="../_static/doctools.js?v=888ff710"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="コマンドリファレンス" href="command.html" />
+    <link rel="next" title="Webモード" href="web.html" />
     <link rel="prev" title="インストール" href="install.html" />
 
 
@@ -59,12 +59,14 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="web.html">Webモード</a></li>
 <li class="toctree-l1"><a class="reference internal" href="command.html">コマンドリファレンス</a></li>
 <li class="toctree-l1"><a class="reference internal" href="models.html">動作確認済みモデル</a></li>
 <li class="toctree-l1"><a class="reference internal" href="detection.html">物体検知</a></li>
 <li class="toctree-l1"><a class="reference internal" href="segmentation.html">領域検知</a></li>
 <li class="toctree-l1"><a class="reference internal" href="face.html">顔認識</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pipeline.html">パイプライン</a></li>
+<li class="toctree-l1"><a class="reference internal" href="injections.html">インジェクション</a></li>
 <li class="toctree-l1"><a class="reference internal" href="customize.html">カスタマイズ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developer.html">開発者向け情報</a></li>
 <li class="toctree-l1"><a class="reference internal" href="errors.html">よくあるエラー</a></li>
@@ -210,21 +212,26 @@
 <img alt="../_images/00300_pipe.jpg" src="../_images/00300_pipe.jpg" />
 <ol class="arabic simple">
 <li><p>最初に実行するコマンドを選択します。</p></li>
-<li><p>ここでは、 <strong>start</strong> コマンドを選択しました。</p></li>
+<li><p>ここでは、 <strong>predict_mmdet</strong> コマンドを選択しました。</p></li>
 <li><p>続けて <strong>[ + ]</strong> ボタンを押すと、次に実行するコマンドを選択できます。</p></li>
 </ol>
 <img alt="../_images/00310_pipe.jpg" src="../_images/00310_pipe.jpg" />
 <ol class="arabic simple">
-<li><p>startから推論して後処理してstopするパイプラインを設定しました。</p></li>
-<li><p><strong>Execute</strong> で実行してみます。</p></li>
+<li><p>推論してから後処理するパイプラインを設定しました。</p></li>
 </ol>
 <img alt="../_images/00311_pipe.jpg" src="../_images/00311_pipe.jpg" />
 <ol class="arabic simple">
-<li><p>パイプラインで設定したコマンドを順に実行した結果が表示されます。</p></li>
-<li><p>guiモードでのパイプライン設定は、各コマンドのファイル入出力オプションを使用して、パイプラインを流れるデータを設定することになります。</p></li>
-<li><p>コマンドラインモードでは、標準入出力をパイプ「|」でつないでいくことで、パイプライン構成することが出来ます。</p></li>
+<li><p><strong>Raw</strong> でどんなコマンドになるか確認してみます。</p></li>
+<li><p>パイプラインは、各コマンドの標準入出力をパイプ「|」でつないでいくことで構成しています。</p></li>
+<li><p>warn(警告)表示されているのは、前のコマンドの入力を受け付けるオプションが設定されていないためです。</p></li>
+<li><p>無視しても実行できますが、正しいパイプラインを構成するためには、適切なオプションを設定してください。</p></li>
 </ol>
 <img alt="../_images/00312_pipe.jpg" src="../_images/00312_pipe.jpg" />
+<ol class="arabic simple">
+<li><p><strong>Execute</strong> で実行してみます。</p></li>
+<li><p>パイプラインで実行した結果が表示されます。</p></li>
+</ol>
+<img alt="../_images/00313_pipe.jpg" src="../_images/00313_pipe.jpg" />
 </section>
 </section>
 </section>
@@ -234,7 +241,7 @@
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="install.html" class="btn btn-neutral float-left" title="インストール" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="command.html" class="btn btn-neutral float-right" title="コマンドリファレンス" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="web.html" class="btn btn-neutral float-right" title="Webモード" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

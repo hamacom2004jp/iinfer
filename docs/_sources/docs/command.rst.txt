@@ -15,4 +15,5 @@
    推論サーバー <cmd_server.rst>
    クライアント <cmd_client.rst>
    GUI <cmd_gui.rst>
+   Web <cmd_web.rst>
    後処理 <cmd_postprocess.rst>

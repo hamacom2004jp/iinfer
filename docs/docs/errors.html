@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>よくあるエラー &mdash; iinfer 2024/04/21 documentation</title>
+  <title>よくあるエラー &mdash; iinfer 2024/04/29 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -16,7 +16,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=22dcbb72"></script>
+        <script src="../_static/documentation_options.js?v=014f887d"></script>
         <script src="../_static/doctools.js?v=888ff710"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -51,12 +51,14 @@
 <li class="toctree-l1"><a class="reference internal" href="overview.html">iinferの概要</a></li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">インストール</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gui.html">GUIモード</a></li>
+<li class="toctree-l1"><a class="reference internal" href="web.html">Webモード</a></li>
 <li class="toctree-l1"><a class="reference internal" href="command.html">コマンドリファレンス</a></li>
 <li class="toctree-l1"><a class="reference internal" href="models.html">動作確認済みモデル</a></li>
 <li class="toctree-l1"><a class="reference internal" href="detection.html">物体検知</a></li>
 <li class="toctree-l1"><a class="reference internal" href="segmentation.html">領域検知</a></li>
 <li class="toctree-l1"><a class="reference internal" href="face.html">顔認識</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pipeline.html">パイプライン</a></li>
+<li class="toctree-l1"><a class="reference internal" href="injections.html">インジェクション</a></li>
 <li class="toctree-l1"><a class="reference internal" href="customize.html">カスタマイズ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developer.html">開発者向け情報</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">よくあるエラー</a></li>
@@ -197,7 +199,12 @@
 <td><p>ライブラリが不足しています</p></td>
 <td><p><cite>pip uninstall -y opencv-python</cite> で一度削除してから <cite>pip install opencv-python</cite> で再インストール</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>iinfer -m gui -c start</cite></p></td>
+<tr class="row-odd"><td><p><cite>iinfer -m client -c predict</cite></p></td>
+<td><p>Failed to run inference: LoadAnnotations.__init__() got an unexpected keyword argument 'with_bbox'</p></td>
+<td><p>mmdetとmmsegを一つのサーバーで同時に起動するとエラーが発生します</p></td>
+<td><p>mmsegとmmsegの両方起動させる場合は、異なるsvnameでそれそれ別のサーバーを起動させてください</p></td>
+</tr>
+<tr class="row-even"><td><p><cite>iinfer -m gui -c start</cite></p></td>
 <td><p>ModuleNotFoundError: No module named 'bottle.ext.websocket'</p></td>
 <td><p>bottleモジュールの不具合です。python3.12以上だと発生します。</p></td>
 <td><p>python3.11以下を使用してください。</p></td>

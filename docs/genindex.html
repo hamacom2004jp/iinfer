@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Index &mdash; iinfer 2024/04/21 documentation</title>
+  <title>Index &mdash; iinfer 2024/04/29 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="_static/custom.css?v=3fafac33" />
@@ -15,7 +15,7 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=22dcbb72"></script>
+        <script src="_static/documentation_options.js?v=014f887d"></script>
         <script src="_static/doctools.js?v=888ff710"></script>
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
@@ -48,12 +48,14 @@
 <li class="toctree-l1"><a class="reference internal" href="docs/overview.html">iinferの概要</a></li>
 <li class="toctree-l1"><a class="reference internal" href="docs/install.html">インストール</a></li>
 <li class="toctree-l1"><a class="reference internal" href="docs/gui.html">GUIモード</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/web.html">Webモード</a></li>
 <li class="toctree-l1"><a class="reference internal" href="docs/command.html">コマンドリファレンス</a></li>
 <li class="toctree-l1"><a class="reference internal" href="docs/models.html">動作確認済みモデル</a></li>
 <li class="toctree-l1"><a class="reference internal" href="docs/detection.html">物体検知</a></li>
 <li class="toctree-l1"><a class="reference internal" href="docs/segmentation.html">領域検知</a></li>
 <li class="toctree-l1"><a class="reference internal" href="docs/face.html">顔認識</a></li>
 <li class="toctree-l1"><a class="reference internal" href="docs/pipeline.html">パイプライン</a></li>
+<li class="toctree-l1"><a class="reference internal" href="docs/injections.html">インジェクション</a></li>
 <li class="toctree-l1"><a class="reference internal" href="docs/customize.html">カスタマイズ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="docs/developer.html">開発者向け情報</a></li>
 <li class="toctree-l1"><a class="reference internal" href="docs/errors.html">よくあるエラー</a></li>
@@ -103,7 +105,6 @@
  | <a href="#S"><strong>S</strong></a>
  | <a href="#T"><strong>T</strong></a>
  | <a href="#U"><strong>U</strong></a>
- | <a href="#W"><strong>W</strong></a>
  
 </div>
 <h2 id="A">A</h2>
@@ -137,7 +138,15 @@
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="resources/iinfer.app.html#iinfer.app.gui.Gui.callback_console_modal_log_func">callback_console_modal_log_func() (iinfer.app.gui.Gui method)</a>
+</li>
+      <li><a href="resources/iinfer.app.html#iinfer.app.gui.Gui.callback_return_cmd_exec_func">callback_return_cmd_exec_func() (iinfer.app.gui.Gui method)</a>
+</li>
+      <li><a href="resources/iinfer.app.html#iinfer.app.gui.Gui.callback_return_pipe_exec_func">callback_return_pipe_exec_func() (iinfer.app.gui.Gui method)</a>
+</li>
       <li><a href="resources/iinfer.app.html#iinfer.app.client.Client.capture">capture() (iinfer.app.client.Client method)</a>
+</li>
+      <li><a href="resources/iinfer.app.html#iinfer.app.common.check_fname">check_fname() (in module iinfer.app.common)</a>
 </li>
       <li><a href="resources/iinfer.app.html#iinfer.app.client.Client.check_server">check_server() (iinfer.app.client.Client method)</a>
 </li>
@@ -260,6 +269,8 @@
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="resources/iinfer.app.html#iinfer.app.common.getopt">getopt() (in module iinfer.app.common)</a>
+</li>
+      <li><a href="resources/iinfer.app.html#iinfer.app.gui.Gui">Gui (class in iinfer.app.gui)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -752,6 +763,8 @@
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="resources/iinfer.app.html#iinfer.app.common.safe_fname">safe_fname() (in module iinfer.app.common)</a>
+</li>
       <li><a href="resources/iinfer.app.html#iinfer.app.common.saveopt">saveopt() (in module iinfer.app.common)</a>
 </li>
       <li><a href="resources/iinfer.app.predicts.html#iinfer.app.predicts.insightface_det.InsightfaceDet.search_face">search_face() (iinfer.app.predicts.insightface_det.InsightfaceDet method)</a>
@@ -763,7 +776,7 @@
       <li><a href="resources/iinfer.app.html#iinfer.app.client.Client.start">start() (iinfer.app.client.Client method)</a>
 
       <ul>
-        <li><a href="resources/iinfer.app.html#iinfer.app.gui.Web.start">(iinfer.app.gui.Web method)</a>
+        <li><a href="resources/iinfer.app.html#iinfer.app.gui.Gui.start">(iinfer.app.gui.Gui method)</a>
 </li>
         <li><a href="resources/iinfer.app.html#iinfer.app.server.Server.start">(iinfer.app.server.Server method)</a>
 </li>
@@ -775,7 +788,7 @@
       <li><a href="resources/iinfer.app.html#iinfer.app.client.Client.stop">stop() (iinfer.app.client.Client method)</a>
 
       <ul>
-        <li><a href="resources/iinfer.app.html#iinfer.app.gui.Web.stop">(iinfer.app.gui.Web method)</a>
+        <li><a href="resources/iinfer.app.html#iinfer.app.gui.Gui.stop">(iinfer.app.gui.Gui method)</a>
 </li>
         <li><a href="resources/iinfer.app.html#iinfer.app.server.Server.stop">(iinfer.app.server.Server method)</a>
 </li>
@@ -806,14 +819,6 @@
         <li><a href="resources/iinfer.app.html#iinfer.app.server.Server.undeploy">(iinfer.app.server.Server method)</a>
 </li>
       </ul></li>
-  </ul></td>
-</tr></table>
-
-<h2 id="W">W</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="resources/iinfer.app.html#iinfer.app.gui.Web">Web (class in iinfer.app.gui)</a>
-</li>
   </ul></td>
 </tr></table>
 

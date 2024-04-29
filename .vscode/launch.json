@@ -5,40 +5,25 @@
     "version": "0.0.1",
     "configurations": [
         {
-            "name": "Python: iinfer",
+            "name": "Python: iinfer server",
             "type": "python",
             "request": "launch",
-            //"args": ["-m","redis","-c","docker_run","--wsl_name","Ubuntu_docker-20.04","--wsl_user","ubuntu","-f"],
             "args": ["-m","server","-c","start","-f"],
-            //"args": ["-m","server","-c","stop","-f"],
-            //"args": ["-m","server","-c","list","-f"],
-            //"args": ["-m","client","-c","deploy","-n","yolox_nano","--model_file","models\\yolox_nano.onnx",
-            //         "--model_img_width","416","--model_img_height","416","--predict_type","onnx_det_YoloX_Lite","--label_file","iinfer\\datasets\\label_voc.txt","-f"],
-            //"args": ["-m","client","-c","deploy","-n","yolox_tiny_mmdet","--model_file","models\\yolox_tiny_8x8_300e_coco_20211124_171234-b4047906.pth",
-            //         "--model_conf_file","models\\yolox_tiny_8xb8-300e_coco.py",
-            //         "--model_conf_file","models\\yolox_s_8xb8-300e_coco.py",
-            //         "--model_conf_file","models\\yolox_tta.py",
-            //         "--model_img_width","640","--model_img_height","640","--predict_type","mmdet_det_YoloX","--label_file","iinfer\\datasets\\label_coco.txt",
-            //         "--overwrite","-f"],
-            //"args": ["-m","client","-c","deploy_list","-f"],
-            //"args": ["-m","client","-c","start","-n","yolox_nano","-f"],
-            //"args": ["-m","client","-c","capture","--capture_count","5","-f"],
-            //"args": ["-m","client","-c","predict","-n","yolox_nano","-i","animal001.jpg","-o","aaa.jpg","-f"],
-            //"args": ["-m","client","-c","predict","-n","yolox_nano","-i","cap.csv","--image_type","capture","-f","-P"],
-            //"args": ["-m","client","-c","undeploy""-n","yolox_nano","-f"],
-            //"args": ["-m","client","-c","start","-n","yolox_tiny_mmdet","-f"],
-            //"args": ["-m","client","-c","predict","-n","yolox_tiny_mmdet","-i","cap.csv","--image_type","capture","-f","-P"],
-            //"args": ["-m","postprocess","-c","csv","-i","pred.json","-f"],
-            //"args": ["-m","postprocess","-c","httpreq","--json_connectstr","https://httpbin.org/post","-i","pred.json","-f"],
-            //"args": ["-m","postprocess","-c","httpreq","--json_connectstr","https://httpbin.org/post","--img_connectstr","https://httpbin.org/post","-i","pred.json","-f"],
-            //"args": ["-m","postprocess","-c","det_filter","--labels","person","-i","pred.json","-f","-P"],
-            //"args": ["-m","install","-c","server"],
-            //"args": ["-m","gui","-c","start","-f"],
+            "module": "iinfer",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "justMyCode": false
+         },
+        {
+            "name": "Python: iinfer client",
+            "type": "python",
+            "request": "launch",
+            "args": ["-m","gui","-c","start","-f"],
             //"args": ["--version"],
             "module": "iinfer",
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
-            "justMyCode": true
+            "justMyCode": false
         }
     ]
 }
