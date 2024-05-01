@@ -10,23 +10,23 @@
 １．領域検知モデル(segmentation)の環境をインストールする（通常Ubuntu上で実行）
 ===============================================================================
 
-- `iinfer -m install -c server <Option>` コマンドで顔認識モデルの環境をインストールしてください。
+- `iinfer -m install -c server <Option>` コマンドで領域検知モデルの環境をインストールしてください。
 
     .. code-block:: bash
 
-         $ iinfer -m install -c server --install_mmdet --install_tag mmseg
+         $ iinfer -m install -c server --install_mmseg --install_tag mmseg
 
-- `docker-compose` コマンドで顔認識モデルのサーバーを起動してください。
+- `docker-compose` コマンドで領域検知モデルのサーバーを起動してください。
 
     .. code-block:: bash
 
-         $ docker-compose -f docker-compose_mmdet.yml up -d
+         $ docker-compose -f docker-compose_mmseg.yml up -d
 
-２．領域検知モデルをデプロイする（通常Windows上で実行）
+２．領域検知モデルをデプロイする（通常Windowsから実行）
 =============================================================
 
 - :doc:`./models` の `Object Detection` の項目に記載されているモデルをダウンロードしてください。
-- `iinfer -m client -c deploy <Option>` コマンドで顔検出モデルを配備してください。
+- `iinfer -m client -c deploy <Option>` コマンドで領域検知モデルを配備してください。
     - mmdetection の場合``
 
     .. code-block:: bash
@@ -39,25 +39,25 @@
 
          $ iinfer -m client -c start --name mmseg_seg_PSPNet
 
-３．領域検知を実行する（通常Windows上で実行）
+３．領域検知を実行する（通常Windowsから実行）
 =============================================================
 
-- `iinfer -m client -c predict <Option>` コマンドで領域検知が行えるようになります。
+- `iinfer -m client -c predict <Option>` コマンドで領域検知が行えます。
 
     .. code-block:: bash
 
          $ iinfer -m client -c capture --image_type capture | iinfer -m client -c predict --name mmseg_seg_PSPNet --image_type capture --stdin --output_preview > /dev/null
 
-４．検知した領域をフィルターする（通常Windows上で実行）
+４．検知した領域をフィルターする（通常Windowsから実行）
 =============================================================
 
-- `iinfer -m postprocess -c seg_filter <Option>` コマンドで検知した領域のフィルターが行えるようになります。
+- `iinfer -m postprocess -c seg_filter <Option>` コマンドで検知した領域のフィルターが行えます。
 
     .. code-block:: bash
 
          $ iinfer -m client -c capture --image_type capture | iinfer -m client -c predict --name mmseg_seg_PSPNet --image_type capture --stdin --nodraw | iinfer -m postprocess -c seg_filter --stdin --score_th 0.1 --labels dog --labels person --output_preview > /dev/null
 
-５．検知した領域の内容から画像判定する（通常Windows上で実行）
+５．検知した領域の内容から画像判定する（通常Windowsから実行）
 =============================================================
 
 - `iinfer -m postprocess -c det_jadge <Option>` コマンドで検知した領域の内容から画像判定が行えます。製造業における良否判定などに利用できます。
@@ -66,7 +66,7 @@
 
          $ iinfer -m client -c capture --image_type capture | iinfer -m client -c predict --name mmseg_seg_PSPNet --image_type capture --stdin --nodraw | iinfer -m postprocess -c seg_filter --stdin --score_th 0.1 --labels dog --labels person --output_preview | iinfer -m postprocess -c seg_jadge --stdin --ok_score_th 0.5 --ok_labels person --ng_score_th 0.3 --ng_labels dog --output_preview > /dev/null
 
-６．画像判定をCSV形式で出力する（通常Windows上で実行）
+６．画像判定をCSV形式で出力する（通常Windowsから実行）
 =============================================================
 
 - `iinfer -m postprocess -c csv <Option>` コマンドで判定結果をCSV形式で出力できます。

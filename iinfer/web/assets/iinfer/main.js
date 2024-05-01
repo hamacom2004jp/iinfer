@@ -4,6 +4,14 @@ change_dark_mode = (dark_mode) => {
     else if(html.attr('data-bs-theme')=='dark') html.removeAttr('data-bs-theme');
     else html.attr('data-bs-theme','dark');
 }
+show_loading = () => {
+    elem = $('#loading');
+    elem.removeClass('d-none');
+}
+hide_loading = () => {
+    elem = $('#loading');
+    elem.addClass('d-none');
+}
 $(() => {
     // ダークモード対応
     change_dark_mode(window.matchMedia('(prefers-color-scheme: dark)').matches);
@@ -85,12 +93,12 @@ $(() => {
         if ($('#loading').find('.bbforce').hasClass('pipe_executed') && 
             window.confirm('パイプラインでこのアクションを実行すると、guiモード自体が停止します。実行しますか？')) {
             await eel.bbforce_cmd()();
-            $('#loading').addClass('d-none');
+            hide_loading();
             window.close();
         }
         else if (!$('#loading').find('.bbforce').hasClass('pipe_executed')) {
             await eel.bbforce_cmd()();
-            $('#loading').addClass('d-none');
+            hide_loading();
         }
     });
 
@@ -118,13 +126,20 @@ $(() => {
         cmd_modal = $('#cmd_modal');
         cmd_modal.modal('hide');
         view_result_func(title, result);
-        $('#loading').addClass('d-none');
+        hide_loading();
     }
     eel.expose(js_return_pipe_exec_func);
     function js_return_pipe_exec_func(title, result) {
         pipe_modal = $('#pipe_modal');
         pipe_modal.modal('hide');
         view_result_func(title, result);
-        $('#loading').addClass('d-none');
+        hide_loading();
     }
+    eel.expose(js_return_stream_log_func);
+    function js_return_stream_log_func(result) {
+        size_th = 1024*1024*5;
+        view_result_func('stream log', result);
+        result_modal = $('#result_modal');
+        result_modal.find('.btn_window').click();
+    };
 });

@@ -118,6 +118,9 @@ class Gui(web.Web):
     def callback_return_pipe_exec_func(self, title, output):
         eel.js_return_pipe_exec_func(title, output)
 
+    def callback_return_stream_log_func(self, output):
+        eel.js_return_stream_log_func(output)
+
     def stop(self, route, websockets):
         self.bbforce_cmd()
         self.logger.info(f"Stop eel web. {route}")

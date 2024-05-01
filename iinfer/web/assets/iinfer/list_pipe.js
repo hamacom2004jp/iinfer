@@ -91,26 +91,26 @@ list_pipe_func_then = () => {
         if (pipe_modal.find('.row_content, .row_content_common').find('.is-invalid').length > 0) {
             return;
         }
-        $('#loading').removeClass('d-none');
+        show_loading();
         result = await eel.save_pipe(title, opt)();
         await list_pipe_func();
         $('.pipe_card').off('click').on('click', pipe_card_func);
         if (result['success']) alert(result['success']);
         else if (result['warn']) alert(result['warn']);
-        $('#loading').addClass('d-none');
+        hide_loading();
     });
     // パイプラインファイルの削除
     $('#pipe_del').off('click').on('click', async () => {
         pipe_modal = $('#pipe_modal');
         var title = pipe_modal.find('[name="title"]').val();
-        $('#loading').removeClass('d-none');
+        show_loading();
         if (window.confirm(`delete "${title}"?`)) {
             await eel.del_pipe(title)();
             pipe_modal.modal('hide');
             await list_pipe_func();
             $('.pipe_card').off('click').on('click', pipe_card_func);
         }
-        $('#loading').addClass('d-none');
+        hide_loading();
     });
     // パイプラインファイルの実行
     $('#pipe_exec').off('click').on('click', async () => {
@@ -119,7 +119,7 @@ list_pipe_func_then = () => {
         if (pipe_modal.find('.row_content').find('.is-invalid').length > 0) {
             return;
         }
-        $('#loading').removeClass('d-none');
+        show_loading();
         // コマンドの実行
         $('#loading').find('.bbforce').addClass('pipe_executed');
         eel.exec_pipe(title, opt)().then((result) => {});
@@ -131,11 +131,11 @@ list_pipe_func_then = () => {
         if (pipe_modal.find('.row_content').find('.is-invalid').length > 0) {
             return;
         }
-        $('#loading').removeClass('d-none');
+        show_loading();
         // コマンドの実行
         eel.raw_pipe(title, opt)().then((result) => {
             view_raw_func(title, result);
-            $('#loading').addClass('d-none');
+            hide_loading();
         });
     });
 };

@@ -5,6 +5,7 @@ from pathlib import Path
 import bottle
 import datetime
 import glob
+import gevent
 import html
 import iinfer
 import io
@@ -661,8 +662,7 @@ class Web(object):
                 self.callback_return_cmd_exec_func(title, output)
         if nothread:
             return _exec_cmd(self.container['iinfer_app'], title, opt, True)
-        th = threading.Thread(target=_exec_cmd, args=(self.container['iinfer_app'], title, opt))
-        th.start()
+        gevent.spawn(_exec_cmd, self.container['iinfer_app'], title, opt, False)
         return [dict(warn='start_cmd')]
     
     def callback_console_modal_log_func(self, output:dict):
@@ -744,6 +744,13 @@ class Web(object):
 
     def exec_pipe(self, title, opt, nothread=False):
         self.logger.info(f"exec_pipe: title={title}, opt={opt}")
+        def to_json(o):
+            res_json = json.loads(o)
+            if 'output_image' in res_json and 'output_image_shape' in res_json:
+                img_npy = convert.b64str2npy(res_json["output_image"], res_json["output_image_shape"])
+                img_bytes = convert.npy2imgfile(img_npy, image_type='png')
+                res_json["output_image"] = convert.bytes2b64str(img_bytes)
+            return res_json
         def _exec_pipe(title, opt, container, nothread=False):
             capture_stdout = True
             for i, cmd_title in enumerate(opt['pipe_cmd']):
@@ -762,18 +769,6 @@ class Web(object):
                     if nothread: return output
                     self.callback_return_pipe_exec_func(title, output)
                     return
-                """
-                if i>0 and chk_stdin and ('stdin' not in cmd_opt or not cmd_opt['stdin']):
-                    output = dict(warn=f'The "stdin" option must be specified for the second and subsequent commands. ({cmd_title})')
-                    if nothread: return output
-                    self.callback_return_pipe_exec_func(title, output)
-                    return
-                if i>0 and chk_input_file and 'input_file' in cmd_opt and cmd_opt['input_file'] != '':
-                    output = dict(warn=f'The "input_file" option must not be specified in a second or subsequent command. ({cmd_title})')
-                    if nothread: return output
-                    self.callback_return_pipe_exec_func(title, output)
-                    return
-                """
 
             cmdline = self.raw_pipe(title, opt)[0]['raw']
             try:
@@ -783,23 +778,19 @@ class Web(object):
                 output = ""
                 output_size = 0
                 while container['pipe_proc'].poll() is None:
-                    time.sleep(0.1)
+                    gevent.sleep(0.1)
                     if capture_stdout:
-                        o = container['pipe_proc'].stdout.read()
-                        output += o.strip()
-                        output_size += len(o)
-                    if output_size > self.output_size_th:
-                        o = output.split('\n')
-                        if len(o) > 0:
-                            osize = len(o[0])
-                            oidx = int(self.output_size_th / osize)
-                            if oidx > 0:
-                                output = '\n'.join(o[-oidx:])
+                        o = container['pipe_proc'].stdout.readline()
+                        try:
+                            if len(o) < self.output_size_th:
+                                o = to_json(o)
+                                self.callback_return_stream_log_func(o)
                             else:
-                                output = [dict(warn=f'The captured stdout was discarded because its size was larger than {self.output_size_th} bytes.')]
-                        else:
-                            output = [dict(warn=f'The captured stdout was discarded because its size was larger than {self.output_size_th} bytes.')]
-                        output_size = len(output)
+                                o = [dict(warn=f'The captured stdout was discarded because its size was larger than {self.output_size_th} bytes.')]
+                                self.callback_return_stream_log_func(o)
+                        except:
+                            o = [dict(warn=f'<pre>{html.escape(traceback.format_exc())}</pre>')]
+                            self.callback_return_stream_log_func(o)
                 if capture_stdout:
                     container['pipe_proc'].stdout.read() # 最後のストリームは読み捨て
                 else:
@@ -809,13 +800,6 @@ class Web(object):
             if 'stdout_log' in opt and cmd_opt['stdout_log']:
                 self.callback_console_modal_log_func(output)
             try:
-                def to_json(o):
-                    res_json = json.loads(o)
-                    if 'output_image' in res_json and 'output_image_shape' in res_json:
-                        img_npy = convert.b64str2npy(res_json["output_image"], res_json["output_image_shape"])
-                        img_bytes = convert.npy2imgfile(img_npy, image_type='png')
-                        res_json["output_image"] = convert.bytes2b64str(img_bytes)
-                    return res_json
                 try:
                     ret = [to_json(o) for o in output.split('\n') if o.strip() != '']
                 except:
@@ -829,13 +813,15 @@ class Web(object):
                 self.callback_return_pipe_exec_func(title, output)
         if nothread:
             return _exec_pipe(title, opt, self.container, True)
-        th = threading.Thread(target=_exec_pipe, args=(title, opt, self.container))
-        th.start()
+        gevent.spawn(_exec_pipe, title, opt, self.container)
         return dict(success='start_pipe')
     
     def callback_return_pipe_exec_func(self, title, output):
         raise NotImplementedError('callback_return_pipe_exec_func is not implemented.')
-        
+
+    def callback_return_stream_log_func(self, output:dict):
+        pass
+
     def raw_pipe(self, title, opt):
         self.logger.info(f"raw_pipe: title={title}, opt={opt}")
         cmdlines = []
@@ -1002,7 +988,7 @@ class Web(object):
             th = threading.Thread(target=bottle.run, kwargs=dict(app=app, server=server))
             th.start()
             while self.is_running:
-                time.sleep(0.01)
+                gevent.sleep(0.01)
             server.srv.shutdown()
 
     def stop(self):
