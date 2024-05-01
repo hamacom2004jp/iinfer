@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>物体検知（ Object Detection ） &mdash; iinfer 2024/04/29 documentation</title>
+  <title>物体検知（ Object Detection ） &mdash; iinfer 2024/05/01 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -16,7 +16,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=014f887d"></script>
+        <script src="../_static/documentation_options.js?v=f98527e0"></script>
         <script src="../_static/doctools.js?v=888ff710"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -56,11 +56,11 @@
 <li class="toctree-l1"><a class="reference internal" href="models.html">動作確認済みモデル</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">物体検知</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#mmdetection-ubuntu">１．物体検知モデル(mmdetection)の環境をインストールする（通常Ubuntu上で実行）</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#windows">２．物体検知モデルをデプロイする（通常Windows上で実行）</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#id1">３．物体検知を実行する（通常Windows上で実行）</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#bbox-windows">４．検知したbboxをフィルターする（通常Windows上で実行）</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#id2">５．検知したbboxの内容から画像判定する（通常Windows上で実行）</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#csv-windows">６．画像判定をCSV形式で出力する（通常Windows上で実行）</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#windows">２．物体検知モデルをデプロイする（通常Windowsから実行）</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id1">３．物体検知を実行する（通常Windowsから実行）</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#bbox-windows">４．検知したbboxをフィルターする（通常Windowsから実行）</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id2">５．検知したbboxの内容から画像判定する（通常Windowsから実行）</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#csv-windows">６．画像判定をCSV形式で出力する（通常Windowsから実行）</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="segmentation.html">領域検知</a></li>
@@ -106,14 +106,14 @@
 <section id="mmdetection-ubuntu">
 <h2>１．物体検知モデル(mmdetection)の環境をインストールする（通常Ubuntu上で実行）<a class="headerlink" href="#mmdetection-ubuntu" title="Link to this heading"></a></h2>
 <ul>
-<li><p><cite>iinfer -m install -c server &lt;Option&gt;</cite> コマンドで顔認識モデルの環境をインストールしてください。</p>
+<li><p><cite>iinfer -m install -c server &lt;Option&gt;</cite> コマンドで物体検知モデルの環境をインストールしてください。</p>
 <blockquote>
 <div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>iinfer<span class="w"> </span>-m<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>server<span class="w"> </span>--install_mmdet<span class="w"> </span>--install_tag<span class="w"> </span>mmdet
 </pre></div>
 </div>
 </div></blockquote>
 </li>
-<li><p><cite>docker-compose</cite> コマンドで顔認識モデルのサーバーを起動してください。</p>
+<li><p><cite>docker-compose</cite> コマンドで物体検知モデルのサーバーを起動してください。</p>
 <blockquote>
 <div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>docker-compose<span class="w"> </span>-f<span class="w"> </span>docker-compose_mmdet.yml<span class="w"> </span>up<span class="w"> </span>-d
 </pre></div>
@@ -123,11 +123,11 @@
 </ul>
 </section>
 <section id="windows">
-<h2>２．物体検知モデルをデプロイする（通常Windows上で実行）<a class="headerlink" href="#windows" title="Link to this heading"></a></h2>
+<h2>２．物体検知モデルをデプロイする（通常Windowsから実行）<a class="headerlink" href="#windows" title="Link to this heading"></a></h2>
 <ul>
 <li><p><a class="reference internal" href="models.html"><span class="doc">動作確認済みモデル</span></a> の <cite>Object Detection</cite> の項目に記載されているモデルをダウンロードしてください。</p></li>
 <li><dl>
-<dt><cite>iinfer -m client -c deploy &lt;Option&gt;</cite> コマンドで顔検出モデルを配備してください。</dt><dd><ul class="simple">
+<dt><cite>iinfer -m client -c deploy &lt;Option&gt;</cite> コマンドで物体検知モデルを配備してください。</dt><dd><ul class="simple">
 <li><p>mmdetection の場合``</p></li>
 </ul>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>iinfer<span class="w"> </span>-m<span class="w"> </span>client<span class="w"> </span>-c<span class="w"> </span>deploy<span class="w"> </span>--name<span class="w"> </span>mmdet_det_YoloX<span class="w"> </span>--model_file<span class="w"> </span>yolox_x_8x8_300e_coco_20211126_140254-1ef88d67.pth<span class="w"> </span>--model_conf_file<span class="w"> </span>yolox_x_8xb8-300e_coco.py<span class="w"> </span>--model_conf_file<span class="w"> </span>yolox_s_8xb8-300e_coco.py<span class="w"> </span>--model_conf_file<span class="w"> </span>yolox_tta.py<span class="w"> </span>--predict_type<span class="w"> </span>mmdet_det_YoloX<span class="w"> </span>--label_file<span class="w"> </span>label_coco.txt
@@ -146,9 +146,9 @@
 </ul>
 </section>
 <section id="id1">
-<h2>３．物体検知を実行する（通常Windows上で実行）<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<h2>３．物体検知を実行する（通常Windowsから実行）<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
 <ul>
-<li><p><cite>iinfer -m client -c predict &lt;Option&gt;</cite> コマンドで物体検知が行えるようになります。</p>
+<li><p><cite>iinfer -m client -c predict &lt;Option&gt;</cite> コマンドで物体検知が行えます。</p>
 <blockquote>
 <div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>iinfer<span class="w"> </span>-m<span class="w"> </span>client<span class="w"> </span>-c<span class="w"> </span>capture<span class="w"> </span>--image_type<span class="w"> </span>capture<span class="w"> </span><span class="p">|</span><span class="w"> </span>iinfer<span class="w"> </span>-m<span class="w"> </span>client<span class="w"> </span>-c<span class="w"> </span>predict<span class="w"> </span>--name<span class="w"> </span>mmdet_det_YoloX<span class="w"> </span>--image_type<span class="w"> </span>capture<span class="w"> </span>--stdin<span class="w"> </span>--output_preview<span class="w"> </span>&gt;<span class="w"> </span>/dev/null
 </pre></div>
@@ -158,9 +158,9 @@
 </ul>
 </section>
 <section id="bbox-windows">
-<h2>４．検知したbboxをフィルターする（通常Windows上で実行）<a class="headerlink" href="#bbox-windows" title="Link to this heading"></a></h2>
+<h2>４．検知したbboxをフィルターする（通常Windowsから実行）<a class="headerlink" href="#bbox-windows" title="Link to this heading"></a></h2>
 <ul>
-<li><p><cite>iinfer -m postprocess -c det_filter &lt;Option&gt;</cite> コマンドで検知したbboxのフィルターが行えるようになります。</p>
+<li><p><cite>iinfer -m postprocess -c det_filter &lt;Option&gt;</cite> コマンドで検知したbboxのフィルターが行えます。</p>
 <blockquote>
 <div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>iinfer<span class="w"> </span>-m<span class="w"> </span>client<span class="w"> </span>-c<span class="w"> </span>capture<span class="w"> </span>--image_type<span class="w"> </span>capture<span class="w"> </span><span class="p">|</span><span class="w"> </span>iinfer<span class="w"> </span>-m<span class="w"> </span>client<span class="w"> </span>-c<span class="w"> </span>predict<span class="w"> </span>--name<span class="w"> </span>mmdet_det_YoloX<span class="w"> </span>--image_type<span class="w"> </span>capture<span class="w"> </span>--stdin<span class="w"> </span>--nodraw<span class="w"> </span><span class="p">|</span><span class="w"> </span>iinfer<span class="w"> </span>-m<span class="w"> </span>postprocess<span class="w"> </span>-c<span class="w"> </span>det_filter<span class="w"> </span>--stdin<span class="w"> </span>--score_th<span class="w"> </span><span class="m">0</span>.1<span class="w"> </span>--labels<span class="w"> </span>dog<span class="w"> </span>--labels<span class="w"> </span>person<span class="w"> </span>--output_preview<span class="w"> </span>&gt;<span class="w"> </span>/dev/null
 </pre></div>
@@ -170,7 +170,7 @@
 </ul>
 </section>
 <section id="id2">
-<h2>５．検知したbboxの内容から画像判定する（通常Windows上で実行）<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<h2>５．検知したbboxの内容から画像判定する（通常Windowsから実行）<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
 <ul>
 <li><p><cite>iinfer -m postprocess -c det_jadge &lt;Option&gt;</cite> コマンドで検知したbboxの内容から画像判定が行えます。製造業における良否判定などに利用できます。</p>
 <blockquote>
@@ -182,7 +182,7 @@
 </ul>
 </section>
 <section id="csv-windows">
-<h2>６．画像判定をCSV形式で出力する（通常Windows上で実行）<a class="headerlink" href="#csv-windows" title="Link to this heading"></a></h2>
+<h2>６．画像判定をCSV形式で出力する（通常Windowsから実行）<a class="headerlink" href="#csv-windows" title="Link to this heading"></a></h2>
 <ul>
 <li><p><cite>iinfer -m postprocess -c csv &lt;Option&gt;</cite> コマンドで判定結果をCSV形式で出力できます。</p>
 <blockquote>
