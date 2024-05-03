@@ -1,6 +1,6 @@
 {
     "nodraw": false,
     "nodraw_bbox": false,
-    "nodraw_rbbox": false,
+    "nodraw_rbbox": true,
     "del_segments": true
 }

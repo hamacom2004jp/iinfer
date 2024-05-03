@@ -1,4 +1,5 @@
 from iinfer.app.commons import convert
+from pathlib import Path
 from PIL import Image
 from typing import Dict, Any
 import logging
@@ -15,7 +16,7 @@ class Postprocess(object):
         """
         self.logger = logger
 
-    def postprocess(self, json_session, img_session, text_session, res_str:str, timeout:int=60) -> Dict[str, Any]:
+    def postprocess(self, json_session, img_session, text_session, res_str:str, output_image_file:str=None, timeout:int=60) -> Dict[str, Any]:
             """
             ポストプロセスを実行します。
 
@@ -24,6 +25,7 @@ class Postprocess(object):
                 img_session (任意): 画像セッション
                 text_session (任意): テキストセッション
                 res_str (str): 推論結果の文字列
+                output_image_file (str, optional): 出力画像ファイル名。デフォルトはNone。
                 timeout (int, optional): タイムアウト時間（秒）。デフォルトは60。
 
             Returns:
@@ -48,7 +50,12 @@ class Postprocess(object):
                         output_image = self.post_img(img_session, result, output_image)
                         output_image_npy = convert.img2npy(output_image)
                         output_image_b64 = convert.npy2b64str(output_image_npy)
+                        if output_image_file is not None:
+                            exp = Path(output_image_file).suffix
+                            exp = exp[1:] if exp[0] == '.' else exp
+                            convert.npy2imgfile(output_image_npy, output_image_file=output_image_file, image_type=exp)
                         return dict(success=result, output_image=output_image_b64, output_image_shape=output_image_npy.shape, output_image_name=outputs["output_image_name"])
+                    
             if type(result) == str:
                 return result
             return dict(success=result)

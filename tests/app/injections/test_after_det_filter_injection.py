@@ -17,6 +17,7 @@ def test_after_det_filter_injection_action():
     name = "test_name"
     outputs = {
         "success": {
+            "output_ids": [1, 2, 3],
             "output_scores": [0.9, 0.1, 0.8],
             "output_classes": [1, 2, 3],
             "output_boxes": [[0, 0, 50, 50], [0, 0, 10, 10], [0, 0, 40, 40]],

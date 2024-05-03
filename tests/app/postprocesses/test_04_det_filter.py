@@ -15,6 +15,7 @@ def test_post_json():
     json_session = None
     outputs = {
         'success': {
+            'output_ids': [1, 2, 3],
             'output_boxes': [[0, 0, 20, 20], [30, 30, 40, 40], [50, 50, 55, 55]],
             'output_scores': [0.6, 0.7, 0.4],
             'output_classes': [0, 1, 2],

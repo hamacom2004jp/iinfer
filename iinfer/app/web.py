@@ -73,7 +73,7 @@ class Web(object):
                     dict(opt="after_injection_conf", type="file", default="", required=False, multi=False, hide=True, choise=None, fileio="in"),
                     dict(opt="after_injection_py", type="file", default="", required=False, multi=True, hide=True, choise=None, fileio="in"),
                     dict(opt="overwrite", type="bool", default=True, required=False, multi=False, hide=False, choise=[True, False]),
-                    dict(opt="timeout", type="int", default="15", required=False, multi=False, hide=True, choise=None),
+                    dict(opt="timeout", type="int", default="120", required=False, multi=False, hide=True, choise=None),
                     dict(opt="output_json", type="file", default="", required=False, multi=False, hide=True, choise=None, fileio="out"),
                     dict(opt="output_json_append", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False]),
                     dict(opt="stdout_log", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False]),
@@ -309,6 +309,7 @@ class Web(object):
                     dict(opt="output_preview", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False]),
                     dict(opt="output_json", type="file", default="", required=False, multi=False, hide=True, choise=None, fileio="out"),
                     dict(opt="output_json_append", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False]),
+                    dict(opt="output_image", type="file", default="", required=False, multi=False, hide=False, choise=None, fileio="out"),
                     dict(opt="stdout_log", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False]),
                     dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False])
                 ]
@@ -357,6 +358,7 @@ class Web(object):
                     dict(opt="output_preview", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False]),
                     dict(opt="output_json", type="file", default="", required=False, multi=False, hide=True, choise=None, fileio="out"),
                     dict(opt="output_json_append", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False]),
+                    dict(opt="output_image", type="file", default="", required=False, multi=False, hide=False, choise=None, fileio="out"),
                     dict(opt="stdout_log", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False]),
                     dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False])
                 ]
@@ -377,6 +379,7 @@ class Web(object):
                     dict(opt="output_preview", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False]),
                     dict(opt="output_json", type="file", default="", required=False, multi=False, hide=True, choise=None, fileio="out"),
                     dict(opt="output_json_append", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False]),
+                    dict(opt="output_image", type="file", default="", required=False, multi=False, hide=False, choise=None, fileio="out"),
                     dict(opt="stdout_log", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False]),
                     dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False])
                 ]
@@ -401,6 +404,7 @@ class Web(object):
                     dict(opt="output_preview", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False]),
                     dict(opt="output_json", type="file", default="", required=False, multi=False, hide=True, choise=None, fileio="out"),
                     dict(opt="output_json_append", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False]),
+                    dict(opt="output_image", type="file", default="", required=False, multi=False, hide=False, choise=None, fileio="out"),
                     dict(opt="stdout_log", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False]),
                     dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False])
                 ]
@@ -416,6 +420,7 @@ class Web(object):
                     dict(opt="output_preview", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False]),
                     dict(opt="output_json", type="file", default="", required=False, multi=False, hide=True, choise=None, fileio="out"),
                     dict(opt="output_json_append", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False]),
+                    dict(opt="output_image", type="file", default="", required=False, multi=False, hide=False, choise=None, fileio="out"),
                     dict(opt="stdout_log", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False]),
                     dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False])
                 ]
@@ -662,7 +667,8 @@ class Web(object):
                 self.callback_return_cmd_exec_func(title, output)
         if nothread:
             return _exec_cmd(self.container['iinfer_app'], title, opt, True)
-        gevent.spawn(_exec_cmd, self.container['iinfer_app'], title, opt, False)
+        th = threading.Thread(target=_exec_cmd, args=(self.container['iinfer_app'], title, opt, False))
+        th.start()
         return [dict(warn='start_cmd')]
     
     def callback_console_modal_log_func(self, output:dict):
@@ -677,7 +683,7 @@ class Web(object):
         if 'stdout_log' in opt: del opt['stdout_log']
         if 'capture_stdout' in opt: del opt['capture_stdout']
         curl_cmd_file = self.mk_curl_fileup(opt)
-        return [dict(type='cmdline',raw=' '.join(['iinfer']+opt_list)),
+        return [dict(type='cmdline',raw=' '.join(['python','-m','iinfer']+opt_list)),
                 dict(type='optjson',raw=json.dumps(opt, default=common.default_json_enc)),
                 dict(type='curlcmd',raw=f'curl {curl_cmd_file} http://localhost:8081/exec_cmd/{title}')]
 
@@ -780,7 +786,9 @@ class Web(object):
                 while container['pipe_proc'].poll() is None:
                     gevent.sleep(0.1)
                     if capture_stdout:
-                        o = container['pipe_proc'].stdout.readline()
+                        o = container['pipe_proc'].stdout.readline().strip()
+                        if 0 >= len(o):
+                            continue
                         try:
                             if len(o) < self.output_size_th:
                                 o = to_json(o)
@@ -850,7 +858,7 @@ class Web(object):
                 curl_cmd_file = self.mk_curl_fileup(cmd_opt)
 
             cmd_output = self.raw_cmd(cmd_title, cmd_opt)
-            cmdlines.append(f'python -m {cmd_output[0]["raw"]}')
+            cmdlines.append(cmd_output[0]["raw"])
 
         curl_opt = json.dumps(opt, default=common.default_json_enc)
         curl_opt = curl_opt.replace('"', '\\"')
@@ -990,12 +998,14 @@ class Web(object):
             while self.is_running:
                 gevent.sleep(0.01)
             server.srv.shutdown()
+        Path("iinfer_web.pid").unlink(missing_ok=True)
 
     def stop(self):
         with open("iinfer_web.pid", mode="r", encoding="utf-8") as f:
             pid = f.read()
             os.kill(int(pid), signal.CTRL_C_EVENT)
             self.logger.info(f"Stop bottle web. allow_host={self.allow_host} listen_port={self.listen_port}")
+        Path("iinfer_web.pid").unlink(missing_ok=True)
 
 class _WSGIRefServer(bottle.WSGIRefServer):
     """

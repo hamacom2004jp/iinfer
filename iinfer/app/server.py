@@ -12,6 +12,7 @@ import numpy as np
 import redis
 import shutil
 import time
+import urllib
 
 
 class Server(object):
@@ -326,6 +327,10 @@ class Server(object):
             self.logger.warn(f"Name is empty.")
             self.responce(reskey, {"warn": f"Name is empty."})
             return self.RESP_WARN
+        if model_file is None or model_file == "":
+            self.logger.warn(f"model_file is empty.")
+            self.responce(reskey, {"warn": f"model_file is empty."})
+            return self.RESP_WARN
         if model_img_width is None or model_img_width <= 0:
             self.logger.warn(f"Image width is invalid.")
             self.responce(reskey, {"warn": f"Image width is invalid."})
@@ -364,10 +369,15 @@ class Server(object):
                 self.logger.info(f"Save {file} to {str(deploy_dir)}")
             return True, file
 
-        if common.BASE_MODELS[predict_type]['required_model_weight']==True and (model_file is None or model_bin is None):
-            self.logger.warn(f"model_file is None.")
-            self.responce(reskey, {"warn": f"model_file is None."})
-            return self.RESP_WARN
+        if model_file.startswith("http") and (model_bin is None or model_bin == ''):
+            model_path = deploy_dir / urllib.parse.urlparse(model_file).path.split('/')[-1]
+            if not model_path.exists():
+                self.logger.info(f"Downloading. {model_file}")
+                urllib.request.urlretrieve(model_file, model_path)
+                self.logger.info(f"Save {model_path}")
+            else:
+                self.logger.info(f"Already exists. {model_path}")
+            model_file = model_path
         else:
             ret, model_file = _save_s(model_file, model_bin)
 
@@ -736,7 +746,7 @@ class Server(object):
                     session['tracker'].step(detections=detections)
                     tracks = session['tracker'].active_tracks()
                     outputs['output_tracks'] = [t.id for t in tracks]
-                    if image is not None:
+                    if image is not None and not nodraw:
                         image = common.draw_boxes(image, outputs['output_boxes'], outputs['output_scores'], outputs['output_classes'], ids=outputs['output_tracks'])
             tracker_end = time.perf_counter()
 
@@ -748,11 +758,11 @@ class Server(object):
                 return output, output_image
 
             def _set_perftime(output, predict_process_start, before_injections_end, predict_end, tracker_end, after_injections_end, predict_process_end):
-                performance = f"before={(before_injections_end-predict_process_start):.3f}s" \
-                              f", predict={(predict_end-before_injections_end):.3f}s" \
-                              f", track={(tracker_end-predict_end):.3f}s" \
-                              f", after={(after_injections_end-tracker_end):.3f}s" \
-                              f", process={(predict_process_end-predict_process_start):.3f}s"
+                performance = [dict(key="sv_before", val=f"{(before_injections_end-predict_process_start):.3f}s"),
+                               dict(key="sv_predict", val=f"{(predict_end-before_injections_end):.3f}s"),
+                               dict(key="sv_track", val=f"{(tracker_end-predict_end):.3f}s"),
+                               dict(key="sv_after", val=f"{(after_injections_end-tracker_end):.3f}s"),
+                               dict(key="sv_process", val=f"{(predict_process_end-predict_process_start):.3f}s")]
                 if 'success' in output:
                     output['success']['performance'] = performance
 

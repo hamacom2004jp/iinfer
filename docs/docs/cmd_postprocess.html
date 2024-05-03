@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>コマンドリファレンス（postprocessモード） &mdash; iinfer 2024/05/01 documentation</title>
+  <title>コマンドリファレンス（postprocessモード） &mdash; iinfer 2024/05/03 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -16,7 +16,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=f98527e0"></script>
+        <script src="../_static/documentation_options.js?v=6a052993"></script>
         <script src="../_static/doctools.js?v=888ff710"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -175,11 +175,15 @@
 <td><p><cite>ext_score_th</cite> を指定する場合は <cite>ext_classes</cite> か <cite>ext_labels</cite> が〇</p></td>
 <td><p>grayクラスに含めるクラスラベルを指定します。複数指定できます。</p></td>
 </tr>
-<tr class="row-odd"><td><p>--nodraw</p></td>
+<tr class="row-odd"><td><p>--output_image &lt;後処理結果画像の保存先ファイル&gt;</p></td>
+<td></td>
+<td><p>後処理結果画像の保存先ファイルを指定する</p></td>
+</tr>
+<tr class="row-even"><td><p>--nodraw</p></td>
 <td></td>
 <td><p>推論結果画像にbbox等の描き込みを行いません。</p></td>
 </tr>
-<tr class="row-even"><td><p>-P,--output_preview</p></td>
+<tr class="row-odd"><td><p>-P,--output_preview</p></td>
 <td></td>
 <td><p>判定結果画像を`cv2.imshow`で表示します。</p></td>
 </tr>
@@ -385,11 +389,15 @@
 <td></td>
 <td><p>このラベル以外のbboxは除去します。複数指定できます。</p></td>
 </tr>
-<tr class="row-odd"><td><p>--nodraw</p></td>
+<tr class="row-odd"><td><p>--output_image &lt;後処理結果画像の保存先ファイル&gt;</p></td>
+<td></td>
+<td><p>後処理結果画像の保存先ファイルを指定する</p></td>
+</tr>
+<tr class="row-even"><td><p>--nodraw</p></td>
 <td></td>
 <td><p>推論結果画像にbbox等の描き込みを行いません。</p></td>
 </tr>
-<tr class="row-even"><td><p>-P,--output_preview</p></td>
+<tr class="row-odd"><td><p>-P,--output_preview</p></td>
 <td></td>
 <td><p>推論結果画像を`cv2.imshow`で表示します。</p></td>
 </tr>
@@ -455,11 +463,15 @@
 <td><p><cite>ext_score_th</cite> を指定する場合は <cite>ext_classes</cite> か <cite>ext_labels</cite> が〇</p></td>
 <td><p>grayクラスに含めるクラスラベルを指定します。複数指定できます。</p></td>
 </tr>
-<tr class="row-odd"><td><p>--nodraw</p></td>
+<tr class="row-odd"><td><p>--output_image &lt;後処理結果画像の保存先ファイル&gt;</p></td>
+<td></td>
+<td><p>後処理結果画像の保存先ファイルを指定する</p></td>
+</tr>
+<tr class="row-even"><td><p>--nodraw</p></td>
 <td></td>
 <td><p>推論結果画像にbbox等の描き込みを行いません。</p></td>
 </tr>
-<tr class="row-even"><td><p>-P,--output_preview</p></td>
+<tr class="row-odd"><td><p>-P,--output_preview</p></td>
 <td></td>
 <td><p>判定結果画像を`cv2.imshow`で表示します。</p></td>
 </tr>
@@ -539,19 +551,23 @@
 <td></td>
 <td><p>セグメンテーションマスクを結果から削除します。結果容量削減に効果があります。</p></td>
 </tr>
-<tr class="row-odd"><td><p>--nodraw</p></td>
+<tr class="row-odd"><td><p>--output_image &lt;後処理結果画像の保存先ファイル&gt;</p></td>
+<td></td>
+<td><p>後処理結果画像の保存先ファイルを指定する</p></td>
+</tr>
+<tr class="row-even"><td><p>--nodraw</p></td>
 <td></td>
 <td><p>推論結果画像にbbox等の描き込みを行いません。</p></td>
 </tr>
-<tr class="row-even"><td><p>--nodraw_bbox</p></td>
+<tr class="row-odd"><td><p>--nodraw_bbox</p></td>
 <td></td>
 <td><p>推論結果画像にbboxの描き込みを行いません。</p></td>
 </tr>
-<tr class="row-odd"><td><p>--nodraw_rbbox</p></td>
+<tr class="row-even"><td><p>--nodraw_rbbox</p></td>
 <td></td>
 <td><p>推論結果画像に回転bboxの描き込みを行いません。</p></td>
 </tr>
-<tr class="row-even"><td><p>-P,--output_preview</p></td>
+<tr class="row-odd"><td><p>-P,--output_preview</p></td>
 <td></td>
 <td><p>推論結果画像を`cv2.imshow`で表示します。</p></td>
 </tr>
@@ -593,15 +609,19 @@
 <td></td>
 <td><p>このラベル以外のbboxは除去します。複数指定できます。</p></td>
 </tr>
-<tr class="row-odd"><td><p>--nodraw</p></td>
+<tr class="row-odd"><td><p>--output_image &lt;後処理結果画像の保存先ファイル&gt;</p></td>
+<td></td>
+<td><p>後処理結果画像の保存先ファイルを指定する</p></td>
+</tr>
+<tr class="row-even"><td><p>--nodraw</p></td>
 <td></td>
 <td><p>推論結果画像にマスクの描き込みを行いません。</p></td>
 </tr>
-<tr class="row-even"><td><p>--del_logits</p></td>
+<tr class="row-odd"><td><p>--del_logits</p></td>
 <td></td>
 <td><p>セグメンテーションスコアを結果から削除します。結果容量削減に効果があります。</p></td>
 </tr>
-<tr class="row-odd"><td><p>-P,--output_preview</p></td>
+<tr class="row-even"><td><p>-P,--output_preview</p></td>
 <td></td>
 <td><p>推論結果画像を`cv2.imshow`で表示します。</p></td>
 </tr>

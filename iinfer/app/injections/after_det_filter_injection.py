@@ -78,10 +78,11 @@ class AfterDetFilterInjection(injection.AfterInjection):
         data = outputs['success']
         if 'output_scores' not in data or 'output_classes' not in data:
             raise Exception('Invalid outputs. outputs[\'success\'][\'output_scores\'] and outputs[\'success\'][\'output_classes\'] must be set.')
-        output_boxes = []
+        output_ids = []
         output_scores = []
         output_classes = []
         output_labels = []
+        output_boxes = []
         output_tracks = []
         for i, score in enumerate(data['output_scores']):
             if score < score_th:
@@ -96,18 +97,20 @@ class AfterDetFilterInjection(injection.AfterInjection):
             if labels is not None and len(labels) > 0 and 'output_labels' in data:
                 if data['output_labels'][i] not in labels:
                     continue
-            output_boxes.append(data['output_boxes'][i])
+            output_ids.append(data['output_ids'][i])
             output_scores.append(score)
             output_classes.append(data['output_classes'][i])
             if 'output_labels' in data:
                 output_labels.append(data['output_labels'][i])
+            output_boxes.append(data['output_boxes'][i])
             if 'output_tracks' in data:
                 output_tracks.append(data['output_tracks'][i])
-        data['output_boxes'] = output_boxes
+        data['output_ids'] = output_ids
         data['output_scores'] = output_scores
         data['output_classes'] = output_classes
         if 'output_labels' in data:
             data['output_labels'] = output_labels
+        data['output_boxes'] = output_boxes
         if 'output_tracks' in data:
             data['output_tracks'] = output_tracks
 
@@ -128,9 +131,10 @@ class AfterDetFilterInjection(injection.AfterInjection):
         nodraw = self.get_config('nodraw', False)
 
         data = outputs['success']
+        output_ids = data["output_ids"] if "output_ids" in data else None
         output_labels = data["output_labels"] if "output_labels" in data else None
-        output_tracks = data["output_tracks"] if "output_tracks" in data else None
+        output_tracks = data["output_tracks"] if "output_tracks" in data else output_ids
         image, output_labels = common.draw_boxes(output_image, data["output_boxes"], data["output_scores"], data["output_classes"],
-                                                 ids=output_labels, labels=output_tracks, nodraw=nodraw, nolookup=True)
+                                                 ids=output_ids, labels=output_labels, tracks=output_tracks, nodraw=nodraw, nolookup=True)
 
         return image

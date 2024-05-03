@@ -1,8 +1,8 @@
 {
     "nodraw": false,
-    "score_th": 0.5,
+    "score_th": 0.1,
     "width_th": 10,
     "height_th": 10,
     "classes": [],
-    "labels": []
+    "labels": ["car","bus","person"]
 }

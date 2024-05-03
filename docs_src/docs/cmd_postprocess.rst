@@ -25,6 +25,7 @@
     "--ext_score_th","","クラススコアがこの値以上のものはgray判定されます"
     "--ext_classes","`ext_score_th` を指定する場合は `ext_classes` か `ext_labels` が〇","grayクラスに含めるクラスindexを指定します。複数指定できます。"
     "--ext_labels","`ext_score_th` を指定する場合は `ext_classes` か `ext_labels` が〇","grayクラスに含めるクラスラベルを指定します。複数指定できます。"
+    "--output_image <後処理結果画像の保存先ファイル>","","後処理結果画像の保存先ファイルを指定する"
     "--nodraw","","推論結果画像にbbox等の描き込みを行いません。"
     "-P,--output_preview","","判定結果画像を`cv2.imshow`で表示します。"
 
@@ -107,6 +108,7 @@ Face Detection and Recognitionで検知した顔特徴データを個所を切�
     "--height_th","","bboxの縦幅がこの長さ以下のものは除去します。"
     "--classes","","このクラス以外のbboxは除去します。複数指定できます。"
     "--labels","","このラベル以外のbboxは除去します。複数指定できます。"
+    "--output_image <後処理結果画像の保存先ファイル>","","後処理結果画像の保存先ファイルを指定する"
     "--nodraw","","推論結果画像にbbox等の描き込みを行いません。"
     "-P,--output_preview","","推論結果画像を`cv2.imshow`で表示します。"
 
@@ -129,6 +131,7 @@ Face Detection and Recognitionで検知した顔特徴データを個所を切�
     "--ext_score_th","","クラススコアがこの値以上のものはgray判定されます"
     "--ext_classes","`ext_score_th` を指定する場合は `ext_classes` か `ext_labels` が〇","grayクラスに含めるクラスindexを指定します。複数指定できます。"
     "--ext_labels","`ext_score_th` を指定する場合は `ext_classes` か `ext_labels` が〇","grayクラスに含めるクラスラベルを指定します。複数指定できます。"
+    "--output_image <後処理結果画像の保存先ファイル>","","後処理結果画像の保存先ファイルを指定する"
     "--nodraw","","推論結果画像にbbox等の描き込みを行いません。"
     "-P,--output_preview","","判定結果画像を`cv2.imshow`で表示します。"
 
@@ -161,6 +164,7 @@ Face Detection and Recognitionで検知した顔特徴データを個所を切�
     "-i,--input_file <推論結果ファイル>","`--stdin` を指定しない場合〇","後処理させる推論結果をファイルで指定します。"
     "--stdin","`--input_file` を指定しない場合〇","後処理させる推論結果を標準入力から読み込みます。"
     "--del_segments","","セグメンテーションマスクを結果から削除します。結果容量削減に効果があります。"
+    "--output_image <後処理結果画像の保存先ファイル>","","後処理結果画像の保存先ファイルを指定する"
     "--nodraw","","推論結果画像にbbox等の描き込みを行いません。"
     "--nodraw_bbox","","推論結果画像にbboxの描き込みを行いません。"
     "--nodraw_rbbox","","推論結果画像に回転bboxの描き込みを行いません。"
@@ -180,6 +184,7 @@ Face Detection and Recognitionで検知した顔特徴データを個所を切�
     "--logits_th","","ピクセルごとのクラススコアがこの値以下のものは除去されます"
     "--classes","","このクラス以外のbboxは除去します。複数指定できます。"
     "--labels","","このラベル以外のbboxは除去します。複数指定できます。"
+    "--output_image <後処理結果画像の保存先ファイル>","","後処理結果画像の保存先ファイルを指定する"
     "--nodraw","","推論結果画像にマスクの描き込みを行いません。"
     "--del_logits","","セグメンテーションスコアを結果から削除します。結果容量削減に効果があります。"
     "-P,--output_preview","","推論結果画像を`cv2.imshow`で表示します。"

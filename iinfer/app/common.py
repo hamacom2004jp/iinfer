@@ -24,6 +24,12 @@ import yaml
 APP_ID = 'iinfer'
 HOME_DIR = Path(os.path.expanduser("~"))
 
+def copy_sample(dst:Path=Path.cwd()/'sample'):
+    if dst.exists():
+        return
+    src = Path(__file__).parent.parent / 'extensions'
+    shutil.copytree(src, dst)
+
 def load_config(mode:str) -> Tuple[logging.Logger, dict]:
     """
     指定されたモードのロガーと設定を読み込みます。
@@ -200,10 +206,14 @@ def print_format(data:dict, format:bool, tm:float, output_json:str=None, output_
     """
     txt = ''
     if format:
-        if 'success' in data and type(data['success']) == list:
-            txt = tabulate(data['success'], headers='keys', tablefmt=tablefmt)
-        elif 'success' in data and type(data['success']) == dict:
-            txt = tabulate([data['success']], headers='keys', tablefmt=tablefmt)
+        if 'success' in data:
+            data = data['success']['data'] if 'data' in data['success'] else data['success']
+            if type(data) == list:
+                txt = tabulate(data, headers='keys', tablefmt=tablefmt)
+            elif type(data) == dict:
+                txt = tabulate([data], headers='keys', tablefmt=tablefmt)
+            else:
+                txt = str(data)
         elif type(data) == list:
             txt = tabulate(data, headers='keys', tablefmt=tablefmt)
         else:
@@ -211,10 +221,15 @@ def print_format(data:dict, format:bool, tm:float, output_json:str=None, output_
         if stdout:
             try:
                 print(txt)
-                print(f"{time.time() - tm:.03f} seconds.")
+                print(f"{time.perf_counter() - tm:.03f}s.")
             except BrokenPipeError:
                 pass
     else:
+        if 'success' in data and type(data['success']) == dict:
+            if "performance" not in data["success"]:
+                data["success"]["performance"] = []
+            performance = data["success"]["performance"]
+            performance.append(dict(key="app_proc", val=f"{time.perf_counter() - tm:.03f}s"))
         try:
             if type(data) == dict:
                 txt = json.dumps(data, default=default_json_enc, ensure_ascii=False)
@@ -314,7 +329,8 @@ def draw_segment(img_npy:np.ndarray, segment:np.ndarray, colors:List[Tuple[int]]
     img_npy = cv2.cvtColor(img_npy, cv2.COLOR_BGR2RGB)
     return img_npy
 
-def draw_boxes(image:Image.Image, boxes:List[List[float]], scores:List[float], classes:List[int], ids:List[str]=None, labels:List[str]=None, colors:List[Tuple[int]]=None,
+def draw_boxes(image:Image.Image, boxes:List[List[float]], scores:List[float], classes:List[int], ids:List[str]=None,
+               labels:List[str]=None, colors:List[Tuple[int]]=None, tracks:List[int]=None,
                nodraw:bool=False, nolookup:bool=False) -> Tuple[Image.Image, List[str]]:
     """
     画像にバウンディングボックスを描画します。
@@ -327,6 +343,7 @@ def draw_boxes(image:Image.Image, boxes:List[List[float]], scores:List[float], c
         ids (List[str]): 各バウンディングボックスのIDリスト
         labels (List[str], optional): クラスのラベルリスト. Defaults to None.
         colors (List[Tuple[int]], optional): クラスごとの色のリスト. Defaults to None.
+        tracks (List[int], optional): トラックIDリスト. Defaults to None.
         nodraw (bool, optional): 描画しない場合はTrue. Defaults to False.
         nolookup (bool, optional): ラベル及び色をクラスIDから取得しない場合はTrue. Defaults to False.
 
@@ -336,8 +353,9 @@ def draw_boxes(image:Image.Image, boxes:List[List[float]], scores:List[float], c
     """
     draw = ImageDraw.Draw(image)
     ids = ids if ids is not None else [None] * len(boxes)
+    tracks = tracks if tracks is not None else [None] * len(boxes)
     output_labels = []
-    for i, (box, score, cl, id) in enumerate(zip(boxes, scores, classes, ids)):
+    for i, (box, score, cl, id, trc) in enumerate(zip(boxes, scores, classes, ids, tracks)):
         y1, x1, y2, x2 = box
         x1 = max(0, np.floor(x1 + 0.5).astype(int))
         y1 = max(0, np.floor(y1 + 0.5).astype(int))
@@ -354,7 +372,7 @@ def draw_boxes(image:Image.Image, boxes:List[List[float]], scores:List[float], c
                 draw.rectangle(((x1, y1), (x2, y2)), outline=color)
                 if label is not None:
                     draw.rectangle(((x1, y1), (x2, y1+10)), outline=color, fill=color)
-                    draw.text((x1, y1), label, tuple([int(255-c) for c in color]))
+                    draw.text((x1, y1), f"{label}:{score}", tuple([int(255-c) for c in color]))
         output_labels.append(label)
 
     return image, output_labels

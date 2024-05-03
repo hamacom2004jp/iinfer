@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>iinfer.app.predict &mdash; iinfer 2024/03/16 documentation</title>
+  <title>iinfer.app.predict &mdash; iinfer 2024/05/03 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -15,7 +15,7 @@
   
         <script src="../../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=3857ef35"></script>
+        <script src="../../../_static/documentation_options.js?v=6a052993"></script>
         <script src="../../../_static/doctools.js?v=888ff710"></script>
         <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -48,12 +48,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/overview.html">iinferの概要</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/install.html">インストール</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/gui.html">GUIモード</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/web.html">Webモード</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/command.html">コマンドリファレンス</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/models.html">動作確認済みモデル</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/detection.html">物体検知</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/segmentation.html">領域検知</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/face.html">顔認識</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/pipeline.html">パイプライン</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/injections.html">インジェクション</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/customize.html">カスタマイズ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/developer.html">開発者向け情報</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../docs/errors.html">よくあるエラー</a></li>
@@ -89,6 +91,7 @@
 <span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span>
 <span class="kn">import</span> <span class="nn">logging</span>
+
 
 <div class="viewcode-block" id="Predict">
 <a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.predict.Predict">[docs]</a>
@@ -239,12 +242,13 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="kn">import</span> <span class="nn">torch</span>
             <span class="n">ret</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;GPU is available: True&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;GPU is available: </span><span class="si">{</span><span class="n">ret</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">ret</span>
         <span class="k">except</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;GPU is available: False&#39;</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">False</span></div>
 </div>
+
 
 </pre></div>
 

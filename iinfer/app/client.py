@@ -65,6 +65,7 @@ class Client(object):
             dict: Redisサーバーからの応答
         """
         try:
+            sreqtime = time.perf_counter()
             self.check_server()
             reskey = common.random_string()
             self.redis_cli.rpush(key, f"{cmd} {reskey} {' '.join([str(p) for p in params])}")
@@ -78,16 +79,16 @@ class Client(object):
                 if res is None or len(res) <= 0:
                     time.sleep(1)
                     continue
-                return self._response(reskey, res)
+                return self._response(reskey, res, sreqtime)
             raise KeyboardInterrupt(f"Stop command.")
         except KeyboardInterrupt as e:
-            self.logger.error(f"Stop command. cmd={cmd}, params={params}", exc_info=True)
-            return {"error": f"Stop command. cmd={cmd}, params={params}"}
+            self.logger.error(f"Stop command. cmd={cmd}", exc_info=True)
+            return {"error": f"Stop command. cmd={cmd}"}
         except Exception as e:
-            self.logger.error(f"fail to execute command. cmd={cmd}, params={params}, msg={e}", exc_info=True)
-            return {"error": f"fail to execute command. cmd={cmd}, params={params}, msg={e}"}
+            self.logger.error(f"fail to execute command. cmd={cmd}, msg={e}", exc_info=True)
+            return {"error": f"fail to execute command. cmd={cmd}, msg={e}"}
 
-    def _response(self, reskey:str, res_msg:List[str]):
+    def _response(self, reskey:str, res_msg:List[str], sreqtime:float):
         """
         Redisサーバーからの応答を解析する
 
@@ -116,9 +117,15 @@ class Client(object):
             self.logger.warn(str(msg_json))
         if "success" in res_json:
             self.logger.info(str(msg_json))
+            if type(res_json["success"]) is not dict:
+                res_json["success"] = dict(data=res_json["success"])
+            if "performance" not in res_json["success"]:
+                res_json["success"]["performance"] = []
+            performance = res_json["success"]["performance"]
+            performance.append(dict(key="cl_svreqest", val=f"{time.perf_counter()-sreqtime:.3f}s"))
         return res_json
 
-    def deploy(self, name:str, model_img_width:int, model_img_height:int, model_file:Path, model_conf_file:List[Path], predict_type:str,
+    def deploy(self, name:str, model_img_width:int, model_img_height:int, model_file:str, model_conf_file:List[Path], predict_type:str,
                custom_predict_py:Path, label_file:Path, color_file:Path,
                before_injection_conf:Path, before_injection_type:List[str], before_injection_py:List[Path],
                after_injection_conf:Path, after_injection_type:List[str], after_injection_py:List[Path], overwrite:bool, timeout:int = 60):
@@ -129,7 +136,7 @@ class Client(object):
             name (str): モデル名
             model_img_width (int): 画像の幅
             model_img_height (int): 画像の高さ
-            model_file (Path): モデルファイルのパス
+            model_file (str): モデルファイルのパス又はURL
             model_conf_file (List[Path]): モデル設定ファイルのパス
             predict_type (str): 推論方法のタイプ
             custom_predict_py (Path): 推論スクリプトのパス
@@ -207,7 +214,8 @@ class Client(object):
         if not ret: return before_injection_conf_b64
         ret, after_injection_conf_b64 = _conf_b64("after_injection_conf", after_injection_conf)
         if not ret: return after_injection_conf_b64
-        if model_file is not None:
+        if model_file is not None and not model_file.startswith("http"):
+            model_file = Path(model_file)
             if model_file.exists():
                 with open(model_file, "rb") as mf:
                     model_bytes_b64 = base64.b64encode(mf.read()).decode('utf-8')
@@ -236,7 +244,8 @@ class Client(object):
         ret, after_injection_py_name, after_injection_py_b64 = _name_b64("after_injection_py", after_injection_py)
         if not ret: return after_injection_py_name
         res_json = self._proc(self.svname, 'deploy', [name, str(model_img_width), str(model_img_height), predict_type,
-                                                   model_file.name, model_bytes_b64, model_conf_file_name, model_conf_bytes_b64,
+                                                   model_file.name if isinstance(model_file, Path) else model_file, model_bytes_b64,
+                                                   model_conf_file_name, model_conf_bytes_b64,
                                                    custom_predict_py_b64, label_file_b64, color_file_b64,
                                                    before_injection_conf_b64, before_injection_type, before_injection_py_name, before_injection_py_b64,
                                                    after_injection_conf_b64, after_injection_type, after_injection_py_name, after_injection_py_b64, overwrite], timeout=timeout)
@@ -326,7 +335,7 @@ class Client(object):
         res_json = self._proc(self.svname, 'stop_server', [], timeout=timeout)
         return res_json
 
-    def predict(self, name:str, image = None, image_file = None, image_file_enable:bool=True, image_type:str = 'jpeg', output_image_file:Path = None, output_preview:bool=False, nodraw:bool=False, timeout:int = 60):
+    def predict(self, name:str, image = None, image_file = None, image_file_enable:bool=True, image_type:str = 'jpeg', output_image_file:str = None, output_preview:bool=False, nodraw:bool=False, timeout:int = 60):
         """
         画像をRedisサーバーに送信し、推論結果を取得する
 
@@ -336,7 +345,7 @@ class Client(object):
             image_file (str|file-like object, optional): 画像ファイルのパス. Defaults to None.
             image_file_enable (bool, optional): 画像ファイルを使用するかどうか. Defaults to True. image_fileがNoneでなく、このパラメーターがTrueの場合はimage_fileを使用する.
             image_type (str, optional): 画像の形式. Defaults to 'jpeg'.
-            output_image_file (Path, optional): 予測結果の画像ファイルのパス. Defaults to None.
+            output_image_file (str, optional): 予測結果の画像ファイルのパス. Defaults to None.
             output_preview (bool, optional): 予測結果の画像をプレビューするかどうか. Defaults to False.
             nodraw (bool, optional): 描画フラグ. Defaults to False.
             timeout (int, optional): タイムアウト時間. Defaults to 60.
@@ -344,6 +353,7 @@ class Client(object):
         Returns:
             dict: Redisサーバーからの応答
         """
+        spredtime = time.perf_counter()
         if self.password is None or self.password == "":
             self.logger.error(f"password is empty.")
             return {"error": f"password is empty."}
@@ -354,6 +364,7 @@ class Client(object):
             self.logger.error(f"image and image_file is empty.")
             return {"error": f"image and image_file is empty."}
         npy_b64 = None
+        simgloadtime = time.perf_counter()
         if image_file is not None and image_file_enable:
             if type(image_file) == str:
                 if not Path(image_file).exists():
@@ -455,10 +466,11 @@ class Client(object):
 
         npy_b64 = convert.npy2b64str(img_npy)
         #img_npy2 = np.frombuffer(base64.b64decode(npy_b64), dtype='uint8').reshape(img_npy.shape)
-
+        eimgloadtime = time.perf_counter()
         res_json = self._proc(self.svname, 'predict',
                               [name, npy_b64, str(nodraw), str(img_npy.shape[0]), str(img_npy.shape[1]),
                                str(img_npy.shape[2] if len(img_npy.shape) > 2 else '-1'), image_file], timeout=timeout)
+        soutputtime = time.perf_counter()
         if "output_image" in res_json and "output_image_shape" in res_json:
             #byteio = BytesIO(base64.b64decode(res_json["output_image"]))
             #img_npy = np.load(byteio)
@@ -474,6 +486,15 @@ class Client(object):
                     cv2.waitKey(1)
                 except KeyboardInterrupt:
                     pass
+        eoutputtime = time.perf_counter()
+        epredtime = time.perf_counter()
+        if "success" in res_json:
+            if "performance" not in res_json["success"]:
+                res_json["success"]["performance"] = []
+            performance = res_json["success"]["performance"]
+            performance.append(dict(key="cl_imgload", val=f"{eimgloadtime-simgloadtime:.3f}s"))
+            performance.append(dict(key="cl_output", val=f"{eoutputtime-soutputtime:.3f}s"))
+            performance.append(dict(key="cl_pred", val=f"{epredtime-spredtime:.3f}s"))
         return res_json
     
     def file_list(self, svpath:str, timeout:int = 60):
@@ -598,12 +619,13 @@ class Client(object):
         if capture_device.isdecimal():
             capture_device = int(capture_device)
         cap = cv2.VideoCapture(capture_device)
+        cap.set(cv2.CAP_PROP_BUFFERSIZE, 0)
+        cap.set(cv2.CAP_PROP_FPS, 30)
+        cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('H', '2', '6', '4'))
         if capture_frame_width is not None:
             cap.set(cv2.CAP_PROP_FRAME_WIDTH, capture_frame_width)
         if capture_frame_height is not None:
             cap.set(cv2.CAP_PROP_FRAME_HEIGHT, capture_frame_height)
-        if capture_fps is not None:
-            cap.set(cv2.CAP_PROP_FPS, capture_fps)
         try:
             interval = float(1 / capture_fps)
             self.is_running = True

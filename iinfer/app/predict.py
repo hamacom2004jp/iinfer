@@ -3,6 +3,7 @@ from PIL import Image
 from typing import List, Tuple, Dict, Any
 import logging
 
+
 class Predict(object):
     def __init__(self, logger:logging.Logger) -> None:
         """
@@ -130,8 +131,9 @@ class TorchPredict(Predict):
         try:
             import torch
             ret = torch.cuda.is_available()
-            self.logger.info(f'GPU is available: True')
+            self.logger.info(f'GPU is available: {ret}')
             return ret
         except:
             self.logger.info(f'GPU is available: False')
             return False
+

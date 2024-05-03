@@ -223,7 +223,7 @@ def test_draw_boxes():
     colors = [(255, 0, 0), (0, 255, 0)]
 
     # Call the function
-    result_image, result_labels = common.draw_boxes(image, boxes, scores, classes, ids, labels, colors)
+    result_image, result_labels = common.draw_boxes(image, boxes, scores, classes, ids=ids, labels=labels, colors=colors)
 
     # Check the labels
     assert result_labels == labels
