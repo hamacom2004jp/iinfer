@@ -16,8 +16,8 @@ Redisサーバー起動 : `iinfer -m redis -c docker_run <Option>`
     :header-rows: 1
 
     "Option","Required","Description"
-    "--port <ポート番号>","","Redisサーバーのサービスポート(任意)を指定します。"
-    "--password <パスワード>","","Redisサーバーのアクセスパスワード(任意)を指定する。省略時は`password`を使用します。"
+    "--port <ポート番号>","","Redisサーバーのサービスポートを指定します。"
+    "--password <パスワード>","","Redisサーバーのアクセスパスワードを指定する。省略時は`password`を使用します。"
     "--wsl_name <ディストリビューション名>","Windowsの場合は〇","Windowsの場合はWSLのディストリビューションの名前を指定します。"
     "--wsl_user <user名>","Windowsの場合は〇","Windowsの場合はWSL内のユーザー名を指定します。"
 

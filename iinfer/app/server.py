@@ -543,7 +543,7 @@ class Server(object):
         self.responce(reskey, {"success": f"Undeployed {name}. {str(deploy_dir)}"})
         return self.RESP_SCCESS
 
-    def start(self, reskey:str, name:str, model_provider:str, use_track:bool, gpuid:int):
+    def start(self, reskey:str, name:str, model_provider:str, use_track:bool, gpuid:str):
         """
         モデルを読み込み、処理が実行できるようにする
 

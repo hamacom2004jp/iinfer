@@ -3,8 +3,12 @@ from pathlib import Path
 from typing import List, Dict, Any
 import importlib.util
 import inspect
+import iinfer
 import logging
 import pkgutil
+
+import iinfer.app
+import iinfer.app.predict
 
 
 def load_custom_predict(custom_predict_py:Path, logger:logging.Logger) -> predict.Predict:
@@ -164,15 +168,22 @@ for mod in get_module_list('iinfer.app.predicts'):
     site = None
     width = None
     height = None
+    model_type = iinfer.app.predict.Predict
     required_model_conf = False
     required_model_weight = False
     for f in dir(m):
+        members = inspect.getmembers(m, inspect.isclass)
+        for name, cls in members:
+            if issubclass(cls, iinfer.app.predict.Predict):
+                model_type = cls
+                break
         if f == 'SITE': site = getattr(m, f)
         elif f == 'IMAGE_WIDTH': width = getattr(m, f)
         elif f == 'IMAGE_HEIGHT': height = getattr(m, f)
+        elif f == 'MODEL_TYPE': model_type = getattr(m, f)
         elif f == 'REQUIREd_MODEL_CONF': required_model_conf = getattr(m, f)
         elif f == 'REQUIREd_MODEL_WEIGHT': required_model_weight = getattr(m, f)
-    common.BASE_MODELS[mod] = dict(site=site, image_width=width, image_height=height,
+    common.BASE_MODELS[mod] = dict(site=site, image_width=width, image_height=height, model_type=model_type,
                                    required_model_conf=required_model_conf, required_model_weight=required_model_weight)
 
 for mod in get_module_list('iinfer.app.injections'):

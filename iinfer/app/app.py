@@ -39,7 +39,7 @@ class IinferApp:
         parser.add_argument('-n', '--name', help='Setting the cmd name.')
         parser.add_argument('--timeout', help='Setting the cmd timeout.', type=int, default=60)
         parser.add_argument('-c', '--cmd', help='Setting the cmd type.',
-                            choices=['redis', 'server', 'onnx', 'mmdet', 'mmseg', 'mmcls', 'mmpretrain', 'insightface', # install mode
+                            choices=['redis', 'server', 'onnx', 'mmdet', 'mmseg', 'mmcls', 'mmpretrain', 'insightface', 'diffusers', # install mode
                                     'docker_run', 'docker_stop', # redis mode
                                     'start', 'stop', # server or client or gui mode or web mode
                                     'list' , # server mode
@@ -69,7 +69,7 @@ class IinferApp:
 
         parser.add_argument('--model_provider', help='Setting the cmd start model_provider.',
                             choices=['CPUExecutionProvider','CUDAExecutionProvider','TensorrtExecutionProvider'], default='CPUExecutionProvider')
-        parser.add_argument('--gpuid', help='Setting the cmd start gpuid.', type=int, default=None)
+        parser.add_argument('--gpuid', help='Setting the cmd start gpuid.', type=str, default=None)
         parser.add_argument('-i', '--input_file', help='Setting the cmd input file.', default=None)
         parser.add_argument('--output_image', help='Setting the cmd output image file.', default=None)
         parser.add_argument('-o', '--output_json', help='Setting the cmd output json file.', default=None)
@@ -130,6 +130,7 @@ class IinferApp:
         parser.add_argument('--install_mmcls', help='Setting the install server install_mmcls.', action='store_true')
         parser.add_argument('--install_mmpretrain', help='Setting the install server install_mmpretrain.', action='store_true')
         parser.add_argument('--install_insightface', help='Setting the install server install_insightface.', action='store_true')
+        parser.add_argument('--install_diffusers', help='Setting the install server install_diffusers.', action='store_true')
         parser.add_argument('--install_tag', help='Setting the install server install_tag.', type=str, default=None)
         parser.add_argument('--install_use_gpu', help='Setting the install use gpu.', action='store_true')
 
@@ -238,6 +239,7 @@ class IinferApp:
         install_mmcls = common.getopt(opt, 'install_mmcls', preval=args_dict, withset=True)
         install_mmpretrain = common.getopt(opt, 'install_mmpretrain', preval=args_dict, withset=True)
         install_insightface = common.getopt(opt, 'install_insightface', preval=args_dict, withset=True)
+        install_diffusers = common.getopt(opt, 'install_diffusers', preval=args_dict, withset=True)
         install_tag = common.getopt(opt, 'install_tag', preval=args_dict, withset=True)
         install_use_gpu = common.getopt(opt, 'install_use_gpu', preval=args_dict, withset=True)
 
@@ -462,7 +464,8 @@ class IinferApp:
 
             elif cmd == 'predict_type_list':
                 type_list = [dict(predict_type=key, site=val['site'], image_width=val['image_width'], image_height=val['image_height'],
-                                required_model_conf=val['required_model_conf'], required_model_weight=val['required_model_weight']) for key,val in common.BASE_MODELS.items()]
+                                required_model_conf=val['required_model_conf'], required_model_weight=val['required_model_weight'],
+                                model_type=f"{val['model_type'].__module__}.{val['model_type'].__name__}") for key,val in common.BASE_MODELS.items()]
                 type_list.append(dict(predict_type='Custom', site='Custom', image_width=None, image_height=None, required_model_conf=None, required_model_weight=None))
                 ret = dict(success=type_list)
                 common.print_format(ret, format, tm, output_json, output_json_append)
@@ -677,13 +680,15 @@ class IinferApp:
                     return 1, ret
 
             elif cmd == 'server':
-                install_set = not (install_onnx or install_mmdet or install_mmseg or install_mmcls or install_mmpretrain or install_insightface)
+                install_set = not (install_onnx or install_mmdet or install_mmseg or install_mmcls or \
+                                   install_mmpretrain or install_insightface or install_diffusers)
                 onnx = install_set
                 mmdet = install_set
                 mmseg = install_set
                 mmcls = False
                 mmpretrain = install_set
                 insightface = install_set
+                diffusers = install_set
                 onnx = install_onnx if install_onnx else onnx
                 mmdet = install_mmdet if install_mmdet else mmdet
                 mmseg = install_mmseg if install_mmseg else mmseg
@@ -696,7 +701,7 @@ class IinferApp:
                     return 1, msg
                 ret = self.inst.server(Path(data), install_iinfer, install_onnx=onnx,
                                 install_mmdet=mmdet, install_mmseg=mmseg, install_mmcls=mmcls, install_mmpretrain=mmpretrain,
-                                install_insightface=insightface, install_tag=install_tag, install_use_gpu=install_use_gpu)
+                                install_insightface=insightface, install_diffusers=diffusers, install_tag=install_tag, install_use_gpu=install_use_gpu)
                 common.print_format(ret, format, tm, output_json, output_json_append)
                 if 'success' not in ret:
                     return 1, ret
@@ -749,6 +754,16 @@ class IinferApp:
                     common.print_format(msg, format, tm, output_json, output_json_append)
                     return 1, msg
                 ret = self.inst.insightface(Path(data), install_use_gpu=install_use_gpu)
+                common.print_format(ret, format, tm, output_json, output_json_append)
+                if 'success' not in ret:
+                    return 1, ret
+            
+            elif cmd == 'diffusers':
+                if data is None:
+                    msg = {"warn":f"Please specify the --data option."}
+                    common.print_format(msg, format, tm, output_json, output_json_append)
+                    return 1, msg
+                ret = self.inst.diffusers(Path(data), install_use_gpu=install_use_gpu)
                 common.print_format(ret, format, tm, output_json, output_json_append)
                 if 'success' not in ret:
                     return 1, ret

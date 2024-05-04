@@ -39,7 +39,8 @@ class Install(object):
 
     def server(self, data:Path, install_iinfer:str='iinfer', install_onnx:bool=True,
                install_mmdet:bool=True, install_mmseg:bool=True, install_mmcls:bool=False, install_mmpretrain:bool=True,
-               install_insightface=False, install_tag:str=None, install_use_gpu:bool=False):
+               install_insightface=False, install_diffusers=True,
+               install_tag:str=None, install_use_gpu:bool=False):
         if platform.system() == 'Windows':
             return {"warn": f"Build server command is Unsupported in windows platform."}
         from importlib.resources import read_text
@@ -66,6 +67,7 @@ class Install(object):
             text = text.replace('#{INSTALL_MMCLS}', f'RUN iinfer -m install -c mmcls --data /home/{user}/.iinfer {install_use_gpu}' if install_mmcls else '')
             text = text.replace('#{INSTALL_MMPRETRAIN}', f'RUN iinfer -m install -c mmpretrain --data /home/{user}/.iinfer {install_use_gpu}' if install_mmpretrain else '')
             text = text.replace('#{INSTALL_INSIGHTFACE}', f'RUN iinfer -m install -c insightface --data /home/{user}/.iinfer {install_use_gpu}' if install_insightface else '')
+            text = text.replace('#{INSTALL_DIFFUSERS}', f'RUN iinfer -m install -c diffusers --data /home/{user}/.iinfer {install_use_gpu}' if install_diffusers else '')
             fp.write(text)
         docker_compose_path = Path('docker-compose.yml')
         if not docker_compose_path.exists():
@@ -176,6 +178,13 @@ class Install(object):
             return {"error": f"Failed to install mmcv."}
         return {"success": f"Success to install mmcv."}
 
+    def _transformers(self, install_use_gpu:bool=False):
+        returncode, _ = common.cmd('pip install accelerate transformers', logger=self.logger)
+        if returncode != 0:
+            self.logger.error(f"Failed to install accelerate transformers.")
+            return {"error": f"Failed to install accelerate transformers."}
+        return {"success": f"Success to install accelerate transformers."}
+
     def mmdet(self, data_dir:Path, install_use_gpu:bool=False):
         returncode, _ = common.cmd(f'git clone https://github.com/open-mmlab/mmdetection.git', logger=self.logger)
         if returncode != 0:
@@ -276,3 +285,16 @@ class Install(object):
         if srcdir.exists():
             return {"success": f"Please remove '{srcdir}' manually."}
         return {"success": f"Success to install mmpretrain."}
+
+    def diffusers(self, data_dir:Path, install_use_gpu:bool=False):
+        ret = self._torch(install_use_gpu)
+        if "error" in ret: return ret
+        ret = self._transformers(install_use_gpu)
+        if "error" in ret: return ret
+
+        ret, _ = common.cmd('pip install diffusers', logger=self.logger)
+        if ret != 0:
+            self.logger.error(f"Failed to install diffusers.")
+            return {"error": f"Failed to install diffusers."}
+
+        return {"success": f"Success to install diffusers."}
