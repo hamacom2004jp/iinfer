@@ -120,6 +120,7 @@ list_cmd_func_then = () => {
                 }
                 title = elem.find('.row_content_template_title');
                 title.html('');
+                title.attr('title', window.navigator.language=='ja'?row['discription_ja']:row['discription_en'])
                 if (row['required']) {
                     title.append('<span class="text-danger">*</span>');
                 }

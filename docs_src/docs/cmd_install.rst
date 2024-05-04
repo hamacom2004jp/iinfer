@@ -50,7 +50,7 @@
     :header-rows: 1
 
     "Option","Required","Description"
-    "--install_use_gpu","","GPUを使用するモジュール構成でインストールします。（検証中）"
+    "--install_use_gpu","","GPUを使用するモジュール構成でインストールします。"
 
 
 インストール(mmpretrain) : `iinfer -m install -c mmpretrain`
@@ -63,7 +63,7 @@
     :header-rows: 1
 
     "Option","Required","Description"
-    "--install_use_gpu","","GPUを使用するモジュール構成でインストールします。（検証中）"
+    "--install_use_gpu","","GPUを使用するモジュール構成でインストールします。"
 
 
 インストール(redis) : `iinfer -m install -c redis <Option>`
@@ -102,7 +102,7 @@
     "--install_mmpretrain","","dockerイメージ内に `mmpretrain` をインストールします。※1"
     "--install_insightface","","dockerイメージ内に `insightface` をインストールします。※1"
     "--install_tag <追加のタグ名>","","指定すると作成するdockerイメージのタグ名に追記出来ます。"
-    "--install_use_gpu","","GPUを使用するモジュール構成でインストールします。（検証中）"
+    "--install_use_gpu","","GPUを使用するモジュール構成でインストールします。"
     
 
 - ※1 : これらのオプションを何れも指定しない場合、 `--install_mmcls` `--install_insightface` 以外すべてをインストールします。

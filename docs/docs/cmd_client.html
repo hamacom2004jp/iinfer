@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>コマンドリファレンス（clientモード） &mdash; iinfer 2024/05/03 documentation</title>
+  <title>コマンドリファレンス（clientモード） &mdash; iinfer 2024/05/04 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -16,8 +16,8 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=6a052993"></script>
-        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/documentation_options.js?v=a18cb95e"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -136,43 +136,43 @@
 <tbody>
 <tr class="row-even"><td><p>--host &lt;IPアドレス又はホスト名&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのサービスホストを指定する</p></td>
+<td><p>Redisサーバーのサービスホストを指定します</p></td>
 </tr>
 <tr class="row-odd"><td><p>--port &lt;ポート番号&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのサービスポートを指定する</p></td>
+<td><p>Redisサーバーのサービスポートを指定します</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;パスワード&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのアクセスパスワード(任意)を指定する。省略時は <cite>password</cite> を使用する</p></td>
+<td><p>Redisサーバーのアクセスパスワード(任意)を指定します。省略時は <cite>password</cite> を使用します</p></td>
 </tr>
 <tr class="row-odd"><td><p>--svname &lt;推論サービス名&gt;</p></td>
 <td></td>
-<td><p>推論サーバーのサービス名を指定する。省略時は <cite>server</cite> を使用する</p></td>
+<td><p>推論サーバーのサービス名を指定します。省略時は <cite>server</cite> を使用します</p></td>
 </tr>
 <tr class="row-even"><td><p>-n,--name &lt;登録名&gt;</p></td>
 <td><p>〇</p></td>
-<td><p>AIモデルの登録名(任意)を指定する</p></td>
+<td><p>AIモデルの登録名を指定します</p></td>
 </tr>
 <tr class="row-odd"><td><p>--model_file &lt;モデルファイル&gt;</p></td>
 <td><p>〇</p></td>
-<td><p>学習済みのモデルファイルのパス又はダウンロードURLを指定する</p></td>
+<td><p>学習済みのモデルファイルのパス又はダウンロードURLを指定します</p></td>
 </tr>
 <tr class="row-even"><td><p>--model_conf_file &lt;モデル設定ファイル&gt;</p></td>
 <td></td>
-<td><p>mmlabの場合はモデル設定ファイルを指定する。複数指定可能ですが、最初に指定したファイルが <cite>start</cite> 時に使用されます。</p></td>
+<td><p>モデル設定ファイルを指定します。複数指定可能ですが、最初に指定したファイルが <cite>start</cite> 時に使用されます。</p></td>
 </tr>
 <tr class="row-odd"><td><p>--model_img_width &lt;モデルのINPUTサイズ(横px)&gt;</p></td>
 <td></td>
-<td><p>AIモデルのINPUTサイズ(横px)を指定する</p></td>
+<td><p>AIモデルのINPUTサイズ(横px)を指定します</p></td>
 </tr>
 <tr class="row-even"><td><p>--model_img_height &lt;モデルのINPUTサイズ(縦px)&gt;</p></td>
 <td></td>
-<td><p>AIモデルのINPUTサイズ(縦px)を指定する</p></td>
+<td><p>AIモデルのINPUTサイズ(縦px)を指定します</p></td>
 </tr>
 <tr class="row-odd"><td><p>--predict_type &lt;推論タイプ&gt;</p></td>
 <td><p>〇</p></td>
-<td><p>AIモデルの推論タイプを指定する。 <a class="reference internal" href="#predict-type-list"><span class="std std-ref">参照</span></a></p></td>
+<td><p>AIモデルの推論タイプを指定します。 <a class="reference internal" href="#predict-type-list"><span class="std std-ref">参照</span></a></p></td>
 </tr>
 <tr class="row-even"><td><p>--custom_predict_py &lt;カスタム推論pyファイル&gt;</p></td>
 <td></td>
@@ -188,7 +188,7 @@
 </tr>
 <tr class="row-odd"><td><p>--before_injection_type &lt;前処理タイプ&gt;</p></td>
 <td></td>
-<td><p>前処理を作成するときに指定。参照： <a class="reference internal" href="injections.html"><span class="doc">インジェクション</span></a></p></td>
+<td><p>前処理を作成させるときに指定。参照： <a class="reference internal" href="injections.html"><span class="doc">インジェクション</span></a></p></td>
 </tr>
 <tr class="row-even"><td><p>--before_injection_py &lt;前処理pyファイル&gt;</p></td>
 <td></td>
@@ -200,7 +200,7 @@
 </tr>
 <tr class="row-even"><td><p>--after_injection_type &lt;後処理タイプ&gt;</p></td>
 <td></td>
-<td><p>後処理を作成するときに指定。参照： <a class="reference internal" href="injections.html"><span class="doc">インジェクション</span></a></p></td>
+<td><p>後処理を作成させるときに指定。参照： <a class="reference internal" href="injections.html"><span class="doc">インジェクション</span></a></p></td>
 </tr>
 <tr class="row-odd"><td><p>--after_injection_py &lt;後処理pyファイル&gt;</p></td>
 <td></td>
@@ -212,11 +212,11 @@
 </tr>
 <tr class="row-odd"><td><p>--overwrite</p></td>
 <td></td>
-<td><p>デプロイ済みであっても上書きする</p></td>
+<td><p>デプロイ済みであっても上書きする指定</p></td>
 </tr>
 <tr class="row-even"><td><p>--timeout &lt;タイムアウト&gt;</p></td>
 <td></td>
-<td><p>サーバーの応答が返ってくるまでの最大待ち時間</p></td>
+<td><p>サーバーの応答が返ってくるまでの最大待ち時間を指定</p></td>
 </tr>
 </tbody>
 </table>
@@ -238,23 +238,23 @@
 <tbody>
 <tr class="row-even"><td><p>--host &lt;IPアドレス又はホスト名&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのサービスホストを指定する</p></td>
+<td><p>Redisサーバーのサービスホストを指定します</p></td>
 </tr>
 <tr class="row-odd"><td><p>--port &lt;ポート番号&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのサービスポートを指定する</p></td>
+<td><p>Redisサーバーのサービスポートを指定します</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;パスワード&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのアクセスパスワード(任意)を指定する。省略時は <cite>password</cite> を使用する</p></td>
+<td><p>Redisサーバーのアクセスパスワード(任意)を指定します。省略時は <cite>password</cite> を使用します</p></td>
 </tr>
 <tr class="row-odd"><td><p>--svname &lt;推論サービス名&gt;</p></td>
 <td></td>
-<td><p>推論サーバーのサービス名を指定する。省略時は <cite>server</cite> を使用する</p></td>
+<td><p>推論サーバーのサービス名を指定します。省略時は <cite>server</cite> を使用します</p></td>
 </tr>
 <tr class="row-even"><td><p>--timeout &lt;タイムアウト&gt;</p></td>
 <td></td>
-<td><p>サーバーの応答が返ってくるまでの最大待ち時間</p></td>
+<td><p>サーバーの応答が返ってくるまでの最大待ち時間を指定</p></td>
 </tr>
 </tbody>
 </table>
@@ -276,23 +276,23 @@
 <tbody>
 <tr class="row-even"><td><p>--host &lt;IPアドレス又はホスト名&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのサービスホストを指定する</p></td>
+<td><p>Redisサーバーのサービスホストを指定します</p></td>
 </tr>
 <tr class="row-odd"><td><p>--port &lt;ポート番号&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのサービスポートを指定する</p></td>
+<td><p>Redisサーバーのサービスポートを指定します</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;パスワード&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのアクセスパスワード(任意)を指定する。省略時は <cite>password</cite> を使用する</p></td>
+<td><p>Redisサーバーのアクセスパスワード(任意)を指定します。省略時は <cite>password</cite> を使用します</p></td>
 </tr>
 <tr class="row-odd"><td><p>--svname &lt;推論サービス名&gt;</p></td>
 <td></td>
-<td><p>推論サーバーのサービス名を指定する。省略時は <cite>server</cite> を使用する</p></td>
+<td><p>推論サーバーのサービス名を指定します。省略時は <cite>server</cite> を使用します</p></td>
 </tr>
 <tr class="row-even"><td><p>-n,--name &lt;登録名&gt;</p></td>
 <td><p>〇</p></td>
-<td><p>AIモデルの登録名を指定する</p></td>
+<td><p>AIモデルの登録名を指定します</p></td>
 </tr>
 <tr class="row-odd"><td><p>--timeout &lt;タイムアウト&gt;</p></td>
 <td></td>
@@ -318,23 +318,23 @@
 <tbody>
 <tr class="row-even"><td><p>--host &lt;IPアドレス又はホスト名&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのサービスホストを指定する</p></td>
+<td><p>Redisサーバーのサービスホストを指定します</p></td>
 </tr>
 <tr class="row-odd"><td><p>--port &lt;ポート番号&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのサービスポートを指定する</p></td>
+<td><p>Redisサーバーのサービスポートを指定します</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;パスワード&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのアクセスパスワード(任意)を指定する。省略時は <cite>password</cite> を使用する</p></td>
+<td><p>Redisサーバーのアクセスパスワード(任意)を指定します。省略時は <cite>password</cite> を使用します</p></td>
 </tr>
 <tr class="row-odd"><td><p>--svname &lt;推論サービス名&gt;</p></td>
 <td></td>
-<td><p>推論サーバーのサービス名を指定する。省略時は <cite>server</cite> を使用する</p></td>
+<td><p>推論サーバーのサービス名を指定します。省略時は <cite>server</cite> を使用します</p></td>
 </tr>
 <tr class="row-even"><td><p>-n,--name &lt;登録名&gt;</p></td>
 <td><p>〇</p></td>
-<td><p>AIモデルの登録名を指定する</p></td>
+<td><p>AIモデルの登録名を指定します</p></td>
 </tr>
 <tr class="row-odd"><td><p>--model_provider &lt;モデルプロバイダー&gt;</p></td>
 <td></td>
@@ -346,7 +346,7 @@
 </tr>
 <tr class="row-odd"><td><p>--gpuid &lt;GPUのid&gt;</p></td>
 <td></td>
-<td><p>GPUのディバイスIDを指定する。 <cite>--model_provider</cite> でGPUを使用するプロバイダーを指定した時に使用可能</p></td>
+<td><p>GPUのディバイスIDを指定します。</p></td>
 </tr>
 <tr class="row-even"><td><p>--timeout &lt;タイムアウト&gt;</p></td>
 <td></td>
@@ -376,23 +376,23 @@
 <tbody>
 <tr class="row-even"><td><p>--host &lt;IPアドレス又はホスト名&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのサービスホストを指定する</p></td>
+<td><p>Redisサーバーのサービスホストを指定します</p></td>
 </tr>
 <tr class="row-odd"><td><p>--port &lt;ポート番号&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのサービスポートを指定する</p></td>
+<td><p>Redisサーバーのサービスポートを指定します</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;パスワード&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのアクセスパスワード(任意)を指定する。省略時は <cite>password</cite> を使用する</p></td>
+<td><p>Redisサーバーのアクセスパスワード(任意)を指定します。省略時は <cite>password</cite> を使用します</p></td>
 </tr>
 <tr class="row-odd"><td><p>--svname &lt;推論サービス名&gt;</p></td>
 <td></td>
-<td><p>推論サーバーのサービス名を指定する。省略時は <cite>server</cite> を使用する</p></td>
+<td><p>推論サーバーのサービス名を指定します。省略時は <cite>server</cite> を使用します</p></td>
 </tr>
 <tr class="row-even"><td><p>-n,--name &lt;登録名&gt;</p></td>
 <td><p>〇</p></td>
-<td><p>AIモデルの登録名を指定する</p></td>
+<td><p>AIモデルの登録名を指定します</p></td>
 </tr>
 <tr class="row-odd"><td><p>--timeout &lt;タイムアウト&gt;</p></td>
 <td></td>
@@ -418,27 +418,27 @@
 <tbody>
 <tr class="row-even"><td><p>--host &lt;IPアドレス又はホスト名&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのサービスホストを指定する</p></td>
+<td><p>Redisサーバーのサービスホストを指定します</p></td>
 </tr>
 <tr class="row-odd"><td><p>--port &lt;ポート番号&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのサービスポートを指定する</p></td>
+<td><p>Redisサーバーのサービスポートを指定します</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;パスワード&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのアクセスパスワード(任意)を指定する。省略時は <cite>password</cite> を使用する</p></td>
+<td><p>Redisサーバーのアクセスパスワード(任意)を指定します。省略時は <cite>password</cite> を使用します</p></td>
 </tr>
 <tr class="row-odd"><td><p>--svname &lt;推論サービス名&gt;</p></td>
 <td></td>
-<td><p>推論サーバーのサービス名を指定する。省略時は <cite>server</cite> を使用する</p></td>
+<td><p>推論サーバーのサービス名を指定します。省略時は <cite>server</cite> を使用します</p></td>
 </tr>
 <tr class="row-even"><td><p>-n,--name &lt;登録名&gt;</p></td>
 <td><p>〇</p></td>
-<td><p>AIモデルの登録名を指定する</p></td>
+<td><p>AIモデルの登録名を指定します</p></td>
 </tr>
 <tr class="row-odd"><td><p>-i,--input_file &lt;推論対象の画像ファイル&gt;</p></td>
 <td></td>
-<td><p>推論させる画像をファイルで指定する</p></td>
+<td><p>推論させる画像をファイルで指定します</p></td>
 </tr>
 <tr class="row-even"><td><p>--stdin</p></td>
 <td></td>
@@ -450,15 +450,15 @@
 </tr>
 <tr class="row-even"><td><p>--image_type &lt;推論対象の画像タイプ&gt;</p></td>
 <td></td>
-<td><p>推論させる画像のタイプを指定する。指定可能な画像タイプは <cite>bmp</cite> , <cite>png</cite> , <cite>jpeg</cite> , <cite>capture</cite> , <cite>output_json</cite></p></td>
+<td><p>推論させる画像のタイプを指定します。指定可能な画像タイプは <cite>bmp</cite> , <cite>png</cite> , <cite>jpeg</cite> , <cite>capture</cite> , <cite>output_json</cite></p></td>
 </tr>
 <tr class="row-odd"><td><p>--output_image &lt;推論結果画像の保存先ファイル&gt;</p></td>
 <td></td>
-<td><p>推論結果画像の保存先ファイルを指定する</p></td>
+<td><p>推論結果画像の保存先ファイルを指定します</p></td>
 </tr>
 <tr class="row-even"><td><p>-P,--output_preview</p></td>
 <td></td>
-<td><p>推論結果画像を <cite>cv2.imshow</cite> で表示する</p></td>
+<td><p>推論結果画像を <cite>cv2.imshow</cite> で表示します</p></td>
 </tr>
 <tr class="row-odd"><td><p>--timeout &lt;タイムアウト&gt;</p></td>
 <td></td>
@@ -488,7 +488,7 @@
 <tbody>
 <tr class="row-even"><td><p>--capture_device &lt;ディバイス&gt;</p></td>
 <td></td>
-<td><p>キャプチャーディバイスを指定する。 <cite>cv2.VideoCapture</cite> の第一引数に渡される値。</p></td>
+<td><p>キャプチャーディバイスを指定します。 <cite>cv2.VideoCapture</cite> の第一引数に渡される値。</p></td>
 </tr>
 <tr class="row-odd"><td><p>--image_type &lt;出力する画像タイプ&gt;</p></td>
 <td></td>
@@ -504,19 +504,19 @@
 </tr>
 <tr class="row-even"><td><p>--capture_fps &lt;キャプチャーFPS&gt;</p></td>
 <td></td>
-<td><p>キャプチャーする画像のFPS。キャプチャーが指定した値より高速な場合に残り時間分をsleepする</p></td>
+<td><p>キャプチャーする画像のFPS。キャプチャーが指定した値より高速な場合に残り時間分をsleepします</p></td>
 </tr>
 <tr class="row-odd"><td><p>--capture_count &lt;キャプチャー回数&gt;</p></td>
 <td></td>
-<td><p>キャプチャー回数。AIの推論速度が指定した値より高速な場合に残り時間分をsleepする</p></td>
+<td><p>キャプチャーする回数。</p></td>
 </tr>
 <tr class="row-even"><td><p>--output_preview</p></td>
 <td></td>
-<td><p>推論結果画像を <cite>cv2.imshow</cite> で表示する</p></td>
+<td><p>推論結果画像を <cite>cv2.imshow</cite> で表示します</p></td>
 </tr>
 <tr class="row-odd"><td><p>--output_csv &lt;処理結果csvの保存先ファイル&gt;</p></td>
 <td></td>
-<td><p>キャプチャーした内容をcsvで保存する。これを指定した場合、標準出力は行いません。</p></td>
+<td><p>キャプチャーした内容をcsvで保存します。これを指定した場合、標準出力は行いません。</p></td>
 </tr>
 <tr class="row-even"><td><p>-o, --output_json &lt;処理結果jsonの保存先ファイル&gt;</p></td>
 <td></td>
@@ -550,23 +550,23 @@
 <tbody>
 <tr class="row-even"><td><p>--host &lt;IPアドレス又はホスト名&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのサービスホストを指定する</p></td>
+<td><p>Redisサーバーのサービスホストを指定します</p></td>
 </tr>
 <tr class="row-odd"><td><p>--port &lt;ポート番号&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのサービスポートを指定する</p></td>
+<td><p>Redisサーバーのサービスポートを指定します</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;パスワード&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのアクセスパスワード(任意)を指定する。省略時は <cite>password</cite> を使用する</p></td>
+<td><p>Redisサーバーのアクセスパスワード(任意)を指定します。省略時は <cite>password</cite> を使用します</p></td>
 </tr>
 <tr class="row-odd"><td><p>--svname &lt;推論サービス名&gt;</p></td>
 <td></td>
-<td><p>推論サーバーのサービス名を指定する。省略時は <cite>server</cite> を使用する</p></td>
+<td><p>推論サーバーのサービス名を指定します。省略時は <cite>server</cite> を使用します</p></td>
 </tr>
 <tr class="row-even"><td><p>--svpath &lt;サーバー側パス&gt;</p></td>
 <td></td>
-<td><p>推論サーバーのデータフォルダ以下のパスを指定する。省略時は <cite>/</cite> を使用する</p></td>
+<td><p>推論サーバーのデータフォルダ以下のパスを指定します。省略時は <cite>/</cite> を使用します</p></td>
 </tr>
 <tr class="row-odd"><td><p>--timeout &lt;タイムアウト&gt;</p></td>
 <td></td>
@@ -596,23 +596,23 @@
 <tbody>
 <tr class="row-even"><td><p>--host &lt;IPアドレス又はホスト名&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのサービスホストを指定する</p></td>
+<td><p>Redisサーバーのサービスホストを指定します</p></td>
 </tr>
 <tr class="row-odd"><td><p>--port &lt;ポート番号&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのサービスポートを指定する</p></td>
+<td><p>Redisサーバーのサービスポートを指定します</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;パスワード&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのアクセスパスワード(任意)を指定する。省略時は <cite>password</cite> を使用する</p></td>
+<td><p>Redisサーバーのアクセスパスワード(任意)を指定します。省略時は <cite>password</cite> を使用します</p></td>
 </tr>
 <tr class="row-odd"><td><p>--svname &lt;推論サービス名&gt;</p></td>
 <td></td>
-<td><p>推論サーバーのサービス名を指定する。省略時は <cite>server</cite> を使用する</p></td>
+<td><p>推論サーバーのサービス名を指定します。省略時は <cite>server</cite> を使用します</p></td>
 </tr>
 <tr class="row-even"><td><p>--svpath &lt;サーバー側パス&gt;</p></td>
 <td></td>
-<td><p>推論サーバーのデータフォルダ以下のパスを指定する。省略時は <cite>/</cite> を使用する</p></td>
+<td><p>推論サーバーのデータフォルダ以下のパスを指定します。省略時は <cite>/</cite> を使用します</p></td>
 </tr>
 <tr class="row-odd"><td><p>--timeout &lt;タイムアウト&gt;</p></td>
 <td></td>
@@ -642,23 +642,23 @@
 <tbody>
 <tr class="row-even"><td><p>--host &lt;IPアドレス又はホスト名&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのサービスホストを指定する</p></td>
+<td><p>Redisサーバーのサービスホストを指定します</p></td>
 </tr>
 <tr class="row-odd"><td><p>--port &lt;ポート番号&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのサービスポートを指定する</p></td>
+<td><p>Redisサーバーのサービスポートを指定します</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;パスワード&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのアクセスパスワード(任意)を指定する。省略時は <cite>password</cite> を使用する</p></td>
+<td><p>Redisサーバーのアクセスパスワード(任意)を指定します。省略時は <cite>password</cite> を使用します</p></td>
 </tr>
 <tr class="row-odd"><td><p>--svname &lt;推論サービス名&gt;</p></td>
 <td></td>
-<td><p>推論サーバーのサービス名を指定する。省略時は <cite>server</cite> を使用する</p></td>
+<td><p>推論サーバーのサービス名を指定します。省略時は <cite>server</cite> を使用します</p></td>
 </tr>
 <tr class="row-even"><td><p>--svpath &lt;サーバー側パス&gt;</p></td>
 <td></td>
-<td><p>推論サーバーのデータフォルダ以下のパスを指定する。省略時は <cite>/</cite> を使用する</p></td>
+<td><p>推論サーバーのデータフォルダ以下のパスを指定します。</p></td>
 </tr>
 <tr class="row-odd"><td><p>--timeout &lt;タイムアウト&gt;</p></td>
 <td></td>
@@ -688,27 +688,27 @@
 <tbody>
 <tr class="row-even"><td><p>--host &lt;IPアドレス又はホスト名&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのサービスホストを指定する</p></td>
+<td><p>Redisサーバーのサービスホストを指定します</p></td>
 </tr>
 <tr class="row-odd"><td><p>--port &lt;ポート番号&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのサービスポートを指定する</p></td>
+<td><p>Redisサーバーのサービスポートを指定します</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;パスワード&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのアクセスパスワード(任意)を指定する。省略時は <cite>password</cite> を使用する</p></td>
+<td><p>Redisサーバーのアクセスパスワード(任意)を指定します。省略時は <cite>password</cite> を使用します</p></td>
 </tr>
 <tr class="row-odd"><td><p>--svname &lt;推論サービス名&gt;</p></td>
 <td></td>
-<td><p>推論サーバーのサービス名を指定する。省略時は <cite>server</cite> を使用する</p></td>
+<td><p>推論サーバーのサービス名を指定します。省略時は <cite>server</cite> を使用します</p></td>
 </tr>
 <tr class="row-even"><td><p>--svpath &lt;サーバー側パス&gt;</p></td>
 <td></td>
-<td><p>推論サーバーのデータフォルダ以下のパスを指定する。</p></td>
+<td><p>推論サーバーのデータフォルダ以下のパスを指定します。</p></td>
 </tr>
 <tr class="row-odd"><td><p>--download_file &lt;クライアント側パス&gt;</p></td>
 <td></td>
-<td><p>クライアントの保存先パスを指定する。</p></td>
+<td><p>クライアントの保存先パスを指定します。</p></td>
 </tr>
 <tr class="row-even"><td><p>--timeout &lt;タイムアウト&gt;</p></td>
 <td></td>
@@ -738,27 +738,27 @@
 <tbody>
 <tr class="row-even"><td><p>--host &lt;IPアドレス又はホスト名&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのサービスホストを指定する</p></td>
+<td><p>Redisサーバーのサービスホストを指定します</p></td>
 </tr>
 <tr class="row-odd"><td><p>--port &lt;ポート番号&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのサービスポートを指定する</p></td>
+<td><p>Redisサーバーのサービスポートを指定します</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;パスワード&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのアクセスパスワード(任意)を指定する。省略時は <cite>password</cite> を使用する</p></td>
+<td><p>Redisサーバーのアクセスパスワード(任意)を指定します。省略時は <cite>password</cite> を使用します</p></td>
 </tr>
 <tr class="row-odd"><td><p>--svname &lt;推論サービス名&gt;</p></td>
 <td></td>
-<td><p>推論サーバーのサービス名を指定する。省略時は <cite>server</cite> を使用する</p></td>
+<td><p>推論サーバーのサービス名を指定します。省略時は <cite>server</cite> を使用します</p></td>
 </tr>
 <tr class="row-even"><td><p>--svpath &lt;サーバー側パス&gt;</p></td>
 <td></td>
-<td><p>推論サーバーのデータフォルダ以下のパスを指定する。</p></td>
+<td><p>推論サーバーのデータフォルダ以下のパスを指定します。</p></td>
 </tr>
 <tr class="row-odd"><td><p>--upload_file &lt;クライアント側パス&gt;</p></td>
 <td></td>
-<td><p>クライアントのアップロード元パスを指定する。</p></td>
+<td><p>クライアントのアップロード元パスを指定します。</p></td>
 </tr>
 <tr class="row-even"><td><p>--timeout &lt;タイムアウト&gt;</p></td>
 <td></td>
@@ -788,23 +788,23 @@
 <tbody>
 <tr class="row-even"><td><p>--host &lt;IPアドレス又はホスト名&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのサービスホストを指定する</p></td>
+<td><p>Redisサーバーのサービスホストを指定します</p></td>
 </tr>
 <tr class="row-odd"><td><p>--port &lt;ポート番号&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのサービスポートを指定する</p></td>
+<td><p>Redisサーバーのサービスポートを指定します</p></td>
 </tr>
 <tr class="row-even"><td><p>--password &lt;パスワード&gt;</p></td>
 <td></td>
-<td><p>Redisサーバーのアクセスパスワード(任意)を指定する。省略時は <cite>password</cite> を使用する</p></td>
+<td><p>Redisサーバーのアクセスパスワード(任意)を指定します。省略時は <cite>password</cite> を使用します</p></td>
 </tr>
 <tr class="row-odd"><td><p>--svname &lt;推論サービス名&gt;</p></td>
 <td></td>
-<td><p>推論サーバーのサービス名を指定する。省略時は <cite>server</cite> を使用する</p></td>
+<td><p>推論サーバーのサービス名を指定します。省略時は <cite>server</cite> を使用します</p></td>
 </tr>
 <tr class="row-even"><td><p>--svpath &lt;サーバー側パス&gt;</p></td>
 <td></td>
-<td><p>推論サーバーのデータフォルダ以下のパスを指定する。省略時は <cite>/</cite> を使用する</p></td>
+<td><p>推論サーバーのデータフォルダ以下のパスを指定します。</p></td>
 </tr>
 <tr class="row-odd"><td><p>--timeout &lt;タイムアウト&gt;</p></td>
 <td></td>
