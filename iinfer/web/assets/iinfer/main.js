@@ -1,23 +1,23 @@
-change_dark_mode = (dark_mode) => {
-    html = $('html');
+const change_dark_mode = (dark_mode) => {
+    const html = $('html');
     if(dark_mode) html.attr('data-bs-theme','dark');
     else if(html.attr('data-bs-theme')=='dark') html.removeAttr('data-bs-theme');
     else html.attr('data-bs-theme','dark');
 }
-show_loading = () => {
-    elem = $('#loading');
+const show_loading = () => {
+    const elem = $('#loading');
     elem.removeClass('d-none');
 }
-hide_loading = () => {
-    elem = $('#loading');
+const hide_loading = () => {
+    const elem = $('#loading');
     elem.addClass('d-none');
 }
 $(() => {
     // ダークモード対応
     change_dark_mode(window.matchMedia('(prefers-color-scheme: dark)').matches);
     // copyright情報取得
-    copyright_func = async () => {
-        copyright = await eel.copyright()();
+    const copyright_func = async () => {
+        const copyright = await eel.copyright()();
         $('.copyright').text(copyright);
     };
     copyright_func();
@@ -32,12 +32,12 @@ $(() => {
 
     $('#versions_modal').on('shown.bs.modal	', () => {
         // iinferのバージョン情報取得
-        versions_iinfer_func = async () => {
-            versions_iinfer = await eel.versions_iinfer()();
+        const versions_iinfer_func = async () => {
+            const versions_iinfer = await eel.versions_iinfer()();
             $('#versions_iinfer').html('');
-            $.each(versions_iinfer, (i, v) => {
+            versions_iinfer.forEach((v, i) => {
                 v = v.replace(/<([^>]+)>/g, '<a href="$1" target="_blank">$1</a>');
-                div = $('<div class="d-block"></div>');
+                const div = $('<div class="d-block"></div>');
                 $('#versions_iinfer').append(div);
                 if(i==0) {
                     div.addClass('m-3');
@@ -50,21 +50,21 @@ $(() => {
         };
         versions_iinfer_func();
         // usedのバージョン情報取得
-        versions_used_func = async () => {
-            versions_used = await eel.versions_used()();
+        const versions_used_func = async () => {
+            const versions_used = await eel.versions_used()();
             $('#versions_used').html('');
-            div = $('<div class="overflow-auto" style="height:calc(100vh - 260px);"></div>');
-            table = $('<table class="table table-bordered table-hover table-sm"></table>');
-            table_head = $('<thead class="table-dark bg-dark"></thead>');
-            table_body = $('<tbody></tbody>');
+            const div = $('<div class="overflow-auto" style="height:calc(100vh - 260px);"></div>');
+            const table = $('<table class="table table-bordered table-hover table-sm"></table>');
+            const table_head = $('<thead class="table-dark bg-dark"></thead>');
+            const table_body = $('<tbody></tbody>');
             table.append(table_head);
             table.append(table_body);
             div.append(table);
             $('#versions_used').append(div);
-            $.each(versions_used, (i, row) => {
-                tr = $('<tr></tr>');
-                $.each(row, (j, cel) => {
-                    td = $('<td></td>').text(cel);
+            versions_used.forEach((row, i) => {
+                const tr = $('<tr></tr>');
+                row.forEach((cel, j) => {
+                    const td = $('<td></td>').text(cel);
                     tr.append(td);
                 });
                 if(i==0) table_head.append(tr);
@@ -116,30 +116,30 @@ $(() => {
     });*/
     eel.expose(js_console_modal_log_func);
     function js_console_modal_log_func(line) {
-        elem = $('#console_modal_log');
-        text = elem.val() + line;
+        const elem = $('#console_modal_log');
+        const text = elem.val() + line;
         elem.val(text);
         elem.get(0).setSelectionRange(text.length-1, text.length-1);
     };
     eel.expose(js_return_cmd_exec_func);
     function js_return_cmd_exec_func(title, result) {
-        cmd_modal = $('#cmd_modal');
+        const cmd_modal = $('#cmd_modal');
         cmd_modal.modal('hide');
         view_result_func(title, result);
         hide_loading();
     }
     eel.expose(js_return_pipe_exec_func);
     function js_return_pipe_exec_func(title, result) {
-        pipe_modal = $('#pipe_modal');
+        const pipe_modal = $('#pipe_modal');
         pipe_modal.modal('hide');
         view_result_func(title, result);
         hide_loading();
     }
     eel.expose(js_return_stream_log_func);
     function js_return_stream_log_func(result) {
-        size_th = 1024*1024*5;
+        const size_th = 1024*1024*5;
         view_result_func('stream log', result);
-        result_modal = $('#result_modal');
+        const result_modal = $('#result_modal');
         result_modal.find('.btn_window').click();
     };
 });

@@ -7,12 +7,12 @@ class Options:
         self.init_options()
 
     def get_mode_opt(self):
-        return [''] + [mode for mode in self._options["mode"]["choise"]]
+        return [''] + [{key:val} for key,val in self._options["mode"].items() if type(val) == dict]
 
     def get_cmd_opt(self, mode):
         if mode not in self._options["cmd"]:
             return ['Please select mode.']
-        ret = [key for key in self._options["cmd"][mode].keys()]
+        ret = [{key:val} for key,val in self._options["cmd"][mode].items() if type(val) == dict]
         if len(ret) > 0:
             return [''] + ret
         return ['Please select mode.']
@@ -20,10 +20,8 @@ class Options:
     def get_opt_opt(self, mode, cmd):
         if mode not in self._options["cmd"]:
             return [f'Unknown mode. ({mode})']
-        if cmd not in self._options["cmd"][mode]:
-            return [f'Unknown cmd. ({cmd})']
-        if cmd is None or cmd == "":
-            return ['Please select command.']
+        if cmd is None or cmd == "" or cmd not in self._options["cmd"][mode]:
+            return []
         return self._options["cmd"][mode][cmd]["choise"]
 
     def init_options(self):
@@ -49,12 +47,7 @@ class Options:
             discription_en="Display version",
             choise=None)
         self._options["mode"] = dict(
-            short="m",
-            type="str",
-            default=None,
-            required=True,
-            multi=False,
-            hide=True,
+            short="m", type="str", default=None, required=True, multi=False, hide=True,
             discription_ja="起動モードを指定します。",
             discription_en="Specify the startup mode.",
             choise=[])
@@ -64,6 +57,8 @@ class Options:
             discription_en="Specify the command.",
             choise=[],
             client=dict(
+                discription_ja="クライアントモード",
+                discription_en="Client mode",
                 deploy=dict(
                     type="str", default=None, required=False, multi=False, hide=False,
                     discription_ja="AIモデルをサーバーに配備します。",
@@ -130,7 +125,7 @@ class Options:
                         dict(opt="overwrite", type="bool", default=True, required=False, multi=False, hide=False, choise=[True, False],
                             discription_ja="デプロイ済みであっても上書きする指定。",
                             discription_en="Specify to overwrite even if it is already deployed."),
-                        dict(opt="timeout", type="bool", default=True, required=False, multi=False, hide=False, choise=[True, False],
+                        dict(opt="timeout", type="int", default=120, required=False, multi=False, hide=False, choise=None,
                             discription_ja="サーバーの応答が返ってくるまでの最大待ち時間を指定。",
                             discription_en="Specify the maximum waiting time until the server responds."),
                         dict(opt="output_json", short="o", type="file", default="", required=False, multi=False, hide=True, choise=None, fileio="out",
@@ -644,6 +639,8 @@ class Options:
                 ),
             ),
             postprocess=dict(
+                discription_ja="後処理モード",
+                discription_en="Post-processing mode",
                 cls_jadge=dict(
                     type="str", default=None, required=False, multi=False, hide=False,
                     discription_ja="推論結果を使用して画像分類判定を行います。",
@@ -1021,6 +1018,8 @@ class Options:
                 ),
             ),
             server=dict(
+                discription_ja="サーバーモード",
+                discription_en="Server mode",
                 start=dict(
                     type="str", default=None, required=False, multi=False, hide=False,
                     discription_ja="推論サーバーを起動します。installモードで `iinfer -m install -c server` を実行している場合は、 `docker-compose up -d` を使用してください。",
@@ -1122,6 +1121,8 @@ class Options:
                 ),
             ),
             redis=dict(
+                discription_ja="Redisモード",
+                discription_en="Redis mode",
                 docker_run=dict(
                     type="str", default=None, required=False, multi=False, hide=False,
                     discription_ja="installモードで `iinfer -m install -c server` を実行している場合は、 `docker-compose up -d` を使用してください。",
@@ -1180,6 +1181,8 @@ class Options:
                 ),
             ),
             install=dict(
+                discription_ja="インストールモード",
+                discription_en="Install mode",
                 onnx=dict(
                     type="str", default=None, required=False, multi=False, hide=False,
                     discription_ja="`onnxruntime` をインストールします。",
@@ -1363,6 +1366,8 @@ class Options:
                 ),
             ),
             web=dict(
+                discription_ja="Webモード",
+                discription_en="Web mode",
                 start=dict(
                     type="str", default=None, required=False, multi=False, hide=False,
                     discription_ja="Webモードを起動します。",
@@ -1402,5 +1407,5 @@ class Options:
                 continue
             self._options["cmd"]["choise"] += [cmd for cmd in mode.keys()]
             self._options["mode"][key] = mode
-            self._options["mode"]["choise"] += [key]
+            self._options["mode"]["choise"] += [mode]
 

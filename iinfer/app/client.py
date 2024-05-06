@@ -508,7 +508,7 @@ class Client(object):
         Returns:
             dict: Redisサーバーからの応答
         """
-        res_json = self._proc(self.svname, 'file_list', [str(svpath)], timeout=timeout)
+        res_json = self._proc(self.svname, 'file_list', [convert.str2b64str(str(svpath))], timeout=timeout)
         return res_json
 
     def file_mkdir(self, svpath:str, timeout:int = 60):
@@ -522,7 +522,7 @@ class Client(object):
         Returns:
             dict: Redisサーバーからの応答
         """
-        res_json = self._proc(self.svname, 'file_mkdir', [str(svpath)], timeout=timeout)
+        res_json = self._proc(self.svname, 'file_mkdir', [convert.str2b64str(str(svpath))], timeout=timeout)
         return res_json
     
     def file_rmdir(self, svpath:str, timeout:int = 60):
@@ -536,7 +536,7 @@ class Client(object):
         Returns:
             dict: Redisサーバーからの応答
         """
-        res_json = self._proc(self.svname, 'file_rmdir', [str(svpath)], timeout=timeout)
+        res_json = self._proc(self.svname, 'file_rmdir', [convert.str2b64str(str(svpath))], timeout=timeout)
         return res_json
     
     def file_download(self, svpath:str, download_file:Path, timeout:int = 60):
@@ -551,7 +551,7 @@ class Client(object):
         Returns:
             bytes: ダウンロードファイルの内容
         """
-        res_json = self._proc(self.svname, 'file_download', [str(svpath)], timeout=timeout)
+        res_json = self._proc(self.svname, 'file_download', [convert.str2b64str(str(svpath))], timeout=timeout)
         if "success" in res_json:
             if download_file is not None:
                 if download_file.is_dir():
@@ -587,7 +587,10 @@ class Client(object):
             self.logger.error(f"input_file {upload_file} is directory.")
             return {"error": f"input_file {upload_file} is directory."}
         with open(upload_file, "rb") as f:
-            res_json = self._proc(self.svname, 'file_upload', [str(svpath), upload_file.name, base64.b64encode(f.read()).decode('utf-8')], timeout=timeout)
+            res_json = self._proc(self.svname, 'file_upload',
+                                  [convert.str2b64str(str(svpath)),
+                                   convert.str2b64str(upload_file.name),
+                                   convert.bytes2b64str(f.read())], timeout=timeout)
             return res_json
 
     def file_remove(self, svpath:str, timeout:int = 60):
@@ -601,7 +604,7 @@ class Client(object):
         Returns:
             dict: Redisサーバーからの応答
         """
-        res_json = self._proc(self.svname, 'file_remove', [str(svpath)], timeout=timeout)
+        res_json = self._proc(self.svname, 'file_remove', [convert.str2b64str(str(svpath))], timeout=timeout)
         return res_json
 
     def capture(self, capture_device='0', image_type:str='capture', capture_frame_width:int=None, capture_frame_height:int=None, capture_fps:int=1000, output_preview:bool=False):

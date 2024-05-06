@@ -118,8 +118,7 @@ const filer = (svpath) => {
       list_tree = res[0]['success'];
       hide_loading();
       // 左側ペイン
-      Object.keys(list_tree).map((key) => {
-        node = list_tree[key];
+      Object.entries(list_tree).forEach(([key, node]) => {
         if(!node['is_dir']) return;
         children = node['children'];
         current_li_elem = modal.find(`#${key}`);
@@ -146,27 +145,26 @@ const filer = (svpath) => {
         });
       });
       // 右側ペイン
-      list_tree_keys = Object.keys(list_tree);
-      if (list_tree_keys.length > 0) {
-        node = list_tree[list_tree_keys[list_tree_keys.length-1]];
+      Object.entries(list_tree).forEach(([key, node]) => {
+        if(!node['path']) return;
         modal.find('.filer_address').val(node['path']);
-        table = $('<table class="table table-bordered table-hover table-sm">'
-            + '<thead class="table-dark bg-dark"><tr><th scope="col">-</th><th scope="col">name</th><th scope="col">size</th><th scope="col">last</th></tr></thead>'
-          + '</table>');
-        table_body = $('<tbody></tbody>');
+        const table = $('<table class="table table-bordered table-hover table-sm">'
+                      + '<thead class="table-dark bg-dark"><tr><th scope="col">-</th><th scope="col">name</th><th scope="col">size</th><th scope="col">last</th></tr></thead>'
+                      + '</table>');
+        const table_body = $('<tbody></tbody>');
         modal.find('.file-list').html('');
         modal.find('.file-list').append(table);
         table.append(table_body);
-        children = node['children'];
+        const children = node['children'];
         if(children) {
           // ツリー表示関数の生成
-          mk_tree = (_p, _e) => {return ()=>tree(_p, _e)}
+          const mk_tree = (_p, _e) => {return ()=>tree(_p, _e)}
           // 削除関数の生成
-          mk_delete = (_p, _e, is_dir) => {return ()=>{
-            if(confirm(`「${_p}」を削除しますか？${is_dir?"\n【注意】ディレクトリの場合は中身も削除されます。":""}`)) {
-              remote = is_dir ? 'file_rmdir' : 'file_remove';
+          const mk_delete = (_p, _e, is_dir) => {return ()=>{
+            if(confirm(`Do you want to delete "${_p}"？${is_dir?"\nNote: In the case of directories, the contents will also be deleted.":""}`)) {
+              const remote = is_dir ? 'file_rmdir' : 'file_remove';
               show_loading();
-              opt = get_server_opt();
+              const opt = get_server_opt();
               opt['mode'] = 'client';
               opt['cmd'] = remote;
               opt['capture_stdout'] = true;
@@ -188,16 +186,16 @@ const filer = (svpath) => {
             }
           }};
           mk_blob = (base64) => {
-            bin = atob(base64.replace(/^.*,/, ''));
-            buffer = new Uint8Array(bin.length);
+            const bin = atob(base64.replace(/^.*,/, ''));
+            const buffer = new Uint8Array(bin.length);
             for (i=0; i<bin.length; i++) buffer[i] = bin.charCodeAt(i);
-            blob = new Blob([buffer.buffer], {type: 'application/octet-stream'});
+            const blob = new Blob([buffer.buffer], {type: 'application/octet-stream'});
             return blob;
           }
           // ダウンロード関数の生成
           mk_download = (_p) => {return ()=>{
             show_loading();
-            opt = get_server_opt();
+            const opt = get_server_opt();
             opt['mode'] = 'client';
             opt['cmd'] = 'file_download';
             opt['capture_stdout'] = true;
@@ -208,8 +206,8 @@ const filer = (svpath) => {
                 hide_loading();
                 return;
               }
-              blob = mk_blob(res[0]['success']['data']);
-              link = modal.find('.filer_download');
+              const blob = mk_blob(res[0]['success']['data']);
+              const link = modal.find('.filer_download');
               link.attr('download', res[0]['success']['name']);
               link.get(0).href = window.URL.createObjectURL(blob);
               link.get(0).click();
@@ -224,14 +222,14 @@ const filer = (svpath) => {
           // フォルダ作成関数の生成
           mk_mkdir = (_p, _e, is_dir) => {return ()=>{
             _p = _p.substring(0, _p.lastIndexOf('/')+1);
-            prompt_text = prompt('Enter a new folder name.');
+            const prompt_text = prompt('Enter a new folder name.');
             if(prompt_text) {
               show_loading();
-              opt = get_server_opt();
+              const opt = get_server_opt();
               opt['mode'] = 'client';
               opt['cmd'] = 'file_mkdir';
               opt['capture_stdout'] = true;
-              opt['svpath'] = `${_p}/${prompt_text}`;
+              opt['svpath'] = `${_p=="/"?"":_p}/${prompt_text}`;
               eel.exec_cmd('file_mkdir', opt, true)().then(async res => {
                 if(res['warn']) {
                   alert(res['warn']);
@@ -249,23 +247,23 @@ const filer = (svpath) => {
             }
           }};
           // ファイルリストの生成
-          mk_tr = (_p, _e, is_dir) => {
-            png = is_dir ? 'folder-close.png' : 'file.png';
-            dt = is_dir ? '-' : new Date(n['last']).toLocaleDateString('ja-JP', {
+          const mk_tr = (_p, _e, _n) => {
+            const png = _n["is_dir"] ? 'folder-close.png' : 'file.png';
+            const dt = _n["is_dir"] ? '-' : new Date(_n["last"]).toLocaleDateString('ja-JP', {
               year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit'
             });
-            tr = $('<tr>'
+            const tr = $('<tr>'
                 + `<td><img src="/assets/tree-menu/image/${png}"></td>`
                 + '<td>'
                   + '<div class="droudown">'
-                    + `<a class="dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">${n['name']}</a>`
+                    + `<a class="dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">${_n['name']}</a>`
                     + '<ul class="dropdown-menu"/>'
                   + '</div>'
                 + '</td>'
-                + `<td class="text-end">${calc_size(n['size'])}</td>`
+                + `<td class="text-end">${calc_size(_n['size'])}</td>`
                 + `<td class="text-end">${dt}</td>`
               + '</tr>');
-            if (is_dir) {
+            if (_n["is_dir"]) {
               tr.find('.dropdown-menu').append('<li><a class="dropdown-item open" href="#">Open</a></li>');
               tr.find('.dropdown-menu').append('<li><a class="dropdown-item mkdir" href="#">Create Folder</a></li>');
               tr.find('.dropdown-menu').append('<li><a class="dropdown-item delete" href="#">Delete</a></li>');
@@ -275,27 +273,25 @@ const filer = (svpath) => {
               tr.find('.dropdown-menu').append('<li><a class="dropdown-item delete" href="#">Delete</a></li>');
             }
             tr.find('.open').off('click').on('click', mk_tree(_p, _e));
-            tr.find('.delete').off('click').on('click', mk_delete(_p, _e, is_dir));
-            tr.find('.mkdir').off('click').on('click', mk_mkdir(_p, _e, is_dir));
+            tr.find('.delete').off('click').on('click', mk_delete(_p, _e, _n["is_dir"]));
+            tr.find('.mkdir').off('click').on('click', mk_mkdir(_p, _e, _n["is_dir"]));
             tr.find('.download').off('click').on('click', mk_download(_p));
             return tr;
           };
           // ディレクトリを先に表示
-          Object.keys(children).map((k, i) => {
-            n = children[k];
+          Object.entries(children).forEach(([k, n]) => {
             if(!n['is_dir'] || node['path']==n['path']) return;
-            tr = mk_tr(n['path'], current_ul_elem, n['is_dir']);
+            const tr = mk_tr(n['path'], current_ul_elem, n);
             table_body.append(tr);
           });
           // ファイルを表示
-          Object.keys(children).map((k, i) => {
-            n = children[k];
+          Object.entries(children).forEach(([k, n]) => {
             if(n['is_dir']) return;
-            tr = mk_tr(n['path'], current_ul_elem, n['is_dir']);
+            const tr = mk_tr(n['path'], current_ul_elem, n);
             table_body.append(tr);
           });
         }
-      }
+      });
     }).then(() => {
       hide_loading();
     }, (error) => {
@@ -305,10 +301,10 @@ const filer = (svpath) => {
   }
   // サーバー一覧を取得 ========================================================
   const get_server_opt = () => {
-    filer_host = modal.find('.filer_host').val();
-    filer_port = modal.find('.filer_port').val();
-    filer_password = modal.find('.filer_password').val();
-    filer_svname = modal.find('.filer_svname').val();
+    let filer_host = modal.find('.filer_host').val();
+    let filer_port = modal.find('.filer_port').val();
+    let filer_password = modal.find('.filer_password').val();
+    let filer_svname = modal.find('.filer_svname').val();
     if (!filer_host) {
       filer_host = localStorage.getItem('filer_host');
       filer_host = filer_host ? filer_host : 'localhost';
@@ -334,7 +330,7 @@ const filer = (svpath) => {
   const load_server_list = () => {
     show_loading();
     modal.find('.filer_svnames').remove();
-    opt = get_server_opt();
+    const opt = get_server_opt();
     opt['mode'] = 'server';
     opt['cmd'] = 'list';
     opt["capture_stdout"] = true;
@@ -350,8 +346,8 @@ const filer = (svpath) => {
         return;
       }
       res[0]['success'].forEach(elem => {
-        a_elem = $(`<a class="dropdown-item" href="#" data-host="${opt['host']}" data-port="${opt['port']}" data-password="${opt['password']}" data-svname="${elem['svname']}">${elem['svname']} ( ${opt['host']}:${opt['port']} )</a>`);
-        mk_func = (elem) => {return ()=>{
+        const a_elem = $(`<a class="dropdown-item" href="#" data-host="${opt['host']}" data-port="${opt['port']}" data-password="${opt['password']}" data-svname="${elem['svname']}">${elem['svname']} ( ${opt['host']}:${opt['port']} )</a>`);
+        const mk_func = (elem) => {return ()=>{
           modal.find('.filer_host').val(elem.attr('data-host'));
           modal.find('.filer_port').val(elem.attr('data-port'));
           modal.find('.filer_password').val(elem.attr('data-password'));
@@ -363,7 +359,7 @@ const filer = (svpath) => {
           tree("/", modal.find('.tree-menu'))
         }};
         a_elem.off("click").on("click", mk_func(a_elem));
-        li_elem = $('<li class="filer_svnames"></li>').append(a_elem);
+        const li_elem = $('<li class="filer_svnames"></li>').append(a_elem);
         modal.find('.filer_server').append(li_elem);
       });
       modal.find('.filer_server').find('.dropdown-item:first').click();
@@ -378,22 +374,22 @@ const filer = (svpath) => {
   const upload = async (event) => {
     show_loading();
     const progress = (_min, _max, _now, _text, _show, _cycle) => {
-      prog_elem = modal.find('.progress');
-      bar_elem = prog_elem.find('.progress-bar');
+      const prog_elem = modal.find('.progress');
+      const bar_elem = prog_elem.find('.progress-bar');
       if(_show) prog_elem.removeClass('d-none');
       else prog_elem.addClass('d-none');
       prog_elem.attr('aria-valuemin', _min);
       prog_elem.attr('aria-valuemax', _max);
       prog_elem.attr('aria-valuenow', _now);
       if (!_cycle) {
-        par = Math.floor((_now / (_max-_min)) * 10000) / 100
+        const par = Math.floor((_now / (_max-_min)) * 10000) / 100
         bar_elem.css('left', 'auto').css('width', `${par}%`);
         bar_elem.text(`${par}% ( ${_now} / ${_max} ) ${_text}`);
         clearTimeout(progress_handle);
       } else {
-        maxwidth = prog_elem.css('width');
+        let maxwidth = prog_elem.css('width');
         maxwidth = parseInt(maxwidth.replace('px', ''));
-        left = bar_elem.css('left');
+        let left = bar_elem.css('left');
         if (!left || left=='auto') left = 0;
         else left = parseInt(left.replace('px', ''));
         if (left > maxwidth) left = -200;
@@ -475,7 +471,7 @@ const filer = (svpath) => {
       async: true,
       data: formData,
       xhr: function() {
-        var xhr = $.ajaxSettings.xhr();
+        const xhr = $.ajaxSettings.xhr();
         xhr.upload.onprogress = function(e) {
           if (e.lengthComputable) {
             progress(0, e.total, e.loaded, '', true, e.total==e.loaded);

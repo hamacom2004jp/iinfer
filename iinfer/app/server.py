@@ -230,18 +230,25 @@ class Server(object):
                     self.responce(msg[1], {"success": f"Successful stop server. svname={self.svname}"})
                     break
                 elif msg[0] == 'file_list':
-                    st = self.file_list(msg[1], msg[2])
+                    svpath = convert.b64str2str(msg[2])
+                    st = self.file_list(msg[1], svpath)
                 elif msg[0] == 'file_mkdir':
-                    st = self.file_mkdir(msg[1], msg[2])
+                    svpath = convert.b64str2str(msg[2])
+                    st = self.file_mkdir(msg[1], svpath)
                 elif msg[0] == 'file_rmdir':
-                    st = self.file_rmdir(msg[1], msg[2])
+                    svpath = convert.b64str2str(msg[2])
+                    st = self.file_rmdir(msg[1], svpath)
                 elif msg[0] == 'file_download':
-                    st = self.file_download(msg[1], msg[2])
+                    svpath = convert.b64str2str(msg[2])
+                    st = self.file_download(msg[1], svpath)
                 elif msg[0] == 'file_upload':
+                    svpath = convert.b64str2str(msg[2])
+                    file_name = convert.b64str2str(msg[3])
                     file_data = convert.b64str2bytes(msg[4])
-                    st = self.file_upload(msg[1], msg[2], msg[3], file_data)
+                    st = self.file_upload(msg[1], svpath, file_name, file_data)
                 elif msg[0] == 'file_remove':
-                    st = self.file_remove(msg[1], msg[2])
+                    svpath = convert.b64str2str(msg[2])
+                    st = self.file_remove(msg[1], svpath)
                 else:
                     self.logger.warn(f"Unknown command {msg}")
                     st = self.RESP_WARN
