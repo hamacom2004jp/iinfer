@@ -1,14 +1,12 @@
 from iinfer.app import common, predict, injection
 from pathlib import Path
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Tuple
 import importlib.util
 import inspect
 import iinfer
 import logging
 import pkgutil
-
-import iinfer.app
-import iinfer.app.predict
+import iinfer
 
 
 def load_custom_predict(custom_predict_py:Path, logger:logging.Logger) -> predict.Predict:
@@ -32,6 +30,20 @@ def load_custom_predict(custom_predict_py:Path, logger:logging.Logger) -> predic
         if inspect.isclass(obj) and issubclass(obj, predict.Predict):
             return obj(logger)
     raise BaseException(f"Predict class not found.({custom_predict_py})")
+
+def build_predict(predict_type:str, custom_predict_file:str, logger:logging.Logger) -> Tuple[bool, predict.Predict]:
+    if predict_type == 'Custom':
+        custom_predict_py = Path(custom_predict_file) if custom_predict_file is not None else None
+        if custom_predict_py is None:
+            logger.warn(f"predict_type is Custom but custom_predict_py is None.")
+            return False, {"warn": f"predict_type is Custom but custom_predict_py is None."}
+        if not custom_predict_py.exists():
+            logger.warn(f"custom_predict_py path {str(custom_predict_py)} does not exist")
+            return False, {"warn": f"custom_predict_py path {str(custom_predict_py)} does not exist"}
+        predict_obj = load_custom_predict(custom_predict_py, logger)
+    else:
+        predict_obj = load_predict(predict_type, logger)
+    return True, predict_obj
 
 def load_predict(predict_type:str, logger:logging.Logger) -> predict.Predict:
     """

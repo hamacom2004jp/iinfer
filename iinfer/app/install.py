@@ -39,7 +39,7 @@ class Install(object):
 
     def server(self, data:Path, install_iinfer:str='iinfer', install_onnx:bool=True,
                install_mmdet:bool=True, install_mmseg:bool=True, install_mmcls:bool=False, install_mmpretrain:bool=True,
-               install_insightface=False, install_diffusers=True,
+               install_insightface=False, install_diffusers=True, install_llamaindex=True,
                install_tag:str=None, install_use_gpu:bool=False):
         if platform.system() == 'Windows':
             return {"warn": f"Build server command is Unsupported in windows platform."}
@@ -56,9 +56,13 @@ class Install(object):
             else:
                 text = text.replace('#{COPY_IINFER}', '')
             install_use_gpu = '--install_use_gpu' if install_use_gpu else ''
-            text = text.replace('#{FROM}', f'FROM nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu20.04' if install_use_gpu else f'FROM python:3.8.18-slim')
+            base_image = 'python:3.11.9-slim' #'python:3.8.18-slim'
+            if install_use_gpu:
+                base_image = 'nvidia/cuda:12.4.1-cudnn-runtime-ubuntu22.04' if install_llamaindex else 'nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu22.04'
+            text = text.replace('#{FROM}', f'FROM {base_image}')
             text = text.replace('${MKUSER}', user)
-            text = text.replace('#{INSTALL_PYTHON}', f'RUN apt-get update && apt-get install -y python3.8 python3.8-distutils python3-pip python-is-python3' if install_use_gpu else '')
+            #text = text.replace('#{INSTALL_PYTHON}', f'RUN apt-get update && apt-get install -y python3.8 python3.8-distutils python3-pip python-is-python3' if install_use_gpu else '')
+            text = text.replace('#{INSTALL_PYTHON}', f'RUN apt-get update && apt-get install -y python3.11 python3.11-distutils python3-pip python-is-python3' if install_use_gpu else '')
             text = text.replace('#{INSTALL_TAG}', install_tag)
             text = text.replace('#{INSTALL_IINFER}', install_iinfer)
             text = text.replace('#{INSTALL_ONNX}', f'RUN iinfer -m install -c onnx --data /home/{user}/.iinfer {install_use_gpu}' if install_onnx else '')
@@ -68,6 +72,7 @@ class Install(object):
             text = text.replace('#{INSTALL_MMPRETRAIN}', f'RUN iinfer -m install -c mmpretrain --data /home/{user}/.iinfer {install_use_gpu}' if install_mmpretrain else '')
             text = text.replace('#{INSTALL_INSIGHTFACE}', f'RUN iinfer -m install -c insightface --data /home/{user}/.iinfer {install_use_gpu}' if install_insightface else '')
             text = text.replace('#{INSTALL_DIFFUSERS}', f'RUN iinfer -m install -c diffusers --data /home/{user}/.iinfer {install_use_gpu}' if install_diffusers else '')
+            text = text.replace('#{INSTALL_LLAMAINDEX}', f'RUN iinfer -m install -c llamaindex --data /home/{user}/.iinfer {install_use_gpu}' if install_llamaindex else '')
             fp.write(text)
         docker_compose_path = Path('docker-compose.yml')
         if not docker_compose_path.exists():
@@ -110,7 +115,7 @@ class Install(object):
 
         if platform.system() == 'Linux':
             returncode, _ = common.cmd(f"{cmd}", self.logger, True)
-            os.remove('Dockerfile')
+            #os.remove('Dockerfile')
             if returncode != 0:
                 self.logger.error(f"Failed to install iinfer-server.")
                 return {"error": f"Failed to install iinfer-server."}
@@ -150,13 +155,13 @@ class Install(object):
 
     def _torch(self, install_use_gpu:bool=False):
         if install_use_gpu:
-            returncode, _ = common.cmd('pip install torch==2.1.0 torchvision --index-url https://download.pytorch.org/whl/cu118', logger=self.logger)
+            returncode, _ = common.cmd('pip install torch==2.1.0 torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118', logger=self.logger)
         else:
-            returncode, _ = common.cmd('pip install torch==2.1.0 torchvision', logger=self.logger)
+            returncode, _ = common.cmd('pip install torch==2.1.0 torchvision torchaudio', logger=self.logger)
         if returncode != 0:
-            self.logger.error(f"Failed to install torch.")
-            return {"error": f"Failed to install torch."}
-        return {"success": f"Success to install torch."}
+            self.logger.error(f"Failed to install torch torchvision torchaudio.")
+            return {"error": f"Failed to install torch torchvision torchaudio."}
+        return {"success": f"Success to install torch torchvision torchaudio."}
 
     def _openmin(self, install_use_gpu:bool=False):
         returncode, _ = common.cmd('pip install openmim', logger=self.logger)
@@ -179,11 +184,11 @@ class Install(object):
         return {"success": f"Success to install mmcv."}
 
     def _transformers(self, install_use_gpu:bool=False):
-        returncode, _ = common.cmd('pip install accelerate transformers', logger=self.logger)
+        returncode, _ = common.cmd('pip install accelerate transformers bitsandbytes sentence-transformers', logger=self.logger)
         if returncode != 0:
-            self.logger.error(f"Failed to install accelerate transformers.")
-            return {"error": f"Failed to install accelerate transformers."}
-        return {"success": f"Success to install accelerate transformers."}
+            self.logger.error(f"Failed to install accelerate transformers bitsandbytes sentence-transformers.")
+            return {"error": f"Failed to install accelerate transformers bitsandbytes sentence-transformers."}
+        return {"success": f"Success to install accelerate transformers bitsandbytes sentence-transformers."}
 
     def mmdet(self, data_dir:Path, install_use_gpu:bool=False):
         returncode, _ = common.cmd(f'git clone https://github.com/open-mmlab/mmdetection.git', logger=self.logger)
@@ -298,3 +303,21 @@ class Install(object):
             return {"error": f"Failed to install diffusers."}
 
         return {"success": f"Success to install diffusers."}
+
+    def llamaindex(self, data_dir:Path, install_use_gpu:bool=False):
+        ret = self._torch(install_use_gpu)
+        if "error" in ret: return ret
+        ret = self._transformers(install_use_gpu)
+        if "error" in ret: return ret
+
+        if install_use_gpu and platform.system() == 'Linux':
+            returncode, _ = common.cmd('apt-get install -y nvidia-cuda-toolkit', logger=self.logger)
+            returncode, _ = common.cmd('rm -rf /usr/lib/x86_64-linux-gnu/libnvidia-ml.so.1 /usr/lib/x86_64-linux-gnu/libcuda.so.1 /usr/lib/x86_64-linux-gnu/libcudadebugger.so.1', logger=self.logger)
+            returncode, _ = common.cmd('pip install llama_index llama-index-llms-huggingface llama-index-embeddings-huggingface', logger=self.logger)
+        else:
+            # llama-cpp-python
+            returncode, _ = common.cmd('pip install llama_index llama-index-llms-huggingface llama-index-embeddings-huggingface', logger=self.logger)
+        if returncode != 0:
+            self.logger.error(f"Failed to install llama_index llama-index-llms-huggingface llama-index-embeddings-huggingface.")
+            return {"error": f"Failed to install llama_index llama-index-llms-huggingface llama-index-embeddings-huggingface."}
+        return {"success": f"Success to install llama_index llama-index-llms-huggingface llama-index-embeddings-huggingface."}

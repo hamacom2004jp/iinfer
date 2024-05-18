@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>iinfer.app.predicts.onnx_cls_EfficientNet_Lite4 &mdash; iinfer 2024/04/11 documentation</title>
+  <title>iinfer.app.predicts.onnx_cls_EfficientNet_Lite4 &mdash; iinfer 2024/05/18 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=3fafac33" />
@@ -15,8 +15,8 @@
   
         <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../../_static/documentation_options.js?v=8f8ccbbe"></script>
-        <script src="../../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../../_static/documentation_options.js?v=1aa140b2"></script>
+        <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
         <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
@@ -48,12 +48,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../docs/overview.html">iinferの概要</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../docs/install.html">インストール</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../docs/gui.html">GUIモード</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../docs/web.html">Webモード</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../docs/command.html">コマンドリファレンス</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../docs/models.html">動作確認済みモデル</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../docs/detection.html">物体検知</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../docs/segmentation.html">領域検知</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../docs/face.html">顔認識</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../docs/pipeline.html">パイプライン</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../docs/injections.html">インジェクション</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../docs/customize.html">カスタマイズ</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../docs/developer.html">開発者向け情報</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../docs/errors.html">よくあるエラー</a></li>
@@ -89,7 +91,7 @@
 <span class="kn">from</span> <span class="nn">iinfer.app.commons</span> <span class="kn">import</span> <span class="n">convert</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Any</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
@@ -108,7 +110,7 @@
 
 <div class="viewcode-block" id="OnnxClsEfficientNetLite4.create_session">
 <a class="viewcode-back" href="../../../../resources/iinfer.app.predicts.html#iinfer.app.predicts.onnx_cls_EfficientNet_Lite4.OnnxClsEfficientNetLite4.create_session">[docs]</a>
-    <span class="k">def</span> <span class="nf">create_session</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_path</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="n">model_conf_path</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="n">model_provider</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">gpu_id</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">create_session</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deploy_dir</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="n">model_path</span><span class="p">:</span><span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="o">|</span><span class="n">Any</span><span class="p">],</span> <span class="n">model_conf_path</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="n">model_provider</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">gpu_id</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        推論セッションを作成する関数です。</span>
 <span class="sd">        startコマンド実行時に呼び出されます。</span>
@@ -116,7 +118,8 @@
 <span class="sd">        戻り値の推論セッションの型は問いません。</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            model_path (Path): モデルファイルのパス</span>
+<span class="sd">            deploy_dir (Path): デプロイディレクトリのパス</span>
+<span class="sd">            model_path (Path|Any): モデルファイルのパス</span>
 <span class="sd">            model_conf_path (Path): モデル設定ファイルのパス</span>
 <span class="sd">            gpu_id (int, optional): GPU ID. Defaults to None.</span>
 
@@ -133,22 +136,18 @@
 
 <div class="viewcode-block" id="OnnxClsEfficientNetLite4.predict">
 <a class="viewcode-back" href="../../../../resources/iinfer.app.predicts.html#iinfer.app.predicts.onnx_cls_EfficientNet_Lite4.OnnxClsEfficientNetLite4.predict">[docs]</a>
-    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">img_width</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">img_height</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">image</span><span class="p">:</span><span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">,</span> <span class="n">labels</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">colors</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nodraw</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">img_width</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">img_height</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">input_data</span><span class="p">:</span><span class="n">Union</span><span class="p">[</span><span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">labels</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">colors</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nodraw</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        予測を行う関数です。</span>
 <span class="sd">        predictコマンドやcaptureコマンド実行時に呼び出されます。</span>
-<span class="sd">        引数のimageはRGBですので、戻り値の出力画像もRGBにしてください。</span>
+<span class="sd">        引数のinput_dataが画像の場合RGBですので、戻り値の出力画像もRGBにしてください。</span>
 <span class="sd">        戻り値の推論結果のdictは、通常推論結果項目ごとに値(list)を設定します。</span>
-<span class="sd">        例）Image Classification（EfficientNet_Lite4）の場合</span>
-<span class="sd">        return dict(output_scores=output_scores, output_classes=output_classes), image_obj</span>
-<span class="sd">        例）Object Detection（YoloX）の場合</span>
-<span class="sd">        return dict(output_boxes=final_boxes, output_scores=final_scores, output_classes=final_cls_inds), output_image</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            session: 推論セッション</span>
-<span class="sd">            img_width (int): モデルのINPUTサイズ（画像の幅）</span>
-<span class="sd">            img_height (int): モデルのINPUTサイズ（画像の高さ）</span>
-<span class="sd">            image (Image): 入力画像（RGB配列であること）</span>
+<span class="sd">            model: 推論セッション</span>
+<span class="sd">            img_width (int): モデルのINPUTサイズ（input_dataが画像の場合は、画像の幅）</span>
+<span class="sd">            img_height (int): モデルのINPUTサイズ（input_dataが画像の場合は、画像の高さ）</span>
+<span class="sd">            input_data (Image | str): 推論するデータ（画像の場合RGB配列であること）</span>
 <span class="sd">            labels (List[str], optional): クラスラベルのリスト. Defaults to None.</span>
 <span class="sd">            colors (List[Tuple[int]], optional): ボックスの色のリスト. Defaults to None.</span>
 <span class="sd">            nodraw (bool, optional): 描画フラグ. Defaults to False.</span>
@@ -157,12 +156,12 @@
 <span class="sd">            Tuple[Dict[str, Any], Image]: 予測結果と出力画像(RGB)のタプル</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># RGB画像をBGR画像に変換</span>
-        <span class="n">img_npy</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">img2npy</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+        <span class="n">img_npy</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">img2npy</span><span class="p">(</span><span class="n">input_data</span><span class="p">)</span>
         <span class="n">img_npy</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">bgr2rgb</span><span class="p">(</span><span class="n">img_npy</span><span class="p">)</span>
 
-        <span class="n">image_data</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">image_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">preprocess_img</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">img_width</span><span class="p">,</span> <span class="n">img_height</span><span class="p">)</span>
+        <span class="n">image_data</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">image_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">preprocess_img</span><span class="p">(</span><span class="n">input_data</span><span class="p">,</span> <span class="n">img_width</span><span class="p">,</span> <span class="n">img_height</span><span class="p">)</span>
 
-        <span class="n">results</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="s2">&quot;Softmax:0&quot;</span><span class="p">],</span> <span class="p">{</span><span class="s2">&quot;images:0&quot;</span><span class="p">:</span> <span class="n">image_data</span><span class="p">})[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="s2">&quot;Softmax:0&quot;</span><span class="p">],</span> <span class="p">{</span><span class="s2">&quot;images:0&quot;</span><span class="p">:</span> <span class="n">image_data</span><span class="p">})[</span><span class="mi">0</span><span class="p">]</span>
 
         <span class="n">output_scores</span><span class="p">,</span> <span class="n">output_classes</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
         <span class="n">result</span> <span class="o">=</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">argsort</span><span class="p">()[</span><span class="o">-</span><span class="mi">5</span><span class="p">:])</span>

@@ -4,10 +4,26 @@ iinfer.app.predicts package
 Submodules
 ----------
 
+iinfer.app.predicts.diffusers\_stablediffusionpipeline\_txt2img module
+----------------------------------------------------------------------
+
+.. automodule:: iinfer.app.predicts.diffusers_stablediffusionpipeline_txt2img
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 iinfer.app.predicts.insightface\_det module
 -------------------------------------------
 
 .. automodule:: iinfer.app.predicts.insightface_det
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+iinfer.app.predicts.llamaindex\_elyza\_search module
+----------------------------------------------------
+
+.. automodule:: iinfer.app.predicts.llamaindex_elyza_search
    :members:
    :undoc-members:
    :show-inheritance:
@@ -44,18 +60,18 @@ iinfer.app.predicts.mmpretrain\_cls\_swin\_Lite module
    :undoc-members:
    :show-inheritance:
 
-iinfer.app.predicts.mmrotate\_det\_ReDet module
------------------------------------------------
-
-.. automodule:: iinfer.app.predicts.mmrotate_det_ReDet
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 iinfer.app.predicts.mmseg\_seg\_PSPNet module
 ---------------------------------------------
 
 .. automodule:: iinfer.app.predicts.mmseg_seg_PSPNet
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+iinfer.app.predicts.mmseg\_seg\_San module
+------------------------------------------
+
+.. automodule:: iinfer.app.predicts.mmseg_seg_San
    :members:
    :undoc-members:
    :show-inheritance:

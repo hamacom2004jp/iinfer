@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>コマンドリファレンス（clientモード） &mdash; iinfer 2024/05/06 documentation</title>
+  <title>コマンドリファレンス（clientモード） &mdash; iinfer 2024/05/18 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -16,7 +16,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=320cb72d"></script>
+        <script src="../_static/documentation_options.js?v=1aa140b2"></script>
         <script src="../_static/doctools.js?v=9a2dae69"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -66,6 +66,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#ai-iinfer-m-client-c-stop-option">クライアント(AIモデルの停止) : <cite>iinfer -m client -c stop &lt;Option&gt;</cite></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#iinfer-m-client-c-predict-option">クライアント(推論の実行) : <cite>iinfer -m client -c predict &lt;Option&gt;</cite></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#iinfer-m-client-c-capture-option">クライアント(キャプチャーの実行) : <cite>iinfer -m client -c capture &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#iinfer-m-client-c-prompt-option">クライアント(プロンプトの実行) : <cite>iinfer -m client -c prompt &lt;Option&gt;</cite></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#iinfer-m-client-c-file-list-option">クライアント(サーバーファイルリスト) : <cite>iinfer -m client -c file_list &lt;Option&gt;</cite></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#iinfer-m-client-c-file-mkdir-option">クライアント(サーバーファイルフォルダ作成) : <cite>iinfer -m client -c file_mkdir &lt;Option&gt;</cite></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#iinfer-m-client-c-file-rmdir-option">クライアント(サーバーファイルフォルダ削除) : <cite>iinfer -m client -c file_rmdir &lt;Option&gt;</cite></a></li>
@@ -448,9 +449,9 @@
 <td></td>
 <td><p>推論結果画像にbbox等の描き込みを行わない</p></td>
 </tr>
-<tr class="row-even"><td><p>--image_type &lt;推論対象の画像タイプ&gt;</p></td>
+<tr class="row-even"><td><p>--pred_input_type &lt;推論対象の入力タイプ&gt;</p></td>
 <td></td>
-<td><p>推論させる画像のタイプを指定します。指定可能な画像タイプは <cite>bmp</cite> , <cite>png</cite> , <cite>jpeg</cite> , <cite>capture</cite> , <cite>output_json</cite></p></td>
+<td><p>推論させる入力タイプを指定します。指定可能な入力タイプは <cite>bmp</cite> , <cite>png</cite> , <cite>jpeg</cite> , <cite>capture</cite> , <cite>output_json</cite> , <cite>prompt</cite></p></td>
 </tr>
 <tr class="row-odd"><td><p>--output_image &lt;推論結果画像の保存先ファイル&gt;</p></td>
 <td></td>
@@ -470,7 +471,7 @@
 <section id="iinfer-m-client-c-capture-option">
 <h2>クライアント(キャプチャーの実行) : <cite>iinfer -m client -c capture &lt;Option&gt;</cite><a class="headerlink" href="#iinfer-m-client-c-capture-option" title="Link to this heading"></a></h2>
 <p>このコマンドは、パイプで接続して下記のように使用します。</p>
-<div class="highlight-bat notranslate"><div class="highlight"><pre><span></span>iinfer -m client -c capture <span class="p">&lt;</span>Option<span class="p">&gt;</span> | iinfer -m client -c predict --stdin --image_type capture <span class="p">&lt;</span>Option&gt;
+<div class="highlight-bat notranslate"><div class="highlight"><pre><span></span>iinfer -m client -c capture <span class="p">&lt;</span>Option<span class="p">&gt;</span> | iinfer -m client -c predict --stdin --pred_image_type capture <span class="p">&lt;</span>Option&gt;
 </pre></div>
 </div>
 <table class="docutils align-default">
@@ -528,6 +529,13 @@
 </tr>
 </tbody>
 </table>
+</section>
+<section id="iinfer-m-client-c-prompt-option">
+<h2>クライアント(プロンプトの実行) : <cite>iinfer -m client -c prompt &lt;Option&gt;</cite><a class="headerlink" href="#iinfer-m-client-c-prompt-option" title="Link to this heading"></a></h2>
+<p>このコマンドは、パイプで接続して下記のように使用します。</p>
+<div class="highlight-bat notranslate"><div class="highlight"><pre><span></span>iinfer -m client -c prompt <span class="p">&lt;</span>Option<span class="p">&gt;</span> | iinfer -m client -c predict --stdin --pred_input_type prompt <span class="p">&lt;</span>Option&gt;
+</pre></div>
+</div>
 </section>
 <section id="iinfer-m-client-c-file-list-option">
 <h2>クライアント(サーバーファイルリスト) : <cite>iinfer -m client -c file_list &lt;Option&gt;</cite><a class="headerlink" href="#iinfer-m-client-c-file-list-option" title="Link to this heading"></a></h2>

@@ -113,7 +113,11 @@ const list_cmd_func_then = () => {
                     input_elem.parent().append(btn_a);
                     let mk_func = (row, next_elem) => {
                         // row, next_elemの値を残すためにクロージャーにする
-                        return () => {add_form_func(0, row, next_elem);}
+                        return () => {
+                            r = {...row};
+                            r.hide = false;
+                            add_form_func(0, r, next_elem);
+                        }
                     }
                     btn_a.click(mk_func(row, input_elem.parent().parent()));
                     // 2個目以降は削除ボタンを追加

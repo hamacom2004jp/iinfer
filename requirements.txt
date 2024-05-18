@@ -4,6 +4,7 @@ eel
 motpy
 opencv-python
 Pillow
+wxPython
 pytest
 pytest-order
 pyyaml

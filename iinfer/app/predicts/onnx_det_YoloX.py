@@ -2,7 +2,7 @@ from pathlib import Path
 from PIL import Image
 from iinfer.app import common, predict
 from iinfer.app.commons import convert
-from typing import List, Tuple
+from typing import List, Tuple, Union
 import cv2
 import logging
 import numpy as np
@@ -18,7 +18,7 @@ class OnnxDetYoloX(predict.OnnxPredict):
     def __init__(self, logger:logging.Logger) -> None:
         super().__init__(logger)
 
-    def create_session(self, model_path:Path, model_conf_path:Path, model_provider:str, gpu_id:int=None):
+    def create_session(self, deploy_dir:Path, model_path:Path, model_conf_path:Path, model_provider:str, gpu_id:int=None):
         """
         推論セッションを作成する関数です。
         startコマンド実行時に呼び出されます。
@@ -26,6 +26,7 @@ class OnnxDetYoloX(predict.OnnxPredict):
         戻り値の推論セッションの型は問いません。
 
         Args:
+            deploy_dir (Path): デプロイディレクトリのパス
             model_path (Path): モデルファイルのパス
             model_conf_path (Path): モデル設定ファイルのパス
             gpu_id (int, optional): GPU ID. Defaults to None.
@@ -40,22 +41,18 @@ class OnnxDetYoloX(predict.OnnxPredict):
             session = rt.InferenceSession(model_path, providers=[model_provider], providers_options=[{'device_id': str(gpu_id)}])
         return session
 
-    def predict(self, session, img_width:int, img_height:int, image:Image.Image, labels:List[str]=None, colors:List[Tuple[int]]=None, nodraw:bool=False):
+    def predict(self, model, img_width:int, img_height:int, input_data:Union[Image.Image, str], labels:List[str]=None, colors:List[Tuple[int]]=None, nodraw:bool=False):
         """
         予測を行う関数です。
         predictコマンドやcaptureコマンド実行時に呼び出されます。
-        引数のimageはRGBですので、戻り値の出力画像もRGBにしてください。
+        引数のinput_dataが画像の場合RGBですので、戻り値の出力画像もRGBにしてください。
         戻り値の推論結果のdictは、通常推論結果項目ごとに値(list)を設定します。
-        例）Image Classification（EfficientNet_Lite4）の場合
-        return dict(output_scores=output_scores, output_classes=output_classes), image_obj
-        例）Object Detection（YoloX）の場合
-        return dict(output_boxes=final_boxes, output_scores=final_scores, output_classes=final_cls_inds), output_image
 
         Args:
-            session: 推論セッション
-            img_width (int): モデルのINPUTサイズ（画像の幅）
-            img_height (int): モデルのINPUTサイズ（画像の高さ）
-            image (Image): 入力画像（RGB配列であること）
+            model: 推論セッション
+            img_width (int): モデルのINPUTサイズ（input_dataが画像の場合は、画像の幅）
+            img_height (int): モデルのINPUTサイズ（input_dataが画像の場合は、画像の高さ）
+            input_data (Image | str): 推論するデータ（画像の場合RGB配列であること）
             labels (List[str], optional): クラスラベルのリスト. Defaults to None.
             colors (List[Tuple[int]], optional): ボックスの色のリスト. Defaults to None.
             nodraw (bool, optional): 描画フラグ. Defaults to False.
@@ -64,13 +61,13 @@ class OnnxDetYoloX(predict.OnnxPredict):
             Tuple[Dict[str, Any], Image]: 予測結果と出力画像(RGB)のタプル
         """
         # RGB画像をBGR画像に変換
-        img_npy = convert.img2npy(image)
+        img_npy = convert.img2npy(input_data)
         img_npy = convert.bgr2rgb(img_npy)
 
         input_shape = (img_width, img_height)
         img, ratio = self.preprocess(img_npy, input_shape)
 
-        output = session.run(None, {session.get_inputs()[0].name: img[None, :, :, :]})
+        output = model.run(None, {model.get_inputs()[0].name: img[None, :, :, :]})
         predictions = self.postprocess(output[0], input_shape)[0]
         boxes = predictions[:, :4]
         scores = predictions[:, 4:5] * predictions[:, 5:]
@@ -86,10 +83,10 @@ class OnnxDetYoloX(predict.OnnxPredict):
             final_boxes, final_scores, final_cls_inds = dets[:, :4], dets[:, 4], dets[:, 5]
             final_boxes = [[row[1],row[0],row[3],row[2]] for row in final_boxes]
             ids = [i for i in range(len(final_boxes))]
-            output_image, output_labels = common.draw_boxes(image, final_boxes, final_scores, final_cls_inds, ids=ids, labels=labels, colors=colors, nodraw=nodraw)
+            output_image, output_labels = common.draw_boxes(input_data, final_boxes, final_scores, final_cls_inds, ids=ids, labels=labels, colors=colors, nodraw=nodraw)
 
             return dict(output_ids=ids, output_scores=final_scores, output_classes=final_cls_inds, output_labels=output_labels, output_boxes=final_boxes), output_image
-        return dict(output_ids=[], output_scores=[], output_classes=[], output_labels=[], output_boxes=[]), image
+        return dict(output_ids=[], output_scores=[], output_classes=[], output_labels=[], output_boxes=[]), input_data
 
     def preprocess(self, img, input_size, swap=(2, 0, 1)):
         """

@@ -95,6 +95,10 @@ def test_05_01_client_deploy_list(capfd):
 
 @pytest.mark.run(order=6)
 def test_06_01_client_start(capfd):
+    try:
+        test_04_01_client_deploy(capfd)
+    except:
+        pass
     cmd = f"-m client -c start --svname server1 -n onnx_det_YoloX_Lite --use_track".split(' ')
     _, result = app.IinferApp().main(args_list=cmd)
     out, err = capfd.readouterr()
@@ -103,7 +107,11 @@ def test_06_01_client_start(capfd):
 
 @pytest.mark.run(order=6)
 def test_06_02_client_start(capfd):
-    cmd = f"-m client -c start --svname server2 -n mmdet_det_YoloX_Lite".split(' ')
+    try:
+        test_04_02_client_deploy(capfd)
+    except:
+        pass
+    cmd = f"-m client -c start --svname server2 -n mmdet_det_YoloX_Lite --timeout 120".split(' ')
     _, result = app.IinferApp().main(args_list=cmd)
     out, err = capfd.readouterr()
     print(out)
@@ -111,6 +119,10 @@ def test_06_02_client_start(capfd):
 
 @pytest.mark.run(order=6)
 def test_06_03_client_start(capfd):
+    try:
+        test_04_03_client_deploy(capfd)
+    except:
+        pass
     cmd = f"-m client -c start --svname server1 -n onnx_cls_EfficientNet_Lite4".split(' ')
     _, result = app.IinferApp().main(args_list=cmd)
     out, err = capfd.readouterr()
@@ -119,7 +131,11 @@ def test_06_03_client_start(capfd):
 
 @pytest.mark.run(order=6)
 def test_06_04_client_start(capfd):
-    cmd = f"-m client -c start --svname server3 -n mmpretrain_cls_swin_Lite".split(' ')
+    try:
+        test_04_04_client_deploy(capfd)
+    except:
+        pass
+    cmd = f"-m client -c start --svname server3 -n mmpretrain_cls_swin_Lite --timeout 120".split(' ')
     _, result = app.IinferApp().main(args_list=cmd)
     out, err = capfd.readouterr()
     print(out)
@@ -153,8 +169,12 @@ def test_08_01_client_capture(capfd):
 
 @pytest.mark.run(order=9)
 def test_09_01_client_predict(capfd):
+    try:
+        test_06_01_client_start(capfd)
+    except:
+        pass
     cmd = f"-m client -c predict --svname server1 -n onnx_det_YoloX_Lite --output_preview " \
-          f"-i cap.csv --image_type capture".split(' ')
+          f"-i cap.csv --pred_input_type capture".split(' ')
     _, result = app.IinferApp().main(args_list=cmd)
     out, err = capfd.readouterr()
     with open('onnx_det_YoloX_Lite.json', 'w', encoding='utf-8') as f:
@@ -166,8 +186,12 @@ def test_09_01_client_predict(capfd):
 
 @pytest.mark.run(order=9)
 def test_09_02_client_predict(capfd):
+    try:
+        test_06_02_client_start(capfd)
+    except:
+        pass
     cmd = f"-m client -c predict --svname server2 -n mmdet_det_YoloX_Lite --output_preview " \
-          f"-i cap.csv --image_type capture".split(' ')
+          f"-i cap.csv --pred_input_type capture".split(' ')
     _, result = app.IinferApp().main(args_list=cmd)
     out, err = capfd.readouterr()
     with open('mmdet_det_YoloX_Lite.json', 'w', encoding='utf-8') as f:
@@ -179,6 +203,10 @@ def test_09_02_client_predict(capfd):
 
 @pytest.mark.run(order=9)
 def test_09_03_client_predict(capfd):
+    try:
+        test_06_03_client_start(capfd)
+    except:
+        pass
     cmd = f"-m client -c predict --svname server1 -n onnx_cls_EfficientNet_Lite4 --output_preview " \
           f"-i tests/dog.jpg --image_type jpeg".split(' ')
     _, result = app.IinferApp().main(args_list=cmd)
@@ -191,6 +219,10 @@ def test_09_03_client_predict(capfd):
 
 @pytest.mark.run(order=9)
 def test_09_04_client_predict(capfd):
+    try:
+        test_06_04_client_start(capfd)
+    except:
+        pass
     cmd = f"-m client -c predict --svname server3 -n mmpretrain_cls_swin_Lite --output_preview " \
           f"-i tests/dog.jpg --image_type jpeg".split(' ')
     _, result = app.IinferApp().main(args_list=cmd)

@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>カスタマイズ &mdash; iinfer 2024/05/06 documentation</title>
+  <title>カスタマイズ &mdash; iinfer 2024/05/18 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -16,7 +16,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=320cb72d"></script>
+        <script src="../_static/documentation_options.js?v=1aa140b2"></script>
         <script src="../_static/doctools.js?v=9a2dae69"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -109,71 +109,83 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 
 <span class="k">class</span> <span class="nc">Predict</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-      <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">            このクラスのインスタンスを初期化します。</span>
-<span class="sd">            継承時は、このコンストラクタを呼び出すようにしてください。</span>
-<span class="sd">                  super().__init__(logger)</span>
-<span class="sd">            Args:</span>
-<span class="sd">                  logger (logging.Logger): ロガー</span>
-<span class="sd">            &quot;&quot;&quot;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logger</span>
+<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">      </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">      このクラスのインスタンスを初期化します。</span>
+<span class="sd">      継承時は、このコンストラクタを呼び出すようにしてください。</span>
+<span class="sd">            super().__init__(logger)</span>
+<span class="sd">      Args:</span>
+<span class="sd">            logger (logging.Logger): ロガー</span>
+<span class="sd">      &quot;&quot;&quot;</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logger</span>
 
-      <span class="k">def</span> <span class="nf">is_gpu_available</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gpu_id</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">            GPUが利用可能かどうかを返す関数です。</span>
-<span class="sd">            戻り値がTrueの場合、GPUが利用可能です。</span>
-<span class="sd">            戻り値がFalseの場合、GPUが利用不可です。</span>
+<span class="k">def</span> <span class="nf">is_gpu_available</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gpu_id</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">      </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">      GPUが利用可能かどうかを返す関数です。</span>
+<span class="sd">      戻り値がTrueの場合、GPUが利用可能です。</span>
+<span class="sd">      戻り値がFalseの場合、GPUが利用不可です。</span>
 
-<span class="sd">            Args:</span>
-<span class="sd">                  gpu_id (int, optional): GPU ID. Defaults to None.</span>
-<span class="sd">            Returns:</span>
-<span class="sd">                  bool: GPUが利用可能かどうか</span>
-<span class="sd">            &quot;&quot;&quot;</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+<span class="sd">      Args:</span>
+<span class="sd">            gpu_id (int, optional): GPU ID. Defaults to None.</span>
+<span class="sd">      Returns:</span>
+<span class="sd">            bool: GPUが利用可能かどうか</span>
+<span class="sd">      &quot;&quot;&quot;</span>
+      <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
 
-      <span class="k">def</span> <span class="nf">create_session</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">model_path</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="n">model_conf_path</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="n">model_provider</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">gpu_id</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">            推論セッションを作成する関数です。</span>
-<span class="sd">            startコマンド実行時に呼び出されます。</span>
-<span class="sd">            この関数内でAIモデルのロードを行い、推論準備を完了するようにしてください。</span>
-<span class="sd">            戻り値の推論セッションの型は問いません。</span>
+<span class="k">def</span> <span class="nf">post_deploy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deploy_dir</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="n">conf</span><span class="p">:</span><span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">      </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">      デプロイ後の処理を行う関数です。</span>
+<span class="sd">      deployコマンド実行時に呼び出されます。</span>
+<span class="sd">      この関数内でデプロイ後の処理を実装してください。</span>
 
-<span class="sd">            Args:</span>
-<span class="sd">                  logger (logging.Logger): ロガー</span>
-<span class="sd">                  model_path (Path): モデルファイルのパス</span>
-<span class="sd">                  model_conf_path (Path): モデル設定ファイルのパス</span>
-<span class="sd">                  gpu_id (int, optional): GPU ID. Defaults to None.</span>
+<span class="sd">      Args:</span>
+<span class="sd">            deploy_dir (Path): デプロイディレクトリのパス</span>
+<span class="sd">            conf (dict): デプロイ設定</span>
+<span class="sd">      &quot;&quot;&quot;</span>
+      <span class="k">pass</span>
 
-<span class="sd">            Returns:</span>
-<span class="sd">                  推論セッション</span>
-<span class="sd">            &quot;&quot;&quot;</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">create_session</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deploy_dir</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="n">model_path</span><span class="p">:</span><span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="o">|</span><span class="n">Any</span><span class="p">],</span> <span class="n">model_conf_path</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="n">model_provider</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">gpu_id</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">      </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">      推論セッションを作成する関数です。</span>
+<span class="sd">      startコマンド実行時に呼び出されます。</span>
+<span class="sd">      この関数内でAIモデルのロードを行い、推論準備を完了するようにしてください。</span>
+<span class="sd">      戻り値の推論セッションの型は問いません。</span>
 
-      <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">img_width</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">img_height</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">image</span><span class="p">:</span><span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">,</span> <span class="n">labels</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">colors</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nodraw</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">]:</span>
-<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">            予測を行う関数です。</span>
-<span class="sd">            predictコマンドやcaptureコマンド実行時に呼び出されます。</span>
-<span class="sd">            引数のimageはRGBですので、戻り値の出力画像もRGBにしてください。</span>
-<span class="sd">            戻り値の推論結果のdictは、通常推論結果項目ごとに値(list)を設定します。</span>
-<span class="sd">            例）Image Classification（EfficientNet_Lite4）の場合</span>
-<span class="sd">            return dict(output_scores=output_scores, output_classes=output_classes), image_obj</span>
-<span class="sd">            例）Object Detection（YoloX）の場合</span>
-<span class="sd">            return dict(output_boxes=final_boxes, output_scores=final_scores, output_classes=final_cls_inds), output_image</span>
+<span class="sd">      Args:</span>
+<span class="sd">            deploy_dir (Path): デプロイディレクトリのパス</span>
+<span class="sd">            model_path (Path|Any): モデルファイルのパス</span>
+<span class="sd">            model_conf_path (Path): モデル設定ファイルのパス</span>
+<span class="sd">            gpu_id (int, optional): GPU ID. Defaults to None.</span>
 
-<span class="sd">            Args:</span>
-<span class="sd">                  session: 推論セッション</span>
-<span class="sd">                  img_width (int): モデルのINPUTサイズ（画像の幅）</span>
-<span class="sd">                  img_height (int): モデルのINPUTサイズ（画像の高さ）</span>
-<span class="sd">                  image (Image): 入力画像（RGB配列であること）</span>
-<span class="sd">                  labels (List[str], optional): クラスラベルのリスト. Defaults to None.</span>
-<span class="sd">                  colors (List[Tuple[int]], optional): ボックスの色のリスト. Defaults to None.</span>
-<span class="sd">                  nodraw (bool, optional): 描画フラグ. Defaults to False.</span>
+<span class="sd">      Returns:</span>
+<span class="sd">            推論セッション</span>
+<span class="sd">      &quot;&quot;&quot;</span>
+      <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
 
-<span class="sd">            Returns:</span>
-<span class="sd">                  Tuple[Dict[str, Any], Image]: 予測結果と出力画像(RGB)のタプル</span>
-<span class="sd">            &quot;&quot;&quot;</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">img_width</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">img_height</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">image</span><span class="p">:</span><span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">,</span> <span class="n">labels</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">colors</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nodraw</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">]:</span>
+<span class="w">      </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">      予測を行う関数です。</span>
+<span class="sd">      predictコマンドやcaptureコマンド実行時に呼び出されます。</span>
+<span class="sd">      引数のimageはRGBですので、戻り値の出力画像もRGBにしてください。</span>
+<span class="sd">      戻り値の推論結果のdictは、通常推論結果項目ごとに値(list)を設定します。</span>
+<span class="sd">      例）Image Classification（EfficientNet_Lite4）の場合</span>
+<span class="sd">      return dict(output_scores=output_scores, output_classes=output_classes), image_obj</span>
+<span class="sd">      例）Object Detection（YoloX）の場合</span>
+<span class="sd">      return dict(output_boxes=final_boxes, output_scores=final_scores, output_classes=final_cls_inds), output_image</span>
+
+<span class="sd">      Args:</span>
+<span class="sd">            session: 推論セッション</span>
+<span class="sd">            img_width (int): モデルのINPUTサイズ（画像の幅）</span>
+<span class="sd">            img_height (int): モデルのINPUTサイズ（画像の高さ）</span>
+<span class="sd">            image (Image): 入力画像（RGB配列であること）</span>
+<span class="sd">            labels (List[str], optional): クラスラベルのリスト. Defaults to None.</span>
+<span class="sd">            colors (List[Tuple[int]], optional): ボックスの色のリスト. Defaults to None.</span>
+<span class="sd">            nodraw (bool, optional): 描画フラグ. Defaults to False.</span>
+
+<span class="sd">      Returns:</span>
+<span class="sd">            Tuple[Dict[str, Any], Image]: 予測結果と出力画像(RGB)のタプル</span>
+<span class="sd">      &quot;&quot;&quot;</span>
+      <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
 </pre></div>
 </div>
 </div></blockquote>

@@ -22,7 +22,8 @@ INSTALL_REQUIRES = [
     'requests',
     'tabulate',
     'urllib3',
-    'wheel'
+    'wheel',
+    'wxPython'
 ]
 PACKAGES = [
     'iinfer',

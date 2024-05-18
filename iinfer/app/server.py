@@ -3,7 +3,7 @@ from pathlib import Path
 from PIL import Image
 from iinfer.app import common, predict, injection
 from iinfer.app.commons import convert, module
-from typing import List, Dict, Any, Tuple
+from typing import List, Dict, Any, Tuple, Union
 import base64
 import datetime
 import logging
@@ -216,15 +216,16 @@ class Server(object):
                 elif msg[0] == 'stop':
                     st = self.stop(msg[1], msg[2])
                 elif msg[0] == 'predict':
-                    #byteio = BytesIO(base64.b64decode(msg[3]))
-                    #img_npy = np.load(byteio)
                     nodraw = True if msg[4] == 'True' else False
                     shape = [int(msg[5]), int(msg[6])]
                     if int(msg[7]) > 0: shape.append(int(msg[7]))
                     output_image_name = msg[8]
-                    img_npy = convert.b64str2npy(msg[3], shape)
-                    image = convert.npy2img(img_npy)
-                    st = self.predict(msg[1], msg[2], image, output_image_name, nodraw)
+                    if shape[0] >0 and shape[1] > 0:
+                        img_npy = convert.b64str2npy(msg[3], shape)
+                        image = convert.npy2img(img_npy)
+                        st = self.predict(msg[1], msg[2], image, output_image_name, nodraw)
+                    else:
+                        st = self.predict(msg[1], msg[2], convert.b64str2str(msg[3]), output_image_name, nodraw)
                 elif msg[0] == 'stop_server':
                     self.is_running = False
                     self.responce(msg[1], {"success": f"Successful stop server. svname={self.svname}"})
@@ -367,26 +368,27 @@ class Server(object):
             return self.RESP_WARN
 
         common.mkdirs(deploy_dir)
-        def _save_s(file:str, data:bytes):
+        def _save_s(file:str, data:bytes, ret_fn:bool=False):
             if file is None or data is None:
-                return False, None
+                return False, file if ret_fn else None
             file = deploy_dir / file
             with open(file, "wb") as f:
                 f.write(data)
                 self.logger.info(f"Save {file} to {str(deploy_dir)}")
-            return True, file
+            return True, file if ret_fn else None
 
-        if model_file.startswith("http") and (model_bin is None or model_bin == ''):
-            model_path = deploy_dir / urllib.parse.urlparse(model_file).path.split('/')[-1]
-            if not model_path.exists():
-                self.logger.info(f"Downloading. {model_file}")
-                urllib.request.urlretrieve(model_file, model_path)
-                self.logger.info(f"Save {model_path}")
+        if common.BASE_MODELS[predict_type]['required_model_weight']:
+            if model_file.startswith("http") and (model_bin is None or model_bin == ''):
+                model_path = deploy_dir / urllib.parse.urlparse(model_file).path.split('/')[-1]
+                if not model_path.exists():
+                    self.logger.info(f"Downloading. {model_file}")
+                    urllib.request.urlretrieve(model_file, model_path)
+                    self.logger.info(f"Save {model_path}")
+                else:
+                    self.logger.info(f"Already exists. {model_path}")
+                model_file = model_path
             else:
-                self.logger.info(f"Already exists. {model_path}")
-            model_file = model_path
-        else:
-            ret, model_file = _save_s(model_file, model_bin)
+                ret, model_file = _save_s(model_file, model_bin, ret_fn=True)
 
         ret, before_injection_conf = _save_s("before_injection_conf.json", before_injection_conf)
         ret, after_injection_conf = _save_s("after_injection_conf.json", after_injection_conf)
@@ -469,6 +471,17 @@ class Server(object):
                     return self.RESP_ERROR
             shutil.copytree(self.data_dir / "mmsegmentation" / "configs", deploy_dir / "configs", dirs_exist_ok=True)
             self.logger.info(f"Copy mmsegmentation configs to {str(deploy_dir / 'configs')}")
+
+        try:
+            ret, predict_obj = module.build_predict(conf["predict_type"], conf["custom_predict_file"], self.logger)
+            if not ret:
+                self.responce(reskey, predict_obj)
+                return self.RESP_WARN
+            predict_obj.post_deploy(deploy_dir, conf)
+        except Exception as e:
+            self.logger.warn(f"Failed to load Predict: {e}", exc_info=True)
+            self.responce(reskey, {"warn": f"Failed to load Predict: {e}"})
+            return self.RESP_WARN
 
         self.responce(reskey, {"success": f"Save conf.json to {str(deploy_dir)}"})
         return self.RESP_SCCESS
@@ -577,7 +590,10 @@ class Server(object):
             return self.RESP_WARN
         with open(conf_path, "r") as cf:
             conf = json.load(cf)
-            model_path = Path(conf["model_file"])
+            if conf['predict_type'] != 'Custom' and common.BASE_MODELS[conf['predict_type']]['required_model_weight']:
+                model_path = Path(conf["model_file"])
+            else:
+                model_path = conf["model_file"]
             if "model_conf_file" in conf and conf["model_conf_file"] is not None and len(conf["model_conf_file"]) > 0:
                 model_conf_path = Path(conf["model_conf_file"][0])
             else:
@@ -618,7 +634,7 @@ class Server(object):
                     paths = [Path(p) for p in conf["after_injection_py"]]
                     after_injections = [] if after_injections is None else after_injections
                     after_injections = module.load_after_injections(paths, after_injection_conf, self.logger)
-                if not model_path.exists():
+                if type(model_path) is Path and not model_path.exists():
                     self.logger.warn(f"Model path {str(model_path)} does not exist")
                     self.responce(reskey, {"warn": f"Model path {str(model_path)} does not exist"})
                     return self.RESP_WARN
@@ -627,19 +643,10 @@ class Server(object):
                 self.responce(reskey, {"warn": f"Failed to load after_injection: {e}"})
                 return self.RESP_WARN
             try:
-                if conf["predict_type"] == 'Custom':
-                    custom_predict_py = Path(conf["custom_predict_file"]) if conf["custom_predict_file"] is not None else None
-                    if custom_predict_py is None:
-                        self.logger.warn(f"predict_type is Custom but custom_predict_py is None.")
-                        self.responce(reskey, {"warn": f"predict_type is Custom but custom_predict_py is None."})
-                        return self.RESP_WARN
-                    if not custom_predict_py.exists():
-                        self.logger.warn(f"custom_predict_py path {str(custom_predict_py)} does not exist")
-                        self.responce(reskey, {"warn": f"custom_predict_py path {str(custom_predict_py)} does not exist"})
-                        return self.RESP_WARN
-                    predict_obj = module.load_custom_predict(custom_predict_py, self.logger)
-                else:
-                    predict_obj = module.load_predict(conf["predict_type"], self.logger)
+                ret, predict_obj = module.build_predict(conf["predict_type"], conf["custom_predict_file"], self.logger)
+                if not ret:
+                    self.responce(reskey, predict_obj)
+                    return self.RESP_WARN
             except Exception as e:
                 self.logger.warn(f"Failed to load Predict: {e}", exc_info=True)
                 self.responce(reskey, {"warn": f"Failed to load Predict: {e}"})
@@ -665,7 +672,7 @@ class Server(object):
             else:
                 colors = None
             try:
-                session = predict_obj.create_session(model_path, model_conf_path, model_provider, gpu_id=gpuid)
+                session = predict_obj.create_session(deploy_dir, model_path, model_conf_path, model_provider, gpu_id=gpuid)
                 self.sessions[name] = dict(
                     session=session,
                     model_img_width=conf["model_img_width"],
@@ -707,14 +714,14 @@ class Server(object):
         self.responce(reskey, {"success": f"Successful stop of {name} session."})
         return self.RESP_SCCESS
 
-    def predict(self, reskey:str, name:str, image:Image.Image, output_image_name:str, nodraw:bool):
+    def predict(self, reskey:str, name:str, input_data:Union[Image.Image, str], output_image_name:str, nodraw:bool):
         """
         クライアントから送られてきた画像の推論を行う。
 
         Args:
             reskey (str): レスポンスキー
             name (dict): モデル名
-            image (Image.Image): 推論する画像データ
+            input_data (Image.Image | str): 推論するデータ
             output_image_name (str): 出力画像のファイル名
             nodraw (bool): 描画フラグ
         """
@@ -722,9 +729,9 @@ class Server(object):
             self.logger.warn(f"Name is empty.")
             self.responce(reskey, {"warn": f"Name is empty."})
             return self.RESP_WARN
-        if image is None:
-            self.logger.warn(f"img_npy is empty.")
-            self.responce(reskey, {"warn": f"img_npy is empty."})
+        if input_data is None:
+            self.logger.warn(f"input_data is empty.")
+            self.responce(reskey, {"warn": f"input_data is empty."})
             return self.RESP_WARN
         if name not in self.sessions:
             self.logger.warn(f"{name} has not yet started a session.")
@@ -739,11 +746,11 @@ class Server(object):
             if session['before_injections'] is not None:
                 injections:List[injection.BeforeInjection] = session['before_injections']
                 for inject in injections:
-                    image = inject.action(reskey, name, image, session)
+                    input_data = inject.action(reskey, name, input_data, session)
             before_injections_end = time.perf_counter()
             # 推論を実行
             predict_obj:predict.Predict = session['predict_obj']
-            outputs, output_image = predict_obj.predict(session['session'], session['model_img_width'], session['model_img_height'], image,
+            outputs, output_image = predict_obj.predict(session['session'], session['model_img_width'], session['model_img_height'], input_data,
                                                         labels=session['labels'], colors=session['colors'], nodraw=nodraw)
             outputs['image_name'] = output_image_name
             predict_end = time.perf_counter()
@@ -753,8 +760,8 @@ class Server(object):
                     session['tracker'].step(detections=detections)
                     tracks = session['tracker'].active_tracks()
                     outputs['output_tracks'] = [t.id for t in tracks]
-                    if image is not None and not nodraw:
-                        image = common.draw_boxes(image, outputs['output_boxes'], outputs['output_scores'], outputs['output_classes'], ids=outputs['output_tracks'])
+                    if output_image is not None and not nodraw:
+                        output_image, _ = common.draw_boxes(output_image, outputs['output_boxes'], outputs['output_scores'], outputs['output_classes'], ids=outputs['output_tracks'])
             tracker_end = time.perf_counter()
 
             def _after_injection(reskey:str, name:str, output:dict, output_image:Image.Image, session:dict):

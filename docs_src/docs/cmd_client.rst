@@ -122,7 +122,7 @@ clientモードのコマンド一覧です。
     "-i,--input_file <推論対象の画像ファイル>","","推論させる画像をファイルで指定します"
     "--stdin","","推論させる画像を標準入力から読み込む"
     "--nodraw","","推論結果画像にbbox等の描き込みを行わない"
-    "--image_type <推論対象の画像タイプ>","","推論させる画像のタイプを指定します。指定可能な画像タイプは `bmp` , `png` , `jpeg` , `capture` , `output_json` "
+    "--pred_input_type <推論対象の入力タイプ>","","推論させる入力タイプを指定します。指定可能な入力タイプは `bmp` , `png` , `jpeg` , `capture` , `output_json` , `prompt` "
     "--output_image <推論結果画像の保存先ファイル>","","推論結果画像の保存先ファイルを指定します"
     "-P,--output_preview","","推論結果画像を `cv2.imshow` で表示します"
     "--timeout <タイムアウト>","","サーバーの応答が返ってくるまでの最大待ち時間"
@@ -134,7 +134,7 @@ clientモードのコマンド一覧です。
 
 .. code-block:: bat
 
-   iinfer -m client -c capture <Option> | iinfer -m client -c predict --stdin --image_type capture <Option>
+   iinfer -m client -c capture <Option> | iinfer -m client -c predict --stdin --pred_image_type capture <Option>
 
 .. csv-table::
     :widths: 20, 10, 70
@@ -151,6 +151,22 @@ clientモードのコマンド一覧です。
     "--output_csv <処理結果csvの保存先ファイル>","","キャプチャーした内容をcsvで保存します。これを指定した場合、標準出力は行いません。"
     "-o, --output_json <処理結果jsonの保存先ファイル>","","このオプションは使用できません"
     "-a, --output_json_append","","このオプションは使用できません"
+
+クライアント(プロンプトの実行) : `iinfer -m client -c prompt <Option>`
+==============================================================================
+
+このコマンドは、パイプで接続して下記のように使用します。
+
+.. code-block:: bat
+
+   iinfer -m client -c prompt <Option> | iinfer -m client -c predict --stdin --pred_input_type prompt <Option>
+
+.. csv-table::
+    :widths: 20, 10, 70
+    :header-rows: 1
+
+    "Option","Required","Description"
+
 
 クライアント(サーバーファイルリスト) : `iinfer -m client -c file_list <Option>`
 ========================================================================================

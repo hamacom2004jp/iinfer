@@ -1,6 +1,6 @@
 from pathlib import Path
 from PIL import Image
-from typing import List, Tuple, Dict, Any
+from typing import List, Tuple, Dict, Any, Union
 import logging
 
 
@@ -28,7 +28,19 @@ class Predict(object):
         """
         raise NotImplementedError()
 
-    def create_session(self, logger:logging.Logger, model_path:Path, model_conf_path:Path, model_provider:str, gpu_id:int=None) -> Any:
+    def post_deploy(self, deploy_dir:Path, conf:dict) -> None:
+        """
+        デプロイ後の処理を行う関数です。
+        deployコマンド実行時に呼び出されます。
+        この関数内でデプロイ後の処理を実装してください。
+        
+        Args:
+            deploy_dir (Path): デプロイディレクトリのパス
+            conf (dict): デプロイ設定
+        """
+        pass
+
+    def create_session(self, deploy_dir:Path, model_path:Union[Path|Any], model_conf_path:Path, model_provider:str, gpu_id:int=None) -> Any:
         """
         推論セッションを作成する関数です。
         startコマンド実行時に呼び出されます。
@@ -36,8 +48,8 @@ class Predict(object):
         戻り値の推論セッションの型は問いません。
 
         Args:
-            logger (logging.Logger): ロガー
-            model_path (Path): モデルファイルのパス
+            deploy_dir (Path): デプロイディレクトリのパス
+            model_path (Path|Any): モデルファイルのパス
             model_conf_path (Path): モデル設定ファイルのパス
             gpu_id (int, optional): GPU ID. Defaults to None.
 
@@ -82,14 +94,14 @@ class OnnxPredict(Predict):
         """
         super().__init__(logger)
 
-    def is_gpu_available(self, model_path:Path, model_conf_path:Path, gpu_id:int=None) -> bool:
+    def is_gpu_available(self, model_path:Union[Path|Any], model_conf_path:Path, gpu_id:int=None) -> bool:
         """
         GPUが利用可能かどうかを返す関数です。
         戻り値がTrueの場合、GPUが利用可能です。
         戻り値がFalseの場合、GPUが利用不可です。
 
         Args:
-            model_path (Path): モデルファイルのパス
+            model_path (Path|Any): モデルファイルのパス
             model_conf_path (Path): モデル設定ファイルのパス
             gpu_id (int, optional): GPU ID. Defaults to None.
         Returns:
@@ -115,14 +127,14 @@ class TorchPredict(Predict):
         """
         super().__init__(logger)
 
-    def is_gpu_available(self, model_path:Path, model_conf_path:Path, gpu_id:int=None) -> bool:
+    def is_gpu_available(self, model_path:Union[Path|Any], model_conf_path:Path, gpu_id:int=None) -> bool:
         """
         GPUが利用可能かどうかを返す関数です。
         戻り値がTrueの場合、GPUが利用可能です。
         戻り値がFalseの場合、GPUが利用不可です。
 
         Args:
-            model_path (Path): モデルファイルのパス
+            model_path (Path|Any): モデルファイルのパス
             model_conf_path (Path): モデル設定ファイルのパス
             gpu_id (int, optional): GPU ID. Defaults to None.
         Returns:

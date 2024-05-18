@@ -60,6 +60,14 @@ iinfer.app.install module
    :undoc-members:
    :show-inheritance:
 
+iinfer.app.options module
+-------------------------
+
+.. automodule:: iinfer.app.options
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 iinfer.app.postprocess module
 -----------------------------
 
@@ -88,6 +96,14 @@ iinfer.app.server module
 ------------------------
 
 .. automodule:: iinfer.app.server
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+iinfer.app.web module
+---------------------
+
+.. automodule:: iinfer.app.web
    :members:
    :undoc-members:
    :show-inheritance:

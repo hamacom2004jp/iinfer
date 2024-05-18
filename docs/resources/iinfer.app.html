@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>iinfer.app package &mdash; iinfer 2024/05/06 documentation</title>
+  <title>iinfer.app package &mdash; iinfer 2024/05/18 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -16,7 +16,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=320cb72d"></script>
+        <script src="../_static/documentation_options.js?v=1aa140b2"></script>
         <script src="../_static/doctools.js?v=9a2dae69"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -95,11 +95,28 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="iinfer.app.predicts.html">iinfer.app.predicts package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="iinfer.app.predicts.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="iinfer.app.predicts.html#module-iinfer.app.predicts.diffusers_stablediffusionpipeline_txt2img">iinfer.app.predicts.diffusers_stablediffusionpipeline_txt2img module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.diffusers_stablediffusionpipeline_txt2img.Diffusers_StableDiffusionPipeline_Txt2Img"><code class="docutils literal notranslate"><span class="pre">Diffusers_StableDiffusionPipeline_Txt2Img</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.diffusers_stablediffusionpipeline_txt2img.Diffusers_StableDiffusionPipeline_Txt2Img.create_session"><code class="docutils literal notranslate"><span class="pre">Diffusers_StableDiffusionPipeline_Txt2Img.create_session()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.diffusers_stablediffusionpipeline_txt2img.Diffusers_StableDiffusionPipeline_Txt2Img.predict"><code class="docutils literal notranslate"><span class="pre">Diffusers_StableDiffusionPipeline_Txt2Img.predict()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="iinfer.app.predicts.html#module-iinfer.app.predicts.insightface_det">iinfer.app.predicts.insightface_det module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.insightface_det.InsightfaceDet"><code class="docutils literal notranslate"><span class="pre">InsightfaceDet</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.insightface_det.InsightfaceDet.create_session"><code class="docutils literal notranslate"><span class="pre">InsightfaceDet.create_session()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.insightface_det.InsightfaceDet.predict"><code class="docutils literal notranslate"><span class="pre">InsightfaceDet.predict()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.insightface_det.InsightfaceDet.search_face"><code class="docutils literal notranslate"><span class="pre">InsightfaceDet.search_face()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="iinfer.app.predicts.html#module-iinfer.app.predicts.llamaindex_elyza_search">iinfer.app.predicts.llamaindex_elyza_search module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.llamaindex_elyza_search.LlamaIndex_ELYZA_Search"><code class="docutils literal notranslate"><span class="pre">LlamaIndex_ELYZA_Search</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.llamaindex_elyza_search.LlamaIndex_ELYZA_Search.create_session"><code class="docutils literal notranslate"><span class="pre">LlamaIndex_ELYZA_Search.create_session()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.llamaindex_elyza_search.LlamaIndex_ELYZA_Search.post_deploy"><code class="docutils literal notranslate"><span class="pre">LlamaIndex_ELYZA_Search.post_deploy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.llamaindex_elyza_search.LlamaIndex_ELYZA_Search.predict"><code class="docutils literal notranslate"><span class="pre">LlamaIndex_ELYZA_Search.predict()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -130,18 +147,6 @@
 <li class="toctree-l3"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.mmpretrain_cls_swin_Lite.MMPretrainClsSwinLite"><code class="docutils literal notranslate"><span class="pre">MMPretrainClsSwinLite</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="iinfer.app.predicts.html#module-iinfer.app.predicts.mmrotate_det_ReDet">iinfer.app.predicts.mmrotate_det_ReDet module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.mmrotate_det_ReDet.MMRotateReDet"><code class="docutils literal notranslate"><span class="pre">MMRotateReDet</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.mmrotate_det_ReDet.MMRotateReDet.create_session"><code class="docutils literal notranslate"><span class="pre">MMRotateReDet.create_session()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.mmrotate_det_ReDet.MMRotateReDet.multiclass_nms"><code class="docutils literal notranslate"><span class="pre">MMRotateReDet.multiclass_nms()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.mmrotate_det_ReDet.MMRotateReDet.nms"><code class="docutils literal notranslate"><span class="pre">MMRotateReDet.nms()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.mmrotate_det_ReDet.MMRotateReDet.postprocess"><code class="docutils literal notranslate"><span class="pre">MMRotateReDet.postprocess()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.mmrotate_det_ReDet.MMRotateReDet.predict"><code class="docutils literal notranslate"><span class="pre">MMRotateReDet.predict()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.mmrotate_det_ReDet.MMRotateReDet.preprocess"><code class="docutils literal notranslate"><span class="pre">MMRotateReDet.preprocess()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
 <li class="toctree-l2"><a class="reference internal" href="iinfer.app.predicts.html#module-iinfer.app.predicts.mmseg_seg_PSPNet">iinfer.app.predicts.mmseg_seg_PSPNet module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.mmseg_seg_PSPNet.MMSegPSPNet"><code class="docutils literal notranslate"><span class="pre">MMSegPSPNet</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.mmseg_seg_PSPNet.MMSegPSPNet.create_session"><code class="docutils literal notranslate"><span class="pre">MMSegPSPNet.create_session()</span></code></a></li>
@@ -149,6 +154,10 @@
 <li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.mmseg_seg_PSPNet.MMSegPSPNet.predict"><code class="docutils literal notranslate"><span class="pre">MMSegPSPNet.predict()</span></code></a></li>
 </ul>
 </li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="iinfer.app.predicts.html#module-iinfer.app.predicts.mmseg_seg_San">iinfer.app.predicts.mmseg_seg_San module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.mmseg_seg_San.MMSegSan"><code class="docutils literal notranslate"><span class="pre">MMSegSan</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="iinfer.app.predicts.html#module-iinfer.app.predicts.mmseg_seg_SwinUpernet">iinfer.app.predicts.mmseg_seg_SwinUpernet module</a><ul>
@@ -167,20 +176,17 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="iinfer.app.predicts.html#module-iinfer.app.predicts.onnx_det_TinyYoloV3">iinfer.app.predicts.onnx_det_TinyYoloV3 module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.onnx_det_TinyYoloV3.OnnxDetTinyYoloV3"><code class="docutils literal notranslate"><span class="pre">OnnxDetTinyYoloV3</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.onnx_det_TinyYoloV3.OnnxDetTinyYoloV3.create_session"><code class="docutils literal notranslate"><span class="pre">OnnxDetTinyYoloV3.create_session()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.onnx_det_TinyYoloV3.OnnxDetTinyYoloV3.predict"><code class="docutils literal notranslate"><span class="pre">OnnxDetTinyYoloV3.predict()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.onnx_det_TinyYoloV3.OnnxDetTinyYoloV3.preprocess_img"><code class="docutils literal notranslate"><span class="pre">OnnxDetTinyYoloV3.preprocess_img()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.onnx_det_TinyYoloV3.OnnxDetTinyYoloV3.resize_img"><code class="docutils literal notranslate"><span class="pre">OnnxDetTinyYoloV3.resize_img()</span></code></a></li>
 </ul>
 </li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="iinfer.app.predicts.html#module-iinfer.app.predicts.onnx_det_YoloV3">iinfer.app.predicts.onnx_det_YoloV3 module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.onnx_det_YoloV3.OnnxDetTinyYoloV3"><code class="docutils literal notranslate"><span class="pre">OnnxDetTinyYoloV3</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.onnx_det_YoloV3.OnnxDetTinyYoloV3.create_session"><code class="docutils literal notranslate"><span class="pre">OnnxDetTinyYoloV3.create_session()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.onnx_det_YoloV3.OnnxDetTinyYoloV3.predict"><code class="docutils literal notranslate"><span class="pre">OnnxDetTinyYoloV3.predict()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.onnx_det_YoloV3.OnnxDetTinyYoloV3.preprocess_img"><code class="docutils literal notranslate"><span class="pre">OnnxDetTinyYoloV3.preprocess_img()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.onnx_det_YoloV3.OnnxDetTinyYoloV3.resize_img"><code class="docutils literal notranslate"><span class="pre">OnnxDetTinyYoloV3.resize_img()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.onnx_det_YoloV3.OnnxDetYoloV3"><code class="docutils literal notranslate"><span class="pre">OnnxDetYoloV3</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.onnx_det_YoloV3.OnnxDetYoloV3.create_session"><code class="docutils literal notranslate"><span class="pre">OnnxDetYoloV3.create_session()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.onnx_det_YoloV3.OnnxDetYoloV3.predict"><code class="docutils literal notranslate"><span class="pre">OnnxDetYoloV3.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.onnx_det_YoloV3.OnnxDetYoloV3.preprocess_img"><code class="docutils literal notranslate"><span class="pre">OnnxDetYoloV3.preprocess_img()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.onnx_det_YoloV3.OnnxDetYoloV3.resize_img"><code class="docutils literal notranslate"><span class="pre">OnnxDetYoloV3.resize_img()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -198,11 +204,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="iinfer.app.predicts.html#module-iinfer.app.predicts.onnx_det_YoloX_Lite">iinfer.app.predicts.onnx_det_YoloX_Lite module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.onnx_det_YoloX_Lite.OnnxdetYoloXLite"><code class="docutils literal notranslate"><span class="pre">OnnxdetYoloXLite</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.onnx_det_YoloX_Lite.OnnxdetYoloXLite.create_session"><code class="docutils literal notranslate"><span class="pre">OnnxdetYoloXLite.create_session()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.onnx_det_YoloX_Lite.OnnxdetYoloXLite.predict"><code class="docutils literal notranslate"><span class="pre">OnnxdetYoloXLite.predict()</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="iinfer.app.predicts.html#iinfer.app.predicts.onnx_det_YoloX_Lite.OnnxdetYoloXLite"><code class="docutils literal notranslate"><span class="pre">OnnxdetYoloXLite</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="iinfer.app.predicts.html#module-iinfer.app.predicts">Module contents</a></li>
@@ -437,7 +439,7 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.client.Client.predict">
-<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_file_enable</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'jpeg'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_image_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_preview</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodraw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">60</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/client.html#Client.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.client.Client.predict" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_file_enable</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pred_input_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'jpeg'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_image_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_preview</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodraw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">60</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/client.html#Client.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.client.Client.predict" title="Link to this definition"></a></dt>
 <dd><p>画像をRedisサーバーに送信し、推論結果を取得する</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -446,7 +448,7 @@
 <li><p><strong>image</strong> (<em>np.ndarray</em><em> | </em><em>bytes</em><em>, </em><em>optional</em>) -- 画像データ. Defaults to None. np.ndarray型の場合はデコードしない(RGBであること).</p></li>
 <li><p><strong>image_file</strong> (<em>str</em><em>|</em><em>file-like object</em><em>, </em><em>optional</em>) -- 画像ファイルのパス. Defaults to None.</p></li>
 <li><p><strong>image_file_enable</strong> (<em>bool</em><em>, </em><em>optional</em>) -- 画像ファイルを使用するかどうか. Defaults to True. image_fileがNoneでなく、このパラメーターがTrueの場合はimage_fileを使用する.</p></li>
-<li><p><strong>image_type</strong> (<em>str</em><em>, </em><em>optional</em>) -- 画像の形式. Defaults to 'jpeg'.</p></li>
+<li><p><strong>pred_input_type</strong> (<em>str</em><em>, </em><em>optional</em>) -- 画像の形式. Defaults to 'jpeg'.</p></li>
 <li><p><strong>output_image_file</strong> (<em>str</em><em>, </em><em>optional</em>) -- 予測結果の画像ファイルのパス. Defaults to None.</p></li>
 <li><p><strong>output_preview</strong> (<em>bool</em><em>, </em><em>optional</em>) -- 予測結果の画像をプレビューするかどうか. Defaults to False.</p></li>
 <li><p><strong>nodraw</strong> (<em>bool</em><em>, </em><em>optional</em>) -- 描画フラグ. Defaults to False.</p></li>
@@ -461,6 +463,11 @@
 </dd>
 </dl>
 </dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.client.Client.prompt">
+<span class="sig-name descname"><span class="pre">prompt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prompt_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'{prompt}'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prompt_form</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/client.html#Client.prompt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.client.Client.prompt" title="Link to this definition"></a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.client.Client.start">
@@ -817,13 +824,33 @@ config (dict): 設定</p>
 </dl>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="iinfer.app.common.show_input">
+<span class="sig-prename descclassname"><span class="pre">iinfer.app.common.</span></span><span class="sig-name descname"><span class="pre">show_input</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../_modules/iinfer/app/common.html#show_input"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.common.show_input" title="Link to this definition"></a></dt>
+<dd><p>ダイアログで入力を求めます。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>title</strong> (<em>str</em>) -- タイトル</p></li>
+<li><p><strong>message</strong> (<em>str</em>) -- メッセージ</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>入力された文字列</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 <section id="module-iinfer.app.gui">
 <span id="iinfer-app-gui-module"></span><h2>iinfer.app.gui module<a class="headerlink" href="#module-iinfer.app.gui" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="iinfer.app.gui.Gui">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">iinfer.app.gui.</span></span><span class="sig-name descname"><span class="pre">Gui</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/gui.html#Gui"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.gui.Gui" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Web</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="#iinfer.app.web.Web" title="iinfer.app.web.Web"><code class="xref py py-class docutils literal notranslate"><span class="pre">Web</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.gui.Gui.callback_console_modal_log_func">
 <span class="sig-name descname"><span class="pre">callback_console_modal_log_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/gui.html#Gui.callback_console_modal_log_func"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.gui.Gui.callback_console_modal_log_func" title="Link to this definition"></a></dt>
@@ -1006,6 +1033,11 @@ config (dict): 設定</p>
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.install.Install.llamaindex">
+<span class="sig-name descname"><span class="pre">llamaindex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">install_use_gpu</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/install.html#Install.llamaindex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.install.Install.llamaindex" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.install.Install.mmcls">
 <span class="sig-name descname"><span class="pre">mmcls</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">install_use_gpu</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/install.html#Install.mmcls"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.install.Install.mmcls" title="Link to this definition"></a></dt>
 <dd></dd></dl>
@@ -1037,7 +1069,41 @@ config (dict): 設定</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.install.Install.server">
-<span class="sig-name descname"><span class="pre">server</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">install_iinfer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'iinfer'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">install_onnx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">install_mmdet</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">install_mmseg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">install_mmcls</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">install_mmpretrain</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">install_insightface</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">install_diffusers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">install_tag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">install_use_gpu</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/install.html#Install.server"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.install.Install.server" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">server</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">install_iinfer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'iinfer'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">install_onnx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">install_mmdet</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">install_mmseg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">install_mmcls</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">install_mmpretrain</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">install_insightface</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">install_diffusers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">install_llamaindex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">install_tag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">install_use_gpu</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/install.html#Install.server"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.install.Install.server" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-iinfer.app.options">
+<span id="iinfer-app-options-module"></span><h2>iinfer.app.options module<a class="headerlink" href="#module-iinfer.app.options" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="iinfer.app.options.Options">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">iinfer.app.options.</span></span><span class="sig-name descname"><span class="pre">Options</span></span><a class="reference internal" href="../_modules/iinfer/app/options.html#Options"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.options.Options" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.options.Options.get_cmd_opt">
+<span class="sig-name descname"><span class="pre">get_cmd_opt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/options.html#Options.get_cmd_opt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.options.Options.get_cmd_opt" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.options.Options.get_mode_opt">
+<span class="sig-name descname"><span class="pre">get_mode_opt</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/options.html#Options.get_mode_opt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.options.Options.get_mode_opt" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.options.Options.get_opt_opt">
+<span class="sig-name descname"><span class="pre">get_opt_opt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/options.html#Options.get_opt_opt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.options.Options.get_opt_opt" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.options.Options.init_options">
+<span class="sig-name descname"><span class="pre">init_options</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/options.html#Options.init_options"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.options.Options.init_options" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.options.Options.list_options">
+<span class="sig-name descname"><span class="pre">list_options</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/options.html#Options.list_options"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.options.Options.list_options" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -1169,14 +1235,14 @@ config (dict): 設定</p>
 <dd><p>Bases: <a class="reference internal" href="#iinfer.app.predict.Predict" title="iinfer.app.predict.Predict"><code class="xref py py-class docutils literal notranslate"><span class="pre">Predict</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.predict.OnnxPredict.is_gpu_available">
-<span class="sig-name descname"><span class="pre">is_gpu_available</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_conf_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gpu_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/iinfer/app/predict.html#OnnxPredict.is_gpu_available"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predict.OnnxPredict.is_gpu_available" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">is_gpu_available</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_conf_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gpu_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/iinfer/app/predict.html#OnnxPredict.is_gpu_available"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predict.OnnxPredict.is_gpu_available" title="Link to this definition"></a></dt>
 <dd><p>GPUが利用可能かどうかを返す関数です。
 戻り値がTrueの場合、GPUが利用可能です。
 戻り値がFalseの場合、GPUが利用不可です。</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>model_path</strong> (<em>Path</em>) -- モデルファイルのパス</p></li>
+<li><p><strong>model_path</strong> (<em>Path</em><em>|</em><em>Any</em>) -- モデルファイルのパス</p></li>
 <li><p><strong>model_conf_path</strong> (<em>Path</em>) -- モデル設定ファイルのパス</p></li>
 <li><p><strong>gpu_id</strong> (<em>int</em><em>, </em><em>optional</em>) -- GPU ID. Defaults to None.</p></li>
 </ul>
@@ -1198,7 +1264,7 @@ config (dict): 設定</p>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.predict.Predict.create_session">
-<span class="sig-name descname"><span class="pre">create_session</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_conf_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_provider</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gpu_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="../_modules/iinfer/app/predict.html#Predict.create_session"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predict.Predict.create_session" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">create_session</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">deploy_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_conf_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_provider</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gpu_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="../_modules/iinfer/app/predict.html#Predict.create_session"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predict.Predict.create_session" title="Link to this definition"></a></dt>
 <dd><p>推論セッションを作成する関数です。
 startコマンド実行時に呼び出されます。
 この関数内でAIモデルのロードを行い、推論準備を完了するようにしてください。
@@ -1206,8 +1272,8 @@ startコマンド実行時に呼び出されます。
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>logger</strong> (<em>logging.Logger</em>) -- ロガー</p></li>
-<li><p><strong>model_path</strong> (<em>Path</em>) -- モデルファイルのパス</p></li>
+<li><p><strong>deploy_dir</strong> (<em>Path</em>) -- デプロイディレクトリのパス</p></li>
+<li><p><strong>model_path</strong> (<em>Path</em><em>|</em><em>Any</em>) -- モデルファイルのパス</p></li>
 <li><p><strong>model_conf_path</strong> (<em>Path</em>) -- モデル設定ファイルのパス</p></li>
 <li><p><strong>gpu_id</strong> (<em>int</em><em>, </em><em>optional</em>) -- GPU ID. Defaults to None.</p></li>
 </ul>
@@ -1233,6 +1299,22 @@ startコマンド実行時に呼び出されます。
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.predict.Predict.post_deploy">
+<span class="sig-name descname"><span class="pre">post_deploy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">deploy_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/iinfer/app/predict.html#Predict.post_deploy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predict.Predict.post_deploy" title="Link to this definition"></a></dt>
+<dd><p>デプロイ後の処理を行う関数です。
+deployコマンド実行時に呼び出されます。
+この関数内でデプロイ後の処理を実装してください。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>deploy_dir</strong> (<em>Path</em>) -- デプロイディレクトリのパス</p></li>
+<li><p><strong>conf</strong> (<em>dict</em>) -- デプロイ設定</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -1277,14 +1359,14 @@ return dict(output_boxes=final_boxes, output_scores=final_scores, output_classes
 <dd><p>Bases: <a class="reference internal" href="#iinfer.app.predict.Predict" title="iinfer.app.predict.Predict"><code class="xref py py-class docutils literal notranslate"><span class="pre">Predict</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.predict.TorchPredict.is_gpu_available">
-<span class="sig-name descname"><span class="pre">is_gpu_available</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_conf_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gpu_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/iinfer/app/predict.html#TorchPredict.is_gpu_available"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predict.TorchPredict.is_gpu_available" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">is_gpu_available</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_conf_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gpu_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/iinfer/app/predict.html#TorchPredict.is_gpu_available"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predict.TorchPredict.is_gpu_available" title="Link to this definition"></a></dt>
 <dd><p>GPUが利用可能かどうかを返す関数です。
 戻り値がTrueの場合、GPUが利用可能です。
 戻り値がFalseの場合、GPUが利用不可です。</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>model_path</strong> (<em>Path</em>) -- モデルファイルのパス</p></li>
+<li><p><strong>model_path</strong> (<em>Path</em><em>|</em><em>Any</em>) -- モデルファイルのパス</p></li>
 <li><p><strong>model_conf_path</strong> (<em>Path</em>) -- モデル設定ファイルのパス</p></li>
 <li><p><strong>gpu_id</strong> (<em>int</em><em>, </em><em>optional</em>) -- GPU ID. Defaults to None.</p></li>
 </ul>
@@ -1529,14 +1611,14 @@ return dict(output_boxes=final_boxes, output_scores=final_scores, output_classes
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.server.Server.predict">
-<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reskey</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_image_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodraw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/server.html#Server.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.server.Server.predict" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reskey</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Image</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_image_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodraw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/server.html#Server.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.server.Server.predict" title="Link to this definition"></a></dt>
 <dd><p>クライアントから送られてきた画像の推論を行う。</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>reskey</strong> (<em>str</em>) -- レスポンスキー</p></li>
 <li><p><strong>name</strong> (<em>dict</em>) -- モデル名</p></li>
-<li><p><strong>image</strong> (<em>Image.Image</em>) -- 推論する画像データ</p></li>
+<li><p><strong>input_data</strong> (<em>Image.Image</em><em> | </em><em>str</em>) -- 推論するデータ</p></li>
 <li><p><strong>output_image_name</strong> (<em>str</em>) -- 出力画像のファイル名</p></li>
 <li><p><strong>nodraw</strong> (<em>bool</em>) -- 描画フラグ</p></li>
 </ul>
@@ -1614,6 +1696,160 @@ return dict(output_boxes=final_boxes, output_scores=final_scores, output_classes
 </dd>
 </dl>
 </dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-iinfer.app.web">
+<span id="iinfer-app-web-module"></span><h2>iinfer.app.web module<a class="headerlink" href="#module-iinfer.app.web" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="iinfer.app.web.Web">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">iinfer.app.web.</span></span><span class="sig-name descname"><span class="pre">Web</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iinfer.app.options.Options" title="iinfer.app.options.Options"><code class="xref py py-class docutils literal notranslate"><span class="pre">Options</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.web.Web.bbforce_cmd">
+<span class="sig-name descname"><span class="pre">bbforce_cmd</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.bbforce_cmd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.bbforce_cmd" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.web.Web.callback_console_modal_log_func">
+<span class="sig-name descname"><span class="pre">callback_console_modal_log_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.callback_console_modal_log_func"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.callback_console_modal_log_func" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.web.Web.callback_return_cmd_exec_func">
+<span class="sig-name descname"><span class="pre">callback_return_cmd_exec_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.callback_return_cmd_exec_func"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.callback_return_cmd_exec_func" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.web.Web.callback_return_pipe_exec_func">
+<span class="sig-name descname"><span class="pre">callback_return_pipe_exec_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.callback_return_pipe_exec_func"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.callback_return_pipe_exec_func" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.web.Web.callback_return_stream_log_func">
+<span class="sig-name descname"><span class="pre">callback_return_stream_log_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.callback_return_stream_log_func"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.callback_return_stream_log_func" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.web.Web.copyright">
+<span class="sig-name descname"><span class="pre">copyright</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.copyright"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.copyright" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.web.Web.del_cmd">
+<span class="sig-name descname"><span class="pre">del_cmd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.del_cmd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.del_cmd" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.web.Web.del_pipe">
+<span class="sig-name descname"><span class="pre">del_pipe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.del_pipe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.del_pipe" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.web.Web.exec_cmd">
+<span class="sig-name descname"><span class="pre">exec_cmd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nothread</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.exec_cmd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.exec_cmd" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.web.Web.exec_pipe">
+<span class="sig-name descname"><span class="pre">exec_pipe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nothread</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.exec_pipe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.exec_pipe" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.web.Web.filer_upload">
+<span class="sig-name descname"><span class="pre">filer_upload</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">BaseRequest</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.filer_upload"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.filer_upload" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.web.Web.list_cmd">
+<span class="sig-name descname"><span class="pre">list_cmd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kwd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.list_cmd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.list_cmd" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.web.Web.list_pipe">
+<span class="sig-name descname"><span class="pre">list_pipe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kwd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.list_pipe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.list_pipe" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.web.Web.list_tree">
+<span class="sig-name descname"><span class="pre">list_tree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.list_tree"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.list_tree" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.web.Web.load_capture">
+<span class="sig-name descname"><span class="pre">load_capture</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.load_capture"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.load_capture" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.web.Web.load_cmd">
+<span class="sig-name descname"><span class="pre">load_cmd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.load_cmd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.load_cmd" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.web.Web.load_pipe">
+<span class="sig-name descname"><span class="pre">load_pipe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.load_pipe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.load_pipe" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.web.Web.load_result">
+<span class="sig-name descname"><span class="pre">load_result</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.load_result"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.load_result" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.web.Web.mk_curl_fileup">
+<span class="sig-name descname"><span class="pre">mk_curl_fileup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd_opt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.mk_curl_fileup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.mk_curl_fileup" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.web.Web.mk_opt_list">
+<span class="sig-name descname"><span class="pre">mk_opt_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">opt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.mk_opt_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.mk_opt_list" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.web.Web.raw_cmd">
+<span class="sig-name descname"><span class="pre">raw_cmd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.raw_cmd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.raw_cmd" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.web.Web.raw_pipe">
+<span class="sig-name descname"><span class="pre">raw_pipe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.raw_pipe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.raw_pipe" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.web.Web.save_cmd">
+<span class="sig-name descname"><span class="pre">save_cmd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.save_cmd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.save_cmd" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.web.Web.save_pipe">
+<span class="sig-name descname"><span class="pre">save_pipe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.save_pipe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.save_pipe" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.web.Web.start">
+<span class="sig-name descname"><span class="pre">start</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">allow_host</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'0.0.0.0'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">listen_port</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">8081</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.start"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.start" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.web.Web.stop">
+<span class="sig-name descname"><span class="pre">stop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.stop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.stop" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.web.Web.to_str">
+<span class="sig-name descname"><span class="pre">to_str</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">o</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.to_str"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.to_str" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.web.Web.versions_iinfer">
+<span class="sig-name descname"><span class="pre">versions_iinfer</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.versions_iinfer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.versions_iinfer" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.web.Web.versions_used">
+<span class="sig-name descname"><span class="pre">versions_used</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.versions_used"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.versions_used" title="Link to this definition"></a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 

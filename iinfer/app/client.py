@@ -214,14 +214,17 @@ class Client(object):
         if not ret: return before_injection_conf_b64
         ret, after_injection_conf_b64 = _conf_b64("after_injection_conf", after_injection_conf)
         if not ret: return after_injection_conf_b64
-        if model_file is not None and not model_file.startswith("http"):
-            model_file = Path(model_file)
-            if model_file.exists():
-                with open(model_file, "rb") as mf:
-                    model_bytes_b64 = base64.b64encode(mf.read()).decode('utf-8')
+        if model_file is not None and not model_file.startswith("http://") and not model_file.startswith("https://"):
+            if common.BASE_MODELS[predict_type]['required_model_weight']:
+                model_file = Path(model_file)
+                if model_file.exists():
+                    with open(model_file, "rb") as mf:
+                        model_bytes_b64 = base64.b64encode(mf.read()).decode('utf-8')
+                else:
+                    self.logger.error(f"model_file {model_file} does not exist")
+                    return {"error": f"model_file {model_file} does not exist"}
             else:
-                self.logger.error(f"model_file {model_file} does not exist")
-                return {"error": f"model_file {model_file} does not exist"}
+                model_bytes_b64 = None
         else:
             model_bytes_b64 = None
         def _name_b64(aname:str, files:List[Path]):
@@ -335,7 +338,7 @@ class Client(object):
         res_json = self._proc(self.svname, 'stop_server', [], timeout=timeout)
         return res_json
 
-    def predict(self, name:str, image = None, image_file = None, image_file_enable:bool=True, image_type:str = 'jpeg', output_image_file:str = None, output_preview:bool=False, nodraw:bool=False, timeout:int = 60):
+    def predict(self, name:str, image = None, image_file = None, image_file_enable:bool=True, pred_input_type:str = 'jpeg', output_image_file:str = None, output_preview:bool=False, nodraw:bool=False, timeout:int = 60):
         """
         画像をRedisサーバーに送信し、推論結果を取得する
 
@@ -344,7 +347,7 @@ class Client(object):
             image (np.ndarray | bytes, optional): 画像データ. Defaults to None. np.ndarray型の場合はデコードしない(RGBであること).
             image_file (str|file-like object, optional): 画像ファイルのパス. Defaults to None.
             image_file_enable (bool, optional): 画像ファイルを使用するかどうか. Defaults to True. image_fileがNoneでなく、このパラメーターがTrueの場合はimage_fileを使用する.
-            image_type (str, optional): 画像の形式. Defaults to 'jpeg'.
+            pred_input_type (str, optional): 画像の形式. Defaults to 'jpeg'.
             output_image_file (str, optional): 予測結果の画像ファイルのパス. Defaults to None.
             output_preview (bool, optional): 予測結果の画像をプレビューするかどうか. Defaults to False.
             nodraw (bool, optional): 描画フラグ. Defaults to False.
@@ -370,22 +373,22 @@ class Client(object):
                 if not Path(image_file).exists():
                     self.logger.error(f"Not found image_file. {image_file}.")
                     return {"error": f"Not found image_file. {image_file}."}
-            if image_type == 'jpeg' or image_type == 'png' or image_type == 'bmp':
+            if pred_input_type == 'jpeg' or pred_input_type == 'png' or pred_input_type == 'bmp':
                 f = None
                 try:
                     f = image_file if type(image_file) is not str else open(image_file, "rb")
                     img_npy = convert.imgfile2npy(f)
                 finally:
                     if f is not None: f.close()
-            elif image_type == 'capture':
+            elif pred_input_type == 'capture':
                 f = None
                 try:
                     f = image_file if type(image_file) is not str else open(image_file, "r", encoding='utf-8')
                     res_list = []
                     for line in f:
                         if type(line) is bytes:
-                            line = line.decode('utf-8').strip()
-                        capture_data = line.split(',')
+                            line = line.decode('utf-8')
+                        capture_data = line.strip().split(',')
                         t = capture_data[0]
                         img = capture_data[1]
                         h = int(capture_data[2])
@@ -396,7 +399,8 @@ class Client(object):
                             img_npy = convert.b64str2npy(img, shape=(h, w, c) if c > 0 else (h, w))
                         else:
                             img_npy = convert.imgbytes2npy(convert.b64str2bytes(img))
-                        res_json = self.predict(name, image=img_npy, image_file=fn, image_file_enable=False, output_image_file=output_image_file, output_preview=output_preview, nodraw=nodraw, timeout=timeout)
+                        res_json = self.predict(name, image=img_npy, image_file=fn, image_file_enable=False,
+                                                output_image_file=output_image_file, output_preview=output_preview, nodraw=nodraw, timeout=timeout)
                         res_list.append(res_json)
                     if len(res_list) <= 0:
                         return {"warn": f"capture file is no data."}
@@ -405,7 +409,7 @@ class Client(object):
                     return res_list
                 finally:
                     if f is not None: f.close()
-            elif image_type == 'output_json':
+            elif pred_input_type == 'output_json':
                 f = None
                 try:
                     f = image_file if type(image_file) is not str else open(image_file, "r", encoding='utf-8')
@@ -426,15 +430,35 @@ class Client(object):
                     return res_list
                 finally:
                     if f is not None: f.close()
+            elif pred_input_type == 'prompt':
+                f = None
+                try:
+                    f = image_file if type(image_file) is not str else open(image_file, "r", encoding='utf-8')
+                    res_list = []
+                    for line in f:
+                        if type(line) is bytes:
+                            line = line.decode('utf-8')
+                        prompt_data = line.strip().split(',')
+                        fn = Path(prompt_data[2].strip())
+                        res_json = self.predict(name, image=line, image_file=fn, image_file_enable=False, pred_input_type='prompt',
+                                                output_image_file=output_image_file, output_preview=output_preview, nodraw=nodraw, timeout=timeout)
+                        res_list.append(res_json)
+                    if len(res_list) <= 0:
+                        return {"warn": f"prompt file is no data."}
+                    elif len(res_list) == 1:
+                        return res_list[0]
+                    return res_list
+                finally:
+                    if f is not None: f.close()
             else:
-                self.logger.error(f"image_type is invalid. {image_type}.")
-                return {"error": f"image_type is invalid. {image_type}."}
+                self.logger.error(f"pred_input_type is invalid. {pred_input_type}.")
+                return {"error": f"pred_input_type is invalid. {pred_input_type}."}
         else:
             if type(image) == np.ndarray:
                 img_npy = image
                 if image_file is None: image_file = f'{datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")}.capture'
                 image_file_enable = False
-            elif image_type == 'capture':
+            elif pred_input_type == 'capture':
                 capture_data = image.split(',')
                 #self.logger.info(f"capture_data={capture_data[1:]}")
                 t = capture_data[0]
@@ -448,7 +472,12 @@ class Client(object):
                     img_npy = convert.b64str2npy(img, shape=(h, w, c) if c > 0 else (h, w))
                 else:
                     img_npy = convert.imgbytes2npy(convert.b64str2bytes(img))
-            elif image_type == 'output_json':
+            elif pred_input_type == 'prompt':
+                prompt_data = image.split(',')
+                t = prompt_data[0]
+                prompt_b64 = prompt_data[1]
+                if image_file is None: image_file = prompt_data[2]
+            elif pred_input_type == 'output_json':
                 res_json = json.loads(image)
                 if not ("output_image" in res_json and "output_image_shape" in res_json and "output_image_name" in res_json):
                     self.logger.error(f"image_file data is invalid. Not found output_image or output_image_shape or output_image_name key.")
@@ -456,24 +485,25 @@ class Client(object):
                 img_npy = convert.b64str2npy(res_json["output_image"], shape=res_json["output_image_shape"])
                 if image_file is None: image_file = res_json["output_image_name"]
                 image_file_enable = False
-            elif image_type == 'jpeg' or image_type == 'png' or image_type == 'bmp':
+            elif pred_input_type == 'jpeg' or pred_input_type == 'png' or pred_input_type == 'bmp':
                 img_npy = convert.imgbytes2npy(image)
-                if image_file is None: image_file = f'{datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")}.{image_type}'
+                if image_file is None: image_file = f'{datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")}.{pred_input_type}'
                 image_file_enable = False
             else:
-                self.logger.error(f"image_type is invalid. {image_type}.")
-                return {"error": f"image_type is invalid. {image_type}."}
+                self.logger.error(f"pred_input_type is invalid. {pred_input_type}.")
+                return {"error": f"pred_input_type is invalid. {pred_input_type}."}
 
-        npy_b64 = convert.npy2b64str(img_npy)
-        #img_npy2 = np.frombuffer(base64.b64decode(npy_b64), dtype='uint8').reshape(img_npy.shape)
         eimgloadtime = time.perf_counter()
-        res_json = self._proc(self.svname, 'predict',
-                              [name, npy_b64, str(nodraw), str(img_npy.shape[0]), str(img_npy.shape[1]),
-                               str(img_npy.shape[2] if len(img_npy.shape) > 2 else '-1'), image_file], timeout=timeout)
+        if pred_input_type == 'prompt':
+            res_json = self._proc(self.svname, 'predict',
+                                  [name, prompt_b64, str(nodraw), str(-1), str(-1), str(-1), image_file], timeout=timeout)
+        else:
+            npy_b64 = convert.npy2b64str(img_npy)
+            res_json = self._proc(self.svname, 'predict',
+                                  [name, npy_b64, str(nodraw), str(img_npy.shape[0]), str(img_npy.shape[1]),
+                                  str(img_npy.shape[2] if len(img_npy.shape) > 2 else '-1'), image_file], timeout=timeout)
         soutputtime = time.perf_counter()
         if "output_image" in res_json and "output_image_shape" in res_json:
-            #byteio = BytesIO(base64.b64decode(res_json["output_image"]))
-            #img_npy = np.load(byteio)
             img_npy = convert.b64str2npy(res_json["output_image"], res_json["output_image_shape"])
             if output_image_file is not None:
                 exp = Path(output_image_file).suffix
@@ -663,3 +693,20 @@ class Client(object):
             self.logger.info("KeyboardInterrupt", exc_info=True)
         finally:
             cap.release()
+
+    def prompt(self, prompt_format='{prompt}', prompt_form:bool=False):
+        try:
+            self.is_running = True
+            while self.is_running:
+                if not prompt_form:
+                    prompt = prompt_format.format(input('Enter the prompt > '))
+                else:
+                    prompt = common.show_input(common.APP_ID, 'Enter the prompt')
+                    prompt = prompt_format.format(prompt=prompt) if prompt is not None else ''
+                output_name = datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")
+                output_name = f"{output_name}.txt"
+                yield 'prompt', convert.str2b64str(prompt), output_name
+        except KeyboardInterrupt:
+            self.logger.info("KeyboardInterrupt", exc_info=True)
+        finally:
+            pass

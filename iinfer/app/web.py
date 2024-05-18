@@ -86,10 +86,16 @@ class Web(options.Options):
                     if v is None or v == '':
                         continue
                     opt_list.append(f"--{key}")
-                    opt_list.append(str(v))
+                    if str(v).find(' ') >= 0:
+                        opt_list.append(f'"{v}"')
+                    else:
+                        opt_list.append(str(v))
             elif val is not None and val != '':
                 opt_list.append(f"--{key}")
-                opt_list.append(str(val))
+                if str(val).find(' ') >= 0:
+                    opt_list.append(f'"{val}"')
+                else:
+                    opt_list.append(str(val))
             if 'fileio' in schema and schema[0]['fileio'] == 'in' and type(val) != str:
                 file_dict[key] = val
         return opt_list, file_dict
@@ -286,11 +292,20 @@ class Web(options.Options):
                     capture_stdout = True
                 if 'output_csv' in cmd_opt and cmd_opt['output_csv'] != '':
                     output = dict(warn=f'The "output_csv" option is not supported in pipe. ({cmd_title})')
-                    if nothread: return output
                     self.callback_return_pipe_exec_func(title, output)
                     return
-
-            cmdline = self.raw_pipe(title, opt)[0]['raw']
+            cmdline = None
+            has_warn = False
+            for cl in self.raw_pipe(title, opt):
+                if cl['type'] == 'cmdline':
+                    cmdline = cl['raw']
+                if cl['type'] == 'warn':
+                    self.callback_return_pipe_exec_func(title, cl)
+                    has_warn = True
+            if cmdline is None:
+                self.callback_return_pipe_exec_func(title, dict(warn='No command to execute.'))
+                has_warn = True
+            if has_warn: return
             try:
                 container['pipe_proc'] = subprocess.Popen(cmdline, shell=True, text=True, encoding='utf-8', 
                                                         stdout=(subprocess.PIPE if capture_stdout else None),
@@ -311,7 +326,7 @@ class Web(options.Options):
                                 o = [dict(warn=f'The captured stdout was discarded because its size was larger than {self.output_size_th} bytes.')]
                                 self.callback_return_stream_log_func(o)
                         except:
-                            o = [dict(warn=f'<pre>{html.escape(traceback.format_exc())}</pre>')]
+                            o = [dict(warn=f'<pre>{html.escape(o)}</pre><br><pre>{html.escape(traceback.format_exc())}</pre>')]
                             self.callback_return_stream_log_func(o)
                 if capture_stdout:
                     container['pipe_proc'].stdout.read() # 最後のストリームは読み捨て
@@ -361,6 +376,8 @@ class Web(options.Options):
             if i>0:
                 if chk_stdin and ('stdin' not in cmd_opt or not cmd_opt['stdin']):
                     errormsg.append(f'The "stdin" option should be specified for the second and subsequent commands. ({cmd_title})')
+                if chk_stdin and 'pred_input_type' in cmd_opt and cmd_opt['pred_input_type'] not in ['capture', 'prompt']:
+                    errormsg.append(f'When using the "stdin" option, "pred_input_type" cannot be other than "capture" or "prompt". ({cmd_title})')
                 for ref in cmd_ref:
                     if 'fileio' in ref and ref['fileio'] == 'in' and ref['opt'] in cmd_opt and cmd_opt[ref['opt']] != '' and len([v for v in cmd_opt[ref['opt']] if v != '']) > 0:
                         errormsg.append(f'The "{ref["opt"]}" option should not be specified in a second or subsequent command. ({cmd_title})')

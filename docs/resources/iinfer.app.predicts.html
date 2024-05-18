@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>iinfer.app.predicts package &mdash; iinfer 2024/05/06 documentation</title>
+  <title>iinfer.app.predicts package &mdash; iinfer 2024/05/18 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -16,7 +16,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=320cb72d"></script>
+        <script src="../_static/documentation_options.js?v=1aa140b2"></script>
         <script src="../_static/doctools.js?v=9a2dae69"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -92,6 +92,65 @@
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
 </section>
+<section id="module-iinfer.app.predicts.diffusers_stablediffusionpipeline_txt2img">
+<span id="iinfer-app-predicts-diffusers-stablediffusionpipeline-txt2img-module"></span><h2>iinfer.app.predicts.diffusers_stablediffusionpipeline_txt2img module<a class="headerlink" href="#module-iinfer.app.predicts.diffusers_stablediffusionpipeline_txt2img" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="iinfer.app.predicts.diffusers_stablediffusionpipeline_txt2img.Diffusers_StableDiffusionPipeline_Txt2Img">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">iinfer.app.predicts.diffusers_stablediffusionpipeline_txt2img.</span></span><span class="sig-name descname"><span class="pre">Diffusers_StableDiffusionPipeline_Txt2Img</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/diffusers_stablediffusionpipeline_txt2img.html#Diffusers_StableDiffusionPipeline_Txt2Img"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.diffusers_stablediffusionpipeline_txt2img.Diffusers_StableDiffusionPipeline_Txt2Img" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="iinfer.app.html#iinfer.app.predict.TorchPredict" title="iinfer.app.predict.TorchPredict"><code class="xref py py-class docutils literal notranslate"><span class="pre">TorchPredict</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.predicts.diffusers_stablediffusionpipeline_txt2img.Diffusers_StableDiffusionPipeline_Txt2Img.create_session">
+<span class="sig-name descname"><span class="pre">create_session</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">deploy_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_conf_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_provider</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gpu_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/diffusers_stablediffusionpipeline_txt2img.html#Diffusers_StableDiffusionPipeline_Txt2Img.create_session"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.diffusers_stablediffusionpipeline_txt2img.Diffusers_StableDiffusionPipeline_Txt2Img.create_session" title="Link to this definition"></a></dt>
+<dd><p>推論セッションを作成する関数です。
+startコマンド実行時に呼び出されます。
+この関数内でAIモデルのロードを行い、推論準備を完了するようにしてください。
+戻り値の推論セッションの型は問いません。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>deploy_dir</strong> (<em>Path</em>) -- デプロイディレクトリのパス</p></li>
+<li><p><strong>model_path</strong> (<em>Path</em><em>|</em><em>Any</em>) -- モデルファイルのパス</p></li>
+<li><p><strong>model_conf_path</strong> (<em>Path</em>) -- モデル設定ファイルのパス</p></li>
+<li><p><strong>gpu_id</strong> (<em>int</em><em>, </em><em>optional</em>) -- GPU ID. Defaults to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>推論セッション</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.predicts.diffusers_stablediffusionpipeline_txt2img.Diffusers_StableDiffusionPipeline_Txt2Img.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_height</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Image</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodraw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/diffusers_stablediffusionpipeline_txt2img.html#Diffusers_StableDiffusionPipeline_Txt2Img.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.diffusers_stablediffusionpipeline_txt2img.Diffusers_StableDiffusionPipeline_Txt2Img.predict" title="Link to this definition"></a></dt>
+<dd><p>予測を行う関数です。
+predictコマンドやcaptureコマンド実行時に呼び出されます。
+引数のinput_dataが画像の場合RGBですので、戻り値の出力画像もRGBにしてください。
+戻り値の推論結果のdictは、通常推論結果項目ごとに値(list)を設定します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> -- 推論セッション</p></li>
+<li><p><strong>img_width</strong> (<em>int</em>) -- モデルのINPUTサイズ（input_dataが画像の場合は、画像の幅）</p></li>
+<li><p><strong>img_height</strong> (<em>int</em>) -- モデルのINPUTサイズ（input_dataが画像の場合は、画像の高さ）</p></li>
+<li><p><strong>input_data</strong> (<em>Image</em><em> | </em><em>str</em>) -- 推論するデータ（画像の場合RGB配列であること）</p></li>
+<li><p><strong>labels</strong> (<em>List</em><em>[</em><em>str</em><em>]</em><em>, </em><em>optional</em>) -- クラスラベルのリスト. Defaults to None.</p></li>
+<li><p><strong>colors</strong> (<em>List</em><em>[</em><em>Tuple</em><em>[</em><em>int</em><em>]</em><em>]</em><em>, </em><em>optional</em>) -- ボックスの色のリスト. Defaults to None.</p></li>
+<li><p><strong>nodraw</strong> (<em>bool</em><em>, </em><em>optional</em>) -- 描画フラグ. Defaults to False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>予測結果と出力画像(RGB)のタプル</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[Dict[str, Any], Image]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
 <section id="module-iinfer.app.predicts.insightface_det">
 <span id="iinfer-app-predicts-insightface-det-module"></span><h2>iinfer.app.predicts.insightface_det module<a class="headerlink" href="#module-iinfer.app.predicts.insightface_det" title="Link to this heading"></a></h2>
 <dl class="py class">
@@ -100,7 +159,7 @@
 <dd><p>Bases: <a class="reference internal" href="iinfer.app.html#iinfer.app.predict.OnnxPredict" title="iinfer.app.predict.OnnxPredict"><code class="xref py py-class docutils literal notranslate"><span class="pre">OnnxPredict</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.predicts.insightface_det.InsightfaceDet.create_session">
-<span class="sig-name descname"><span class="pre">create_session</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_conf_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_provider</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gpu_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/insightface_det.html#InsightfaceDet.create_session"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.insightface_det.InsightfaceDet.create_session" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">create_session</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">deploy_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_conf_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_provider</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gpu_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/insightface_det.html#InsightfaceDet.create_session"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.insightface_det.InsightfaceDet.create_session" title="Link to this definition"></a></dt>
 <dd><p>推論セッションを作成する関数です。
 startコマンド実行時に呼び出されます。
 この関数内でAIモデルのロードを行い、推論準備を完了するようにしてください。
@@ -108,7 +167,8 @@ startコマンド実行時に呼び出されます。
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>model_path</strong> (<em>Path</em>) -- モデルファイルのパス</p></li>
+<li><p><strong>deploy_dir</strong> (<em>Path</em>) -- デプロイディレクトリのパス</p></li>
+<li><p><strong>model_path</strong> (<em>Path</em><em>|</em><em>Any</em>) -- モデルファイルのパス</p></li>
 <li><p><strong>model_conf_path</strong> (<em>Path</em>) -- モデル設定ファイルのパス</p></li>
 <li><p><strong>gpu_id</strong> (<em>int</em><em>, </em><em>optional</em>) -- GPU ID. Defaults to None.</p></li>
 </ul>
@@ -121,22 +181,18 @@ startコマンド実行時に呼び出されます。
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.predicts.insightface_det.InsightfaceDet.predict">
-<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_height</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodraw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/insightface_det.html#InsightfaceDet.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.insightface_det.InsightfaceDet.predict" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_height</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Image</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodraw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/insightface_det.html#InsightfaceDet.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.insightface_det.InsightfaceDet.predict" title="Link to this definition"></a></dt>
 <dd><p>予測を行う関数です。
 predictコマンドやcaptureコマンド実行時に呼び出されます。
-引数のimageはRGBですので、戻り値の出力画像もRGBにしてください。
-戻り値の推論結果のdictは、通常推論結果項目ごとに値(list)を設定します。
-例）Image Classification（EfficientNet_Lite4）の場合
-return dict(output_scores=output_scores, output_classes=output_classes), image_obj
-例）Object Detection（YoloX）の場合
-return dict(output_boxes=final_boxes, output_scores=final_scores, output_classes=final_cls_inds), output_image</p>
+引数のinput_dataが画像の場合RGBですので、戻り値の出力画像もRGBにしてください。
+戻り値の推論結果のdictは、通常推論結果項目ごとに値(list)を設定します。</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>model</strong> -- 推論セッション</p></li>
-<li><p><strong>img_width</strong> (<em>int</em>) -- モデルのINPUTサイズ（画像の幅）</p></li>
-<li><p><strong>img_height</strong> (<em>int</em>) -- モデルのINPUTサイズ（画像の高さ）</p></li>
-<li><p><strong>image</strong> (<em>Image</em>) -- 入力画像（RGB配列であること）</p></li>
+<li><p><strong>img_width</strong> (<em>int</em>) -- モデルのINPUTサイズ（input_dataが画像の場合は、画像の幅）</p></li>
+<li><p><strong>img_height</strong> (<em>int</em>) -- モデルのINPUTサイズ（input_dataが画像の場合は、画像の高さ）</p></li>
+<li><p><strong>input_data</strong> (<em>Image</em><em> | </em><em>str</em>) -- 推論するデータ（画像の場合RGB配列であること）</p></li>
 <li><p><strong>labels</strong> (<em>List</em><em>[</em><em>str</em><em>]</em><em>, </em><em>optional</em>) -- クラスラベルのリスト. Defaults to None.</p></li>
 <li><p><strong>colors</strong> (<em>List</em><em>[</em><em>Tuple</em><em>[</em><em>int</em><em>]</em><em>]</em><em>, </em><em>optional</em>) -- ボックスの色のリスト. Defaults to None.</p></li>
 <li><p><strong>nodraw</strong> (<em>bool</em><em>, </em><em>optional</em>) -- 描画フラグ. Defaults to False.</p></li>
@@ -159,15 +215,15 @@ return dict(output_boxes=final_boxes, output_scores=final_scores, output_classes
 </dd></dl>
 
 </section>
-<section id="module-iinfer.app.predicts.mmdet_det_YoloX">
-<span id="iinfer-app-predicts-mmdet-det-yolox-module"></span><h2>iinfer.app.predicts.mmdet_det_YoloX module<a class="headerlink" href="#module-iinfer.app.predicts.mmdet_det_YoloX" title="Link to this heading"></a></h2>
+<section id="module-iinfer.app.predicts.llamaindex_elyza_search">
+<span id="iinfer-app-predicts-llamaindex-elyza-search-module"></span><h2>iinfer.app.predicts.llamaindex_elyza_search module<a class="headerlink" href="#module-iinfer.app.predicts.llamaindex_elyza_search" title="Link to this heading"></a></h2>
 <dl class="py class">
-<dt class="sig sig-object py" id="iinfer.app.predicts.mmdet_det_YoloX.MMDetYoloX">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">iinfer.app.predicts.mmdet_det_YoloX.</span></span><span class="sig-name descname"><span class="pre">MMDetYoloX</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/mmdet_det_YoloX.html#MMDetYoloX"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.mmdet_det_YoloX.MMDetYoloX" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="iinfer.app.predicts.llamaindex_elyza_search.LlamaIndex_ELYZA_Search">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">iinfer.app.predicts.llamaindex_elyza_search.</span></span><span class="sig-name descname"><span class="pre">LlamaIndex_ELYZA_Search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/llamaindex_elyza_search.html#LlamaIndex_ELYZA_Search"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.llamaindex_elyza_search.LlamaIndex_ELYZA_Search" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="iinfer.app.html#iinfer.app.predict.TorchPredict" title="iinfer.app.predict.TorchPredict"><code class="xref py py-class docutils literal notranslate"><span class="pre">TorchPredict</span></code></a></p>
 <dl class="py method">
-<dt class="sig sig-object py" id="iinfer.app.predicts.mmdet_det_YoloX.MMDetYoloX.create_session">
-<span class="sig-name descname"><span class="pre">create_session</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_conf_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_provider</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gpu_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/mmdet_det_YoloX.html#MMDetYoloX.create_session"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.mmdet_det_YoloX.MMDetYoloX.create_session" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="iinfer.app.predicts.llamaindex_elyza_search.LlamaIndex_ELYZA_Search.create_session">
+<span class="sig-name descname"><span class="pre">create_session</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">deploy_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_conf_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_provider</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gpu_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/llamaindex_elyza_search.html#LlamaIndex_ELYZA_Search.create_session"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.llamaindex_elyza_search.LlamaIndex_ELYZA_Search.create_session" title="Link to this definition"></a></dt>
 <dd><p>推論セッションを作成する関数です。
 startコマンド実行時に呼び出されます。
 この関数内でAIモデルのロードを行い、推論準備を完了するようにしてください。
@@ -175,6 +231,7 @@ startコマンド実行時に呼び出されます。
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
+<li><p><strong>deploy_dir</strong> (<em>Path</em>) -- デプロイディレクトリのパス</p></li>
 <li><p><strong>model_path</strong> (<em>Path</em>) -- モデルファイルのパス</p></li>
 <li><p><strong>model_conf_path</strong> (<em>Path</em>) -- モデル設定ファイルのパス</p></li>
 <li><p><strong>gpu_id</strong> (<em>int</em><em>, </em><em>optional</em>) -- GPU ID. Defaults to None.</p></li>
@@ -187,23 +244,94 @@ startコマンド実行時に呼び出されます。
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="iinfer.app.predicts.mmdet_det_YoloX.MMDetYoloX.predict">
-<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_height</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodraw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/mmdet_det_YoloX.html#MMDetYoloX.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.mmdet_det_YoloX.MMDetYoloX.predict" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="iinfer.app.predicts.llamaindex_elyza_search.LlamaIndex_ELYZA_Search.post_deploy">
+<span class="sig-name descname"><span class="pre">post_deploy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">deploy_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/iinfer/app/predicts/llamaindex_elyza_search.html#LlamaIndex_ELYZA_Search.post_deploy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.llamaindex_elyza_search.LlamaIndex_ELYZA_Search.post_deploy" title="Link to this definition"></a></dt>
+<dd><p>デプロイ後の処理を行う関数です。
+deployコマンド実行時に呼び出されます。
+この関数内でデプロイ後の処理を実装してください。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>deploy_dir</strong> (<em>Path</em>) -- デプロイディレクトリのパス</p></li>
+<li><p><strong>conf</strong> (<em>dict</em>) -- デプロイ設定</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.predicts.llamaindex_elyza_search.LlamaIndex_ELYZA_Search.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_height</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Image</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodraw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/llamaindex_elyza_search.html#LlamaIndex_ELYZA_Search.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.llamaindex_elyza_search.LlamaIndex_ELYZA_Search.predict" title="Link to this definition"></a></dt>
 <dd><p>予測を行う関数です。
 predictコマンドやcaptureコマンド実行時に呼び出されます。
-引数のimageはRGBですので、戻り値の出力画像もRGBにしてください。
-戻り値の推論結果のdictは、通常推論結果項目ごとに値(list)を設定します。
-例）Image Classification（EfficientNet_Lite4）の場合
-return dict(output_scores=output_scores, output_classes=output_classes), image_obj
-例）Object Detection（YoloX）の場合
-return dict(output_boxes=final_boxes, output_scores=final_scores, output_classes=final_cls_inds), output_image</p>
+引数のinput_dataが画像の場合RGBですので、戻り値の出力画像もRGBにしてください。
+戻り値の推論結果のdictは、通常推論結果項目ごとに値(list)を設定します。</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>model</strong> -- 推論セッション</p></li>
-<li><p><strong>img_width</strong> (<em>int</em>) -- モデルのINPUTサイズ（画像の幅）</p></li>
-<li><p><strong>img_height</strong> (<em>int</em>) -- モデルのINPUTサイズ（画像の高さ）</p></li>
-<li><p><strong>image</strong> (<em>Image</em>) -- 入力画像（RGB配列であること）</p></li>
+<li><p><strong>img_width</strong> (<em>int</em>) -- モデルのINPUTサイズ（input_dataが画像の場合は、画像の幅）</p></li>
+<li><p><strong>img_height</strong> (<em>int</em>) -- モデルのINPUTサイズ（input_dataが画像の場合は、画像の高さ）</p></li>
+<li><p><strong>input_data</strong> (<em>Image</em><em> | </em><em>str</em>) -- 推論するデータ（画像の場合RGB配列であること）</p></li>
+<li><p><strong>labels</strong> (<em>List</em><em>[</em><em>str</em><em>]</em><em>, </em><em>optional</em>) -- クラスラベルのリスト. Defaults to None.</p></li>
+<li><p><strong>colors</strong> (<em>List</em><em>[</em><em>Tuple</em><em>[</em><em>int</em><em>]</em><em>]</em><em>, </em><em>optional</em>) -- ボックスの色のリスト. Defaults to None.</p></li>
+<li><p><strong>nodraw</strong> (<em>bool</em><em>, </em><em>optional</em>) -- 描画フラグ. Defaults to False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>予測結果と出力画像(RGB)のタプル</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[Dict[str, Any], Image]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-iinfer.app.predicts.mmdet_det_YoloX">
+<span id="iinfer-app-predicts-mmdet-det-yolox-module"></span><h2>iinfer.app.predicts.mmdet_det_YoloX module<a class="headerlink" href="#module-iinfer.app.predicts.mmdet_det_YoloX" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="iinfer.app.predicts.mmdet_det_YoloX.MMDetYoloX">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">iinfer.app.predicts.mmdet_det_YoloX.</span></span><span class="sig-name descname"><span class="pre">MMDetYoloX</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/mmdet_det_YoloX.html#MMDetYoloX"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.mmdet_det_YoloX.MMDetYoloX" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="iinfer.app.html#iinfer.app.predict.TorchPredict" title="iinfer.app.predict.TorchPredict"><code class="xref py py-class docutils literal notranslate"><span class="pre">TorchPredict</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.predicts.mmdet_det_YoloX.MMDetYoloX.create_session">
+<span class="sig-name descname"><span class="pre">create_session</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">deploy_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_conf_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_provider</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gpu_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/mmdet_det_YoloX.html#MMDetYoloX.create_session"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.mmdet_det_YoloX.MMDetYoloX.create_session" title="Link to this definition"></a></dt>
+<dd><p>推論セッションを作成する関数です。
+startコマンド実行時に呼び出されます。
+この関数内でAIモデルのロードを行い、推論準備を完了するようにしてください。
+戻り値の推論セッションの型は問いません。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>deploy_dir</strong> (<em>Path</em>) -- デプロイディレクトリのパス</p></li>
+<li><p><strong>model_path</strong> (<em>Path</em><em>|</em><em>Any</em>) -- モデルファイルのパス</p></li>
+<li><p><strong>model_conf_path</strong> (<em>Path</em>) -- モデル設定ファイルのパス</p></li>
+<li><p><strong>gpu_id</strong> (<em>int</em><em>, </em><em>optional</em>) -- GPU ID. Defaults to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>推論セッション</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.predicts.mmdet_det_YoloX.MMDetYoloX.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_height</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Image</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodraw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/mmdet_det_YoloX.html#MMDetYoloX.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.mmdet_det_YoloX.MMDetYoloX.predict" title="Link to this definition"></a></dt>
+<dd><p>予測を行う関数です。
+predictコマンドやcaptureコマンド実行時に呼び出されます。
+引数のinput_dataが画像の場合RGBですので、戻り値の出力画像もRGBにしてください。
+戻り値の推論結果のdictは、通常推論結果項目ごとに値(list)を設定します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> -- 推論セッション</p></li>
+<li><p><strong>img_width</strong> (<em>int</em>) -- モデルのINPUTサイズ（input_dataが画像の場合は、画像の幅）</p></li>
+<li><p><strong>img_height</strong> (<em>int</em>) -- モデルのINPUTサイズ（input_dataが画像の場合は、画像の高さ）</p></li>
+<li><p><strong>input_data</strong> (<em>Image</em><em> | </em><em>str</em>) -- 推論するデータ（画像の場合RGB配列であること）</p></li>
 <li><p><strong>labels</strong> (<em>List</em><em>[</em><em>str</em><em>]</em><em>, </em><em>optional</em>) -- クラスラベルのリスト. Defaults to None.</p></li>
 <li><p><strong>colors</strong> (<em>List</em><em>[</em><em>Tuple</em><em>[</em><em>int</em><em>]</em><em>]</em><em>, </em><em>optional</em>) -- ボックスの色のリスト. Defaults to None.</p></li>
 <li><p><strong>nodraw</strong> (<em>bool</em><em>, </em><em>optional</em>) -- 描画フラグ. Defaults to False.</p></li>
@@ -238,7 +366,7 @@ return dict(output_boxes=final_boxes, output_scores=final_scores, output_classes
 <dd><p>Bases: <a class="reference internal" href="iinfer.app.html#iinfer.app.predict.TorchPredict" title="iinfer.app.predict.TorchPredict"><code class="xref py py-class docutils literal notranslate"><span class="pre">TorchPredict</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.predicts.mmpretrain_cls_swin.MMPretrainClsSwin.create_session">
-<span class="sig-name descname"><span class="pre">create_session</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_conf_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_provider</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gpu_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/mmpretrain_cls_swin.html#MMPretrainClsSwin.create_session"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.mmpretrain_cls_swin.MMPretrainClsSwin.create_session" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">create_session</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">deploy_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_conf_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_provider</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gpu_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/mmpretrain_cls_swin.html#MMPretrainClsSwin.create_session"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.mmpretrain_cls_swin.MMPretrainClsSwin.create_session" title="Link to this definition"></a></dt>
 <dd><p>推論セッションを作成する関数です。
 startコマンド実行時に呼び出されます。
 この関数内でAIモデルのロードを行い、推論準備を完了するようにしてください。
@@ -246,7 +374,8 @@ startコマンド実行時に呼び出されます。
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>model_path</strong> (<em>Path</em>) -- モデルファイルのパス</p></li>
+<li><p><strong>deploy_dir</strong> (<em>Path</em>) -- デプロイディレクトリのパス</p></li>
+<li><p><strong>model_path</strong> (<em>Path</em><em>|</em><em>Any</em>) -- モデルファイルのパス</p></li>
 <li><p><strong>model_conf_path</strong> (<em>Path</em>) -- モデル設定ファイルのパス</p></li>
 <li><p><strong>gpu_id</strong> (<em>int</em><em>, </em><em>optional</em>) -- GPU ID. Defaults to None.</p></li>
 </ul>
@@ -259,22 +388,18 @@ startコマンド実行時に呼び出されます。
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.predicts.mmpretrain_cls_swin.MMPretrainClsSwin.predict">
-<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_height</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodraw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/mmpretrain_cls_swin.html#MMPretrainClsSwin.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.mmpretrain_cls_swin.MMPretrainClsSwin.predict" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_height</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Image</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodraw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/mmpretrain_cls_swin.html#MMPretrainClsSwin.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.mmpretrain_cls_swin.MMPretrainClsSwin.predict" title="Link to this definition"></a></dt>
 <dd><p>予測を行う関数です。
 predictコマンドやcaptureコマンド実行時に呼び出されます。
-引数のimageはRGBですので、戻り値の出力画像もRGBにしてください。
-戻り値の推論結果のdictは、通常推論結果項目ごとに値(list)を設定します。
-例）Image Classification（EfficientNet_Lite4）の場合
-return dict(output_scores=output_scores, output_classes=output_classes), image_obj
-例）Object Detection（YoloX）の場合
-return dict(output_boxes=final_boxes, output_scores=final_scores, output_classes=final_cls_inds), output_image</p>
+引数のinput_dataが画像の場合RGBですので、戻り値の出力画像もRGBにしてください。
+戻り値の推論結果のdictは、通常推論結果項目ごとに値(list)を設定します。</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>session</strong> -- 推論セッション</p></li>
-<li><p><strong>img_width</strong> (<em>int</em>) -- モデルのINPUTサイズ（画像の幅）</p></li>
-<li><p><strong>img_height</strong> (<em>int</em>) -- モデルのINPUTサイズ（画像の高さ）</p></li>
-<li><p><strong>image</strong> (<em>Image</em>) -- 入力画像（RGB配列であること）</p></li>
+<li><p><strong>model</strong> -- 推論セッション</p></li>
+<li><p><strong>img_width</strong> (<em>int</em>) -- モデルのINPUTサイズ（input_dataが画像の場合は、画像の幅）</p></li>
+<li><p><strong>img_height</strong> (<em>int</em>) -- モデルのINPUTサイズ（input_dataが画像の場合は、画像の高さ）</p></li>
+<li><p><strong>input_data</strong> (<em>Image</em><em> | </em><em>str</em>) -- 推論するデータ（画像の場合RGB配列であること）</p></li>
 <li><p><strong>labels</strong> (<em>List</em><em>[</em><em>str</em><em>]</em><em>, </em><em>optional</em>) -- クラスラベルのリスト. Defaults to None.</p></li>
 <li><p><strong>colors</strong> (<em>List</em><em>[</em><em>Tuple</em><em>[</em><em>int</em><em>]</em><em>]</em><em>, </em><em>optional</em>) -- ボックスの色のリスト. Defaults to None.</p></li>
 <li><p><strong>nodraw</strong> (<em>bool</em><em>, </em><em>optional</em>) -- 描画フラグ. Defaults to False.</p></li>
@@ -312,154 +437,6 @@ return dict(output_boxes=final_boxes, output_scores=final_scores, output_classes
 </dd></dl>
 
 </section>
-<section id="module-iinfer.app.predicts.mmrotate_det_ReDet">
-<span id="iinfer-app-predicts-mmrotate-det-redet-module"></span><h2>iinfer.app.predicts.mmrotate_det_ReDet module<a class="headerlink" href="#module-iinfer.app.predicts.mmrotate_det_ReDet" title="Link to this heading"></a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="iinfer.app.predicts.mmrotate_det_ReDet.MMRotateReDet">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">iinfer.app.predicts.mmrotate_det_ReDet.</span></span><span class="sig-name descname"><span class="pre">MMRotateReDet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/mmrotate_det_ReDet.html#MMRotateReDet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.mmrotate_det_ReDet.MMRotateReDet" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="iinfer.app.html#iinfer.app.predict.TorchPredict" title="iinfer.app.predict.TorchPredict"><code class="xref py py-class docutils literal notranslate"><span class="pre">TorchPredict</span></code></a></p>
-<dl class="py method">
-<dt class="sig sig-object py" id="iinfer.app.predicts.mmrotate_det_ReDet.MMRotateReDet.create_session">
-<span class="sig-name descname"><span class="pre">create_session</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_conf_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_provider</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gpu_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/mmrotate_det_ReDet.html#MMRotateReDet.create_session"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.mmrotate_det_ReDet.MMRotateReDet.create_session" title="Link to this definition"></a></dt>
-<dd><p>推論セッションを作成する関数です。
-startコマンド実行時に呼び出されます。
-この関数内でAIモデルのロードを行い、推論準備を完了するようにしてください。
-戻り値の推論セッションの型は問いません。</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>model_path</strong> (<em>Path</em>) -- モデルファイルのパス</p></li>
-<li><p><strong>model_conf_path</strong> (<em>Path</em>) -- モデル設定ファイルのパス</p></li>
-<li><p><strong>gpu_id</strong> (<em>int</em><em>, </em><em>optional</em>) -- GPU ID. Defaults to None.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>推論セッション</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="iinfer.app.predicts.mmrotate_det_ReDet.MMRotateReDet.multiclass_nms">
-<span class="sig-name descname"><span class="pre">multiclass_nms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">boxes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nms_thr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">score_thr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/mmrotate_det_ReDet.html#MMRotateReDet.multiclass_nms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.mmrotate_det_ReDet.MMRotateReDet.multiclass_nms" title="Link to this definition"></a></dt>
-<dd><p>多クラスのNon-Maximum Suppression（NMS）を実行し、結果を返す関数です。</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>boxes</strong> (<em>numpy.ndarray</em>) -- バウンディングボックスの座標情報が格納された配列</p></li>
-<li><p><strong>scores</strong> (<em>numpy.ndarray</em>) -- 各バウンディングボックスのクラススコアが格納された配列</p></li>
-<li><p><strong>nms_thr</strong> (<em>float</em>) -- NMSの閾値</p></li>
-<li><p><strong>score_thr</strong> (<em>float</em>) -- スコアの閾値</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>NMSを実行した結果のバウンディングボックスとスコアの配列</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>numpy.ndarray</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="iinfer.app.predicts.mmrotate_det_ReDet.MMRotateReDet.nms">
-<span class="sig-name descname"><span class="pre">nms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">boxes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nms_thr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/mmrotate_det_ReDet.html#MMRotateReDet.nms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.mmrotate_det_ReDet.MMRotateReDet.nms" title="Link to this definition"></a></dt>
-<dd><p>Non-Maximum Suppression (NMS)を実行し、重複するボックスを削除します。</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>boxes</strong> (<em>numpy.ndarray</em>) -- ボックスの座標情報を含む2次元配列。</p></li>
-<li><p><strong>scores</strong> (<em>numpy.ndarray</em>) -- ボックスのスコアを含む1次元配列。</p></li>
-<li><p><strong>nms_thr</strong> (<em>float</em>) -- NMSの閾値。</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>NMSを通過したボックスのインデックスのリスト。</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>keep (list)</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="iinfer.app.predicts.mmrotate_det_ReDet.MMRotateReDet.postprocess">
-<span class="sig-name descname"><span class="pre">postprocess</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">outputs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p6</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/mmrotate_det_ReDet.html#MMRotateReDet.postprocess"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.mmrotate_det_ReDet.MMRotateReDet.postprocess" title="Link to this definition"></a></dt>
-<dd><p>推論結果を後処理する関数です。</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>outputs</strong> (<em>numpy.ndarray</em>) -- 推論結果の配列</p></li>
-<li><p><strong>img_size</strong> (<em>tuple</em>) -- 入力画像のサイズ (height, width)</p></li>
-<li><p><strong>p6</strong> (<em>bool</em><em>, </em><em>optional</em>) -- P6モードのフラグ (デフォルトはFalse)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>後処理された推論結果の配列</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>numpy.ndarray</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="iinfer.app.predicts.mmrotate_det_ReDet.MMRotateReDet.predict">
-<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_height</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodraw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/mmrotate_det_ReDet.html#MMRotateReDet.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.mmrotate_det_ReDet.MMRotateReDet.predict" title="Link to this definition"></a></dt>
-<dd><p>予測を行う関数です。
-predictコマンドやcaptureコマンド実行時に呼び出されます。
-引数のimageはRGBですので、戻り値の出力画像もRGBにしてください。
-戻り値の推論結果のdictは、通常推論結果項目ごとに値(list)を設定します。
-例）Image Classification（EfficientNet_Lite4）の場合
-return dict(output_scores=output_scores, output_classes=output_classes), image_obj
-例）Object Detection（YoloX）の場合
-return dict(output_boxes=final_boxes, output_scores=final_scores, output_classes=final_cls_inds), output_image</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>model</strong> -- 推論セッション</p></li>
-<li><p><strong>img_width</strong> (<em>int</em>) -- モデルのINPUTサイズ（画像の幅）</p></li>
-<li><p><strong>img_height</strong> (<em>int</em>) -- モデルのINPUTサイズ（画像の高さ）</p></li>
-<li><p><strong>image</strong> (<em>Image</em>) -- 入力画像（RGB配列であること）</p></li>
-<li><p><strong>labels</strong> (<em>List</em><em>[</em><em>str</em><em>]</em><em>, </em><em>optional</em>) -- クラスラベルのリスト. Defaults to None.</p></li>
-<li><p><strong>colors</strong> (<em>List</em><em>[</em><em>Tuple</em><em>[</em><em>int</em><em>]</em><em>]</em><em>, </em><em>optional</em>) -- ボックスの色のリスト. Defaults to None.</p></li>
-<li><p><strong>nodraw</strong> (<em>bool</em><em>, </em><em>optional</em>) -- 描画フラグ. Defaults to False.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>予測結果と出力画像(RGB)のタプル</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Tuple[Dict[str, Any], Image]</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="iinfer.app.predicts.mmrotate_det_ReDet.MMRotateReDet.preprocess">
-<span class="sig-name descname"><span class="pre">preprocess</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">swap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(2,</span> <span class="pre">0,</span> <span class="pre">1)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/mmrotate_det_ReDet.html#MMRotateReDet.preprocess"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.mmrotate_det_ReDet.MMRotateReDet.preprocess" title="Link to this definition"></a></dt>
-<dd><p>画像を前処理する関数です。</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>img</strong> (<em>numpy.ndarray</em>) -- 入力画像（BGR）</p></li>
-<li><p><strong>input_size</strong> (<em>tuple</em>) -- リサイズ後の画像サイズ</p></li>
-<li><p><strong>swap</strong> (<em>tuple</em><em>, </em><em>optional</em>) -- チャンネルの順番を変更するためのタプル (デフォルト値: (2, 0, 1))</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>前処理された画像
-float: リサイズ倍率</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>numpy.ndarray</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-</section>
 <section id="module-iinfer.app.predicts.mmseg_seg_PSPNet">
 <span id="iinfer-app-predicts-mmseg-seg-pspnet-module"></span><h2>iinfer.app.predicts.mmseg_seg_PSPNet module<a class="headerlink" href="#module-iinfer.app.predicts.mmseg_seg_PSPNet" title="Link to this heading"></a></h2>
 <dl class="py class">
@@ -468,7 +445,7 @@ float: リサイズ倍率</p>
 <dd><p>Bases: <a class="reference internal" href="iinfer.app.html#iinfer.app.predict.TorchPredict" title="iinfer.app.predict.TorchPredict"><code class="xref py py-class docutils literal notranslate"><span class="pre">TorchPredict</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.predicts.mmseg_seg_PSPNet.MMSegPSPNet.create_session">
-<span class="sig-name descname"><span class="pre">create_session</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_conf_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_provider</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gpu_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/mmseg_seg_PSPNet.html#MMSegPSPNet.create_session"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.mmseg_seg_PSPNet.MMSegPSPNet.create_session" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">create_session</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">deploy_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_conf_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_provider</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gpu_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/mmseg_seg_PSPNet.html#MMSegPSPNet.create_session"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.mmseg_seg_PSPNet.MMSegPSPNet.create_session" title="Link to this definition"></a></dt>
 <dd><p>推論セッションを作成する関数です。
 startコマンド実行時に呼び出されます。
 この関数内でAIモデルのロードを行い、推論準備を完了するようにしてください。
@@ -476,7 +453,8 @@ startコマンド実行時に呼び出されます。
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>model_path</strong> (<em>Path</em>) -- モデルファイルのパス</p></li>
+<li><p><strong>deploy_dir</strong> (<em>Path</em>) -- デプロイディレクトリのパス</p></li>
+<li><p><strong>model_path</strong> (<em>Path</em><em>|</em><em>Any</em>) -- モデルファイルのパス</p></li>
 <li><p><strong>model_conf_path</strong> (<em>Path</em>) -- モデル設定ファイルのパス</p></li>
 <li><p><strong>gpu_id</strong> (<em>int</em><em>, </em><em>optional</em>) -- GPU ID. Defaults to None.</p></li>
 </ul>
@@ -494,22 +472,18 @@ startコマンド実行時に呼び出されます。
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.predicts.mmseg_seg_PSPNet.MMSegPSPNet.predict">
-<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_height</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodraw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/mmseg_seg_PSPNet.html#MMSegPSPNet.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.mmseg_seg_PSPNet.MMSegPSPNet.predict" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_height</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Image</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodraw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/mmseg_seg_PSPNet.html#MMSegPSPNet.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.mmseg_seg_PSPNet.MMSegPSPNet.predict" title="Link to this definition"></a></dt>
 <dd><p>予測を行う関数です。
 predictコマンドやcaptureコマンド実行時に呼び出されます。
-引数のimageはRGBですので、戻り値の出力画像もRGBにしてください。
-戻り値の推論結果のdictは、通常推論結果項目ごとに値(list)を設定します。
-例）Image Classification（EfficientNet_Lite4）の場合
-return dict(output_scores=output_scores, output_classes=output_classes), image_obj
-例）Object Detection（YoloX）の場合
-return dict(output_boxes=final_boxes, output_scores=final_scores, output_classes=final_cls_inds), output_image</p>
+引数のinput_dataが画像の場合RGBですので、戻り値の出力画像もRGBにしてください。
+戻り値の推論結果のdictは、通常推論結果項目ごとに値(list)を設定します。</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>model</strong> -- 推論セッション</p></li>
-<li><p><strong>img_width</strong> (<em>int</em>) -- モデルのINPUTサイズ（画像の幅）</p></li>
-<li><p><strong>img_height</strong> (<em>int</em>) -- モデルのINPUTサイズ（画像の高さ）</p></li>
-<li><p><strong>image</strong> (<em>Image</em>) -- 入力画像（RGB配列であること）</p></li>
+<li><p><strong>img_width</strong> (<em>int</em>) -- モデルのINPUTサイズ（input_dataが画像の場合は、画像の幅）</p></li>
+<li><p><strong>img_height</strong> (<em>int</em>) -- モデルのINPUTサイズ（input_dataが画像の場合は、画像の高さ）</p></li>
+<li><p><strong>input_data</strong> (<em>Image</em><em> | </em><em>str</em>) -- 推論するデータ（画像の場合RGB配列であること）</p></li>
 <li><p><strong>labels</strong> (<em>List</em><em>[</em><em>str</em><em>]</em><em>, </em><em>optional</em>) -- クラスラベルのリスト. Defaults to None.</p></li>
 <li><p><strong>colors</strong> (<em>List</em><em>[</em><em>Tuple</em><em>[</em><em>int</em><em>]</em><em>]</em><em>, </em><em>optional</em>) -- ボックスの色のリスト. Defaults to None.</p></li>
 <li><p><strong>nodraw</strong> (<em>bool</em><em>, </em><em>optional</em>) -- 描画フラグ. Defaults to False.</p></li>
@@ -524,6 +498,15 @@ return dict(output_boxes=final_boxes, output_scores=final_scores, output_classes
 </dl>
 </dd></dl>
 
+</dd></dl>
+
+</section>
+<section id="module-iinfer.app.predicts.mmseg_seg_San">
+<span id="iinfer-app-predicts-mmseg-seg-san-module"></span><h2>iinfer.app.predicts.mmseg_seg_San module<a class="headerlink" href="#module-iinfer.app.predicts.mmseg_seg_San" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="iinfer.app.predicts.mmseg_seg_San.MMSegSan">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">iinfer.app.predicts.mmseg_seg_San.</span></span><span class="sig-name descname"><span class="pre">MMSegSan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/mmseg_seg_San.html#MMSegSan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.mmseg_seg_San.MMSegSan" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#iinfer.app.predicts.mmseg_seg_PSPNet.MMSegPSPNet" title="iinfer.app.predicts.mmseg_seg_PSPNet.MMSegPSPNet"><code class="xref py py-class docutils literal notranslate"><span class="pre">MMSegPSPNet</span></code></a></p>
 </dd></dl>
 
 </section>
@@ -544,7 +527,7 @@ return dict(output_boxes=final_boxes, output_scores=final_scores, output_classes
 <dd><p>Bases: <a class="reference internal" href="iinfer.app.html#iinfer.app.predict.OnnxPredict" title="iinfer.app.predict.OnnxPredict"><code class="xref py py-class docutils literal notranslate"><span class="pre">OnnxPredict</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.predicts.onnx_cls_EfficientNet_Lite4.OnnxClsEfficientNetLite4.create_session">
-<span class="sig-name descname"><span class="pre">create_session</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_conf_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_provider</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gpu_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/onnx_cls_EfficientNet_Lite4.html#OnnxClsEfficientNetLite4.create_session"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.onnx_cls_EfficientNet_Lite4.OnnxClsEfficientNetLite4.create_session" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">create_session</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">deploy_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_conf_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_provider</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gpu_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/onnx_cls_EfficientNet_Lite4.html#OnnxClsEfficientNetLite4.create_session"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.onnx_cls_EfficientNet_Lite4.OnnxClsEfficientNetLite4.create_session" title="Link to this definition"></a></dt>
 <dd><p>推論セッションを作成する関数です。
 startコマンド実行時に呼び出されます。
 この関数内でAIモデルのロードを行い、推論準備を完了するようにしてください。
@@ -552,7 +535,8 @@ startコマンド実行時に呼び出されます。
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>model_path</strong> (<em>Path</em>) -- モデルファイルのパス</p></li>
+<li><p><strong>deploy_dir</strong> (<em>Path</em>) -- デプロイディレクトリのパス</p></li>
+<li><p><strong>model_path</strong> (<em>Path</em><em>|</em><em>Any</em>) -- モデルファイルのパス</p></li>
 <li><p><strong>model_conf_path</strong> (<em>Path</em>) -- モデル設定ファイルのパス</p></li>
 <li><p><strong>gpu_id</strong> (<em>int</em><em>, </em><em>optional</em>) -- GPU ID. Defaults to None.</p></li>
 </ul>
@@ -565,22 +549,18 @@ startコマンド実行時に呼び出されます。
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.predicts.onnx_cls_EfficientNet_Lite4.OnnxClsEfficientNetLite4.predict">
-<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_height</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodraw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/onnx_cls_EfficientNet_Lite4.html#OnnxClsEfficientNetLite4.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.onnx_cls_EfficientNet_Lite4.OnnxClsEfficientNetLite4.predict" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_height</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Image</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodraw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/onnx_cls_EfficientNet_Lite4.html#OnnxClsEfficientNetLite4.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.onnx_cls_EfficientNet_Lite4.OnnxClsEfficientNetLite4.predict" title="Link to this definition"></a></dt>
 <dd><p>予測を行う関数です。
 predictコマンドやcaptureコマンド実行時に呼び出されます。
-引数のimageはRGBですので、戻り値の出力画像もRGBにしてください。
-戻り値の推論結果のdictは、通常推論結果項目ごとに値(list)を設定します。
-例）Image Classification（EfficientNet_Lite4）の場合
-return dict(output_scores=output_scores, output_classes=output_classes), image_obj
-例）Object Detection（YoloX）の場合
-return dict(output_boxes=final_boxes, output_scores=final_scores, output_classes=final_cls_inds), output_image</p>
+引数のinput_dataが画像の場合RGBですので、戻り値の出力画像もRGBにしてください。
+戻り値の推論結果のdictは、通常推論結果項目ごとに値(list)を設定します。</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>session</strong> -- 推論セッション</p></li>
-<li><p><strong>img_width</strong> (<em>int</em>) -- モデルのINPUTサイズ（画像の幅）</p></li>
-<li><p><strong>img_height</strong> (<em>int</em>) -- モデルのINPUTサイズ（画像の高さ）</p></li>
-<li><p><strong>image</strong> (<em>Image</em>) -- 入力画像（RGB配列であること）</p></li>
+<li><p><strong>model</strong> -- 推論セッション</p></li>
+<li><p><strong>img_width</strong> (<em>int</em>) -- モデルのINPUTサイズ（input_dataが画像の場合は、画像の幅）</p></li>
+<li><p><strong>img_height</strong> (<em>int</em>) -- モデルのINPUTサイズ（input_dataが画像の場合は、画像の高さ）</p></li>
+<li><p><strong>input_data</strong> (<em>Image</em><em> | </em><em>str</em>) -- 推論するデータ（画像の場合RGB配列であること）</p></li>
 <li><p><strong>labels</strong> (<em>List</em><em>[</em><em>str</em><em>]</em><em>, </em><em>optional</em>) -- クラスラベルのリスト. Defaults to None.</p></li>
 <li><p><strong>colors</strong> (<em>List</em><em>[</em><em>Tuple</em><em>[</em><em>int</em><em>]</em><em>]</em><em>, </em><em>optional</em>) -- ボックスの色のリスト. Defaults to None.</p></li>
 <li><p><strong>nodraw</strong> (<em>bool</em><em>, </em><em>optional</em>) -- 描画フラグ. Defaults to False.</p></li>
@@ -614,46 +594,21 @@ return dict(output_boxes=final_boxes, output_scores=final_scores, output_classes
 <dl class="py class">
 <dt class="sig sig-object py" id="iinfer.app.predicts.onnx_det_TinyYoloV3.OnnxDetTinyYoloV3">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">iinfer.app.predicts.onnx_det_TinyYoloV3.</span></span><span class="sig-name descname"><span class="pre">OnnxDetTinyYoloV3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/onnx_det_TinyYoloV3.html#OnnxDetTinyYoloV3"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.onnx_det_TinyYoloV3.OnnxDetTinyYoloV3" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="iinfer.app.html#iinfer.app.predict.OnnxPredict" title="iinfer.app.predict.OnnxPredict"><code class="xref py py-class docutils literal notranslate"><span class="pre">OnnxPredict</span></code></a></p>
-<dl class="py method">
-<dt class="sig sig-object py" id="iinfer.app.predicts.onnx_det_TinyYoloV3.OnnxDetTinyYoloV3.create_session">
-<span class="sig-name descname"><span class="pre">create_session</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_conf_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_provider</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gpu_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/onnx_det_TinyYoloV3.html#OnnxDetTinyYoloV3.create_session"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.onnx_det_TinyYoloV3.OnnxDetTinyYoloV3.create_session" title="Link to this definition"></a></dt>
-<dd><p>推論セッションを作成する関数です。
-startコマンド実行時に呼び出されます。
-この関数内でAIモデルのロードを行い、推論準備を完了するようにしてください。
-戻り値の推論セッションの型は問いません。</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>model_path</strong> (<em>Path</em>) -- モデルファイルのパス</p></li>
-<li><p><strong>model_conf_path</strong> (<em>Path</em>) -- モデル設定ファイルのパス</p></li>
-<li><p><strong>gpu_id</strong> (<em>int</em><em>, </em><em>optional</em>) -- GPU ID. Defaults to None.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>推論セッション</p>
-</dd>
-</dl>
-</dd></dl>
-
+<dd><p>Bases: <a class="reference internal" href="#iinfer.app.predicts.onnx_det_YoloV3.OnnxDetYoloV3" title="iinfer.app.predicts.onnx_det_YoloV3.OnnxDetYoloV3"><code class="xref py py-class docutils literal notranslate"><span class="pre">OnnxDetYoloV3</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.predicts.onnx_det_TinyYoloV3.OnnxDetTinyYoloV3.predict">
-<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_height</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodraw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/onnx_det_TinyYoloV3.html#OnnxDetTinyYoloV3.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.onnx_det_TinyYoloV3.OnnxDetTinyYoloV3.predict" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_height</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Image</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodraw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/onnx_det_TinyYoloV3.html#OnnxDetTinyYoloV3.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.onnx_det_TinyYoloV3.OnnxDetTinyYoloV3.predict" title="Link to this definition"></a></dt>
 <dd><p>予測を行う関数です。
 predictコマンドやcaptureコマンド実行時に呼び出されます。
-引数のimageはRGBですので、戻り値の出力画像もRGBにしてください。
-戻り値の推論結果のdictは、通常推論結果項目ごとに値(list)を設定します。
-例）Image Classification（EfficientNet_Lite4）の場合
-return dict(output_scores=output_scores, output_classes=output_classes), image_obj
-例）Object Detection（YoloX）の場合
-return dict(output_boxes=final_boxes, output_scores=final_scores, output_classes=final_cls_inds), output_image</p>
+引数のinput_dataが画像の場合RGBですので、戻り値の出力画像もRGBにしてください。
+戻り値の推論結果のdictは、通常推論結果項目ごとに値(list)を設定します。</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>session</strong> -- 推論セッション</p></li>
-<li><p><strong>img_width</strong> (<em>int</em>) -- モデルのINPUTサイズ（画像の幅）</p></li>
-<li><p><strong>img_height</strong> (<em>int</em>) -- モデルのINPUTサイズ（画像の高さ）</p></li>
-<li><p><strong>image</strong> (<em>Image</em>) -- 入力画像（RGB配列であること）</p></li>
+<li><p><strong>model</strong> -- 推論セッション</p></li>
+<li><p><strong>img_width</strong> (<em>int</em>) -- モデルのINPUTサイズ（input_dataが画像の場合は、画像の幅）</p></li>
+<li><p><strong>img_height</strong> (<em>int</em>) -- モデルのINPUTサイズ（input_dataが画像の場合は、画像の高さ）</p></li>
+<li><p><strong>input_data</strong> (<em>Image</em><em> | </em><em>str</em>) -- 推論するデータ（画像の場合RGB配列であること）</p></li>
 <li><p><strong>labels</strong> (<em>List</em><em>[</em><em>str</em><em>]</em><em>, </em><em>optional</em>) -- クラスラベルのリスト. Defaults to None.</p></li>
 <li><p><strong>colors</strong> (<em>List</em><em>[</em><em>Tuple</em><em>[</em><em>int</em><em>]</em><em>]</em><em>, </em><em>optional</em>) -- ボックスの色のリスト. Defaults to None.</p></li>
 <li><p><strong>nodraw</strong> (<em>bool</em><em>, </em><em>optional</em>) -- 描画フラグ. Defaults to False.</p></li>
@@ -666,17 +621,6 @@ return dict(output_boxes=final_boxes, output_scores=final_scores, output_classes
 <dd class="field-odd"><p>Tuple[Dict[str, Any], Image]</p>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="iinfer.app.predicts.onnx_det_TinyYoloV3.OnnxDetTinyYoloV3.preprocess_img">
-<span class="sig-name descname"><span class="pre">preprocess_img</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image:</span> <span class="pre">&lt;module</span> <span class="pre">'PIL.Image'</span> <span class="pre">from</span> <span class="pre">'C:\\Users\\hama\\OneDrive\\デスクトップ\\devenv\\iinfer\\.venv\\Lib\\site-packages\\PIL\\Image.py'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_img_width:</span> <span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_img_height:</span> <span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/onnx_det_TinyYoloV3.html#OnnxDetTinyYoloV3.preprocess_img"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.onnx_det_TinyYoloV3.OnnxDetTinyYoloV3.preprocess_img" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="iinfer.app.predicts.onnx_det_TinyYoloV3.OnnxDetTinyYoloV3.resize_img">
-<span class="sig-name descname"><span class="pre">resize_img</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_h</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/onnx_det_TinyYoloV3.html#OnnxDetTinyYoloV3.resize_img"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.onnx_det_TinyYoloV3.OnnxDetTinyYoloV3.resize_img" title="Link to this definition"></a></dt>
-<dd><p>resize image with unchanged aspect ratio using padding</p>
 </dd></dl>
 
 </dd></dl>
@@ -685,12 +629,12 @@ return dict(output_boxes=final_boxes, output_scores=final_scores, output_classes
 <section id="module-iinfer.app.predicts.onnx_det_YoloV3">
 <span id="iinfer-app-predicts-onnx-det-yolov3-module"></span><h2>iinfer.app.predicts.onnx_det_YoloV3 module<a class="headerlink" href="#module-iinfer.app.predicts.onnx_det_YoloV3" title="Link to this heading"></a></h2>
 <dl class="py class">
-<dt class="sig sig-object py" id="iinfer.app.predicts.onnx_det_YoloV3.OnnxDetTinyYoloV3">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">iinfer.app.predicts.onnx_det_YoloV3.</span></span><span class="sig-name descname"><span class="pre">OnnxDetTinyYoloV3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/onnx_det_YoloV3.html#OnnxDetTinyYoloV3"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.onnx_det_YoloV3.OnnxDetTinyYoloV3" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="iinfer.app.predicts.onnx_det_YoloV3.OnnxDetYoloV3">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">iinfer.app.predicts.onnx_det_YoloV3.</span></span><span class="sig-name descname"><span class="pre">OnnxDetYoloV3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/onnx_det_YoloV3.html#OnnxDetYoloV3"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.onnx_det_YoloV3.OnnxDetYoloV3" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="iinfer.app.html#iinfer.app.predict.OnnxPredict" title="iinfer.app.predict.OnnxPredict"><code class="xref py py-class docutils literal notranslate"><span class="pre">OnnxPredict</span></code></a></p>
 <dl class="py method">
-<dt class="sig sig-object py" id="iinfer.app.predicts.onnx_det_YoloV3.OnnxDetTinyYoloV3.create_session">
-<span class="sig-name descname"><span class="pre">create_session</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_conf_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_provider</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gpu_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/onnx_det_YoloV3.html#OnnxDetTinyYoloV3.create_session"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.onnx_det_YoloV3.OnnxDetTinyYoloV3.create_session" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="iinfer.app.predicts.onnx_det_YoloV3.OnnxDetYoloV3.create_session">
+<span class="sig-name descname"><span class="pre">create_session</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">deploy_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_conf_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_provider</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gpu_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/onnx_det_YoloV3.html#OnnxDetYoloV3.create_session"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.onnx_det_YoloV3.OnnxDetYoloV3.create_session" title="Link to this definition"></a></dt>
 <dd><p>推論セッションを作成する関数です。
 startコマンド実行時に呼び出されます。
 この関数内でAIモデルのロードを行い、推論準備を完了するようにしてください。
@@ -698,6 +642,7 @@ startコマンド実行時に呼び出されます。
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
+<li><p><strong>deploy_dir</strong> (<em>Path</em>) -- デプロイディレクトリのパス</p></li>
 <li><p><strong>model_path</strong> (<em>Path</em>) -- モデルファイルのパス</p></li>
 <li><p><strong>model_conf_path</strong> (<em>Path</em>) -- モデル設定ファイルのパス</p></li>
 <li><p><strong>gpu_id</strong> (<em>int</em><em>, </em><em>optional</em>) -- GPU ID. Defaults to None.</p></li>
@@ -710,23 +655,19 @@ startコマンド実行時に呼び出されます。
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="iinfer.app.predicts.onnx_det_YoloV3.OnnxDetTinyYoloV3.predict">
-<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_height</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodraw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/onnx_det_YoloV3.html#OnnxDetTinyYoloV3.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.onnx_det_YoloV3.OnnxDetTinyYoloV3.predict" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="iinfer.app.predicts.onnx_det_YoloV3.OnnxDetYoloV3.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_height</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Image</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodraw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/onnx_det_YoloV3.html#OnnxDetYoloV3.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.onnx_det_YoloV3.OnnxDetYoloV3.predict" title="Link to this definition"></a></dt>
 <dd><p>予測を行う関数です。
 predictコマンドやcaptureコマンド実行時に呼び出されます。
-引数のimageはRGBですので、戻り値の出力画像もRGBにしてください。
-戻り値の推論結果のdictは、通常推論結果項目ごとに値(list)を設定します。
-例）Image Classification（EfficientNet_Lite4）の場合
-return dict(output_scores=output_scores, output_classes=output_classes), image_obj
-例）Object Detection（YoloX）の場合
-return dict(output_boxes=final_boxes, output_scores=final_scores, output_classes=final_cls_inds), output_image</p>
+引数のinput_dataが画像の場合RGBですので、戻り値の出力画像もRGBにしてください。
+戻り値の推論結果のdictは、通常推論結果項目ごとに値(list)を設定します。</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>session</strong> -- 推論セッション</p></li>
-<li><p><strong>img_width</strong> (<em>int</em>) -- モデルのINPUTサイズ（画像の幅）</p></li>
-<li><p><strong>img_height</strong> (<em>int</em>) -- モデルのINPUTサイズ（画像の高さ）</p></li>
-<li><p><strong>image</strong> (<em>Image</em>) -- 入力画像（RGB配列であること）</p></li>
+<li><p><strong>model</strong> -- 推論セッション</p></li>
+<li><p><strong>img_width</strong> (<em>int</em>) -- モデルのINPUTサイズ（input_dataが画像の場合は、画像の幅）</p></li>
+<li><p><strong>img_height</strong> (<em>int</em>) -- モデルのINPUTサイズ（input_dataが画像の場合は、画像の高さ）</p></li>
+<li><p><strong>input_data</strong> (<em>Image</em><em> | </em><em>str</em>) -- 推論するデータ（画像の場合RGB配列であること）</p></li>
 <li><p><strong>labels</strong> (<em>List</em><em>[</em><em>str</em><em>]</em><em>, </em><em>optional</em>) -- クラスラベルのリスト. Defaults to None.</p></li>
 <li><p><strong>colors</strong> (<em>List</em><em>[</em><em>Tuple</em><em>[</em><em>int</em><em>]</em><em>]</em><em>, </em><em>optional</em>) -- ボックスの色のリスト. Defaults to None.</p></li>
 <li><p><strong>nodraw</strong> (<em>bool</em><em>, </em><em>optional</em>) -- 描画フラグ. Defaults to False.</p></li>
@@ -742,13 +683,13 @@ return dict(output_boxes=final_boxes, output_scores=final_scores, output_classes
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="iinfer.app.predicts.onnx_det_YoloV3.OnnxDetTinyYoloV3.preprocess_img">
-<span class="sig-name descname"><span class="pre">preprocess_img</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_img_width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_img_height</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/onnx_det_YoloV3.html#OnnxDetTinyYoloV3.preprocess_img"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.onnx_det_YoloV3.OnnxDetTinyYoloV3.preprocess_img" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="iinfer.app.predicts.onnx_det_YoloV3.OnnxDetYoloV3.preprocess_img">
+<span class="sig-name descname"><span class="pre">preprocess_img</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_img_width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_img_height</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/onnx_det_YoloV3.html#OnnxDetYoloV3.preprocess_img"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.onnx_det_YoloV3.OnnxDetYoloV3.preprocess_img" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="iinfer.app.predicts.onnx_det_YoloV3.OnnxDetTinyYoloV3.resize_img">
-<span class="sig-name descname"><span class="pre">resize_img</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_h</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/onnx_det_YoloV3.html#OnnxDetTinyYoloV3.resize_img"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.onnx_det_YoloV3.OnnxDetTinyYoloV3.resize_img" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="iinfer.app.predicts.onnx_det_YoloV3.OnnxDetYoloV3.resize_img">
+<span class="sig-name descname"><span class="pre">resize_img</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_h</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/onnx_det_YoloV3.html#OnnxDetYoloV3.resize_img"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.onnx_det_YoloV3.OnnxDetYoloV3.resize_img" title="Link to this definition"></a></dt>
 <dd><p>resize image with unchanged aspect ratio using padding</p>
 </dd></dl>
 
@@ -763,7 +704,7 @@ return dict(output_boxes=final_boxes, output_scores=final_scores, output_classes
 <dd><p>Bases: <a class="reference internal" href="iinfer.app.html#iinfer.app.predict.OnnxPredict" title="iinfer.app.predict.OnnxPredict"><code class="xref py py-class docutils literal notranslate"><span class="pre">OnnxPredict</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.predicts.onnx_det_YoloX.OnnxDetYoloX.create_session">
-<span class="sig-name descname"><span class="pre">create_session</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_conf_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_provider</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gpu_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/onnx_det_YoloX.html#OnnxDetYoloX.create_session"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.onnx_det_YoloX.OnnxDetYoloX.create_session" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">create_session</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">deploy_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_conf_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_provider</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gpu_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/onnx_det_YoloX.html#OnnxDetYoloX.create_session"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.onnx_det_YoloX.OnnxDetYoloX.create_session" title="Link to this definition"></a></dt>
 <dd><p>推論セッションを作成する関数です。
 startコマンド実行時に呼び出されます。
 この関数内でAIモデルのロードを行い、推論準備を完了するようにしてください。
@@ -771,6 +712,7 @@ startコマンド実行時に呼び出されます。
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
+<li><p><strong>deploy_dir</strong> (<em>Path</em>) -- デプロイディレクトリのパス</p></li>
 <li><p><strong>model_path</strong> (<em>Path</em>) -- モデルファイルのパス</p></li>
 <li><p><strong>model_conf_path</strong> (<em>Path</em>) -- モデル設定ファイルのパス</p></li>
 <li><p><strong>gpu_id</strong> (<em>int</em><em>, </em><em>optional</em>) -- GPU ID. Defaults to None.</p></li>
@@ -848,22 +790,18 @@ startコマンド実行時に呼び出されます。
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.predicts.onnx_det_YoloX.OnnxDetYoloX.predict">
-<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_height</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodraw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/onnx_det_YoloX.html#OnnxDetYoloX.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.onnx_det_YoloX.OnnxDetYoloX.predict" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_height</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Image</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodraw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/onnx_det_YoloX.html#OnnxDetYoloX.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.onnx_det_YoloX.OnnxDetYoloX.predict" title="Link to this definition"></a></dt>
 <dd><p>予測を行う関数です。
 predictコマンドやcaptureコマンド実行時に呼び出されます。
-引数のimageはRGBですので、戻り値の出力画像もRGBにしてください。
-戻り値の推論結果のdictは、通常推論結果項目ごとに値(list)を設定します。
-例）Image Classification（EfficientNet_Lite4）の場合
-return dict(output_scores=output_scores, output_classes=output_classes), image_obj
-例）Object Detection（YoloX）の場合
-return dict(output_boxes=final_boxes, output_scores=final_scores, output_classes=final_cls_inds), output_image</p>
+引数のinput_dataが画像の場合RGBですので、戻り値の出力画像もRGBにしてください。
+戻り値の推論結果のdictは、通常推論結果項目ごとに値(list)を設定します。</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>session</strong> -- 推論セッション</p></li>
-<li><p><strong>img_width</strong> (<em>int</em>) -- モデルのINPUTサイズ（画像の幅）</p></li>
-<li><p><strong>img_height</strong> (<em>int</em>) -- モデルのINPUTサイズ（画像の高さ）</p></li>
-<li><p><strong>image</strong> (<em>Image</em>) -- 入力画像（RGB配列であること）</p></li>
+<li><p><strong>model</strong> -- 推論セッション</p></li>
+<li><p><strong>img_width</strong> (<em>int</em>) -- モデルのINPUTサイズ（input_dataが画像の場合は、画像の幅）</p></li>
+<li><p><strong>img_height</strong> (<em>int</em>) -- モデルのINPUTサイズ（input_dataが画像の場合は、画像の高さ）</p></li>
+<li><p><strong>input_data</strong> (<em>Image</em><em> | </em><em>str</em>) -- 推論するデータ（画像の場合RGB配列であること）</p></li>
 <li><p><strong>labels</strong> (<em>List</em><em>[</em><em>str</em><em>]</em><em>, </em><em>optional</em>) -- クラスラベルのリスト. Defaults to None.</p></li>
 <li><p><strong>colors</strong> (<em>List</em><em>[</em><em>Tuple</em><em>[</em><em>int</em><em>]</em><em>]</em><em>, </em><em>optional</em>) -- ボックスの色のリスト. Defaults to None.</p></li>
 <li><p><strong>nodraw</strong> (<em>bool</em><em>, </em><em>optional</em>) -- 描画フラグ. Defaults to False.</p></li>
@@ -909,59 +847,6 @@ float: リサイズ倍率</p>
 <dt class="sig sig-object py" id="iinfer.app.predicts.onnx_det_YoloX_Lite.OnnxdetYoloXLite">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">iinfer.app.predicts.onnx_det_YoloX_Lite.</span></span><span class="sig-name descname"><span class="pre">OnnxdetYoloXLite</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/onnx_det_YoloX_Lite.html#OnnxdetYoloXLite"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.onnx_det_YoloX_Lite.OnnxdetYoloXLite" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#iinfer.app.predicts.onnx_det_YoloX.OnnxDetYoloX" title="iinfer.app.predicts.onnx_det_YoloX.OnnxDetYoloX"><code class="xref py py-class docutils literal notranslate"><span class="pre">OnnxDetYoloX</span></code></a></p>
-<dl class="py method">
-<dt class="sig sig-object py" id="iinfer.app.predicts.onnx_det_YoloX_Lite.OnnxdetYoloXLite.create_session">
-<span class="sig-name descname"><span class="pre">create_session</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_conf_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_provider</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gpu_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/onnx_det_YoloX_Lite.html#OnnxdetYoloXLite.create_session"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.onnx_det_YoloX_Lite.OnnxdetYoloXLite.create_session" title="Link to this definition"></a></dt>
-<dd><p>推論セッションを作成する関数です。
-startコマンド実行時に呼び出されます。
-この関数内でAIモデルのロードを行い、推論準備を完了するようにしてください。
-戻り値の推論セッションの型は問いません。</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>model_path</strong> (<em>Path</em>) -- モデルファイルのパス</p></li>
-<li><p><strong>model_conf_path</strong> (<em>Path</em>) -- モデル設定ファイルのパス</p></li>
-<li><p><strong>gpu_id</strong> (<em>int</em><em>, </em><em>optional</em>) -- GPU ID. Defaults to None.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>推論セッション</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="iinfer.app.predicts.onnx_det_YoloX_Lite.OnnxdetYoloXLite.predict">
-<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_height</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodraw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/predicts/onnx_det_YoloX_Lite.html#OnnxdetYoloXLite.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.predicts.onnx_det_YoloX_Lite.OnnxdetYoloXLite.predict" title="Link to this definition"></a></dt>
-<dd><p>予測を行う関数です。
-predictコマンドやcaptureコマンド実行時に呼び出されます。
-引数のimageはRGBですので、戻り値の出力画像もRGBにしてください。
-戻り値の推論結果のdictは、通常推論結果項目ごとに値(list)を設定します。
-例）Image Classification（EfficientNet_Lite4）の場合
-return dict(output_scores=output_scores, output_classes=output_classes), image_obj
-例）Object Detection（YoloX）の場合
-return dict(output_boxes=final_boxes, output_scores=final_scores, output_classes=final_cls_inds), output_image</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>session</strong> -- 推論セッション</p></li>
-<li><p><strong>img_width</strong> (<em>int</em>) -- モデルのINPUTサイズ（画像の幅）</p></li>
-<li><p><strong>img_height</strong> (<em>int</em>) -- モデルのINPUTサイズ（画像の高さ）</p></li>
-<li><p><strong>image</strong> (<em>Image</em>) -- 入力画像（RGB配列であること）</p></li>
-<li><p><strong>labels</strong> (<em>List</em><em>[</em><em>str</em><em>]</em><em>, </em><em>optional</em>) -- クラスラベルのリスト. Defaults to None.</p></li>
-<li><p><strong>colors</strong> (<em>List</em><em>[</em><em>Tuple</em><em>[</em><em>int</em><em>]</em><em>]</em><em>, </em><em>optional</em>) -- ボックスの色のリスト. Defaults to None.</p></li>
-<li><p><strong>nodraw</strong> (<em>bool</em><em>, </em><em>optional</em>) -- 描画フラグ. Defaults to False.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>予測結果と出力画像のタプル</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Tuple[Dict[str, Any], Image]</p>
-</dd>
-</dl>
-</dd></dl>
-
 </dd></dl>
 
 </section>

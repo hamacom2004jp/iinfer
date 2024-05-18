@@ -140,7 +140,7 @@ iinferの開発環境を構築するための手順を説明します。
 
     .. code-block:: bat
 
-        wsl --install -d Ubuntu-20.04
+        wsl --install -d Ubuntu-22.04
 
 2. Ubuntu初期設定
 
@@ -166,11 +166,21 @@ iinferの開発環境を構築するための手順を説明します。
         sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
         sudo apt update
         apt-cache policy docker-ce
-        sudo apt install -y docker-ce docker-compose
+        sudo apt install -y docker-ce python3.8-venv python3-wheel
         sudo systemctl start docker
         sudo systemctl enable docker
         sudo usermod -aG docker $USER
-        exit
+
+    GPUを使用する場合は、以下のコマンドも実行します:
+
+    .. code-block:: bash
+        
+        curl -s -L https://nvidia.github.io/nvidia-container-runtime/gpgkey |   sudo apt-key add -
+        distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
+        curl -s -L https://nvidia.github.io/nvidia-container-runtime/$distribution/nvidia-container-runtime.list |   sudo tee /etc/apt/sources.list.d/nvidia-container-runtime.list
+        sudo apt-get update
+        sudo apt-get install nvidia-container-runtime
+
 
 4. WSL-Ubuntu-dockerイメージファイル作成
 
@@ -179,8 +189,8 @@ iinferの開発環境を構築するための手順を説明します。
     .. code-block:: bat
 
         wsl --shutdown
-        wsl --export Ubuntu-20.04 <任意のパス>/Ubuntu_docker-20.04.tar
-        wsl --unregister Ubuntu-20.04
+        wsl --export Ubuntu-22.04 <任意のパス>/Ubuntu_docker-22.04.tar
+        wsl --unregister Ubuntu-22.04
 
 5. WSL-Ubuntu-dockerイメージファイルのインポート
 
@@ -188,7 +198,7 @@ iinferの開発環境を構築するための手順を説明します。
 
     .. code-block:: bat
 
-        wsl --import Ubuntu_docker-20.04 <任意のパス> <任意のパス>/Ubuntu_docker-20.04.tar --version 2
+        wsl --import Ubuntu_docker-22.04 <任意のパス> <任意のパス>/Ubuntu_docker-20.04.tar --version 2
 
 【参考】RedisをWindows環境を構築する手順
 =====================================================

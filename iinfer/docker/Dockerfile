@@ -11,7 +11,8 @@ ENV TZ=Asia/Tokyo
 RUN apt-get update && \
     apt-get install -y libgl1-mesa-dev libglib2.0-0 git build-essential
 RUN pip install --upgrade pip && \
-    pip install #{INSTALL_IINFER}
+    pip install #{INSTALL_IINFER} && \
+    iinfer --version
 
 #{INSTALL_ONNX}
 #{INSTALL_MMDET}
@@ -20,6 +21,7 @@ RUN pip install --upgrade pip && \
 #{INSTALL_MMPRETRAIN}
 #{INSTALL_INSIGHTFACE}
 #{INSTALL_DIFFUSERS}
+#{INSTALL_LLAMAINDEX}
 RUN mkdir -p /home/${MKUSER}/.iinfer && chown -R ${MKUSER}:${MKUSER} /home/${MKUSER}/.iinfer
 
 ENV REDIS_HOST=redis

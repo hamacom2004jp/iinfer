@@ -10,7 +10,7 @@ import logging.config
 import json
 import numpy as np
 import os
-import platform
+import multiprocessing
 import random
 import shutil
 import string
@@ -116,7 +116,7 @@ def getopt(opt:dict, key:str, preval=None, defval=None, withset=False) -> any:
             v = preval.get(key, None)
         if (v is None or not v) and key in opt:
             v = opt[key]
-        elif v is None or not v:
+        elif (v is None or not v) and v != 0:
             v = defval
         if withset:
             opt[key] = v
@@ -291,9 +291,9 @@ def cmd(cmd:str, logger:logging.Logger, strip:bool=False):
             break
         for enc in ['utf-8', 'cp932', 'utf-16', 'utf-16-le', 'utf-16-be']:
             try:
-                output = out.decode(enc)
-                if platform.system() == 'Windows' or strip:
-                    output = output.rstrip()
+                output = out.decode(enc).rstrip()
+                #if platform.system() == 'Windows' or strip:
+                #    output = output.rstrip()
                 logger.debug(f"output:{output}")
                 break
             except UnicodeDecodeError:
@@ -381,4 +381,31 @@ def make_color(idstr:str) -> Tuple[int]:
     if len(idstr) < 3:
         idstr = idstr.zfill(3)
     return tuple([ord(c) * ord(c) % 256 for c in idstr[:3]])
-    
+
+def show_input(title:str, message:str) -> str:
+    """
+    ダイアログで入力を求めます。
+
+    Args:
+        title (str): タイトル
+        message (str): メッセージ
+
+    Returns:
+        str: 入力された文字列
+    """
+    manager = multiprocessing.Manager()
+    result = manager.dict()
+    proc = multiprocessing.Process(target=_show_input_daialog, args=(title, message, result))
+    proc.start()
+    proc.join()
+    return result['input_text']
+
+def _show_input_daialog(title:str, message:str, result) -> str:
+    import wx
+    app = wx.App()
+    dlg = wx.TextEntryDialog(None, message, title)
+    dlg.ShowModal()
+    dlg.Destroy()
+    input_text = dlg.GetValue()
+    app.Destroy()
+    result['input_text'] = input_text
