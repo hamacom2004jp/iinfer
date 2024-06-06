@@ -297,12 +297,12 @@ class Install(object):
         ret = self._transformers(install_use_gpu)
         if "error" in ret: return ret
 
-        ret, _ = common.cmd('pip install diffusers', logger=self.logger)
+        ret, _ = common.cmd('pip install diffusers peft', logger=self.logger)
         if ret != 0:
-            self.logger.error(f"Failed to install diffusers.")
-            return {"error": f"Failed to install diffusers."}
+            self.logger.error(f"Failed to install diffusers peft.")
+            return {"error": f"Failed to install diffusers peft."}
 
-        return {"success": f"Success to install diffusers."}
+        return {"success": f"Success to install diffusers peft."}
 
     def llamaindex(self, data_dir:Path, install_use_gpu:bool=False):
         ret = self._torch(install_use_gpu)

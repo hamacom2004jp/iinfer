@@ -32,17 +32,19 @@ class Diffusers_StableDiffusionPipeline_Txt2Img(predict.TorchPredict):
         Returns:
             推論セッション
         """
-        from diffusers import StableDiffusionPipeline, DPMSolverMultistepScheduler
+        from diffusers import StableDiffusionXLPipeline, EulerAncestralDiscreteScheduler
 
         opt = common.loadopt(model_conf_path) if model_conf_path is not None else dict()
         self.num_inference_steps = common.getopt(opt, 'num_inference_steps', preval=10, withset=False)
 
-        # KBlueLeaf/kohaku-v2.1
-        # SimianLuo/LCM_Dreamshaper_v7
-        pipeline = StableDiffusionPipeline.from_pretrained(model_path, cache_dir=deploy_dir)
-        pipeline.scheduler = DPMSolverMultistepScheduler.from_config(pipeline.scheduler.config)
+        # https://huggingface.co/martyn/sdxl-turbo-mario-merge-top-rated/blob/main/topRatedTurboxlLCM_v10.safetensors
+        pipeline = StableDiffusionXLPipeline.from_single_file(model_path, cache_dir=deploy_dir)
+        pipeline.scheduler = EulerAncestralDiscreteScheduler.from_config(pipeline.scheduler.config)
         if gpu_id is not None and self.is_gpu_available(model_path, model_conf_path, gpu_id):
             pipeline.to("cuda")
+        pipeline.load_lora_weights('ntc-ai/SDXL-LoRA-slider.anime', weight_name='anime.safetensors', adapter_name="anime")
+        pipeline.set_adapters(["anime"], adapter_weights=[2.0])
+
         return pipeline
 
     def predict(self, model, img_width:int, img_height:int, input_data:Union[Image.Image, str], labels:List[str]=None, colors:List[Tuple[int]]=None, nodraw:bool=False):
@@ -65,7 +67,9 @@ class Diffusers_StableDiffusionPipeline_Txt2Img(predict.TorchPredict):
             Tuple[Dict[str, Any], Image]: 予測結果と出力画像(RGB)のタプル
         """
         import torch
-        output_images = model(input_data, height=img_height, width=img_width, num_inference_steps=self.num_inference_steps, output_type='pil',
+        output_images = model(input_data, negative_prompt='nsfw', guidance_scale = 2,
+                              height=img_height, width=img_width,
+                              num_inference_steps=self.num_inference_steps, output_type='pil',
                               torch_dtype=torch.float16).images
 
         return dict(prompt=input_data), output_images[0]
