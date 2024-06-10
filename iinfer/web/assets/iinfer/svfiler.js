@@ -24,6 +24,7 @@ const filer = (svpath) => {
                     + '<label class="input-group-text text-decoration-underline"><span class="text-danger">*</span>password</label>'
                     + '<input name="filer_password" type="text" class="form-control filer_password" param_data_type="str" param_data_multi="false" required>'
                     + '<input name="filer_svname" type="hidden" class="filer_svname">'
+                    + '<input name="filer_local_data" type="hidden" class="filer_local_data">'
                   + '</div>'
                 + '</div>'
               + '</li><li><hr class="dropdown-divider"></li></ul>'
@@ -128,7 +129,8 @@ const filer = (svpath) => {
           current_li_elem = $(`<li id="${key}" data_path="${node['path']}"/>`);
           current_ul_elem.append(current_li_elem);
         }
-        current_a_elem = $(`<a href="#" class="folder-open">${node['name']}</a>`);
+        const font_color = "color:rgba(var(--bs-link-color-rgb),var(--bs-link-opacity,1));font-size:initial;";
+        current_a_elem = $(`<a href="#" class="folder-open" style="${font_color}">${node['name']}</a>`);
         current_li_elem.append(current_a_elem);
         mk_func = (_p, _e) => {return ()=>{
           tree(_p, _e);
@@ -138,7 +140,7 @@ const filer = (svpath) => {
         Object.keys(children).map((k, i) => {
           n = children[k];
           if(!n['is_dir']) return;
-          ul_elem = $('<ul class="tree_ul"/>').append(`<li id="${k}" data_path="${n['path']}"><a href="#" class="folder-close">${n['name']}</a></li>`);
+          ul_elem = $('<ul class="tree_ul"/>').append(`<li id="${k}" data_path="${n['path']}"><a href="#" class="folder-close" style="${font_color}">${n['name']}</a></li>`);
           current_li_elem.append(ul_elem);
           modal.find(`#${k}`).off('click');
           modal.find(`#${k}`).on('click', mk_func(n['path'], current_ul_elem));
@@ -149,7 +151,7 @@ const filer = (svpath) => {
         if(!node['path']) return;
         modal.find('.filer_address').val(node['path']);
         const table = $('<table class="table table-bordered table-hover table-sm">'
-                      + '<thead class="table-dark bg-dark"><tr><th scope="col">-</th><th scope="col">name</th><th scope="col">size</th><th scope="col">last</th></tr></thead>'
+                      + '<thead><tr><th scope="col">-</th><th scope="col">name</th><th scope="col">size</th><th scope="col">last</th></tr></thead>'
                       + '</table>');
         const table_body = $('<tbody></tbody>');
         modal.find('.file-list').html('');
@@ -305,6 +307,7 @@ const filer = (svpath) => {
     let filer_port = modal.find('.filer_port').val();
     let filer_password = modal.find('.filer_password').val();
     let filer_svname = modal.find('.filer_svname').val();
+    let filer_local_data = modal.find('.filer_local_data').val();
     if (!filer_host) {
       filer_host = localStorage.getItem('filer_host');
       filer_host = filer_host ? filer_host : 'localhost';
@@ -325,7 +328,12 @@ const filer = (svpath) => {
       filer_svname = filer_svname ? filer_svname : 'server';
       modal.find('.filer_svname').val(filer_svname);
     }
-    return {"host":filer_host, "port":filer_port, "password":filer_password, "svname":filer_svname};
+    if (!filer_local_data) {
+      filer_local_data = localStorage.getItem('filer_local_data');
+      filer_local_data = filer_local_data ? filer_local_data : '';
+      modal.find('.filer_local_data').val(filer_local_data);
+    }
+    return {"host":filer_host, "port":filer_port, "password":filer_password, "svname":filer_svname, "local_data": filer_local_data};
   }
   const load_server_list = () => {
     show_loading();
@@ -345,23 +353,34 @@ const filer = (svpath) => {
         hide_loading();
         return;
       }
+      const mk_func = (elem) => {return ()=>{
+        modal.find('.filer_server_bot').text(elem.attr('data-svname'));
+        modal.find('.filer_host').val(elem.attr('data-host'));
+        modal.find('.filer_port').val(elem.attr('data-port'));
+        modal.find('.filer_password').val(elem.attr('data-password'));
+        modal.find('.filer_svname').val(elem.attr('data-svname'));
+        modal.find('.filer_local_data').val(elem.attr('data-local_data'));
+        localStorage.setItem('filer_host', elem.attr('data-host'));
+        localStorage.setItem('filer_port', elem.attr('data-port'));
+        localStorage.setItem('filer_password', elem.attr('data-password'));
+        localStorage.setItem('filer_svname', elem.attr('data-svname'));
+        localStorage.setItem('filer_local_data', elem.attr('data-local_data'));
+        tree("/", modal.find('.tree-menu'))
+      }};
       res[0]['success'].forEach(elem => {
-        const a_elem = $(`<a class="dropdown-item" href="#" data-host="${opt['host']}" data-port="${opt['port']}" data-password="${opt['password']}" data-svname="${elem['svname']}">${elem['svname']} ( ${opt['host']}:${opt['port']} )</a>`);
-        const mk_func = (elem) => {return ()=>{
-          modal.find('.filer_host').val(elem.attr('data-host'));
-          modal.find('.filer_port').val(elem.attr('data-port'));
-          modal.find('.filer_password').val(elem.attr('data-password'));
-          modal.find('.filer_svname').val(elem.attr('data-svname'));
-          localStorage.setItem('filer_host', elem.attr('data-host'));
-          localStorage.setItem('filer_port', elem.attr('data-port'));
-          localStorage.setItem('filer_password', elem.attr('data-password'));
-          localStorage.setItem('filer_svname', elem.attr('data-svname'));
-          tree("/", modal.find('.tree-menu'))
-        }};
+        const a_elem = $(`<a class="dropdown-item" href="#" data-host="${opt['host']}" data-port="${opt['port']}" data-password="${opt['password']}" data-svname="${elem['svname']}" data-local_data="">${elem['svname']} ( ${opt['host']}:${opt['port']} )</a>`);
         a_elem.off("click").on("click", mk_func(a_elem));
         const li_elem = $('<li class="filer_svnames"></li>').append(a_elem);
         modal.find('.filer_server').append(li_elem);
       });
+      const cl = async () => {
+        const local_data = await eel.get_local_data()();
+        const a_elem = $(`<a class="dropdown-item" href="#" data-host="localhost" data-port="6379" data-password="password" data-svname="client" data-local_data="${local_data}">client</a>`);
+        a_elem.off("click").on("click", mk_func(a_elem));
+        const li_elem = $('<li class="filer_svnames"></li>').append(a_elem);
+        modal.find('.filer_server').append(li_elem);
+      }
+      await cl();
       modal.find('.filer_server').find('.dropdown-item:first').click();
     }).then(() => {
       hide_loading();

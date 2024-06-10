@@ -14,7 +14,7 @@ Webサービス起動 : `iinfer -m web -c start <Option>`
     :header-rows: 1
 
     "Option","Required","Description"
-    "--data <データディレクトリ>","","省略した時は `$HONE/.iinfer` を使用します。"
+    "--data <データフォルダ>","","省略した時は `$HONE/.iinfer` を使用します。"
     "--allow_host <接続許可するIP>","","省略した時は `0.0.0.0` を使用します。"
     "--listen_port <サービスポート>","","省略した時は `8081` を使用します。"
 
@@ -27,5 +27,5 @@ Webサービス停止 : `iinfer -m web -c stop <Option>`
     :header-rows: 1
 
     "Option","Required","Description"
-    "--data <データディレクトリ>","","省略した時は `$HONE/.iinfer` を使用します。"
+    "--data <データフォルダ>","","省略した時は `$HONE/.iinfer` を使用します。"
 

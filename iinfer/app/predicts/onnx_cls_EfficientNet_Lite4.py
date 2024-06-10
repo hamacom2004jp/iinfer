@@ -17,7 +17,7 @@ class OnnxClsEfficientNetLite4(predict.OnnxPredict):
     def __init__(self, logger:logging.Logger) -> None:
         super().__init__(logger)
 
-    def create_session(self, deploy_dir:Path, model_path:Union[Path|Any], model_conf_path:Path, model_provider:str, gpu_id:int=None):
+    def create_session(self, deploy_dir:Path, model_path:Union[Path,Any], model_conf_path:Path, model_provider:str, gpu_id:int=None):
         """
         推論セッションを作成する関数です。
         startコマンド実行時に呼び出されます。

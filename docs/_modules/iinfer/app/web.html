@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="jp" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>iinfer.app.web &mdash; iinfer 2024/06/10 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=0e783793"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            iinfer
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/overview.html">iinferの概要</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/install.html">インストール</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/gui.html">GUIモード</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/web.html">Webモード</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/command.html">コマンドリファレンス</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/models.html">動作確認済みモデル</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/detection.html">物体検知</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/segmentation.html">領域検知</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/face.html">顔認識</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/pipeline.html">パイプライン</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/injections.html">インジェクション</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/customize.html">カスタマイズ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/developer.html">開発者向け情報</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/errors.html">よくあるエラー</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/license.html">ライセンス</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">iinfer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">iinfer.app.web</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for iinfer.app.web</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">iinfer</span> <span class="kn">import</span> <span class="n">version</span>
+<span class="kn">from</span> <span class="nn">iinfer.app</span> <span class="kn">import</span> <span class="n">app</span><span class="p">,</span> <span class="n">common</span><span class="p">,</span> <span class="n">options</span>
+<span class="kn">from</span> <span class="nn">iinfer.app.commons</span> <span class="kn">import</span> <span class="n">convert</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">bottle</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">gevent</span>
+<span class="kn">import</span> <span class="nn">html</span>
+<span class="kn">import</span> <span class="nn">iinfer</span>
+<span class="kn">import</span> <span class="nn">io</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">signal</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+
+
+<div class="viewcode-block" id="Web">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web">[docs]</a>
+<span class="k">class</span> <span class="nc">Web</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">Options</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span><span class="n">Path</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logger</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">container</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_size_th</span> <span class="o">=</span> <span class="mi">1024</span><span class="o">*</span><span class="mi">1024</span><span class="o">*</span><span class="mi">5</span>
+        <span class="n">common</span><span class="o">.</span><span class="n">mkdirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Web.mk_curl_fileup">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.mk_curl_fileup">[docs]</a>
+    <span class="k">def</span> <span class="nf">mk_curl_fileup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd_opt</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s1">&#39;mode&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cmd_opt</span> <span class="ow">or</span> <span class="s1">&#39;cmd&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cmd_opt</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">curl_fileup</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">ref</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_opt_opt</span><span class="p">(</span><span class="n">cmd_opt</span><span class="p">[</span><span class="s1">&#39;mode&#39;</span><span class="p">],</span> <span class="n">cmd_opt</span><span class="p">[</span><span class="s1">&#39;cmd&#39;</span><span class="p">]):</span>
+            <span class="k">if</span> <span class="s1">&#39;fileio&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ref</span> <span class="ow">or</span> <span class="n">ref</span><span class="p">[</span><span class="s1">&#39;fileio&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;in&#39;</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">ref</span><span class="p">[</span><span class="s1">&#39;opt&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">cmd_opt</span> <span class="ow">and</span> <span class="n">cmd_opt</span><span class="p">[</span><span class="n">ref</span><span class="p">[</span><span class="s1">&#39;opt&#39;</span><span class="p">]]</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+                <span class="n">curl_fileup</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;-F &quot;</span><span class="si">{</span><span class="n">ref</span><span class="p">[</span><span class="s2">&quot;opt&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">=@&amp;lt;</span><span class="si">{</span><span class="n">ref</span><span class="p">[</span><span class="s2">&quot;opt&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&amp;gt;&quot;&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;stdin&#39;</span> <span class="ow">in</span> <span class="n">cmd_opt</span> <span class="ow">and</span> <span class="n">cmd_opt</span><span class="p">[</span><span class="s1">&#39;stdin&#39;</span><span class="p">]:</span>
+            <span class="n">curl_fileup</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;-F &quot;input_file=@&amp;lt;input_file&amp;gt;&quot;&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">curl_fileup</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Web.list_cmd">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.list_cmd">[docs]</a>
+    <span class="k">def</span> <span class="nf">list_cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kwd</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">kwd</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">kwd</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">kwd</span> <span class="o">=</span> <span class="s1">&#39;*&#39;</span>
+        <span class="n">paths</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;cmd-</span><span class="si">{</span><span class="n">kwd</span><span class="si">}</span><span class="s2">.json&quot;</span><span class="p">))</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="p">[</span><span class="n">common</span><span class="o">.</span><span class="n">loadopt</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">ret</span></div>
+
+
+<div class="viewcode-block" id="Web.save_cmd">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.save_cmd">[docs]</a>
+    <span class="k">def</span> <span class="nf">save_cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">opt</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">common</span><span class="o">.</span><span class="n">check_fname</span><span class="p">(</span><span class="n">title</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;The title contains invalid characters.&quot;</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+        <span class="n">opt_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;cmd-</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2">.json&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;save_cmd: opt_path=</span><span class="si">{</span><span class="n">opt_path</span><span class="si">}</span><span class="s2">, opt=</span><span class="si">{</span><span class="n">opt</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">common</span><span class="o">.</span><span class="n">saveopt</span><span class="p">(</span><span class="n">opt</span><span class="p">,</span> <span class="n">opt_path</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">success</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;Command &quot;</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s1">&quot; saved in &quot;</span><span class="si">{</span><span class="n">opt_path</span><span class="si">}</span><span class="s1">&quot;.&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Web.load_cmd">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.load_cmd">[docs]</a>
+    <span class="k">def</span> <span class="nf">load_cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">):</span>
+        <span class="n">opt_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;cmd-</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2">.json&quot;</span>
+        <span class="k">return</span> <span class="n">common</span><span class="o">.</span><span class="n">loadopt</span><span class="p">(</span><span class="n">opt_path</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Web.del_cmd">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.del_cmd">[docs]</a>
+    <span class="k">def</span> <span class="nf">del_cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">):</span>
+        <span class="n">opt_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;cmd-</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2">.json&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;del_cmd: opt_path=</span><span class="si">{</span><span class="n">opt_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">opt_path</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Web.mk_opt_list">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.mk_opt_list">[docs]</a>
+    <span class="k">def</span> <span class="nf">mk_opt_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">opt</span><span class="p">:</span><span class="nb">dict</span><span class="p">):</span>
+        <span class="n">opt_schema</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_opt_opt</span><span class="p">(</span><span class="n">opt</span><span class="p">[</span><span class="s1">&#39;mode&#39;</span><span class="p">],</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;cmd&#39;</span><span class="p">])</span>
+        <span class="n">opt_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;-m&#39;</span><span class="p">,</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;mode&#39;</span><span class="p">],</span> <span class="s1">&#39;-c&#39;</span><span class="p">,</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;cmd&#39;</span><span class="p">]]</span>
+        <span class="n">file_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">opt</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;stdout_log&#39;</span><span class="p">,</span> <span class="s1">&#39;capture_stdout&#39;</span><span class="p">]:</span>
+                <span class="k">continue</span>
+            <span class="n">schema</span> <span class="o">=</span> <span class="p">[</span><span class="n">schema</span> <span class="k">for</span> <span class="n">schema</span> <span class="ow">in</span> <span class="n">opt_schema</span> <span class="k">if</span> <span class="n">schema</span><span class="p">[</span><span class="s1">&#39;opt&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">key</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">schema</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">val</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">schema</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;bool&#39;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">val</span><span class="p">:</span>
+                    <span class="n">opt_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;--</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">==</span> <span class="nb">list</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">val</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">v</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+                        <span class="k">continue</span>
+                    <span class="n">opt_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;--</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">opt_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">opt_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="n">val</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">val</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+                <span class="n">opt_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;--</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">)</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">opt_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">opt_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
+            <span class="k">if</span> <span class="s1">&#39;fileio&#39;</span> <span class="ow">in</span> <span class="n">schema</span> <span class="ow">and</span> <span class="n">schema</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;fileio&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;in&#39;</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">str</span><span class="p">:</span>
+                <span class="n">file_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+        <span class="k">return</span> <span class="n">opt_list</span><span class="p">,</span> <span class="n">file_dict</span></div>
+
+
+<div class="viewcode-block" id="Web.bbforce_cmd">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.bbforce_cmd">[docs]</a>
+    <span class="k">def</span> <span class="nf">bbforce_cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;bbforce_cmd&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="p">[</span><span class="s1">&#39;iinfer_app&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sv</span><span class="o">.</span><span class="n">is_running</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="p">[</span><span class="s1">&#39;iinfer_app&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">cl</span><span class="o">.</span><span class="n">is_running</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="p">[</span><span class="s1">&#39;iinfer_app&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">web</span><span class="o">.</span><span class="n">is_running</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="p">[</span><span class="s1">&#39;pipe_proc&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">send_signal</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">CTRL_C_EVENT</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="p">[</span><span class="s1">&#39;pipe_proc&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="Web.exec_cmd">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.exec_cmd">[docs]</a>
+    <span class="k">def</span> <span class="nf">exec_cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">nothread</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="p">[</span><span class="s1">&#39;iinfer_app&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">IinferApp</span><span class="p">()</span>
+        <span class="k">def</span> <span class="nf">_exec_cmd</span><span class="p">(</span><span class="n">iinfer_app</span><span class="p">:</span><span class="n">app</span><span class="o">.</span><span class="n">IinferApp</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">nothread</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;exec_cmd: title=</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2">, opt=</span><span class="si">{</span><span class="n">opt</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">opt_list</span><span class="p">,</span> <span class="n">file_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mk_opt_list</span><span class="p">(</span><span class="n">opt</span><span class="p">)</span>
+            <span class="n">old_stdout</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span>
+
+            <span class="k">if</span> <span class="s1">&#39;capture_stdout&#39;</span> <span class="ow">in</span> <span class="n">opt</span> <span class="ow">and</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;capture_stdout&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="s1">&#39;stdin&#39;</span> <span class="ow">in</span> <span class="n">opt</span> <span class="ow">and</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;stdin&#39;</span><span class="p">]:</span>
+                <span class="n">output</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;The &quot;stdin&quot; and &quot;capture_stdout&quot; options cannot be enabled at the same time. This is because it may cause a memory squeeze.&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">nothread</span><span class="p">:</span> <span class="k">return</span> <span class="n">output</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">callback_return_pipe_exec_func</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">output</span><span class="p">)</span>
+                <span class="k">return</span>
+            <span class="k">if</span> <span class="s1">&#39;capture_stdout&#39;</span> <span class="ow">in</span> <span class="n">opt</span> <span class="ow">and</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;capture_stdout&#39;</span><span class="p">]:</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span> <span class="o">=</span> <span class="n">captured_output</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">iinfer_app</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="n">args_list</span><span class="o">=</span><span class="n">opt_list</span><span class="p">,</span> <span class="n">file_dict</span><span class="o">=</span><span class="n">file_dict</span><span class="p">)</span>
+                <span class="k">if</span> <span class="s1">&#39;capture_stdout&#39;</span> <span class="ow">in</span> <span class="n">opt</span> <span class="ow">and</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;capture_stdout&#39;</span><span class="p">]:</span>
+                    <span class="n">output</span> <span class="o">=</span> <span class="n">captured_output</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                    <span class="n">output_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">output_size</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_size_th</span><span class="p">:</span>
+                        <span class="n">o</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">o</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="n">osize</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                            <span class="n">oidx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_size_th</span> <span class="o">/</span> <span class="n">osize</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="n">oidx</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                                <span class="n">output</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="o">-</span><span class="n">oidx</span><span class="p">:])</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">output</span> <span class="o">=</span> <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;The captured stdout was discarded because its size was larger than </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">output_size_th</span><span class="si">}</span><span class="s1"> bytes.&#39;</span><span class="p">)]</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">output</span> <span class="o">=</span> <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;The captured stdout was discarded because its size was larger than </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">output_size_th</span><span class="si">}</span><span class="s1"> bytes.&#39;</span><span class="p">)]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">output</span> <span class="o">=</span> <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="s1">&#39;capture_stdout is off.&#39;</span><span class="p">)]</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">output</span> <span class="o">=</span> <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;&lt;pre&gt;</span><span class="si">{</span><span class="n">html</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span><span class="si">}</span><span class="s1">&lt;/pre&gt;&#39;</span><span class="p">)]</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span> <span class="o">=</span> <span class="n">old_stdout</span>
+            <span class="k">if</span> <span class="s1">&#39;stdout_log&#39;</span> <span class="ow">in</span> <span class="n">opt</span> <span class="ow">and</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;stdout_log&#39;</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">callback_console_modal_log_func</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">def</span> <span class="nf">to_json</span><span class="p">(</span><span class="n">o</span><span class="p">):</span>
+                    <span class="n">res_json</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="s1">&#39;output_image&#39;</span> <span class="ow">in</span> <span class="n">res_json</span> <span class="ow">and</span> <span class="s1">&#39;output_image_shape&#39;</span> <span class="ow">in</span> <span class="n">res_json</span><span class="p">:</span>
+                        <span class="n">img_npy</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">b64str2npy</span><span class="p">(</span><span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;output_image&quot;</span><span class="p">],</span> <span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;output_image_shape&quot;</span><span class="p">])</span>
+                        <span class="n">img_bytes</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">npy2imgfile</span><span class="p">(</span><span class="n">img_npy</span><span class="p">,</span> <span class="n">image_type</span><span class="o">=</span><span class="s1">&#39;png&#39;</span><span class="p">)</span>
+                        <span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;output_image&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">bytes2b64str</span><span class="p">(</span><span class="n">img_bytes</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="n">res_json</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">ret</span> <span class="o">=</span> <span class="p">[</span><span class="n">to_json</span><span class="p">(</span><span class="n">o</span><span class="p">)</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">output</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">o</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">]</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="n">ret</span> <span class="o">=</span> <span class="n">to_json</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">nothread</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">ret</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">callback_return_cmd_exec_func</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">ret</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">nothread</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">output</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">callback_return_cmd_exec_func</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">output</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">nothread</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">_exec_cmd</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="p">[</span><span class="s1">&#39;iinfer_app&#39;</span><span class="p">],</span> <span class="n">title</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="n">th</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">_exec_cmd</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="p">[</span><span class="s1">&#39;iinfer_app&#39;</span><span class="p">],</span> <span class="n">title</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
+        <span class="n">th</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="k">return</span> <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="s1">&#39;start_cmd&#39;</span><span class="p">)]</span></div>
+
+    
+<div class="viewcode-block" id="Web.callback_console_modal_log_func">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.callback_console_modal_log_func">[docs]</a>
+    <span class="k">def</span> <span class="nf">callback_console_modal_log_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output</span><span class="p">:</span><span class="nb">dict</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;callback_console_modal_log_func is not implemented.&#39;</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="Web.callback_return_cmd_exec_func">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.callback_return_cmd_exec_func">[docs]</a>
+    <span class="k">def</span> <span class="nf">callback_return_cmd_exec_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">output</span><span class="p">:</span><span class="nb">dict</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;callback_return_cmd_exec_func is not implemented.&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Web.raw_cmd">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.raw_cmd">[docs]</a>
+    <span class="k">def</span> <span class="nf">raw_cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">opt</span><span class="p">:</span><span class="nb">dict</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;raw_cmd: title=</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2">, opt=</span><span class="si">{</span><span class="n">opt</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">opt_list</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mk_opt_list</span><span class="p">(</span><span class="n">opt</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;stdout_log&#39;</span> <span class="ow">in</span> <span class="n">opt</span><span class="p">:</span> <span class="k">del</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;stdout_log&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s1">&#39;capture_stdout&#39;</span> <span class="ow">in</span> <span class="n">opt</span><span class="p">:</span> <span class="k">del</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;capture_stdout&#39;</span><span class="p">]</span>
+        <span class="n">curl_cmd_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mk_curl_fileup</span><span class="p">(</span><span class="n">opt</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;cmdline&#39;</span><span class="p">,</span><span class="n">raw</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;python&#39;</span><span class="p">,</span><span class="s1">&#39;-m&#39;</span><span class="p">,</span><span class="s1">&#39;iinfer&#39;</span><span class="p">]</span><span class="o">+</span><span class="n">opt_list</span><span class="p">)),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;optjson&#39;</span><span class="p">,</span><span class="n">raw</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">opt</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">common</span><span class="o">.</span><span class="n">default_json_enc</span><span class="p">)),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;curlcmd&#39;</span><span class="p">,</span><span class="n">raw</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;curl </span><span class="si">{</span><span class="n">curl_cmd_file</span><span class="si">}</span><span class="s1"> http://localhost:8081/exec_cmd/</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)]</span></div>
+
+
+<div class="viewcode-block" id="Web.list_tree">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.list_tree">[docs]</a>
+    <span class="k">def</span> <span class="nf">list_tree</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_path</span><span class="p">):</span>
+        <span class="n">current_path</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span> <span class="k">if</span> <span class="n">current_path</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">current_path</span><span class="o">==</span><span class="s1">&#39;&#39;</span> <span class="k">else</span> <span class="n">Path</span><span class="p">(</span><span class="n">current_path</span><span class="p">)</span>
+        <span class="n">current_path</span> <span class="o">=</span> <span class="n">current_path</span> <span class="k">if</span> <span class="n">current_path</span><span class="o">.</span><span class="n">is_dir</span><span class="p">()</span> <span class="k">else</span> <span class="n">current_path</span><span class="o">.</span><span class="n">parent</span>
+        <span class="n">path_tree</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">def</span> <span class="nf">mk_key</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;[\s:</span><span class="se">\\\\</span><span class="s1">/,\.#$%^&amp;!@*\(\)\{\}\[\]</span><span class="se">\&#39;</span><span class="s1">\&quot;\`]&#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+        <span class="k">def</span> <span class="nf">ts2str</span><span class="p">(</span><span class="n">ts</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">part</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">current_path</span><span class="o">.</span><span class="n">parts</span><span class="p">):</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">current_path</span><span class="o">.</span><span class="n">parts</span><span class="p">[:</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">access</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">R_OK</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="n">path_key</span> <span class="o">=</span> <span class="n">mk_key</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+            <span class="n">children</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">children</span> <span class="o">=</span> <span class="p">{</span><span class="n">mk_key</span><span class="p">(</span><span class="n">p</span><span class="p">):</span><span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">is_dir</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">is_dir</span><span class="p">(),</span> <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span><span class="p">,</span> <span class="n">last</span><span class="o">=</span><span class="n">ts2str</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_mtime</span><span class="p">))</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">path</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()}</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="n">children</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">path_tree</span><span class="p">[</span><span class="n">path_key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">part</span><span class="p">,</span> <span class="n">is_dir</span><span class="o">=</span><span class="n">path</span><span class="o">.</span><span class="n">is_dir</span><span class="p">(),</span> <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">),</span> <span class="n">children</span><span class="o">=</span><span class="n">children</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">path</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span><span class="p">,</span> <span class="n">last</span><span class="o">=</span><span class="n">ts2str</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_mtime</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">path_tree</span></div>
+
+
+<div class="viewcode-block" id="Web.load_result">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.load_result">[docs]</a>
+    <span class="k">def</span> <span class="nf">load_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_path</span><span class="p">):</span>
+        <span class="n">current_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">current_path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">current_path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;warn&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;A non-file was selected.: </span><span class="si">{</span><span class="n">current_path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">}</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">current_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">ret</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">res_json</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="s1">&#39;output_image&#39;</span> <span class="ow">in</span> <span class="n">res_json</span> <span class="ow">and</span> <span class="s1">&#39;output_image_shape&#39;</span> <span class="ow">in</span> <span class="n">res_json</span><span class="p">:</span>
+                        <span class="n">img_npy</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">b64str2npy</span><span class="p">(</span><span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;output_image&quot;</span><span class="p">],</span> <span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;output_image_shape&quot;</span><span class="p">])</span>
+                        <span class="n">img_bytes</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">npy2imgfile</span><span class="p">(</span><span class="n">img_npy</span><span class="p">,</span> <span class="n">image_type</span><span class="o">=</span><span class="s1">&#39;jpeg&#39;</span><span class="p">)</span>
+                        <span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;output_image&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">bytes2b64str</span><span class="p">(</span><span class="n">img_bytes</span><span class="p">)</span>
+                    <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res_json</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">ret</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;warn&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;An error occurred while reading the file.: </span><span class="si">{</span><span class="n">current_path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="Web.load_capture">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.load_capture">[docs]</a>
+    <span class="k">def</span> <span class="nf">load_capture</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_path</span><span class="p">):</span>
+        <span class="n">current_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">current_path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">current_path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;warn&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;A non-file was selected.: </span><span class="si">{</span><span class="n">current_path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">}</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">current_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">ret</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">cel</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+                    <span class="n">res_json</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">success</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">image_name</span><span class="o">=</span><span class="n">cel</span><span class="p">[</span><span class="mi">5</span><span class="p">]),</span>
+                                    <span class="n">output_image</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                    <span class="n">output_image_shape</span><span class="o">=</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">cel</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span><span class="nb">int</span><span class="p">(</span><span class="n">cel</span><span class="p">[</span><span class="mi">3</span><span class="p">]),</span><span class="nb">int</span><span class="p">(</span><span class="n">cel</span><span class="p">[</span><span class="mi">4</span><span class="p">])),</span>
+                                    <span class="n">output_image_name</span><span class="o">=</span><span class="n">cel</span><span class="p">[</span><span class="mi">5</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="n">cel</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;capture&#39;</span><span class="p">:</span>
+                        <span class="n">img_npy</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">b64str2npy</span><span class="p">(</span><span class="n">cel</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;output_image_shape&quot;</span><span class="p">])</span>
+                        <span class="n">img_bytes</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">npy2imgfile</span><span class="p">(</span><span class="n">img_npy</span><span class="p">,</span> <span class="n">image_type</span><span class="o">=</span><span class="s1">&#39;jpeg&#39;</span><span class="p">)</span>
+                        <span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;output_image&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">bytes2b64str</span><span class="p">(</span><span class="n">img_bytes</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;output_image&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cel</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res_json</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">ret</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;warn&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;An error occurred while reading the file.: </span><span class="si">{</span><span class="n">current_path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">}</span></div>
+
+    
+<div class="viewcode-block" id="Web.list_pipe">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.list_pipe">[docs]</a>
+    <span class="k">def</span> <span class="nf">list_pipe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kwd</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">kwd</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">kwd</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">kwd</span> <span class="o">=</span> <span class="s1">&#39;*&#39;</span>
+        <span class="n">paths</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;pipe-</span><span class="si">{</span><span class="n">kwd</span><span class="si">}</span><span class="s2">.json&quot;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">common</span><span class="o">.</span><span class="n">loadopt</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="Web.exec_pipe">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.exec_pipe">[docs]</a>
+    <span class="k">def</span> <span class="nf">exec_pipe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">nothread</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;exec_pipe: title=</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2">, opt=</span><span class="si">{</span><span class="n">opt</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">to_json</span><span class="p">(</span><span class="n">o</span><span class="p">):</span>
+            <span class="n">res_json</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s1">&#39;output_image&#39;</span> <span class="ow">in</span> <span class="n">res_json</span> <span class="ow">and</span> <span class="s1">&#39;output_image_shape&#39;</span> <span class="ow">in</span> <span class="n">res_json</span><span class="p">:</span>
+                <span class="n">img_npy</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">b64str2npy</span><span class="p">(</span><span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;output_image&quot;</span><span class="p">],</span> <span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;output_image_shape&quot;</span><span class="p">])</span>
+                <span class="n">img_bytes</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">npy2imgfile</span><span class="p">(</span><span class="n">img_npy</span><span class="p">,</span> <span class="n">image_type</span><span class="o">=</span><span class="s1">&#39;png&#39;</span><span class="p">)</span>
+                <span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;output_image&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">bytes2b64str</span><span class="p">(</span><span class="n">img_bytes</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">res_json</span>
+        <span class="k">def</span> <span class="nf">_exec_pipe</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">container</span><span class="p">,</span> <span class="n">nothread</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+            <span class="n">capture_stdout</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">cmd_title</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">opt</span><span class="p">[</span><span class="s1">&#39;pipe_cmd&#39;</span><span class="p">]):</span>
+                <span class="k">if</span> <span class="n">cmd_title</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">cmd_opt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_cmd</span><span class="p">(</span><span class="n">cmd_title</span><span class="p">)</span>
+                <span class="c1">#cmd_ref = self.get_opt_opt(cmd_opt[&#39;mode&#39;], cmd_opt[&#39;cmd&#39;])</span>
+                <span class="c1">#chk_stdin = len([ref for ref in cmd_ref if ref[&#39;opt&#39;] == &#39;stdin&#39;]) &gt; 0</span>
+                <span class="c1">#chk_input_file = len([ref for ref in cmd_ref if ref[&#39;opt&#39;] == &#39;input_file&#39;]) &gt; 0</span>
+                <span class="k">if</span> <span class="s1">&#39;capture_stdout&#39;</span> <span class="ow">in</span> <span class="n">cmd_opt</span><span class="p">:</span>
+                    <span class="n">capture_stdout</span> <span class="o">=</span> <span class="n">cmd_opt</span><span class="p">[</span><span class="s1">&#39;capture_stdout&#39;</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">capture_stdout</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">if</span> <span class="s1">&#39;output_csv&#39;</span> <span class="ow">in</span> <span class="n">cmd_opt</span> <span class="ow">and</span> <span class="n">cmd_opt</span><span class="p">[</span><span class="s1">&#39;output_csv&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+                    <span class="n">output</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;The &quot;output_csv&quot; option is not supported in pipe. (</span><span class="si">{</span><span class="n">cmd_title</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">callback_return_pipe_exec_func</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">output</span><span class="p">)</span>
+                    <span class="k">return</span>
+            <span class="n">cmdline</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">has_warn</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">for</span> <span class="n">cl</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_pipe</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">opt</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">cl</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;cmdline&#39;</span><span class="p">:</span>
+                    <span class="n">cmdline</span> <span class="o">=</span> <span class="n">cl</span><span class="p">[</span><span class="s1">&#39;raw&#39;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">cl</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;warn&#39;</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">callback_return_pipe_exec_func</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">cl</span><span class="p">)</span>
+                    <span class="n">has_warn</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="n">cmdline</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">callback_return_pipe_exec_func</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="s1">&#39;No command to execute.&#39;</span><span class="p">))</span>
+                <span class="n">has_warn</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="n">has_warn</span><span class="p">:</span> <span class="k">return</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">container</span><span class="p">[</span><span class="s1">&#39;pipe_proc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">cmdline</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">,</span> 
+                                                        <span class="n">stdout</span><span class="o">=</span><span class="p">(</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span> <span class="k">if</span> <span class="n">capture_stdout</span> <span class="k">else</span> <span class="kc">None</span><span class="p">),</span>
+                                                        <span class="n">stderr</span><span class="o">=</span><span class="p">(</span><span class="n">subprocess</span><span class="o">.</span><span class="n">STDOUT</span> <span class="k">if</span> <span class="n">capture_stdout</span> <span class="k">else</span> <span class="kc">None</span><span class="p">))</span>
+                <span class="n">output</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                <span class="n">output_size</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">while</span> <span class="n">container</span><span class="p">[</span><span class="s1">&#39;pipe_proc&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">poll</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">gevent</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">capture_stdout</span><span class="p">:</span>
+                        <span class="n">o</span> <span class="o">=</span> <span class="n">container</span><span class="p">[</span><span class="s1">&#39;pipe_proc&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                        <span class="k">if</span> <span class="mi">0</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">o</span><span class="p">):</span>
+                            <span class="k">continue</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">o</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_size_th</span><span class="p">:</span>
+                                <span class="n">o</span> <span class="o">=</span> <span class="n">to_json</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">callback_return_stream_log_func</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">o</span> <span class="o">=</span> <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;The captured stdout was discarded because its size was larger than </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">output_size_th</span><span class="si">}</span><span class="s1"> bytes.&#39;</span><span class="p">)]</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">callback_return_stream_log_func</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+                        <span class="k">except</span><span class="p">:</span>
+                            <span class="n">o</span> <span class="o">=</span> <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;&lt;pre&gt;</span><span class="si">{</span><span class="n">html</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">o</span><span class="p">)</span><span class="si">}</span><span class="s1">&lt;/pre&gt;&lt;br&gt;&lt;pre&gt;</span><span class="si">{</span><span class="n">html</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span><span class="si">}</span><span class="s1">&lt;/pre&gt;&#39;</span><span class="p">)]</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">callback_return_stream_log_func</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">capture_stdout</span><span class="p">:</span>
+                    <span class="n">container</span><span class="p">[</span><span class="s1">&#39;pipe_proc&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">read</span><span class="p">()</span> <span class="c1"># 最後のストリームは読み捨て</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">output</span> <span class="o">=</span> <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="s1">&#39;capture_stdout is off.&#39;</span><span class="p">)]</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">output</span> <span class="o">=</span> <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;&lt;pre&gt;</span><span class="si">{</span><span class="n">html</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span><span class="si">}</span><span class="s1">&lt;/pre&gt;&#39;</span><span class="p">)]</span>
+            <span class="k">if</span> <span class="s1">&#39;stdout_log&#39;</span> <span class="ow">in</span> <span class="n">opt</span> <span class="ow">and</span> <span class="n">cmd_opt</span><span class="p">[</span><span class="s1">&#39;stdout_log&#39;</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">callback_console_modal_log_func</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">ret</span> <span class="o">=</span> <span class="p">[</span><span class="n">to_json</span><span class="p">(</span><span class="n">o</span><span class="p">)</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">output</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">o</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">]</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="n">ret</span> <span class="o">=</span> <span class="n">to_json</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">nothread</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">ret</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">callback_return_pipe_exec_func</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">ret</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">nothread</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">output</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">callback_return_pipe_exec_func</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">output</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">nothread</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">_exec_pipe</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="n">gevent</span><span class="o">.</span><span class="n">spawn</span><span class="p">(</span><span class="n">_exec_pipe</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">success</span><span class="o">=</span><span class="s1">&#39;start_pipe&#39;</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="Web.callback_return_pipe_exec_func">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.callback_return_pipe_exec_func">[docs]</a>
+    <span class="k">def</span> <span class="nf">callback_return_pipe_exec_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">output</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;callback_return_pipe_exec_func is not implemented.&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Web.callback_return_stream_log_func">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.callback_return_stream_log_func">[docs]</a>
+    <span class="k">def</span> <span class="nf">callback_return_stream_log_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output</span><span class="p">:</span><span class="nb">dict</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="Web.raw_pipe">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.raw_pipe">[docs]</a>
+    <span class="k">def</span> <span class="nf">raw_pipe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">opt</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;raw_pipe: title=</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2">, opt=</span><span class="si">{</span><span class="n">opt</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">cmdlines</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">errormsg</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">curl_cmd_file</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">cmd_title</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">opt</span><span class="p">[</span><span class="s1">&#39;pipe_cmd&#39;</span><span class="p">]):</span>
+            <span class="k">if</span> <span class="n">cmd_title</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">cmd_opt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_cmd</span><span class="p">(</span><span class="n">cmd_title</span><span class="p">)</span>
+            <span class="n">cmd_ref</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_opt_opt</span><span class="p">(</span><span class="n">cmd_opt</span><span class="p">[</span><span class="s1">&#39;mode&#39;</span><span class="p">],</span> <span class="n">cmd_opt</span><span class="p">[</span><span class="s1">&#39;cmd&#39;</span><span class="p">])</span>
+            <span class="n">chk_stdin</span> <span class="o">=</span> <span class="nb">len</span><span class="p">([</span><span class="n">ref</span> <span class="k">for</span> <span class="n">ref</span> <span class="ow">in</span> <span class="n">cmd_ref</span> <span class="k">if</span> <span class="n">ref</span><span class="p">[</span><span class="s1">&#39;opt&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;stdin&#39;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span>
+
+            <span class="k">if</span> <span class="s1">&#39;output_csv&#39;</span> <span class="ow">in</span> <span class="n">cmd_opt</span> <span class="ow">and</span> <span class="n">cmd_opt</span><span class="p">[</span><span class="s1">&#39;output_csv&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+                <span class="n">errormsg</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;The &quot;output_csv&quot; option is not supported in pipe. (</span><span class="si">{</span><span class="n">cmd_title</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">i</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">chk_stdin</span> <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;stdin&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cmd_opt</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">cmd_opt</span><span class="p">[</span><span class="s1">&#39;stdin&#39;</span><span class="p">]):</span>
+                    <span class="n">errormsg</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;The &quot;stdin&quot; option should be specified for the second and subsequent commands. (</span><span class="si">{</span><span class="n">cmd_title</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">chk_stdin</span> <span class="ow">and</span> <span class="s1">&#39;pred_input_type&#39;</span> <span class="ow">in</span> <span class="n">cmd_opt</span> <span class="ow">and</span> <span class="n">cmd_opt</span><span class="p">[</span><span class="s1">&#39;pred_input_type&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;capture&#39;</span><span class="p">,</span> <span class="s1">&#39;prompt&#39;</span><span class="p">]:</span>
+                    <span class="n">errormsg</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;When using the &quot;stdin&quot; option, &quot;pred_input_type&quot; cannot be other than &quot;capture&quot; or &quot;prompt&quot;. (</span><span class="si">{</span><span class="n">cmd_title</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">ref</span> <span class="ow">in</span> <span class="n">cmd_ref</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="s1">&#39;fileio&#39;</span> <span class="ow">in</span> <span class="n">ref</span> <span class="ow">and</span> <span class="n">ref</span><span class="p">[</span><span class="s1">&#39;fileio&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;in&#39;</span> <span class="ow">and</span> <span class="n">ref</span><span class="p">[</span><span class="s1">&#39;opt&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">cmd_opt</span> <span class="ow">and</span> <span class="n">cmd_opt</span><span class="p">[</span><span class="n">ref</span><span class="p">[</span><span class="s1">&#39;opt&#39;</span><span class="p">]]</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">([</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">cmd_opt</span><span class="p">[</span><span class="n">ref</span><span class="p">[</span><span class="s1">&#39;opt&#39;</span><span class="p">]]</span> <span class="k">if</span> <span class="n">v</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">errormsg</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;The &quot;</span><span class="si">{</span><span class="n">ref</span><span class="p">[</span><span class="s2">&quot;opt&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&quot; option should not be specified in a second or subsequent command. (</span><span class="si">{</span><span class="n">cmd_title</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">i</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s1">&#39;request_files&#39;</span> <span class="ow">in</span> <span class="n">opt</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">opt</span><span class="p">[</span><span class="s1">&#39;request_files&#39;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;request_files&#39;</span><span class="p">]:</span>
+                        <span class="k">if</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">cmd_opt</span><span class="p">:</span>
+                            <span class="n">cmd_opt</span><span class="p">[</span><span class="n">fn</span><span class="p">]</span> <span class="o">=</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;request_files&#39;</span><span class="p">][</span><span class="n">fn</span><span class="p">]</span>
+                <span class="n">curl_cmd_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mk_curl_fileup</span><span class="p">(</span><span class="n">cmd_opt</span><span class="p">)</span>
+
+            <span class="n">cmd_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_cmd</span><span class="p">(</span><span class="n">cmd_title</span><span class="p">,</span> <span class="n">cmd_opt</span><span class="p">)</span>
+            <span class="n">cmdlines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cmd_output</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;raw&quot;</span><span class="p">])</span>
+
+        <span class="n">curl_opt</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">opt</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">common</span><span class="o">.</span><span class="n">default_json_enc</span><span class="p">)</span>
+        <span class="n">curl_opt</span> <span class="o">=</span> <span class="n">curl_opt</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;cmdline&#39;</span><span class="p">,</span> <span class="n">raw</span><span class="o">=</span><span class="s1">&#39; | &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cmdlines</span><span class="p">)),</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;curlcmd&#39;</span><span class="p">,</span> <span class="n">raw</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;curl </span><span class="si">{</span><span class="n">curl_cmd_file</span><span class="si">}</span><span class="s1"> http://localhost:8081/exec_pipe/</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)]</span>
+        <span class="n">ret</span> <span class="o">+=</span> <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;warn&#39;</span><span class="p">,</span> <span class="n">raw</span><span class="o">=</span><span class="n">em</span><span class="p">)</span> <span class="k">for</span> <span class="n">em</span> <span class="ow">in</span> <span class="n">errormsg</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">ret</span></div>
+
+
+<div class="viewcode-block" id="Web.save_pipe">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.save_pipe">[docs]</a>
+    <span class="k">def</span> <span class="nf">save_pipe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">opt</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">common</span><span class="o">.</span><span class="n">check_fname</span><span class="p">(</span><span class="n">title</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;The title contains invalid characters.&quot;</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+        <span class="n">opt_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;pipe-</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2">.json&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;save_pipe: opt_path=</span><span class="si">{</span><span class="n">opt_path</span><span class="si">}</span><span class="s2">, opt=</span><span class="si">{</span><span class="n">opt</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">common</span><span class="o">.</span><span class="n">saveopt</span><span class="p">(</span><span class="n">opt</span><span class="p">,</span> <span class="n">opt_path</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">success</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;Pipeline &quot;</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s1">&quot; saved in &quot;</span><span class="si">{</span><span class="n">opt_path</span><span class="si">}</span><span class="s1">&quot;.&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Web.del_pipe">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.del_pipe">[docs]</a>
+    <span class="k">def</span> <span class="nf">del_pipe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">):</span>
+        <span class="n">opt_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;pipe-</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2">.json&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;del_pipe: opt_path=</span><span class="si">{</span><span class="n">opt_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">opt_path</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Web.load_pipe">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.load_pipe">[docs]</a>
+    <span class="k">def</span> <span class="nf">load_pipe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">):</span>
+        <span class="n">opt_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;pipe-</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2">.json&quot;</span>
+        <span class="k">return</span> <span class="n">common</span><span class="o">.</span><span class="n">loadopt</span><span class="p">(</span><span class="n">opt_path</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Web.copyright">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.copyright">[docs]</a>
+    <span class="k">def</span> <span class="nf">copyright</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">version</span><span class="o">.</span><span class="n">__copyright__</span></div>
+
+
+<div class="viewcode-block" id="Web.versions_iinfer">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.versions_iinfer">[docs]</a>
+    <span class="k">def</span> <span class="nf">versions_iinfer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">version</span><span class="o">.</span><span class="n">__description__</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span></div>
+
+        
+<div class="viewcode-block" id="Web.versions_used">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.versions_used">[docs]</a>
+    <span class="k">def</span> <span class="nf">versions_used</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">iinfer</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s1">&#39;licenses&#39;</span> <span class="o">/</span> <span class="s1">&#39;files.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()):</span>
+                <span class="n">parts</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ret</span></div>
+
+    
+<div class="viewcode-block" id="Web.filer_upload">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.filer_upload">[docs]</a>
+    <span class="k">def</span> <span class="nf">filer_upload</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span><span class="n">bottle</span><span class="o">.</span><span class="n">Request</span><span class="p">):</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">query</span>
+        <span class="n">svpath</span> <span class="o">=</span> <span class="n">q</span><span class="p">[</span><span class="s1">&#39;svpath&#39;</span><span class="p">]</span>
+        <span class="n">opt</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;client&#39;</span><span class="p">,</span> <span class="n">cmd</span><span class="o">=</span><span class="s1">&#39;file_upload&#39;</span><span class="p">,</span>
+                    <span class="n">host</span><span class="o">=</span><span class="n">q</span><span class="p">[</span><span class="s1">&#39;host&#39;</span><span class="p">],</span> <span class="n">port</span><span class="o">=</span><span class="n">q</span><span class="p">[</span><span class="s1">&#39;port&#39;</span><span class="p">],</span> <span class="n">password</span><span class="o">=</span><span class="n">q</span><span class="p">[</span><span class="s1">&#39;password&#39;</span><span class="p">],</span> <span class="n">svname</span><span class="o">=</span><span class="n">q</span><span class="p">[</span><span class="s1">&#39;svname&#39;</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">files</span><span class="o">.</span><span class="n">getall</span><span class="p">(</span><span class="s1">&#39;files&#39;</span><span class="p">):</span>
+            <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmpdir</span><span class="p">:</span>
+                <span class="n">raw_filename</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">raw_filename</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">,</span><span class="s1">&#39;/&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;//&#39;</span><span class="p">,</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
+                <span class="n">raw_filename</span> <span class="o">=</span> <span class="n">raw_filename</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">raw_filename</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="n">raw_filename</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+                <span class="n">upload_file</span><span class="p">:</span><span class="n">Path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tmpdir</span><span class="p">)</span> <span class="o">/</span> <span class="n">raw_filename</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">upload_file</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                    <span class="n">upload_file</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;svpath&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">svpath</span> <span class="o">/</span> <span class="n">Path</span><span class="p">(</span><span class="n">raw_filename</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span>
+                <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;upload_file&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">upload_file</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+                <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;capture_stdout&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">file</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">opt</span><span class="p">[</span><span class="s1">&#39;upload_file&#39;</span><span class="p">])</span>
+                <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exec_cmd</span><span class="p">(</span><span class="s2">&quot;file_upload&quot;</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">nothread</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ret</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="s1">&#39;success&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ret</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">ret</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s1">&#39;upload success&#39;</span></div>
+
+        <span class="c1">#return f&#39;upload {upload.filename}&#39;</span>
+    
+<div class="viewcode-block" id="Web.to_str">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.to_str">[docs]</a>
+    <span class="k">def</span> <span class="nf">to_str</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">o</span><span class="p">)</span> <span class="o">==</span> <span class="nb">dict</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">common</span><span class="o">.</span><span class="n">default_json_enc</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">o</span><span class="p">)</span> <span class="o">==</span> <span class="nb">list</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">o</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="nb">dict</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">common</span><span class="o">.</span><span class="n">default_json_enc</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">o</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Web.start">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.start">[docs]</a>
+    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">allow_host</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s2">&quot;0.0.0.0&quot;</span><span class="p">,</span> <span class="n">listen_port</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">8081</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">allow_host</span> <span class="o">=</span> <span class="n">allow_host</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">listen_port</span> <span class="o">=</span> <span class="n">listen_port</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Start bottle web. allow_host=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">allow_host</span><span class="si">}</span><span class="s2"> listen_port=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">listen_port</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">app</span> <span class="o">=</span> <span class="n">bottle</span><span class="o">.</span><span class="n">Bottle</span><span class="p">()</span>
+        <span class="n">bottle</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/get_local_data&#39;</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">get_local_data</span><span class="p">():</span>
+            <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/bbforce_cmd&#39;</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">bbforce_cmd</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bbforce_cmd</span><span class="p">()</span>
+            <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">success</span><span class="o">=</span><span class="s1">&#39;bbforce_cmd&#39;</span><span class="p">)</span>
+
+        <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/exec_cmd&#39;</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;POST&#39;</span><span class="p">)</span>
+        <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/exec_cmd/&lt;title&gt;&#39;</span><span class="p">)</span>
+        <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/exec_cmd/&lt;title&gt;&#39;</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;POST&#39;</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">exec_cmd</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">opt</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">if</span> <span class="n">bottle</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">content_type</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;multipart/form-data&#39;</span><span class="p">):</span>
+                    <span class="n">opt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_cmd</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">bottle</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">files</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                        <span class="n">opt</span><span class="p">[</span><span class="n">fn</span><span class="p">]</span> <span class="o">=</span> <span class="n">bottle</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="n">fn</span><span class="p">]</span><span class="o">.</span><span class="n">file</span>
+                        <span class="k">if</span> <span class="n">fn</span> <span class="o">==</span> <span class="s1">&#39;input_file&#39;</span><span class="p">:</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;stdin&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">elif</span> <span class="n">bottle</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">content_type</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;application/json&#39;</span><span class="p">):</span>
+                    <span class="n">opt</span> <span class="o">=</span> <span class="n">bottle</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">json</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">opt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_cmd</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+                <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;capture_stdout&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nothread</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;stdout_log&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exec_cmd</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">nothread</span><span class="p">))</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_str</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;Command &quot;</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s1">&quot; failed. </span><span class="si">{</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">))</span>
+
+        <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/exec_pipe/&lt;title&gt;&#39;</span><span class="p">)</span>
+        <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/exec_pipe/&lt;title&gt;&#39;</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;POST&#39;</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">exec_pipe</span><span class="p">(</span><span class="n">title</span><span class="p">):</span>
+            <span class="n">upfiles</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">opt</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">if</span> <span class="n">bottle</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">content_type</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;multipart/form-data&#39;</span><span class="p">):</span>
+                    <span class="n">opt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_pipe</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+                    <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;request_files&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+                    <span class="k">for</span> <span class="n">cmd_title</span> <span class="ow">in</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;pipe_cmd&#39;</span><span class="p">]:</span>
+                        <span class="k">if</span> <span class="n">cmd_title</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+                            <span class="k">continue</span>
+                        <span class="n">cmd_opt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_cmd</span><span class="p">(</span><span class="n">cmd_title</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">bottle</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">files</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                            <span class="k">if</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">cmd_opt</span><span class="p">:</span>
+                                <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">(</span><span class="n">delete</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="n">bottle</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="n">fn</span><span class="p">]</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span><span class="o">.</span><span class="n">suffix</span><span class="p">)</span> <span class="k">as</span> <span class="n">tf</span><span class="p">:</span>
+                                    <span class="n">upfiles</span><span class="p">[</span><span class="n">fn</span><span class="p">]</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">name</span>
+                                    <span class="n">tf</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">bottle</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="n">fn</span><span class="p">]</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+                                    <span class="n">tf</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+                                    <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;request_files&#39;</span><span class="p">][</span><span class="n">fn</span><span class="p">]</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">name</span>
+                                    <span class="k">if</span> <span class="n">fn</span> <span class="o">==</span> <span class="s1">&#39;input_file&#39;</span><span class="p">:</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;request_files&#39;</span><span class="p">][</span><span class="s1">&#39;stdin&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">opt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_pipe</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+                <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;capture_stdout&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nothread</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;stdout_log&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exec_pipe</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">nothread</span><span class="p">))</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_str</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;Pipeline &quot;</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s1">&quot; failed. </span><span class="si">{</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">))</span>
+            <span class="k">finally</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">tfname</span> <span class="ow">in</span> <span class="n">upfiles</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">tfname</span><span class="p">)</span>
+
+        <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/versions_iinfer&#39;</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">versions_iinfer</span><span class="p">():</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">versions_iinfer</span><span class="p">()</span>
+
+        <span class="n">static_root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s1">&#39;web&#39;</span>
+
+        <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/filer&#39;</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">filer</span><span class="p">():</span>
+            <span class="k">return</span> <span class="n">bottle</span><span class="o">.</span><span class="n">static_file</span><span class="p">(</span><span class="s1">&#39;filer.html&#39;</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="n">static_root</span><span class="p">)</span>
+
+        <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/filer/upload&#39;</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;POST&#39;</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">filer_upload</span><span class="p">():</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">filer_upload</span><span class="p">(</span><span class="n">bottle</span><span class="o">.</span><span class="n">request</span><span class="p">)</span>
+
+        <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/assets/&lt;filename:path&gt;&#39;</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">assets</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">bottle</span><span class="o">.</span><span class="n">static_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="n">static_root</span> <span class="o">/</span> <span class="s1">&#39;assets&#39;</span><span class="p">)</span>
+
+        <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/copyright&#39;</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">copyright</span><span class="p">():</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">copyright</span><span class="p">()</span>
+
+        <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/versions_iinfer&#39;</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">versions_iinfer</span><span class="p">():</span>
+            <span class="n">bottle</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">content_type</span> <span class="o">=</span> <span class="s1">&#39;application/json&#39;</span>
+            <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">versions_iinfer</span><span class="p">())</span>
+
+        <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/versions_used&#39;</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">versions_used</span><span class="p">():</span>
+            <span class="n">bottle</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">content_type</span> <span class="o">=</span> <span class="s1">&#39;application/json&#39;</span>
+            <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">versions_used</span><span class="p">())</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;iinfer_web.pid&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">pid</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">()</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">pid</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">is_running</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">server</span> <span class="o">=</span> <span class="n">_WSGIRefServer</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">allow_host</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">listen_port</span><span class="p">)</span>
+            <span class="n">th</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">bottle</span><span class="o">.</span><span class="n">run</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">app</span><span class="o">=</span><span class="n">app</span><span class="p">,</span> <span class="n">server</span><span class="o">=</span><span class="n">server</span><span class="p">))</span>
+            <span class="n">th</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+            <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_running</span><span class="p">:</span>
+                <span class="n">gevent</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+            <span class="n">server</span><span class="o">.</span><span class="n">srv</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
+        <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;iinfer_web.pid&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Web.stop">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.stop">[docs]</a>
+    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;iinfer_web.pid&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">pid</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">kill</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">pid</span><span class="p">),</span> <span class="n">signal</span><span class="o">.</span><span class="n">CTRL_C_EVENT</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Stop bottle web. allow_host=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">allow_host</span><span class="si">}</span><span class="s2"> listen_port=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">listen_port</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;iinfer_web.pid&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+</div>
+
+
+<span class="k">class</span> <span class="nc">_WSGIRefServer</span><span class="p">(</span><span class="n">bottle</span><span class="o">.</span><span class="n">WSGIRefServer</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    runメソッドでWSGIRefServerを起動する際に、make_serverの戻り値をインスタンス変数にするためのクラス</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="s1">&#39;127.0.0.1&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">8080</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app</span><span class="p">):</span> <span class="c1"># pragma: no cover</span>
+        <span class="kn">from</span> <span class="nn">wsgiref.simple_server</span> <span class="kn">import</span> <span class="n">WSGIRequestHandler</span><span class="p">,</span> <span class="n">WSGIServer</span>
+        <span class="kn">from</span> <span class="nn">wsgiref.simple_server</span> <span class="kn">import</span> <span class="n">make_server</span>
+        <span class="kn">import</span> <span class="nn">socket</span>
+
+        <span class="k">class</span> <span class="nc">FixedHandler</span><span class="p">(</span><span class="n">WSGIRequestHandler</span><span class="p">):</span>
+            <span class="k">def</span> <span class="nf">address_string</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="c1"># Prevent reverse DNS lookups please.</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">client_address</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">def</span> <span class="nf">log_request</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">quiet</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">WSGIRequestHandler</span><span class="o">.</span><span class="n">log_request</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span>
+
+        <span class="n">handler_cls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;handler_class&#39;</span><span class="p">,</span> <span class="n">FixedHandler</span><span class="p">)</span>
+        <span class="n">server_cls</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;server_class&#39;</span><span class="p">,</span> <span class="n">WSGIServer</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s1">&#39;:&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="p">:</span> <span class="c1"># Fix wsgiref for IPv6 addresses.</span>
+            <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">server_cls</span><span class="p">,</span> <span class="s1">&#39;address_family&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">:</span>
+                <span class="k">class</span> <span class="nc">server_cls</span><span class="p">(</span><span class="n">server_cls</span><span class="p">):</span>
+                    <span class="n">address_family</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">AF_INET6</span>
+        <span class="c1"># self.srvに代入することで、shutdownを実行できるようにする</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">srv</span> <span class="o">=</span> <span class="n">make_server</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">,</span> <span class="n">app</span><span class="p">,</span> <span class="n">server_cls</span><span class="p">,</span> <span class="n">handler_cls</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">srv</span><span class="o">.</span><span class="n">serve_forever</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">srv</span><span class="o">.</span><span class="n">server_close</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright (c) 2023-2024 hamacom2004jp All Rights Reserved..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

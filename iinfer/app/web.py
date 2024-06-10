@@ -203,7 +203,7 @@ class Web(options.Options):
         current_path = current_path if current_path.is_dir() else current_path.parent
         path_tree = {}
         def mk_key(path):
-            return re.sub('[\s:\\\\/,\.#$%^&!@*\(\)\{\}\[\]\'\"\`]', '_',str(path))
+            return re.sub(r'[\s:\\\\/,\.#$%^&!@*\(\)\{\}\[\]\'\"\`]', '_',str(path))
         def ts2str(ts):
             return datetime.datetime.fromtimestamp(ts)
         for i, part in enumerate(current_path.parts):
@@ -436,11 +436,13 @@ class Web(options.Options):
                     host=q['host'], port=q['port'], password=q['password'], svname=q['svname'])
         for file in request.files.getall('files'):
             with tempfile.TemporaryDirectory() as tmpdir:
-                upload_file:Path = Path(tmpdir) / file.raw_filename
+                raw_filename = file.raw_filename.replace('\\','/').replace('//','/')
+                raw_filename = raw_filename if not raw_filename.startswith('/') else raw_filename[1:]
+                upload_file:Path = Path(tmpdir) / raw_filename
                 if not upload_file.parent.exists():
                     upload_file.parent.mkdir(parents=True)
-                opt['svpath'] = str(svpath / Path(file.raw_filename).parent).replace('\\','/')
-                opt['upload_file'] = str(upload_file)
+                opt['svpath'] = str(svpath / Path(raw_filename).parent)
+                opt['upload_file'] = str(upload_file).replace('"','')
                 opt['capture_stdout'] = True
                 file.save(opt['upload_file'])
                 ret = self.exec_cmd("file_upload", opt, nothread=True)
@@ -452,6 +454,8 @@ class Web(options.Options):
     def to_str(self, o):
         if type(o) == dict:
             return json.dumps(o, default=common.default_json_enc)
+        elif type(o) == list and len(o) > 0 and type(o[0]) == dict:
+            return json.dumps(o, default=common.default_json_enc)
         return str(o)
 
     def start(self, allow_host:str="0.0.0.0", listen_port:int=8081):
@@ -459,15 +463,21 @@ class Web(options.Options):
         self.listen_port = listen_port
         self.logger.info(f"Start bottle web. allow_host={self.allow_host} listen_port={self.listen_port}")
         app = bottle.Bottle()
+        bottle.debug(True)
+
+        @app.route('/get_local_data')
+        def get_local_data():
+            return str(self.data)
 
         @app.route('/bbforce_cmd')
         def bbforce_cmd():
             self.bbforce_cmd()
             return dict(success='bbforce_cmd')
 
+        @app.route('/exec_cmd', method='POST')
         @app.route('/exec_cmd/<title>')
         @app.route('/exec_cmd/<title>', method='POST')
-        def exec_cmd(title):
+        def exec_cmd(title=None):
             try:
                 opt = None
                 if bottle.request.content_type.startswith('multipart/form-data'):
@@ -475,13 +485,15 @@ class Web(options.Options):
                     for fn in bottle.request.files.keys():
                         opt[fn] = bottle.request.files[fn].file
                         if fn == 'input_file': opt['stdin'] = False
+                elif bottle.request.content_type.startswith('application/json'):
+                    opt = bottle.request.json
                 else:
                     opt = self.load_cmd(title)
                 opt['capture_stdout'] = nothread = True
                 opt['stdout_log'] = False
                 return self.to_str(self.exec_cmd(title, opt, nothread))
             except:
-                return dict(warn=f'Command "{title}" failed. {traceback.format_exc()}')
+                return self.to_str(dict(warn=f'Command "{title}" failed. {traceback.format_exc()}'))
 
         @app.route('/exec_pipe/<title>')
         @app.route('/exec_pipe/<title>', method='POST')
@@ -510,7 +522,7 @@ class Web(options.Options):
                 opt['stdout_log'] = False
                 return self.to_str(self.exec_pipe(title, opt, nothread))
             except:
-                return dict(warn=f'Pipeline "{title}" failed. {traceback.format_exc()}')
+                return self.to_str(dict(warn=f'Pipeline "{title}" failed. {traceback.format_exc()}'))
             finally:
                 for tfname in upfiles.values():
                     os.unlink(tfname)
@@ -518,6 +530,34 @@ class Web(options.Options):
         @app.route('/versions_iinfer')
         def versions_iinfer():
             return self.versions_iinfer()
+
+        static_root = Path(__file__).parent.parent / 'web'
+
+        @app.route('/filer')
+        def filer():
+            return bottle.static_file('filer.html', root=static_root)
+
+        @app.route('/filer/upload', method='POST')
+        def filer_upload():
+            return self.filer_upload(bottle.request)
+
+        @app.route('/assets/<filename:path>')
+        def assets(filename):
+            return bottle.static_file(filename, root=static_root / 'assets')
+
+        @app.route('/copyright')
+        def copyright():
+            return self.copyright()
+
+        @app.route('/versions_iinfer')
+        def versions_iinfer():
+            bottle.response.content_type = 'application/json'
+            return json.dumps(self.versions_iinfer())
+
+        @app.route('/versions_used')
+        def versions_used():
+            bottle.response.content_type = 'application/json'
+            return json.dumps(self.versions_used())
 
         with open("iinfer_web.pid", mode="w", encoding="utf-8") as f:
             pid = os.getpid()

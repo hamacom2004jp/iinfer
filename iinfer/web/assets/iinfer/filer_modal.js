@@ -24,10 +24,11 @@ filer_modal_func = async (target_id, modal_title, current_path, call_back_func) 
         Object.entries(py_list_tree).forEach(([key, node]) => {
             if(!node['is_dir']) return;
             let li_elem = $(`#${key}`);
+            const font_color = "color:rgba(var(--bs-link-color-rgb),var(--bs-link-opacity,1));font-size:initial;";
             if (li_elem.length > 0) {
-                li_elem.html(`<a href="#" class="folder-open">${node['name']}</a>`);
+                li_elem.html(`<a href="#" class="folder-open" style="${font_color}">${node['name']}</a>`);
             } else {
-                li_elem = $(`<li id="${key}"><a href="#" class="folder-open">${node['name']}</a></li>`);
+                li_elem = $(`<li id="${key}"><a href="#" class="folder-open" style="${font_color}">${node['name']}</a></li>`);
                 current_node.append(li_elem);
             }
             const mk_func = (target_id, current_node, current_path) => {
@@ -40,7 +41,7 @@ filer_modal_func = async (target_id, modal_title, current_path, call_back_func) 
                 li_elem.append(ul_elem);
                 Object.entries(node['children']).forEach(([k, n]) => {
                     if(!n['is_dir']) return;
-                    const li = $(`<li id="${k}"><a href="#" class="folder-close">${n['name']}</a></li>`);
+                    const li = $(`<li id="${k}"><a href="#" class="folder-close" style="${font_color}">${n['name']}</a></li>`);
                     li.find('a').click(mk_func(target_id, ul_elem, n['path']));
                     ul_elem.append(li);
                 });
@@ -52,7 +53,7 @@ filer_modal_func = async (target_id, modal_title, current_path, call_back_func) 
             const table = $('<table class="table table-bordered table-hover table-sm"></table>');
             filer_modal.find('.file-list').html('');
             filer_modal.find('.file-list').append(table);
-            const table_head = $('<thead class="table-dark bg-dark"></thead>');
+            const table_head = $('<thead></thead>');
             table_head.append($('<tr><th scope="col">-</th><th scope="col">name</th><th scope="col">size</th><th scope="col">last</th></tr>'));
             table.append(table_head);
             const table_body = $('<tbody></tbody>');

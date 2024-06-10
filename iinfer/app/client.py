@@ -1,5 +1,5 @@
 from pathlib import Path
-from iinfer.app import common
+from iinfer.app import common, filer
 from iinfer.app.commons import convert
 from typing import List
 import base64
@@ -114,7 +114,7 @@ class Client(object):
         if "error" in res_json:
             self.logger.error(str(msg_json))
         if "warn" in res_json:
-            self.logger.warn(str(msg_json))
+            self.logger.warning(str(msg_json))
         if "success" in res_json:
             self.logger.info(str(msg_json))
             if type(res_json["success"]) is not dict:
@@ -527,61 +527,81 @@ class Client(object):
             performance.append(dict(key="cl_pred", val=f"{epredtime-spredtime:.3f}s"))
         return res_json
     
-    def file_list(self, svpath:str, timeout:int = 60):
+    def file_list(self, svpath:str, local_data:Path = None, timeout:int = 60):
         """
         サーバー上のファイルリストを取得する
 
         Args:
             svpath (Path): サーバー上のファイルパス
+            local_data (Path, optional): ローカルを参照させる場合のデータフォルダ. Defaults to None.
             timeout (int, optional): タイムアウト時間. Defaults to 60.
 
         Returns:
             dict: Redisサーバーからの応答
         """
+        if local_data is not None:
+            f = filer.Filer(local_data, self.logger)
+            _, res_json = f.file_list(svpath)
+            return res_json
         res_json = self._proc(self.svname, 'file_list', [convert.str2b64str(str(svpath))], timeout=timeout)
         return res_json
 
-    def file_mkdir(self, svpath:str, timeout:int = 60):
+    def file_mkdir(self, svpath:str, local_data:Path = None, timeout:int = 60):
         """
         サーバー上にディレクトリを作成する
 
         Args:
             svpath (Path): サーバー上のディレクトリパス
+            local_data (Path, optional): ローカルを参照させる場合のデータフォルダ. Defaults to None.
             timeout (int, optional): タイムアウト時間. Defaults to 60.
 
         Returns:
             dict: Redisサーバーからの応答
         """
+        if local_data is not None:
+            f = filer.Filer(local_data, self.logger)
+            _, res_json = f.file_mkdir(svpath)
+            return res_json
         res_json = self._proc(self.svname, 'file_mkdir', [convert.str2b64str(str(svpath))], timeout=timeout)
         return res_json
     
-    def file_rmdir(self, svpath:str, timeout:int = 60):
+    def file_rmdir(self, svpath:str, local_data:Path = None, timeout:int = 60):
         """
         サーバー上のディレクトリを削除する
 
         Args:
             svpath (Path): サーバー上のディレクトリパス
+            local_data (Path, optional): ローカルを参照させる場合のデータフォルダ. Defaults to None.
             timeout (int, optional): タイムアウト時間. Defaults to 60.
 
         Returns:
             dict: Redisサーバーからの応答
         """
+        if local_data is not None:
+            f = filer.Filer(local_data, self.logger)
+            _, res_json = f.file_rmdir(svpath)
+            return res_json
         res_json = self._proc(self.svname, 'file_rmdir', [convert.str2b64str(str(svpath))], timeout=timeout)
         return res_json
     
-    def file_download(self, svpath:str, download_file:Path, timeout:int = 60):
+    def file_download(self, svpath:str, download_file:Path, local_data:Path = None, timeout:int = 60):
         """
         サーバー上のファイルをダウンロードする
 
         Args:
             svpath (Path): サーバー上のファイルパス
             download_file (Path): ローカルのファイルパス
+            local_data (Path, optional): ローカルを参照させる場合のデータフォルダ. Defaults to None.
             timeout (int, optional): タイムアウト時間. Defaults to 60.
 
         Returns:
             bytes: ダウンロードファイルの内容
         """
-        res_json = self._proc(self.svname, 'file_download', [convert.str2b64str(str(svpath))], timeout=timeout)
+        if local_data is not None:
+            f = filer.Filer(local_data, self.logger)
+            _, res_json = f.file_download(svpath)
+        else:
+            res_json = self._proc(self.svname, 'file_download', [convert.str2b64str(str(svpath))], timeout=timeout)
         if "success" in res_json:
             if download_file is not None:
                 if download_file.is_dir():
@@ -595,13 +615,14 @@ class Client(object):
                     res_json["success"]["download_file"] = str(download_file.absolute())
         return res_json
     
-    def file_upload(self, svpath:str, upload_file:Path, timeout:int = 60):
+    def file_upload(self, svpath:str, upload_file:Path, local_data:Path = None, timeout:int = 60):
         """
         サーバー上にファイルをアップロードする
 
         Args:
             svpath (Path): サーバー上のファイルパス
             upload_file (Path): ローカルのファイルパス
+            local_data (Path, optional): ローカルを参照させる場合のデータフォルダ. Defaults to None.
             timeout (int, optional): タイムアウト時間. Defaults to 60.
 
         Returns:
@@ -617,23 +638,32 @@ class Client(object):
             self.logger.error(f"input_file {upload_file} is directory.")
             return {"error": f"input_file {upload_file} is directory."}
         with open(upload_file, "rb") as f:
+            if local_data is not None:
+                f = filer.Filer(local_data, self.logger)
+                _, res_json = f.file_upload(svpath, upload_file.name, f.read())
+                return res_json
             res_json = self._proc(self.svname, 'file_upload',
                                   [convert.str2b64str(str(svpath)),
                                    convert.str2b64str(upload_file.name),
                                    convert.bytes2b64str(f.read())], timeout=timeout)
             return res_json
 
-    def file_remove(self, svpath:str, timeout:int = 60):
+    def file_remove(self, svpath:str, local_data:Path = None, timeout:int = 60):
         """
         サーバー上のファイルを削除する
 
         Args:
             svpath (Path): サーバー上のファイルパス
+            local_data (Path, optional): ローカルを参照させる場合のデータフォルダ. Defaults to None.
             timeout (int, optional): タイムアウト時間. Defaults to 60.
 
         Returns:
             dict: Redisサーバーからの応答
         """
+        if local_data is not None:
+            f = filer.Filer(local_data, self.logger)
+            _, res_json = f.file_remove(svpath)
+            return res_json
         res_json = self._proc(self.svname, 'file_remove', [convert.str2b64str(str(svpath))], timeout=timeout)
         return res_json
 

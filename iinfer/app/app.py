@@ -77,7 +77,7 @@ class IinferApp:
                     common.print_format(msg, args.format, tm, args.output_json, args.output_json_append)
                     return 1, msg
                 self.sv = server.Server(Path(args.data), logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
-                self.sv.start_server()
+                self.sv.start_server(args.retry_count, args.retry_interval)
             elif args.cmd == 'stop':
                 if args.svname is None:
                     msg = {"warn":f"Please specify the --svname option."}
@@ -234,39 +234,45 @@ class IinferApp:
                         pass
 
             elif args.cmd == 'file_list':
-                ret = self.cl.file_list(args.svpath, timeout=args.timeout)
+                local_data = Path(args.local_data.replace('"','')) if args.local_data is not None else None
+                ret = self.cl.file_list(args.svpath.replace('"',''), local_data=local_data, timeout=args.timeout)
                 common.print_format(ret, args.format, tm, args.output_json, args.output_json_append)
                 if 'success' not in ret:
                     return 1, ret
             
             elif args.cmd == 'file_mkdir':
-                ret = self.cl.file_mkdir(args.svpath, timeout=args.timeout)
+                local_data = Path(args.local_data.replace('"','')) if args.local_data is not None else None
+                ret = self.cl.file_mkdir(args.svpath.replace('"',''), local_data=local_data, timeout=args.timeout)
                 common.print_format(ret, args.format, tm, args.output_json, args.output_json_append)
                 if 'success' not in ret:
                     return 1, ret
             
             elif args.cmd == 'file_rmdir':
-                ret = self.cl.file_rmdir(args.svpath, timeout=args.timeout)
+                local_data = Path(args.local_data.replace('"','')) if args.local_data is not None else None
+                ret = self.cl.file_rmdir(args.svpath.replace('"',''), local_data=local_data, timeout=args.timeout)
                 common.print_format(ret, args.format, tm, args.output_json, args.output_json_append)
                 if 'success' not in ret:
                     return 1, ret
             
             elif args.cmd == 'file_download':
-                download_file = Path(download_file) if download_file is not None else None
-                ret = self.cl.file_download(args.svpath, download_file, timeout=args.timeout)
+                local_data = Path(args.local_data.replace('"','')) if args.local_data is not None else None
+                download_file = Path(args.download_file.replace('"','')) if args.download_file is not None else None
+                ret = self.cl.file_download(args.svpath.replace('"',''), download_file, local_data=local_data, timeout=args.timeout)
                 common.print_format(ret, args.format, tm, args.output_json, args.output_json_append)
                 if 'success' not in ret:
                     return 1, ret
             
             elif args.cmd == 'file_upload':
-                upload_file = Path(upload_file) if upload_file is not None else None
-                ret = self.cl.file_upload(args.svpath, upload_file, timeout=args.timeout)
+                local_data = Path(args.local_data.replace('"','')) if args.local_data is not None else None
+                upload_file = Path(args.upload_file.replace('"','')) if args.upload_file is not None else None
+                ret = self.cl.file_upload(args.svpath.replace('"',''), upload_file, local_data=local_data, timeout=args.timeout)
                 common.print_format(ret, args.format, tm, args.output_json, args.output_json_append)
                 if 'success' not in ret:
                     return 1, ret
 
             elif args.cmd == 'file_remove':
-                ret = self.cl.file_remove(args.svpath, timeout=args.timeout)
+                local_data = Path(args.local_data.replace('"','')) if args.local_data is not None else None
+                ret = self.cl.file_remove(args.svpath.replace('"',''), local_data=local_data, timeout=args.timeout)
                 common.print_format(ret, args.format, tm, args.output_json, args.output_json_append)
                 if 'success' not in ret:
                     return 1, ret

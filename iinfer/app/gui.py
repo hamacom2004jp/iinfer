@@ -15,6 +15,10 @@ class Gui(web.Web):
         self.logger.info(f"Start eel web on http://{web_host}:{web_port}")
 
         @eel.expose
+        def get_local_data():
+            return str(self.data)
+
+        @eel.expose
         def get_mode_opt():
             return self.get_mode_opt()
 

@@ -1,0 +1,13 @@
+.filer-pane-divider {
+  border: 1px solid #C8C8C8 !important;
+  /**background-color: #F0F0F0 !important;*/
+  border-radius: 1px;
+  /*left: 50%;*/
+}
+/*
+.filer-pane-left {
+  width: 49%;
+}
+.filer-pane-left-top {
+  height: 49%;
+}*/

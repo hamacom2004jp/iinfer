@@ -10,10 +10,10 @@
 
     :header: "Operation","Message","Cause","How to"
     "`pip install iinfer` ","ERROR: Command errored out with exit status 1: ....  error: invalid command 'bdist_wheel' ","pipのバージョンが古い","`pip install --upgrade pip` でpipをアップデート"
-    "`iinfer -m install -c mmdet` ","shutil.Error ...","現在のディレクトリにmmdetectionが既に存在したり、データディレクトリ「~/.iinfer/」にmmdetectionが存在する","mmdetectionのディレクトリを削除"
+    "`iinfer -m install -c mmdet` ","shutil.Error ...","現在のディレクトリにmmdetectionが既に存在したり、データフォルダ「~/.iinfer/」にmmdetectionが存在する","mmdetectionのディレクトリを削除"
     "`iinfer -m install -c mmdet` ","error: Microsoft Visual C++ 14.0 or greater is required. Get it with `Microsoft C++ Build Tools`: https://visualstudio.microsoft.com/visual-cpp-build-tools/","Windows SDKが必要です。","`Windows SDK <https://developer.microsoft.com/en-gb/windows/downloads/sdk-archive/>`__ をインストールしてください。"
-    "`iinfer -m install -c mmpretrain` ","shutil.Error ...","現在のディレクトリにmmpretrainが既に存在したり、データディレクトリ「~/.iinfer/」にmmpretrainが存在する","mmpretrainのディレクトリを削除"
-    "`iinfer -m install -c mmrotate` ","shutil.Error ...","現在のディレクトリにmmrotateが既に存在したり、データディレクトリ「~/.iinfer/」にmmrotateが存在する","mmrotateのディレクトリを削除"
+    "`iinfer -m install -c mmpretrain` ","shutil.Error ...","現在のディレクトリにmmpretrainが既に存在したり、データフォルダ「~/.iinfer/」にmmpretrainが存在する","mmpretrainのディレクトリを削除"
+    "`iinfer -m install -c mmrotate` ","shutil.Error ...","現在のディレクトリにmmrotateが既に存在したり、データフォルダ「~/.iinfer/」にmmrotateが存在する","mmrotateのディレクトリを削除"
     "`iinfer -m install -c insightface` ","Could not install packages due to an OSError: [WinError 5] アクセスが拒否されました。","更新ファイルが使用中？","`pip install insightface` でインストール"
     "`iinfer -m install -c insightface` ","CreateExecutionProviderInstance CUDA_PATH is set but CUDA wasnt able to be loaded.","CUDAのバージョンとonnxruntimeのバージョンが合っていない","https://onnxruntime.ai/docs/execution-providers/CUDA-ExecutionProvider.html#requirements で確認し適切なバージョンのonnxruntime及びonnxruntime-guiをインストールしてください。"
     "`iinfer -m install -c insightface` ","CreateExecutionProviderInstance CUDA_PATH is set but CUDA wasnt able to be loaded.","cudnnがインストールされていない","https://developer.nvidia.com/rdp/cudnn-archive で適切なバージョンのcudnnをダウンロードしインストールしてください。"

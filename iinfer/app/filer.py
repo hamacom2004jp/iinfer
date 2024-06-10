@@ -1,0 +1,210 @@
+from iinfer.app import common
+from iinfer.app.commons import convert
+from pathlib import Path
+from typing import List, Dict, Any, Tuple, Union
+import logging
+import datetime
+
+
+class Filer(object):
+    RESP_SCCESS:int = 0
+    RESP_WARN:int = 1
+    RESP_ERROR:int = 2
+    def __init__(self, data_dir: Path, logger: logging.Logger,):
+        self.data_dir = data_dir
+        self.logger = logger
+
+    def _file_exists(self, current_path:str, not_exists:bool=False, exists_chk:bool=True) -> Tuple[bool, Path, Dict[str, Any]]:
+        """
+        パスが存在するかどうかを確認する
+
+        Args:
+            current_path (str): パス
+            not_exists (bool, optional): パスが存在しないことを確認するかどうか, by default False
+            exists_chk (bool, optional): パス存在チェックを行うかどうか, by default True
+        
+        Returns:
+            bool: not_existsがFalseの時パスが存在すればTrue、存在しなければFalse。not_existsがTrueの時パスが存在しなければTrue、存在すればFalse。
+            Path: データフォルダ以下のcurrent_pathを含めた絶対パス
+            dict: メッセージ
+        """
+        if current_path is None or current_path == "":
+            self.logger.warn(f"current_path is empty.")
+            return False, None, {"warn": f"current_path is empty."}
+        current_path = current_path.replace("\\","/")
+        cp = current_path[1:] if current_path.startswith('/') else current_path
+        abspath:Path = (self.data_dir / cp).resolve()
+        if not str(abspath).startswith(str(self.data_dir)):
+            self.logger.warn(f"Path {abspath} is out of data directory. current_path={current_path}")
+            return False, None, {"warn": f"Path {abspath} is out of data directory. current_path={current_path}"}
+        if not exists_chk:
+            return True, abspath, {"success": f"Path {abspath} not exists."}
+        if not not_exists and not abspath.exists():
+            self.logger.warn(f"Path {abspath} does not exist. param={current_path}")
+            return False, None, {"warn": f"Path {abspath} does not exist. param={current_path}"}
+        if not_exists and abspath.exists():
+            self.logger.warn(f"Path {abspath} exist. param={current_path}")
+            return False, None, {"warn": f"Path {abspath} exist. param={current_path}"}
+        return True, abspath, {"success": f"Path {abspath} exists."}
+
+    def file_list(self, current_path:str) -> Tuple[int, Dict[str, Any]]:
+        """
+        ファイルリストを取得する
+
+        Args:
+            path (str): ファイルパス
+
+        Returns:
+            int: レスポンスコード
+            dict: メッセージ
+        """
+        chk, _, msg = self._file_exists(current_path)
+        if not chk:
+            return self.RESP_WARN, msg
+        
+        def _ts2str(ts):
+            return datetime.datetime.fromtimestamp(ts)
+
+        current_path = f'/{current_path}' if not current_path.startswith('/') else current_path
+        current_path_parts = current_path.split("/")
+        current_path_parts = current_path_parts[1:] if current_path=='/' else current_path_parts
+        path_tree = {}
+        data_dir_len = len(str(self.data_dir))
+        for i, cpart in enumerate(current_path_parts):
+            cpath = '/'.join(current_path_parts[1:i+1])
+            file_list:Path = self.data_dir / cpath
+            children = dict()
+            for f in file_list.iterdir():
+                parts = str(f)[data_dir_len:].replace("\\","/").split("/")
+                path = "/".join(parts[:i+2])
+                key = common.safe_fname(path)
+                if key in children:
+                    continue
+                children[key] = dict(name=f.name, is_dir=f.is_dir(), path=path, size=f.stat().st_size , last=_ts2str(f.stat().st_mtime))
+
+            tpath = '/'.join(current_path_parts[:i+1])
+            tpath = '/' if tpath=='' else tpath
+            tpath_key = common.safe_fname(tpath)
+            cpart = '/' if cpart=='' else cpart
+            path_tree[tpath_key] = dict(name=cpart, is_dir=True, path=tpath, children=children, size=0, last="")
+
+        return self.RESP_SCCESS, {"success": path_tree}
+    
+    def file_mkdir(self, current_path:str) -> Tuple[int, Dict[str, Any]]:
+        """
+        ディレクトリを作成する
+
+        Args:
+            current_path (str): ディレクトリパス
+
+        Returns:
+            int: レスポンスコード
+            dict: メッセージ
+        """
+        chk, abspath, msg = self._file_exists(current_path, not_exists=True)
+        if not chk:
+            return self.RESP_WARN, msg
+
+        abspath.mkdir(parents=True)
+        ret_path = str(Path(current_path).parent).replace("\\","/")
+        return self.RESP_SCCESS, {"success": {"path":f"{ret_path}","msg":f"Created {abspath}"}}
+    
+    def file_rmdir(self, current_path:str) -> Tuple[int, Dict[str, Any]]:
+        """
+        ディレクトリを削除する
+
+        Args:
+            current_path (str): ディレクトリパス
+
+        Returns:
+            int: レスポンスコード
+            dict: メッセージ
+        """
+        chk, abspath, msg = self._file_exists(current_path)
+        if not chk:
+            return self.RESP_WARN, msg
+        if abspath == self.data_dir:
+            self.logger.warn(f"Path {abspath} is root directory.")
+            return self.RESP_WARN, {"warn": f"Path {abspath} is root directory."}
+
+        common.rmdirs(abspath)
+        ret_path = str(Path(current_path).parent).replace("\\","/")
+        return self.RESP_SCCESS, {"success": {"path":f"{ret_path}","msg":f"Removed {abspath}"}}
+
+    def file_download(self, current_path:str) -> Tuple[int, Dict[str, Any]]:
+        """
+        ファイルをダウンロードする
+
+        Args:
+            current_path (str): ファイルパス
+
+        Returns:
+            int: レスポンスコード
+            dict: メッセージ
+        """
+        chk, abspath, msg = self._file_exists(current_path)
+        if not chk:
+            return self.RESP_WARN, msg
+        if abspath.is_dir():
+            self.logger.warn(f"Path {abspath} is directory.")
+            return self.RESP_WARN, {"warn": f"Path {abspath} is directory."}
+
+        with open(abspath, "rb") as f:
+            data = convert.bytes2b64str(f.read())
+        return self.RESP_SCCESS, {"success":{"name":abspath.name, "data":data}}
+
+    def file_upload(self, current_path:str, file_name:str, file_data:bytes) -> Tuple[int, Dict[str, Any]]:
+        """
+        ファイルをアップロードする
+
+        Args:
+            current_path (str): ファイルパス
+            file_name (str): ファイル名
+            file_data (bytes): ファイルデータ
+
+        Returns:
+            int: レスポンスコード
+            dict: メッセージ
+        """
+        chk, abspath, msg = self._file_exists(current_path, exists_chk=False)
+        if not chk:
+            return self.RESP_WARN, msg
+
+        if abspath.exists():
+            if abspath.is_dir():
+                abspath = abspath / file_name
+            if abspath.is_file():
+                self.logger.warn(f"Path {abspath} already exist. param={current_path}")
+                return self.RESP_WARN, {"warn": f"Path {abspath} already exist. param={current_path}"}
+            save_path = abspath
+        elif abspath.suffix == '':
+            abspath.mkdir(parents=True, exist_ok=True)
+            save_path = abspath / file_name
+        else:
+            save_path = abspath
+
+        with open(save_path, "wb") as f:
+            f.write(file_data)
+        return self.RESP_SCCESS, {"success": f"Uploaded {save_path}"}
+
+    def file_remove(self, current_path:str) -> Tuple[int, Dict[str, Any]]:
+        """
+        ファイルを削除する
+
+        Args:
+            current_path (str): ファイルパス
+
+        Returns:
+            int: レスポンスコード
+            dict: メッセージ
+        """
+        chk, abspath, msg = self._file_exists(current_path)
+        if not chk:
+            return self.RESP_WARN, msg
+        if abspath.is_dir():
+            self.logger.warn(f"Path {abspath} is directory.")
+            return self.RESP_WARN, {"warn": f"Path {abspath} is directory."}
+
+        abspath.unlink()
+        ret_path = str(Path(current_path).parent).replace("\\","/")
+        return self.RESP_SCCESS, {"success": {"path":f"{ret_path}","msg":f"Removed {abspath}"}}

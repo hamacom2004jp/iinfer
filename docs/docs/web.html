@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Webモード &mdash; iinfer 2024/05/18 documentation</title>
+  <title>Webモード &mdash; iinfer 2024/06/10 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -16,7 +16,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=1aa140b2"></script>
+        <script src="../_static/documentation_options.js?v=0e783793"></script>
         <script src="../_static/doctools.js?v=9a2dae69"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -54,6 +54,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Webモード</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#http-exec-cmd-title">コマンド実行 : <cite>http://&lt;ホスト&gt;:&lt;ポート&gt;/exec_cmd/&lt;title&gt;</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#http-exec-pipe-title">パイプライン実行 : <cite>http://&lt;ホスト&gt;:&lt;ポート&gt;/exec_pipe/&lt;title&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#http-filer">ファイラー表示 : <cite>http://&lt;ホスト&gt;:&lt;ポート&gt;/filer</cite></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="command.html">コマンドリファレンス</a></li>
@@ -147,6 +148,16 @@
 <li><p>GUIモードで登録したパイプラインのRawボタンを押すと、curlコマンドの例を確認できます。</p></li>
 </ul>
 <img alt="../_images/00312_pipe.jpg" src="../_images/00312_pipe.jpg" />
+</section>
+<section id="http-filer">
+<h2>ファイラー表示 : <cite>http://&lt;ホスト&gt;:&lt;ポート&gt;/filer</cite><a class="headerlink" href="#http-filer" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>ブラウザでこのURLにアクセスすると、ファイル転送用のファイラーが表示されます。</p></li>
+<li><p>ファイラーを使用することで、ローカル(ブラウザ側)とサーバー(iinfer client 又は iinfer server)間で、ファイルをアップロード/ダウンロードすることが出来ます。</p></li>
+<li><p><strong>&lt;ホスト&gt;</strong> には、Webモードを起動したホスト名またはIPアドレスを指定します。</p></li>
+<li><p><strong>&lt;ポート&gt;</strong> には、Webモードを起動したポート番号を指定します。 <cite>--listen_port</cite> オプションで指定したポート番号です。</p></li>
+</ul>
+<img alt="../_images/00401_web.jpg" src="../_images/00401_web.jpg" />
 </section>
 </section>
 

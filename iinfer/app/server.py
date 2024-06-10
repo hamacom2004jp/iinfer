@@ -1,7 +1,7 @@
 from motpy import Detection, MultiObjectTracker
 from pathlib import Path
 from PIL import Image
-from iinfer.app import common, predict, injection
+from iinfer.app import common, filer, predict, injection
 from iinfer.app.commons import convert, module
 from typing import List, Dict, Any, Tuple, Union
 import base64
@@ -15,24 +15,21 @@ import time
 import urllib
 
 
-class Server(object):
-    RESP_SCCESS:int = 0
-    RESP_WARN:int = 1
-    RESP_ERROR:int = 2
+class Server(filer.Filer):
+
     def __init__(self, data_dir: Path, logger: logging.Logger, redis_host: str = "localhost", redis_port: int = 6379, redis_password: str = None, svname: str = 'server'):
         """
         Redisサーバーに接続し、クライアントからのコマンドを受信し実行する
 
         Args:
-            data_dir (Path): データディレクトリのパス
+            data_dir (Path): データフォルダのパス
             logger (logging): ロガー
             redis_host (str): Redisホスト名, by default "localhost"
             redis_port (int): Redisポート番号, by default 6379
             redis_password (str): Redisパスワード, by default None
             svname (str, optional): 推論サーバーのサービス名. by default 'server'
         """
-        self.data_dir = data_dir
-        self.logger = logger
+        super().__init__(data_dir, logger)
         self.redis_host = redis_host
         self.redis_port = redis_port
         self.redis_password = redis_password
@@ -49,18 +46,30 @@ class Server(object):
     def __exit__(self, a, b, c):
         self.terminate_server()
 
-    def start_server(self):
+    def start_server(self, retry_count:int=20, retry_interval:int=5):
         """
         サーバー処理を開始する
         """
         self.redis_cli = redis.Redis(host=self.redis_host, port=self.redis_port, db=0, password=self.redis_password)
-        try:
-            self.redis_cli.ping()
-            self.is_running = True
-            self._run_server()
-        except redis.exceptions.ConnectionError as e:
-            self.is_running = False
-            self.logger.error(f"fail to ping server. {e}")
+        i = 0
+        while i < retry_count or retry_count <= 0:
+            try:
+                self.logger.info(f"({i+1}/{retry_count if retry_count>0 else '-'}) connecting to the server. {self.redis_host}:{self.redis_port}")
+                self.redis_cli.ping()
+                i = 0
+                self.is_running = True
+                self._run_server()
+                break
+            except redis.exceptions.ConnectionError as e:
+                self.is_running = False
+                self.logger.error(f"fail to ping server. {e}")
+                if i >= retry_count and retry_count > 0:
+                    break
+                time.sleep(retry_interval if retry_interval > 0 else 5)
+                i += 1
+            except KeyboardInterrupt as e:
+                self.is_running = False
+                break
 
     def list_server(self):
         """
@@ -807,44 +816,7 @@ class Server(object):
             self.responce(reskey, {"warn": f"Failed to run inference: {e}"})
             return self.RESP_WARN
 
-    def _file_exists(self, reskey:str, current_path:str, not_exists:bool=False, exists_chk:bool=True) -> Tuple[bool, Path]:
-        """
-        パスが存在するかどうかを確認する
-
-        Args:
-            reskey (str): レスポンスキー
-            current_path (str): パス
-            not_exists (bool, optional): パスが存在しないことを確認するかどうか, by default False
-            exists_chk (bool, optional): パス存在チェックを行うかどうか, by default True
-        
-        Returns:
-            bool: not_existsがFalseの時パスが存在すればTrue、存在しなければFalse。not_existsがTrueの時パスが存在しなければTrue、存在すればFalse。
-            Path: データフォルダ以下のcurrent_pathを含めた絶対パス
-        """
-        if current_path is None or current_path == "":
-            self.logger.warn(f"current_path is empty.")
-            self.responce(reskey, {"warn": f"current_path is empty."})
-            return False, None
-        current_path = current_path.replace("\\","/")
-        cp = current_path[1:] if current_path.startswith('/') else current_path
-        abspath:Path = (self.data_dir / cp).resolve()
-        if not str(abspath).startswith(str(self.data_dir)):
-            self.logger.warn(f"Path {abspath} is out of data directory. current_path={current_path}")
-            self.responce(reskey, {"warn": f"Path {abspath} is out of data directory. current_path={current_path}"})
-            return False, None
-        if not exists_chk:
-            return True, abspath
-        if not not_exists and not abspath.exists():
-            self.logger.warn(f"Path {abspath} does not exist. param={current_path}")
-            self.responce(reskey, {"warn": f"Path {abspath} does not exist. param={current_path}"})
-            return False, None
-        if not_exists and abspath.exists():
-            self.logger.warn(f"Path {abspath} exist. param={current_path}")
-            self.responce(reskey, {"warn": f"Path {abspath} exist. param={current_path}"})
-            return False, None
-        return True, abspath
-
-    def file_list(self, reskey:str, current_path:str):
+    def file_list(self, reskey:str, current_path:str) -> int:
         """
         ファイルリストを取得する
 
@@ -855,39 +827,11 @@ class Server(object):
         Returns:
             int: レスポンスコード
         """
-        chk, _ = self._file_exists(reskey, current_path)
-        if not chk: return self.RESP_WARN
-        
-        def _ts2str(ts):
-            return datetime.datetime.fromtimestamp(ts)
+        rescode, msg = super().file_list(current_path)
+        self.responce(reskey, msg)
+        return rescode
 
-        current_path = f'/{current_path}' if not current_path.startswith('/') else current_path
-        current_path_parts = current_path.split("/")
-        current_path_parts = current_path_parts[1:] if current_path=='/' else current_path_parts
-        path_tree = {}
-        data_dir_len = len(str(self.data_dir))
-        for i, cpart in enumerate(current_path_parts):
-            cpath = '/'.join(current_path_parts[1:i+1])
-            file_list:Path = self.data_dir / cpath
-            children = dict()
-            for f in file_list.iterdir():
-                parts = str(f)[data_dir_len:].replace("\\","/").split("/")
-                path = "/".join(parts[:i+2])
-                key = common.safe_fname(path)
-                if key in children:
-                    continue
-                children[key] = dict(name=f.name, is_dir=f.is_dir(), path=path, size=f.stat().st_size , last=_ts2str(f.stat().st_mtime))
-
-            tpath = '/'.join(current_path_parts[:i+1])
-            tpath = '/' if tpath=='' else tpath
-            tpath_key = common.safe_fname(tpath)
-            cpart = '/' if cpart=='' else cpart
-            path_tree[tpath_key] = dict(name=cpart, is_dir=True, path=tpath, children=children, size=0, last="")
-
-        self.responce(reskey, {"success": path_tree})
-        return self.RESP_SCCESS
-
-    def file_mkdir(self, reskey:str, current_path:str):
+    def file_mkdir(self, reskey:str, current_path:str) -> int:
         """
         ディレクトリを作成する
 
@@ -898,15 +842,11 @@ class Server(object):
         Returns:
             int: レスポンスコード
         """
-        chk, abspath = self._file_exists(reskey, current_path, not_exists=True)
-        if not chk: return self.RESP_WARN
-
-        abspath.mkdir(parents=True)
-        ret_path = str(Path(current_path).parent).replace("\\","/")
-        self.responce(reskey, {"success": {"path":f"{ret_path}","msg":f"Created {abspath}"}})
-        return self.RESP_SCCESS
+        rescode, msg = super().file_mkdir(current_path)
+        self.responce(reskey, msg)
+        return rescode
     
-    def file_rmdir(self, reskey:str, current_path:str):
+    def file_rmdir(self, reskey:str, current_path:str) -> int:
         """
         ディレクトリを削除する
 
@@ -917,19 +857,11 @@ class Server(object):
         Returns:
             int: レスポンスコード
         """
-        chk, abspath = self._file_exists(reskey, current_path)
-        if not chk: return self.RESP_WARN
-        if abspath == self.data_dir:
-            self.logger.warn(f"Path {abspath} is root directory.")
-            self.responce(reskey, {"warn": f"Path {abspath} is root directory."})
-            return self.RESP_WARN
+        rescode, msg = super().file_rmdir(current_path)
+        self.responce(reskey, msg)
+        return rescode
 
-        common.rmdirs(abspath)
-        ret_path = str(Path(current_path).parent).replace("\\","/")
-        self.responce(reskey, {"success": {"path":f"{ret_path}","msg":f"Removed {abspath}"}})
-        return self.RESP_SCCESS
-
-    def file_download(self, reskey:str, current_path:str):
+    def file_download(self, reskey:str, current_path:str) -> int:
         """
         ファイルをダウンロードする
 
@@ -940,19 +872,11 @@ class Server(object):
         Returns:
             int: レスポンスコード
         """
-        chk, abspath = self._file_exists(reskey, current_path)
-        if not chk: return self.RESP_WARN
-        if abspath.is_dir():
-            self.logger.warn(f"Path {abspath} is directory.")
-            self.responce(reskey, {"warn": f"Path {abspath} is directory."})
-            return self.RESP_WARN
+        rescode, msg = super().file_download(current_path)
+        self.responce(reskey, msg)
+        return rescode
 
-        with open(abspath, "rb") as f:
-            data = convert.bytes2b64str(f.read())
-            self.responce(reskey, {"success":{"name":abspath.name, "data":data}})
-        return self.RESP_SCCESS
-    
-    def file_upload(self, reskey:str, current_path:str, file_name:str, file_data:bytes):
+    def file_upload(self, reskey:str, current_path:str, file_name:str, file_data:bytes) -> int:
         """
         ファイルをアップロードする
 
@@ -965,28 +889,9 @@ class Server(object):
         Returns:
             int: レスポンスコード
         """
-        chk, abspath = self._file_exists(reskey, current_path, exists_chk=False)
-        if not chk:
-            return self.RESP_WARN
-
-        if abspath.exists():
-            if abspath.is_dir():
-                abspath = abspath / file_name
-            if abspath.is_file():
-                self.logger.warn(f"Path {abspath} already exist. param={current_path}")
-                self.responce(reskey, {"warn": f"Path {abspath} already exist. param={current_path}"})
-                return self.RESP_WARN
-            save_path = abspath
-        elif abspath.suffix == '':
-            abspath.mkdir(parents=True, exist_ok=True)
-            save_path = abspath / file_name
-        else:
-            save_path = abspath
-
-        with open(save_path, "wb") as f:
-            f.write(file_data)
-            self.responce(reskey, {"success": f"Uploaded {save_path}"})
-        return self.RESP_SCCESS
+        rescode, msg = super().file_upload(current_path, file_name, file_data)
+        self.responce(reskey, msg)
+        return rescode
 
     def file_remove(self, reskey:str, current_path:str) -> int:
         """
@@ -999,15 +904,6 @@ class Server(object):
         Returns:
             int: レスポンスコード
         """
-        chk, abspath = self._file_exists(reskey, current_path)
-        if not chk: return self.RESP_WARN
-        if abspath.is_dir():
-            self.logger.warn(f"Path {abspath} is directory.")
-            self.responce(reskey, {"warn": f"Path {abspath} is directory."})
-            return self.RESP_WARN
-
-        abspath.unlink()
-        ret_path = str(Path(current_path).parent).replace("\\","/")
-        self.responce(reskey, {"success": {"path":f"{ret_path}","msg":f"Removed {abspath}"}})
-        return self.RESP_SCCESS
-    
+        rescode, msg = super().file_remove(current_path)
+        self.responce(reskey, msg)
+        return rescode

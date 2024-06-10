@@ -117,6 +117,9 @@ $(() => {
     eel.expose(js_console_modal_log_func);
     function js_console_modal_log_func(line) {
         const elem = $('#console_modal_log');
+        if (typeof line === 'object') {
+            line = JSON.stringify(line);
+        }
         const text = elem.val() + line;
         elem.val(text);
         elem.get(0).setSelectionRange(text.length-1, text.length-1);

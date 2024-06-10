@@ -14,5 +14,5 @@
     :header-rows: 1
 
     "Option","Required","Description"
-    "--data <データディレクトリ>","","省略した時は `$HONE/.iinfer` を使用します。"
+    "--data <データフォルダ>","","省略した時は `$HONE/.iinfer` を使用します。"
 

@@ -40,7 +40,7 @@ class Predict(object):
         """
         pass
 
-    def create_session(self, deploy_dir:Path, model_path:Union[Path|Any], model_conf_path:Path, model_provider:str, gpu_id:int=None) -> Any:
+    def create_session(self, deploy_dir:Path, model_path:Union[Path,Any], model_conf_path:Path, model_provider:str, gpu_id:int=None) -> Any:
         """
         推論セッションを作成する関数です。
         startコマンド実行時に呼び出されます。
@@ -94,7 +94,7 @@ class OnnxPredict(Predict):
         """
         super().__init__(logger)
 
-    def is_gpu_available(self, model_path:Union[Path|Any], model_conf_path:Path, gpu_id:int=None) -> bool:
+    def is_gpu_available(self, model_path:Union[Path,Any], model_conf_path:Path, gpu_id:int=None) -> bool:
         """
         GPUが利用可能かどうかを返す関数です。
         戻り値がTrueの場合、GPUが利用可能です。
@@ -127,7 +127,7 @@ class TorchPredict(Predict):
         """
         super().__init__(logger)
 
-    def is_gpu_available(self, model_path:Union[Path|Any], model_conf_path:Path, gpu_id:int=None) -> bool:
+    def is_gpu_available(self, model_path:Union[Path,Any], model_conf_path:Path, gpu_id:int=None) -> bool:
         """
         GPUが利用可能かどうかを返す関数です。
         戻り値がTrueの場合、GPUが利用可能です。

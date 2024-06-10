@@ -132,7 +132,7 @@
     :header-rows: 1
 
     "Option","Required","Description"
-    "--data <データディレクトリ>","","省略した時は `$HONE/.iinfer` を使用します。"
+    "--data <データフォルダ>","","省略した時は `$HONE/.iinfer` を使用します。"
     "--install_iinfer <iinferモジュール名>","","省略した時は `iinfer` を使用します。 `iinfer==0.7.2` といった指定も可能です。"
     "--install_onnx","","dockerイメージ内に `onnxruntime` をインストールします。※1"
     "--install_mmdet","","dockerイメージ内に `mmdetection` をインストールします。※1"
