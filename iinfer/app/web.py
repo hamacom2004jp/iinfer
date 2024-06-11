@@ -22,12 +22,13 @@ import tempfile
 
 
 class Web(options.Options):
-    def __init__(self, logger:logging.Logger, data:Path):
+    def __init__(self, logger:logging.Logger, data:Path, client_only:bool=False):
         super().__init__()
         self.logger = logger
         self.data = data
         self.container = dict()
         self.output_size_th = 1024*1024*5
+        self.client_only = client_only
         common.mkdirs(self.data)
 
     def mk_curl_fileup(self, cmd_opt):
@@ -120,10 +121,31 @@ class Web(options.Options):
         except Exception as e:
             pass
 
+    def chk_client_only(self, opt):
+        use_redis = self.get_cmd_attr(opt['mode'], opt['cmd'], "use_redis")
+        def _chk(opt, opt_name, jadge_func):
+            for c in self.get_cmd_attr(opt['mode'], opt['cmd'], "choise"):
+                if c['opt'] == opt_name and jadge_func(opt, opt_name):
+                    return True
+            return False
+        if use_redis == self.USE_REDIS_TRUE or _chk(opt, 'local_data', lambda opt, opt_name: opt_name in opt and opt[opt_name] is None):
+            output = dict(warn=f'Commands that require a connection to the iinfer server are not available.'
+                            +f' (mode={opt["mode"]}, cmd={opt["cmd"]}) '
+                            +f'The cause is that the client_only option is specified when starting web mode.')
+            return True, output
+        return False, None
+
     def exec_cmd(self, title, opt, nothread=False):
         self.container['iinfer_app'] = app.IinferApp()
         def _exec_cmd(iinfer_app:app.IinferApp, title, opt, nothread=False):
             self.logger.info(f"exec_cmd: title={title}, opt={opt}")
+            if self.client_only:
+                ret, output = self.chk_client_only(opt)
+                if ret:
+                    if nothread: return output
+                    self.callback_return_pipe_exec_func(title, output)
+                    return
+
             opt_list, file_dict = self.mk_opt_list(opt)
             old_stdout = sys.stdout
 
@@ -553,6 +575,10 @@ class Web(options.Options):
         def versions_iinfer():
             bottle.response.content_type = 'application/json'
             return json.dumps(self.versions_iinfer())
+
+        @app.route('/client_only')
+        def client_only():
+            return str(self.client_only)
 
         @app.route('/versions_used')
         def versions_used():

@@ -29,7 +29,7 @@
             "name": "Python: iinfer web",
             "type": "python",
             "request": "launch",
-            "args": ["-m","web","-c","start","-f"],
+            "args": ["-m","web","-c","start","-f", "--client_only"],
             //"args": ["--version"],
             "module": "iinfer",
             "console": "integratedTerminal",

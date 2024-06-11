@@ -131,12 +131,12 @@ fsapi.filer = (svpath, is_local) => {
         return xhr;
       },
       success: function(data) {
-        alert(data);
+        fsapi.message(data);
         fsapi.tree(fsapi.right, svpath, fsapi.right.find('.tree-menu'), false);
       },
       error: function(data) {
         console.log(data);
-        alert(data);
+        fsapi.message(data);
         fsapi.tree(fsapi.right, svpath, fsapi.right.find('.tree-menu'), false);
       }
     });
@@ -151,8 +151,7 @@ fsapi.filer = (svpath, is_local) => {
     opt['svpath'] = event.originalEvent.dataTransfer.getData('path');
     fsapi.sv_exec_cmd(opt).then(async res => {
       if(!res[0] || !res[0]['success']) {
-        alert(JSON.stringify(res));
-        hide_loading();
+        fsapi.message(res);
         return;
       }
       const mk_blob = (base64) => {
@@ -163,6 +162,10 @@ fsapi.filer = (svpath, is_local) => {
         return blob;
       }
       const down_dir = fsapi.handles[fsapi.left.find('.filer_address').val()];
+      if (!down_dir) {
+        fsapi.message({warn: 'Please select a local directory before downloading.'});
+        return;
+      }
       const down_file = await down_dir.getFileHandle(res[0]['success']['name'], {create: true});
       const writable = await down_file.createWritable();
       const blob = mk_blob(res[0]['success']['data']);
@@ -270,6 +273,20 @@ fsapi.get_server_opt = () => {
 fsapi.load_server_list = () => {
   show_loading();
   fsapi.right.find('.filer_svnames').remove();
+  const mk_func = (elem) => {return ()=>{
+    fsapi.right.find('.filer_server_bot').text(elem.attr('data-svname'));
+    fsapi.right.find('.filer_host').val(elem.attr('data-host'));
+    fsapi.right.find('.filer_port').val(elem.attr('data-port'));
+    fsapi.right.find('.filer_password').val(elem.attr('data-password'));
+    fsapi.right.find('.filer_svname').val(elem.attr('data-svname'));
+    fsapi.right.find('.filer_local_data').val(elem.attr('data-local_data'));
+    localStorage.setItem('filer_host', elem.attr('data-host'));
+    localStorage.setItem('filer_port', elem.attr('data-port'));
+    localStorage.setItem('filer_password', elem.attr('data-password'));
+    localStorage.setItem('filer_svname', elem.attr('data-svname'));
+    localStorage.setItem('filer_local_data', elem.attr('data-local_data'));
+    fsapi.tree(fsapi.right, "/", fsapi.right.find('.tree-menu'), false);
+  }};
   const opt = fsapi.get_server_opt();
   opt['mode'] = 'server';
   opt['cmd'] = 'list';
@@ -277,49 +294,35 @@ fsapi.load_server_list = () => {
   delete opt['svname'];
   fsapi.sv_exec_cmd(opt).then(async res => {
     if(!res[0] || !res[0]['success']) {
-      alert(JSON.stringify(res));
-      hide_loading();
+      fsapi.message(res);
       return;
     }
     if(res.length<=0 || !res[0]['success']) {
       hide_loading();
       return;
     }
-    const mk_func = (elem) => {return ()=>{
-      fsapi.right.find('.filer_server_bot').text(elem.attr('data-svname'));
-      fsapi.right.find('.filer_host').val(elem.attr('data-host'));
-      fsapi.right.find('.filer_port').val(elem.attr('data-port'));
-      fsapi.right.find('.filer_password').val(elem.attr('data-password'));
-      fsapi.right.find('.filer_svname').val(elem.attr('data-svname'));
-      fsapi.right.find('.filer_local_data').val(elem.attr('data-local_data'));
-      localStorage.setItem('filer_host', elem.attr('data-host'));
-      localStorage.setItem('filer_port', elem.attr('data-port'));
-      localStorage.setItem('filer_password', elem.attr('data-password'));
-      localStorage.setItem('filer_svname', elem.attr('data-svname'));
-      localStorage.setItem('filer_local_data', elem.attr('data-local_data'));
-      fsapi.tree(fsapi.right, "/", fsapi.right.find('.tree-menu'), false);
-    }};
     res[0]['success'].forEach(elem => {
       const a_elem = $(`<a class="dropdown-item" href="#" data-host="${opt['host']}" data-port="${opt['port']}" data-password="${opt['password']}" data-svname="${elem['svname']}" data-local_data="">${elem['svname']} ( ${opt['host']}:${opt['port']} )</a>`);
       a_elem.off("click").on("click", mk_func(a_elem));
       const li_elem = $('<li class="filer_svnames"></li>').append(a_elem);
       fsapi.right.find('.filer_server').append(li_elem);
     });
-    const cl = async () => {
-      const res = await fetch('/get_local_data')
-      const local_data = await res.text();
-      const a_elem = $(`<a class="dropdown-item" href="#" data-host="localhost" data-port="6379" data-password="password" data-svname="client" data-local_data="${local_data}">client</a>`);
-      a_elem.off("click").on("click", mk_func(a_elem));
-      const li_elem = $('<li class="filer_svnames"></li>').append(a_elem);
-      fsapi.right.find('.filer_server').append(li_elem);
-    }
-    await cl();
     fsapi.right.find('.filer_server').find('.dropdown-item:first').click();
   }).catch((e) => {
     console.log(e);
   }).finally(() => {
     hide_loading();
   });
+  const cl = async () => {
+    const res = await fetch('/get_local_data')
+    const local_data = await res.text();
+    const a_elem = $(`<a class="dropdown-item" href="#" data-host="localhost" data-port="6379" data-password="password" data-svname="client" data-local_data="${local_data}">client</a>`);
+    a_elem.off("click").on("click", mk_func(a_elem));
+    const li_elem = $('<li class="filer_svnames"></li>').append(a_elem);
+    fsapi.right.find('.filer_server').append(li_elem);
+    fsapi.right.find('.filer_server').find('.dropdown-item:first').click();
+  }
+  cl();
 }
 // ファイルサイズ表記 ================================================================
 fsapi.calc_size = (size) => {
@@ -357,9 +360,8 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
   exec_cmd(opt).then(res => {
     current_ul_elem.html('');
     if(!res[0] || !res[0]['success']) {
-      alert(JSON.stringify(res));
+      fsapi.message(res);
       target.find('.file-list').html('');
-      hide_loading();
       return;
     }
     const list_tree = Object.entries(res[0]['success']).sort();
@@ -419,8 +421,7 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
             const exec_cmd = _l ? fsapi.local_exec_cmd : fsapi.sv_exec_cmd;
             exec_cmd(opt).then(res => {
               if(!res[0] || !res[0]['success']) {
-                alert(JSON.stringify(res));
-                hide_loading();
+                fsapi.message(res);
                 return;
               }
               hide_loading();
@@ -445,8 +446,7 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
           opt['svpath'] = _p;
           fsapi.sv_exec_cmd(opt).then(res => {
             if(!res[0] || !res[0]['success']) {
-              alert(JSON.stringify(res));
-              hide_loading();
+              fsapi.message(res);
               return;
             }
             const blob = mk_blob(res[0]['success']['data']);
@@ -471,8 +471,7 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
             const exec_cmd = _l ? fsapi.local_exec_cmd : fsapi.sv_exec_cmd;
             exec_cmd(opt).then(res => {
               if(!res[0] || !res[0]['success']) {
-                alert(JSON.stringify(res));
-                hide_loading();
+                fsapi.message(res);
                 return;
               }
               hide_loading();
@@ -624,6 +623,19 @@ fsapi.sv_exec_cmd = async (opt) => {
     body: JSON.stringify(opt)
   }).then(response => response.json());
 };
+fsapi.is_client_only = async () => {
+  const res = await fetch('/client_only', {method: 'GET'});
+  const text = await res.text()
+  if (text == "true") {
+    return true;
+  }
+  return false;
+}
+fsapi.message = (res) => {
+  msg = JSON.stringify(res)
+  alert(msg.replace(/\\n/g, '\n'));
+  hide_loading();
+}
 $(()=>{
   fsapi.filer("/", false);
 })

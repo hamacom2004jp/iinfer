@@ -3,6 +3,9 @@ import os
 
 
 class Options:
+    USE_REDIS_FALSE = -1
+    USE_REDIS_MEIGHT = 0
+    USE_REDIS_TRUE = 1
     def __init__(self):
         self._options = dict()
         self.init_options()
@@ -18,12 +21,15 @@ class Options:
             return [''] + ret
         return ['Please select mode.']
 
-    def get_opt_opt(self, mode, cmd):
+    def get_cmd_attr(self, mode, cmd, attr):
         if mode not in self._options["cmd"]:
             return [f'Unknown mode. ({mode})']
         if cmd is None or cmd == "" or cmd not in self._options["cmd"][mode]:
             return []
-        return self._options["cmd"][mode][cmd]["choise"]
+        return self._options["cmd"][mode][cmd][attr]
+
+    def get_opt_opt(self, mode, cmd):
+        return self.get_cmd_attr(mode, cmd, "choise")
 
     def list_options(self):
         def _list(ret, key, val):
@@ -108,7 +114,7 @@ class Options:
                 discription_ja="クライアントモード",
                 discription_en="Client mode",
                 deploy=dict(
-                    type="str", default=None, required=False, multi=False, hide=False,
+                    type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_TRUE,
                     discription_ja="AIモデルをサーバーに配備します。",
                     discription_en="Deploy AI model to server.",
                     choise=[
@@ -191,7 +197,7 @@ class Options:
                     ]
                 ),
                 deploy_list=dict(
-                    type="str", default=None, required=False, multi=False, hide=False,
+                    type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_TRUE,
                     discription_ja="サーバーに配備されているAIモデル一覧を取得します。",
                     discription_en="Get a list of AI models deployed on the server.",
                     choise=[
@@ -225,7 +231,7 @@ class Options:
                     ]
                 ),
                 undeploy=dict(
-                    type="str", default=None, required=False, multi=False, hide=False,
+                    type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_TRUE,
                     discription_ja="サーバーに配備されているAIモデルを削除します。",
                     discription_en="Delete AI models deployed on the server.",
                     choise=[
@@ -262,7 +268,7 @@ class Options:
                     ]
                 ),
                 start=dict(
-                    type="str", default=None, required=False, multi=False, hide=False,
+                    type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_TRUE,
                     discription_ja="AIモデルを指定して推論サーバーを起動します。",
                     discription_en="Start the inference server by specifying the AI model.",
                     choise=[
@@ -309,7 +315,7 @@ class Options:
                     ]
                 ),
                 predict_type_list=dict(
-                    type="str", default=None, required=False, multi=False, hide=False,
+                    type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_TRUE,
                     discription_ja="推論タイプ一覧を取得します。",
                     discription_en="Get a list of inference types.",
                     choise=[
@@ -328,7 +334,7 @@ class Options:
                     ]
                 ),
                 stop=dict(
-                    type="str", default=None, required=False, multi=False, hide=False,
+                    type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_TRUE,
                     discription_ja="AIモデルを指定して推論サーバーを停止します。",
                     discription_en="Stop the inference server by specifying the AI model.",
                     choise=[
@@ -365,7 +371,7 @@ class Options:
                     ]
                 ),
                 predict=dict(
-                    type="str", default=None, required=False, multi=False, hide=False,
+                    type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_TRUE,
                     discription_ja="AIモデルを指定して推論を実行します。",
                     discription_en="Perform inference by specifying the AI model.",
                     choise=[
@@ -421,7 +427,7 @@ class Options:
                     ]
                 ),
                 capture=dict(
-                    type="str", default=None, required=False, multi=False, hide=False,
+                    type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_FALSE,
                     discription_ja="クライアント側でキャプチャー画像を取得します。",
                     discription_en="Get a capture image on the client side.",
                     choise=[
@@ -458,7 +464,7 @@ class Options:
                     ]
                 ),
                 prompt=dict(
-                    type="str", default=None, required=False, multi=False, hide=False,
+                    type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_FALSE,
                     discription_ja="LLM向けに単にキー入力したものを標準出力します。",
                     discription_en="Standard output of simply keyed input for LLM.",
                     choise=[
@@ -483,7 +489,7 @@ class Options:
                     ]
                 ),
                 file_list=dict(
-                    type="str", default=None, required=False, multi=False, hide=False,
+                    type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_MEIGHT,
                     discription_ja="サーバー側のデータフォルダ配下のファイルリストを取得します。",
                     discription_en="Get a list of files under the data folder on the server.",
                     choise=[
@@ -523,7 +529,7 @@ class Options:
                     ]
                 ),
                 file_mkdir=dict(
-                    type="str", default=None, required=False, multi=False, hide=False,
+                    type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_MEIGHT,
                     discription_ja="サーバー側のデータフォルダ配下に新しいフォルダを作成します。",
                     discription_en="Create a new folder under the data folder on the server.",
                     choise=[
@@ -563,7 +569,7 @@ class Options:
                     ]
                 ),
                 file_rmdir=dict(
-                    type="str", default=None, required=False, multi=False, hide=False,
+                    type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_MEIGHT,
                     discription_ja="サーバー側のデータフォルダ配下のフォルダを削除します。",
                     discription_en="Delete a folder under the data folder on the server.",
                     choise=[
@@ -603,7 +609,7 @@ class Options:
                     ]
                 ),
                 file_download=dict(
-                    type="str", default=None, required=False, multi=False, hide=False,
+                    type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_MEIGHT,
                     discription_ja="サーバー側のデータフォルダ配下のファイルをダウンロードします。",
                     discription_en="Download a file under the data folder on the server.",
                     choise=[
@@ -646,7 +652,7 @@ class Options:
                     ]
                 ),
                 file_upload=dict(
-                    type="str", default=None, required=False, multi=False, hide=False,
+                    type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_MEIGHT,
                     discription_ja="サーバー側のデータフォルダ配下にファイルをアップロードします。",
                     discription_en="Upload a file under the data folder on the server.",
                     choise=[
@@ -689,7 +695,7 @@ class Options:
                     ]
                 ),
                 file_remove=dict(
-                    type="str", default=None, required=False, multi=False, hide=False,
+                    type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_MEIGHT,
                     discription_ja="サーバー側のデータフォルダ配下のファイルを削除します。",
                     discription_en="Delete a file under the data folder on the server.",
                     choise=[
@@ -733,7 +739,7 @@ class Options:
                 discription_ja="後処理モード",
                 discription_en="Post-processing mode",
                 cls_jadge=dict(
-                    type="str", default=None, required=False, multi=False, hide=False,
+                    type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_FALSE,
                     discription_ja="推論結果を使用して画像分類判定を行います。",
                     discription_en="Perform image classification judgment using the inference result.",
                     choise=[
@@ -794,7 +800,7 @@ class Options:
                     ]
                 ),
                 csv=dict(
-                    type="str", default=None, required=False, multi=False, hide=False,
+                    type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_FALSE,
                     discription_ja="推論結果をCSVファイルに変換します。",
                     discription_en="Convert the inference result to a CSV file.",
                     choise=[
@@ -822,7 +828,7 @@ class Options:
                     ]
                 ),
                 det_clip=dict(
-                    type="str", default=None, required=False, multi=False, hide=False,
+                    type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_FALSE,
                     discription_ja="ObjectDetectionで検知した個所を切り出し、caprute形式のcsvで出力します。",
                     discription_en="Cut out the detected area in ObjectDetection and output it in caprute format csv.",
                     choise=[
@@ -850,7 +856,7 @@ class Options:
                     ]
                 ),
                 det_face_store=dict(
-                    type="str", default=None, required=False, multi=False, hide=False,
+                    type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_FALSE,
                     discription_ja="Face Detection and Recognitionで検知した顔特徴データを個所を切り出し、顔認識ストアファイルを生成します。",
                     discription_en="Cut out the face feature data detected by Face Detection and Recognition and generate a face recognition store file.",
                     choise=[
@@ -878,7 +884,7 @@ class Options:
                     ]
                 ),
                 det_filter=dict(
-                    type="str", default=None, required=False, multi=False, hide=False,
+                    type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_FALSE,
                     discription_ja="ObjectDetectionで検知した個所をフィルタリングします。",
                     discription_en="Filter the detected area in ObjectDetection.",
                     choise=[
@@ -927,7 +933,7 @@ class Options:
                     ]
                 ),
                 det_jadge=dict(
-                    type="str", default=None, required=False, multi=False, hide=False,
+                    type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_FALSE,
                     discription_ja="ObjectDetectionで検知した個所を使用して判定を行います。",
                     discription_en="Perform judgment using the detected area in ObjectDetection.",
                     choise=[
@@ -988,7 +994,7 @@ class Options:
                     ]
                 ),
                 httpreq=dict(
-                    type="str", default=None, required=False, multi=False, hide=False,
+                    type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_FALSE,
                     discription_ja="推論結果を指定したHTTPサーバーに送信します。",
                     discription_en="Send the inference result to the specified HTTP server.",
                     choise=[
@@ -1019,7 +1025,7 @@ class Options:
                     ]
                 ),
                 seg_bbox=dict(
-                    type="str", default=None, required=False, multi=False, hide=False,
+                    type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_FALSE,
                     discription_ja="SemanticSegmentationで検知した個所をbboxに変換します。",
                     discription_en="Convert the detected area in SemanticSegmentation to bbox.",
                     choise=[
@@ -1062,7 +1068,7 @@ class Options:
                     ]
                 ),
                 seg_filter=dict(
-                    type="str", default=None, required=False, multi=False, hide=False,
+                    type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_FALSE,
                     discription_ja="SemanticSegmentationで検知した個所をフィルタリングします。",
                     discription_en="Filter the detected area in SemanticSegmentation.",
                     choise=[
@@ -1115,7 +1121,7 @@ class Options:
                 discription_ja="サーバーモード",
                 discription_en="Server mode",
                 start=dict(
-                    type="str", default=None, required=False, multi=False, hide=False,
+                    type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_TRUE,
                     discription_ja="推論サーバーを起動します。installモードで `iinfer -m install -c server` を実行している場合は、 `docker-compose up -d` を使用してください。",
                     discription_en="Start the inference server. If you are running `iinfer -m install -c server` in install mode, use `docker-compose up -d`.",
                     choise=[
@@ -1155,7 +1161,7 @@ class Options:
                     ]
                 ),
                 stop=dict(
-                    type="str", default=None, required=False, multi=False, hide=False,
+                    type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_TRUE,
                     discription_ja="推論サーバーを停止します。installモードで `iinfer -m install -c server` を実行している場合は、 `docker-compose down` を使用してください。",
                     discription_en="Stop the inference server. If you are running `iinfer -m install -c server` in install mode, use `docker-compose down`.",
                     choise=[
@@ -1189,7 +1195,7 @@ class Options:
                     ]
                 ),
                 list=dict(
-                    type="str", default=None, required=False, multi=False, hide=False,
+                    type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_TRUE,
                     discription_ja="起動中の推論サーバーの一覧を表示します。クライアント環境からの利用も可能です。",
                     discription_en="Displays a list of running inference servers. Can also be used from the client environment.",
                     choise=[
@@ -1224,7 +1230,7 @@ class Options:
                 discription_ja="Redisモード",
                 discription_en="Redis mode",
                 docker_run=dict(
-                    type="str", default=None, required=False, multi=False, hide=False,
+                    type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_FALSE,
                     discription_ja="installモードで `iinfer -m install -c server` を実行している場合は、 `docker-compose up -d` を使用してください。",
                     discription_en="If you are running `iinfer -m install -c server` in install mode, use `docker-compose up -d`.",
                     choise=[
@@ -1255,7 +1261,7 @@ class Options:
                     ]
                 ),
                 docker_stop=dict(
-                    type="str", default=None, required=False, multi=False, hide=False,
+                    type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_FALSE,
                     discription_ja="installモードで `iinfer -m install -c server` を実行している場合は、 `docker-compose down` を使用してください。",
                     discription_en="If you are running `iinfer -m install -c server` in install mode, use `docker-compose down`.",
                     choise=[
@@ -1284,7 +1290,7 @@ class Options:
                 discription_ja="インストールモード",
                 discription_en="Install mode",
                 onnx=dict(
-                    type="str", default=None, required=False, multi=False, hide=False,
+                    type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_FALSE,
                     discription_ja="`onnxruntime` をインストールします。",
                     discription_en="Install `onnxruntime`.",
                     choise=[
@@ -1303,7 +1309,7 @@ class Options:
                     ]
                 ),
                 mmdet=dict(
-                    type="str", default=None, required=False, multi=False, hide=False,
+                    type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_FALSE,
                     discription_ja="`mmdetection` をインストールします。",
                     discription_en="Install `mmdetection`.",
                     choise=[
@@ -1325,7 +1331,7 @@ class Options:
                     ]
                 ),
                 mmseg=dict(
-                    type="str", default=None, required=False, multi=False, hide=False,
+                    type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_FALSE,
                     discription_ja="`mmsegmentation` をインストールします。",
                     discription_en="Install `mmsegmentation`.",
                     choise=[
@@ -1347,7 +1353,7 @@ class Options:
                     ]
                 ),
                 mmcls=dict(
-                    type="str", default=None, required=False, multi=False, hide=False,
+                    type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_FALSE,
                     discription_ja="`mmcls` をインストールします。",
                     discription_en="Install `mmcls`.",
                     choise=[
@@ -1369,7 +1375,7 @@ class Options:
                     ]
                 ),
                 mmpretrain=dict(
-                    type="str", default=None, required=False, multi=False, hide=False,
+                    type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_FALSE,
                     discription_ja="`mmpretrain` をインストールします。",
                     discription_en="Install `mmpretrain`.",
                     choise=[
@@ -1391,7 +1397,7 @@ class Options:
                     ]
                 ),
                 insightface=dict(
-                    type="str", default=None, required=False, multi=False, hide=False,
+                    type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_FALSE,
                     discription_ja="`insightface` をインストールします。",
                     discription_en="Install `insightface`.",
                     choise=[
@@ -1413,7 +1419,7 @@ class Options:
                     ]
                 ),
                 diffusers=dict(
-                    type="str", default=None, required=False, multi=False, hide=False,
+                    type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_FALSE,
                     discription_ja="`diffusers` をインストールします。",
                     discription_en="Install `diffusers`.",
                     choise=[
@@ -1435,7 +1441,7 @@ class Options:
                     ]
                 ),
                 llamaindex=dict(
-                    type="str", default=None, required=False, multi=False, hide=False,
+                    type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_FALSE,
                     discription_ja="`llamaindex` をインストールします。",
                     discription_en="Install `llamaindex`.",
                     choise=[
@@ -1457,7 +1463,7 @@ class Options:
                     ]
                 ),
                 redis=dict(
-                    type="str", default=None, required=False, multi=False, hide=False,
+                    type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_FALSE,
                     discription_ja="`redis-server` のdockerイメージをPULLします。",
                     discription_en="PULL the docker image of `redis-server`.",
                     choise=[
@@ -1482,7 +1488,7 @@ class Options:
                     ]
                 ),
                 server=dict(
-                    type="str", default=None, required=False, multi=False, hide=False,
+                    type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_FALSE,
                     discription_ja="`推論サーバー` のdockerイメージを `build` します。`build` が成功すると、実行時ディレクトリに `docker-compose.yml` ファイルが生成されます。",
                     discription_en="`Build` the docker image of the `inference server`. If the `build` is successful, a `docker-compose.yml` file is generated in the execution directory.",
                     choise=[
@@ -1541,7 +1547,7 @@ class Options:
                 discription_ja="Webモード",
                 discription_en="Web mode",
                 start=dict(
-                    type="str", default=None, required=False, multi=False, hide=False,
+                    type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_MEIGHT,
                     discription_ja="Webモードを起動します。",
                     discription_en="Start Web mode.",
                     choise=[
@@ -1554,13 +1560,16 @@ class Options:
                         dict(opt="listen_port", type="int", default="8081", required=False, multi=False, hide=False, choise=None,
                              discription_ja="省略した時は `8081` を使用します。",
                              discription_en="If omitted, `8081` is used."),
+                        dict(opt="client_only", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False],
+                             discription_ja="iinferサーバーへの接続を行わないようにします。",
+                             discription_en="Do not make connections to the iinfer server."),
                         dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False],
                              discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
                              discription_en="Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."),
                     ]
                 ),
                 stop=dict(
-                    type="str", default=None, required=False, multi=False, hide=False,
+                    type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_FALSE,
                     discription_ja="Webモードを停止します。",
                     discription_en="Stop Web mode.",
                     choise=[
@@ -1577,7 +1586,7 @@ class Options:
                 discription_ja="GUIモード",
                 discription_en="GUI mode",
                 start=dict(
-                    type="str", default=None, required=False, multi=False, hide=False,
+                    type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_MEIGHT,
                     discription_ja="GUIモードを起動します。",
                     discription_en="Start GUI mode.",
                     choise=[
