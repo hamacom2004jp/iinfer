@@ -115,7 +115,7 @@ fsapi.filer = (svpath, is_local) => {
     param = {method: 'POST', body: formData};
     opt = fsapi.get_server_opt();
     $.ajax({ // fetchだとxhr.upload.onprogressが使えないため、$.ajaxを使用
-      url: `/filer/upload?host=${encodeURI(opt['host'])}&port=${encodeURI(opt['port'])}&password=${encodeURI(opt['password'])}&svname=${encodeURI(opt['svname'])}&svpath=${encodeURI(svpath)}`,
+      url: `/filer/upload?host=${encodeURI(opt['host'])}&port=${encodeURI(opt['port'])}&password=${encodeURI(opt['password'])}&svname=${encodeURI(opt['svname'])}&svpath=${encodeURI(svpath)}&local_data=${encodeURI(opt['local_data'])}`,
       type: 'POST',
       processData: false,
       contentType: false,
@@ -142,7 +142,7 @@ fsapi.filer = (svpath, is_local) => {
     });
   }
   // ファイルダウンロード ==============================================================
-  const download = async (event) => {
+  const download = (event) => {
     show_loading();
     const opt = fsapi.get_server_opt();
     opt['mode'] = 'client';
@@ -202,9 +202,6 @@ fsapi.filer = (svpath, is_local) => {
     }
     event.preventDefault();
   });
-  fsapi.right.find('.filer_host').off('change').on('change', (event) => {load_server_list();});
-  fsapi.right.find('.filer_port').off('change').on('change', (event) => {load_server_list();});
-  fsapi.right.find('.filer_password').off('change').on('change', (event) => {load_server_list();});
 
   fsapi.left.find('.drop-area').off('dragover').on('dragover', (event) => {
     fsapi.left.find('.drop-area').addClass('dragover');
@@ -237,36 +234,12 @@ fsapi.filer = (svpath, is_local) => {
 }
 // 接続情報一覧を取得 ========================================================
 fsapi.get_server_opt = () => {
-  let filer_host = fsapi.right.find('.filer_host').val();
-  let filer_port = fsapi.right.find('.filer_port').val();
-  let filer_password = fsapi.right.find('.filer_password').val();
-  let filer_svname = fsapi.right.find('.filer_svname').val();
-  let filer_local_data = fsapi.right.find('.filer_local_data').val();
-  if (!filer_host) {
-    filer_host = localStorage.getItem('filer_host');
-    filer_host = filer_host ? filer_host : 'localhost';
-    fsapi.right.find('.filer_host').val(filer_host);
-  }
-  if (!filer_port) {
-    filer_port = localStorage.getItem('filer_port');
-    filer_port = filer_port ? filer_port : 6379;
-    fsapi.right.find('.filer_port').val(filer_port);
-  }
-  if (!filer_password) {
-    filer_password = localStorage.getItem('filer_password');
-    filer_password = filer_password ? filer_password : 'password';
-    fsapi.right.find('.filer_password').val(filer_password);
-  }
-  if (!filer_svname) {
-    filer_svname = localStorage.getItem('filer_svname');
-    filer_svname = filer_svname ? filer_svname : 'server';
-    fsapi.right.find('.filer_svname').val(filer_svname);
-  }
-  if (!filer_local_data) {
-    filer_local_data = localStorage.getItem('filer_local_data');
-    filer_local_data = filer_local_data ? filer_local_data : '';
-    fsapi.right.find('.filer_local_data').val(filer_local_data);
-  }
+  const filer_host = fsapi.right.find('.filer_host').val();
+  const filer_port = fsapi.right.find('.filer_port').val();
+  const filer_password = fsapi.right.find('.filer_password').val();
+  const filer_svname = fsapi.right.find('.filer_svname').val();
+  const filer_local_data = fsapi.right.find('.filer_local_data').val();
+
   return {"host":filer_host, "port":filer_port, "password":filer_password, "svname":filer_svname, "local_data": filer_local_data};
 }
 // サーバーリスト取得 ================================================================
@@ -280,43 +253,47 @@ fsapi.load_server_list = () => {
     fsapi.right.find('.filer_password').val(elem.attr('data-password'));
     fsapi.right.find('.filer_svname').val(elem.attr('data-svname'));
     fsapi.right.find('.filer_local_data').val(elem.attr('data-local_data'));
-    localStorage.setItem('filer_host', elem.attr('data-host'));
-    localStorage.setItem('filer_port', elem.attr('data-port'));
-    localStorage.setItem('filer_password', elem.attr('data-password'));
-    localStorage.setItem('filer_svname', elem.attr('data-svname'));
-    localStorage.setItem('filer_local_data', elem.attr('data-local_data'));
     fsapi.tree(fsapi.right, "/", fsapi.right.find('.tree-menu'), false);
   }};
-  const opt = fsapi.get_server_opt();
-  opt['mode'] = 'server';
-  opt['cmd'] = 'list';
-  opt["capture_stdout"] = true;
-  delete opt['svname'];
-  fsapi.sv_exec_cmd(opt).then(async res => {
-    if(!res[0] || !res[0]['success']) {
-      fsapi.message(res);
-      return;
-    }
-    if(res.length<=0 || !res[0]['success']) {
+  if (!fsapi.initargs['client_only']) {
+    const opt = fsapi.get_server_opt();
+    opt['mode'] = 'server';
+    opt['cmd'] = 'list';
+    opt["capture_stdout"] = true;
+    delete opt['svname'];
+    fsapi.sv_exec_cmd(opt).then(res => {
+      if(!res[0] || !res[0]['success']) {
+        fsapi.message(res);
+        return;
+      }
+      if(res.length<=0 || !res[0]['success']) {
+        hide_loading();
+        return;
+      }
+      res[0]['success'].forEach(elem => {
+        const a_elem = $(`<a class="dropdown-item" href="#" data-local_data="">${elem['svname']} ( ${opt['host']}:${opt['port']} )</a>`);
+        a_elem.attr('data-host', opt['host']);
+        a_elem.attr('data-port', opt['port']);
+        a_elem.attr('data-password', opt['password']);
+        a_elem.attr('data-svname', elem['svname']);
+        a_elem.off("click").on("click", mk_func(a_elem));
+        const li_elem = $('<li class="filer_svnames"></li>').append(a_elem);
+        fsapi.right.find('.filer_server').append(li_elem);
+      });
+      fsapi.right.find('.filer_server').find('.dropdown-item:first').click();
+    }).catch((e) => {
+      console.log(e);
+    }).finally(() => {
       hide_loading();
-      return;
-    }
-    res[0]['success'].forEach(elem => {
-      const a_elem = $(`<a class="dropdown-item" href="#" data-host="${opt['host']}" data-port="${opt['port']}" data-password="${opt['password']}" data-svname="${elem['svname']}" data-local_data="">${elem['svname']} ( ${opt['host']}:${opt['port']} )</a>`);
-      a_elem.off("click").on("click", mk_func(a_elem));
-      const li_elem = $('<li class="filer_svnames"></li>').append(a_elem);
-      fsapi.right.find('.filer_server').append(li_elem);
     });
-    fsapi.right.find('.filer_server').find('.dropdown-item:first').click();
-  }).catch((e) => {
-    console.log(e);
-  }).finally(() => {
-    hide_loading();
-  });
-  const cl = async () => {
-    const res = await fetch('/get_local_data')
-    const local_data = await res.text();
-    const a_elem = $(`<a class="dropdown-item" href="#" data-host="localhost" data-port="6379" data-password="password" data-svname="client" data-local_data="${local_data}">client</a>`);
+  }
+  const cl = () => {
+    const a_elem = $(`<a class="dropdown-item" href="#">client</a>`);
+    a_elem.attr('data-host', fsapi.initargs['host']);
+    a_elem.attr('data-port', fsapi.initargs['port']);
+    a_elem.attr('data-password', fsapi.initargs['password']);
+    a_elem.attr('data-svname', 'client');
+    a_elem.attr('data-local_data', fsapi.initargs['data']);
     a_elem.off("click").on("click", mk_func(a_elem));
     const li_elem = $('<li class="filer_svnames"></li>').append(a_elem);
     fsapi.right.find('.filer_server').append(li_elem);
@@ -561,7 +538,7 @@ fsapi.file_list = async (target_path, current_path, dh) => {
       if (target_path.indexOf(path)<0) {
         continue;
       }
-      let res = await fsapi.file_list(target_path, path, entry);
+      const res = await fsapi.file_list(target_path, path, entry);
       if (res && res[0] && res[0]['success']) {
         Object.keys(res[0]['success']).map((key) => {
           path_tree[key] = res[0]['success'][key];
@@ -623,19 +600,19 @@ fsapi.sv_exec_cmd = async (opt) => {
     body: JSON.stringify(opt)
   }).then(response => response.json());
 };
-fsapi.is_client_only = async () => {
-  const res = await fetch('/client_only', {method: 'GET'});
-  const text = await res.text()
-  if (text == "true") {
-    return true;
-  }
-  return false;
-}
 fsapi.message = (res) => {
   msg = JSON.stringify(res)
   alert(msg.replace(/\\n/g, '\n'));
   hide_loading();
 }
 $(()=>{
-  fsapi.filer("/", false);
+  fetch('/get_server_opt', {method: 'GET'}).then(res => res.json()).then(opt => {
+    fsapi.initargs = opt;
+    fsapi.right.find('.filer_host').val(fsapi.initargs['host']);
+    fsapi.right.find('.filer_port').val(fsapi.initargs['port']);
+    fsapi.right.find('.filer_password').val(fsapi.initargs['password']);
+    fsapi.right.find('.filer_svname').val(fsapi.initargs['svname']);
+    fsapi.right.find('.filer_local_data').val(fsapi.initargs['data']);
+    fsapi.filer("/", false);
+  });
 })

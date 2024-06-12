@@ -69,28 +69,12 @@
                     <!-- サーバー側アドレスバー -->
                     <div class="input-group p-1" style="top:0%;">
                         <button class="btn btn-outline-secondary dropdown-toggle filer_server_bot" type="button" data-bs-toggle="dropdown" aria-expanded="false">Server</button>'
-                        <ul class="dropdown-menu filer_server"><li class="mb-3 p-3">
-                            <div class="col-12">
-                                <div class="input-group">
-                                    <label class="input-group-text text-decoration-underline"><span class="text-danger">*</span>host</label>
-                                    <input name="filer_host" type="text" class="form-control filer_host" param_data_type="str" param_data_multi="false" required>
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <div class="input-group">
-                                    <label class="input-group-text text-decoration-underline"><span class="text-danger">*</span>port</label>
-                                    <input name="filer_port" type="text" class="form-control filer_port" param_data_type="int" param_data_multi="false" required>
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <div class="input-group">
-                                    <label class="input-group-text text-decoration-underline"><span class="text-danger">*</span>password</label>
-                                    <input name="filer_password" type="text" class="form-control filer_password" param_data_type="str" param_data_multi="false" required>
-                                    <input name="filer_svname" type="hidden" class="filer_svname">
-                                    <input name="filer_local_data" type="hidden" class="filer_local_data">
-                                </div>
-                            </div>
-                        </li><li><hr class="dropdown-divider"></li></ul>
+                        <input name="filer_host" type="hidden" class="filer_host">
+                        <input name="filer_port" type="hidden" class="filer_port">
+                        <input name="filer_password" type="hidden" class="filer_password">
+                        <input name="filer_svname" type="hidden" class="filer_svname">
+                        <input name="filer_local_data" type="hidden" class="filer_local_data">
+                        <ul class="dropdown-menu filer_server"></ul>
                         <input type="text" class="form-control filer_address" aria-describedby="button-addon2">
                         <button class="btn btn-outline-secondary filer_address_bot" type="button" id="button-addon2">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right-circle" viewBox="0 0 16 16">

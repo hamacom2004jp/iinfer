@@ -639,8 +639,8 @@ class Client(object):
             return {"error": f"input_file {upload_file} is directory."}
         with open(upload_file, "rb") as f:
             if local_data is not None:
-                f = filer.Filer(local_data, self.logger)
-                _, res_json = f.file_upload(svpath, upload_file.name, f.read())
+                fi = filer.Filer(local_data, self.logger)
+                _, res_json = fi.file_upload(svpath, upload_file.name, f.read())
                 return res_json
             res_json = self._proc(self.svname, 'file_upload',
                                   [convert.str2b64str(str(svpath)),

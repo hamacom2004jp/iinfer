@@ -22,13 +22,31 @@ import tempfile
 
 
 class Web(options.Options):
-    def __init__(self, logger:logging.Logger, data:Path, client_only:bool=False):
+    def __init__(self, logger:logging.Logger, data:Path, redis_host:str = "localhost", redis_port:int = 6379, redis_password:str = None, svname:str = 'server', client_only:bool=False):
+        """
+        iinferクライアント側のwebapiサービス
+
+        Args:
+            logger (logging): ロガー
+            data (Path): コマンドやパイプラインの設定ファイルを保存するディレクトリ
+            redis_host (str, optional): Redisサーバーのホスト名. Defaults to "localhost".
+            redis_port (int, optional): Redisサーバーのポート番号. Defaults to 6379.
+            redis_password (str, optional): Redisサーバーのパスワード. Defaults to None.
+            svname (str, optional): 推論サーバーのサービス名. Defaults to 'server'.
+            client_only (bool, optional): クライアントのみのサービスかどうか. Defaults to False.
+        """
         super().__init__()
         self.logger = logger
         self.data = data
         self.container = dict()
         self.output_size_th = 1024*1024*5
+        self.redis_host = redis_host
+        self.redis_port = redis_port
+        self.redis_password = redis_password
+        self.svname = svname
         self.client_only = client_only
+        if self.client_only:
+            self.svname = 'client'
         common.mkdirs(self.data)
 
     def mk_curl_fileup(self, cmd_opt):
@@ -122,29 +140,30 @@ class Web(options.Options):
             pass
 
     def chk_client_only(self, opt):
+        if not self.client_only:
+            return False, None
         use_redis = self.get_cmd_attr(opt['mode'], opt['cmd'], "use_redis")
-        def _chk(opt, opt_name, jadge_func):
-            for c in self.get_cmd_attr(opt['mode'], opt['cmd'], "choise"):
-                if c['opt'] == opt_name and jadge_func(opt, opt_name):
-                    return True
-            return False
-        if use_redis == self.USE_REDIS_TRUE or _chk(opt, 'local_data', lambda opt, opt_name: opt_name in opt and opt[opt_name] is None):
-            output = dict(warn=f'Commands that require a connection to the iinfer server are not available.'
-                            +f' (mode={opt["mode"]}, cmd={opt["cmd"]}) '
-                            +f'The cause is that the client_only option is specified when starting web mode.')
+        if use_redis == self.USE_REDIS_FALSE:
+            return False, None
+        output = dict(warn=f'Commands that require a connection to the iinfer server are not available.'
+                        +f' (mode={opt["mode"]}, cmd={opt["cmd"]}) '
+                        +f'The cause is that the client_only option is specified when starting web mode.')
+        if use_redis == self.USE_REDIS_TRUE:
             return True, output
+        for c in self.get_cmd_attr(opt['mode'], opt['cmd'], "choise"):
+            if c['opt'] == 'local_data' and 'local_data' in opt and opt['local_data'] is None:
+                return True, output
         return False, None
 
     def exec_cmd(self, title, opt, nothread=False):
         self.container['iinfer_app'] = app.IinferApp()
         def _exec_cmd(iinfer_app:app.IinferApp, title, opt, nothread=False):
             self.logger.info(f"exec_cmd: title={title}, opt={opt}")
-            if self.client_only:
-                ret, output = self.chk_client_only(opt)
-                if ret:
-                    if nothread: return output
-                    self.callback_return_pipe_exec_func(title, output)
-                    return
+            ret, output = self.chk_client_only(opt)
+            if ret:
+                if nothread: return output
+                self.callback_return_pipe_exec_func(title, output)
+                return
 
             opt_list, file_dict = self.mk_opt_list(opt)
             old_stdout = sys.stdout
@@ -455,7 +474,8 @@ class Web(options.Options):
         q = request.query
         svpath = q['svpath']
         opt = dict(mode='client', cmd='file_upload',
-                    host=q['host'], port=q['port'], password=q['password'], svname=q['svname'])
+                   host=q['host'], port=q['port'], password=q['password'], svname=q['svname'],
+                   local_data=q['local_data'])
         for file in request.files.getall('files'):
             with tempfile.TemporaryDirectory() as tmpdir:
                 raw_filename = file.raw_filename.replace('\\','/').replace('//','/')
@@ -486,10 +506,6 @@ class Web(options.Options):
         self.logger.info(f"Start bottle web. allow_host={self.allow_host} listen_port={self.listen_port}")
         app = bottle.Bottle()
         bottle.debug(True)
-
-        @app.route('/get_local_data')
-        def get_local_data():
-            return str(self.data)
 
         @app.route('/bbforce_cmd')
         def bbforce_cmd():
@@ -576,9 +592,12 @@ class Web(options.Options):
             bottle.response.content_type = 'application/json'
             return json.dumps(self.versions_iinfer())
 
-        @app.route('/client_only')
-        def client_only():
-            return str(self.client_only)
+        @app.route('/get_server_opt')
+        def get_server_opt():
+            opt = dict(host=self.redis_host, port=self.redis_port, password=self.redis_password, svname=self.svname,
+                       data=str(self.data), client_only=self.client_only)
+            bottle.response.content_type = 'application/json'
+            return json.dumps(opt)
 
         @app.route('/versions_used')
         def versions_used():
