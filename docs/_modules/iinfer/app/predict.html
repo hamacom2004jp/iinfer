@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>iinfer.app.predict &mdash; iinfer 2024/06/10 documentation</title>
+  <title>iinfer.app.predict &mdash; iinfer 2024/06/12 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -15,7 +15,7 @@
   
         <script src="../../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=0e783793"></script>
+        <script src="../../../_static/documentation_options.js?v=9df839e0"></script>
         <script src="../../../_static/doctools.js?v=9a2dae69"></script>
         <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -202,7 +202,7 @@
 
 <div class="viewcode-block" id="OnnxPredict.is_gpu_available">
 <a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.predict.OnnxPredict.is_gpu_available">[docs]</a>
-    <span class="k">def</span> <span class="nf">is_gpu_available</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_path</span><span class="p">:</span><span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="o">|</span><span class="n">Any</span><span class="p">],</span> <span class="n">model_conf_path</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="n">gpu_id</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">is_gpu_available</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_path</span><span class="p">:</span><span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span><span class="n">Any</span><span class="p">],</span> <span class="n">model_conf_path</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="n">gpu_id</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        GPUが利用可能かどうかを返す関数です。</span>
 <span class="sd">        戻り値がTrueの場合、GPUが利用可能です。</span>
@@ -241,7 +241,7 @@
 
 <div class="viewcode-block" id="TorchPredict.is_gpu_available">
 <a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.predict.TorchPredict.is_gpu_available">[docs]</a>
-    <span class="k">def</span> <span class="nf">is_gpu_available</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_path</span><span class="p">:</span><span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="o">|</span><span class="n">Any</span><span class="p">],</span> <span class="n">model_conf_path</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="n">gpu_id</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">is_gpu_available</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_path</span><span class="p">:</span><span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span><span class="n">Any</span><span class="p">],</span> <span class="n">model_conf_path</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="n">gpu_id</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        GPUが利用可能かどうかを返す関数です。</span>
 <span class="sd">        戻り値がTrueの場合、GPUが利用可能です。</span>

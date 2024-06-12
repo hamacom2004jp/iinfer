@@ -14,9 +14,14 @@ Webサービス起動 : `iinfer -m web -c start <Option>`
     :header-rows: 1
 
     "Option","Required","Description"
+    "--host <IPアドレス又はホスト名>","","Redisサーバーのサービスホストを指定します"
+    "--port <ポート番号>","","Redisサーバーのサービスポートを指定します"
+    "--password <パスワード>","","Redisサーバーのアクセスパスワード(任意)を指定します。省略時は `password` を使用します"
+    "--svname <推論サービス名>","","推論サーバーのサービス名を指定します。省略時は `server` を使用します"
     "--data <データフォルダ>","","省略した時は `$HONE/.iinfer` を使用します。"
     "--allow_host <接続許可するIP>","","省略した時は `0.0.0.0` を使用します。"
     "--listen_port <サービスポート>","","省略した時は `8081` を使用します。"
+    "--client_only","","iinferサーバーへの接続を行わないようにします。"
 
 
 Webサービス停止 : `iinfer -m web -c stop <Option>`

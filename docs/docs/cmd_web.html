@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>コマンドリファレンス（webモード） &mdash; iinfer 2024/06/10 documentation</title>
+  <title>コマンドリファレンス（webモード） &mdash; iinfer 2024/06/12 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -16,7 +16,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=0e783793"></script>
+        <script src="../_static/documentation_options.js?v=9df839e0"></script>
         <script src="../_static/doctools.js?v=9a2dae69"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -124,6 +124,22 @@
 </tr>
 </thead>
 <tbody>
+<tr class="row-even"><td><p>--host &lt;IPアドレス又はホスト名&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーのサービスホストを指定します</p></td>
+</tr>
+<tr class="row-odd"><td><p>--port &lt;ポート番号&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーのサービスポートを指定します</p></td>
+</tr>
+<tr class="row-even"><td><p>--password &lt;パスワード&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーのアクセスパスワード(任意)を指定します。省略時は <cite>password</cite> を使用します</p></td>
+</tr>
+<tr class="row-odd"><td><p>--svname &lt;推論サービス名&gt;</p></td>
+<td></td>
+<td><p>推論サーバーのサービス名を指定します。省略時は <cite>server</cite> を使用します</p></td>
+</tr>
 <tr class="row-even"><td><p>--data &lt;データフォルダ&gt;</p></td>
 <td></td>
 <td><p>省略した時は <cite>$HONE/.iinfer</cite> を使用します。</p></td>
@@ -135,6 +151,10 @@
 <tr class="row-even"><td><p>--listen_port &lt;サービスポート&gt;</p></td>
 <td></td>
 <td><p>省略した時は <cite>8081</cite> を使用します。</p></td>
+</tr>
+<tr class="row-odd"><td><p>--client_only</p></td>
+<td></td>
+<td><p>iinferサーバーへの接続を行わないようにします。</p></td>
 </tr>
 </tbody>
 </table>

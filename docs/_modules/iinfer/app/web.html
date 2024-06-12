@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>iinfer.app.web &mdash; iinfer 2024/06/10 documentation</title>
+  <title>iinfer.app.web &mdash; iinfer 2024/06/12 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -15,7 +15,7 @@
   
         <script src="../../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=0e783793"></script>
+        <script src="../../../_static/documentation_options.js?v=9df839e0"></script>
         <script src="../../../_static/doctools.js?v=9a2dae69"></script>
         <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -113,12 +113,31 @@
 <div class="viewcode-block" id="Web">
 <a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web">[docs]</a>
 <span class="k">class</span> <span class="nc">Web</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">Options</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span><span class="n">Path</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="n">redis_host</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;localhost&quot;</span><span class="p">,</span> <span class="n">redis_port</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="mi">6379</span><span class="p">,</span> <span class="n">redis_password</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">svname</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;server&#39;</span><span class="p">,</span> <span class="n">client_only</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        iinferクライアント側のwebapiサービス</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            logger (logging): ロガー</span>
+<span class="sd">            data (Path): コマンドやパイプラインの設定ファイルを保存するディレクトリ</span>
+<span class="sd">            redis_host (str, optional): Redisサーバーのホスト名. Defaults to &quot;localhost&quot;.</span>
+<span class="sd">            redis_port (int, optional): Redisサーバーのポート番号. Defaults to 6379.</span>
+<span class="sd">            redis_password (str, optional): Redisサーバーのパスワード. Defaults to None.</span>
+<span class="sd">            svname (str, optional): 推論サーバーのサービス名. Defaults to &#39;server&#39;.</span>
+<span class="sd">            client_only (bool, optional): クライアントのみのサービスかどうか. Defaults to False.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logger</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">container</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">output_size_th</span> <span class="o">=</span> <span class="mi">1024</span><span class="o">*</span><span class="mi">1024</span><span class="o">*</span><span class="mi">5</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redis_host</span> <span class="o">=</span> <span class="n">redis_host</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redis_port</span> <span class="o">=</span> <span class="n">redis_port</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redis_password</span> <span class="o">=</span> <span class="n">redis_password</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">svname</span> <span class="o">=</span> <span class="n">svname</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client_only</span> <span class="o">=</span> <span class="n">client_only</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">client_only</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">svname</span> <span class="o">=</span> <span class="s1">&#39;client&#39;</span>
         <span class="n">common</span><span class="o">.</span><span class="n">mkdirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Web.mk_curl_fileup">
@@ -232,12 +251,37 @@
             <span class="k">pass</span></div>
 
 
+<div class="viewcode-block" id="Web.chk_client_only">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.chk_client_only">[docs]</a>
+    <span class="k">def</span> <span class="nf">chk_client_only</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">opt</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">client_only</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="n">use_redis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cmd_attr</span><span class="p">(</span><span class="n">opt</span><span class="p">[</span><span class="s1">&#39;mode&#39;</span><span class="p">],</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;cmd&#39;</span><span class="p">],</span> <span class="s2">&quot;use_redis&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">use_redis</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">USE_REDIS_FALSE</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;Commands that require a connection to the iinfer server are not available.&#39;</span>
+                        <span class="o">+</span><span class="sa">f</span><span class="s1">&#39; (mode=</span><span class="si">{</span><span class="n">opt</span><span class="p">[</span><span class="s2">&quot;mode&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">, cmd=</span><span class="si">{</span><span class="n">opt</span><span class="p">[</span><span class="s2">&quot;cmd&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">) &#39;</span>
+                        <span class="o">+</span><span class="sa">f</span><span class="s1">&#39;The cause is that the client_only option is specified when starting web mode.&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">use_redis</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">USE_REDIS_TRUE</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="n">output</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cmd_attr</span><span class="p">(</span><span class="n">opt</span><span class="p">[</span><span class="s1">&#39;mode&#39;</span><span class="p">],</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;cmd&#39;</span><span class="p">],</span> <span class="s2">&quot;choise&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">c</span><span class="p">[</span><span class="s1">&#39;opt&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;local_data&#39;</span> <span class="ow">and</span> <span class="s1">&#39;local_data&#39;</span> <span class="ow">in</span> <span class="n">opt</span> <span class="ow">and</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;local_data&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="n">output</span>
+        <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">None</span></div>
+
+
 <div class="viewcode-block" id="Web.exec_cmd">
 <a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.exec_cmd">[docs]</a>
     <span class="k">def</span> <span class="nf">exec_cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">nothread</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="p">[</span><span class="s1">&#39;iinfer_app&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">IinferApp</span><span class="p">()</span>
         <span class="k">def</span> <span class="nf">_exec_cmd</span><span class="p">(</span><span class="n">iinfer_app</span><span class="p">:</span><span class="n">app</span><span class="o">.</span><span class="n">IinferApp</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">nothread</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;exec_cmd: title=</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2">, opt=</span><span class="si">{</span><span class="n">opt</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">ret</span><span class="p">,</span> <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chk_client_only</span><span class="p">(</span><span class="n">opt</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">ret</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">nothread</span><span class="p">:</span> <span class="k">return</span> <span class="n">output</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">callback_return_pipe_exec_func</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">output</span><span class="p">)</span>
+                <span class="k">return</span>
+
             <span class="n">opt_list</span><span class="p">,</span> <span class="n">file_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mk_opt_list</span><span class="p">(</span><span class="n">opt</span><span class="p">)</span>
             <span class="n">old_stdout</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span>
 
@@ -601,7 +645,8 @@
         <span class="n">q</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">query</span>
         <span class="n">svpath</span> <span class="o">=</span> <span class="n">q</span><span class="p">[</span><span class="s1">&#39;svpath&#39;</span><span class="p">]</span>
         <span class="n">opt</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;client&#39;</span><span class="p">,</span> <span class="n">cmd</span><span class="o">=</span><span class="s1">&#39;file_upload&#39;</span><span class="p">,</span>
-                    <span class="n">host</span><span class="o">=</span><span class="n">q</span><span class="p">[</span><span class="s1">&#39;host&#39;</span><span class="p">],</span> <span class="n">port</span><span class="o">=</span><span class="n">q</span><span class="p">[</span><span class="s1">&#39;port&#39;</span><span class="p">],</span> <span class="n">password</span><span class="o">=</span><span class="n">q</span><span class="p">[</span><span class="s1">&#39;password&#39;</span><span class="p">],</span> <span class="n">svname</span><span class="o">=</span><span class="n">q</span><span class="p">[</span><span class="s1">&#39;svname&#39;</span><span class="p">])</span>
+                   <span class="n">host</span><span class="o">=</span><span class="n">q</span><span class="p">[</span><span class="s1">&#39;host&#39;</span><span class="p">],</span> <span class="n">port</span><span class="o">=</span><span class="n">q</span><span class="p">[</span><span class="s1">&#39;port&#39;</span><span class="p">],</span> <span class="n">password</span><span class="o">=</span><span class="n">q</span><span class="p">[</span><span class="s1">&#39;password&#39;</span><span class="p">],</span> <span class="n">svname</span><span class="o">=</span><span class="n">q</span><span class="p">[</span><span class="s1">&#39;svname&#39;</span><span class="p">],</span>
+                   <span class="n">local_data</span><span class="o">=</span><span class="n">q</span><span class="p">[</span><span class="s1">&#39;local_data&#39;</span><span class="p">])</span>
         <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">files</span><span class="o">.</span><span class="n">getall</span><span class="p">(</span><span class="s1">&#39;files&#39;</span><span class="p">):</span>
             <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmpdir</span><span class="p">:</span>
                 <span class="n">raw_filename</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">raw_filename</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">,</span><span class="s1">&#39;/&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;//&#39;</span><span class="p">,</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
@@ -638,10 +683,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Start bottle web. allow_host=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">allow_host</span><span class="si">}</span><span class="s2"> listen_port=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">listen_port</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">app</span> <span class="o">=</span> <span class="n">bottle</span><span class="o">.</span><span class="n">Bottle</span><span class="p">()</span>
         <span class="n">bottle</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
-
-        <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/get_local_data&#39;</span><span class="p">)</span>
-        <span class="k">def</span> <span class="nf">get_local_data</span><span class="p">():</span>
-            <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
 
         <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/bbforce_cmd&#39;</span><span class="p">)</span>
         <span class="k">def</span> <span class="nf">bbforce_cmd</span><span class="p">():</span>
@@ -727,6 +768,13 @@
         <span class="k">def</span> <span class="nf">versions_iinfer</span><span class="p">():</span>
             <span class="n">bottle</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">content_type</span> <span class="o">=</span> <span class="s1">&#39;application/json&#39;</span>
             <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">versions_iinfer</span><span class="p">())</span>
+
+        <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/get_server_opt&#39;</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">get_server_opt</span><span class="p">():</span>
+            <span class="n">opt</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">redis_host</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">redis_port</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">redis_password</span><span class="p">,</span> <span class="n">svname</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">svname</span><span class="p">,</span>
+                       <span class="n">data</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">),</span> <span class="n">client_only</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">client_only</span><span class="p">)</span>
+            <span class="n">bottle</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">content_type</span> <span class="o">=</span> <span class="s1">&#39;application/json&#39;</span>
+            <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">opt</span><span class="p">)</span>
 
         <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/versions_used&#39;</span><span class="p">)</span>
         <span class="k">def</span> <span class="nf">versions_used</span><span class="p">():</span>
