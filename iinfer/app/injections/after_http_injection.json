@@ -1,6 +1,7 @@
 {
-    "outputs_url": "https://httpbin.org/post",
-    "output_image_url": "https://httpbin.org/post",
+    "outputs_url": "http://localhost:8081/showimg/pub_img",
+    "output_image_url": "http://localhost:8081/showimg/pub_img",
     "output_image_ext": "jpeg",
-    "output_image_prefix": "output_"
+    "output_image_prefix": "output_",
+    "json_without_img": true
 }

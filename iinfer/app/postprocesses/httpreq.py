@@ -10,16 +10,18 @@ import urllib3
 urllib3.disable_warnings(InsecureRequestWarning)
 
 class Httpreq(postprocess.Postprocess):
-    def __init__(self, logger:logging.Logger, fileup_name:str='file'):
+    def __init__(self, logger:logging.Logger, fileup_name:str='file', json_without_img:bool=False):
         """
         HTTP Requestを行う後処理クラスです。
         
         Args:
             logger (logging.Logger): ロガー
+            fileup_name (str, optional): ファイルアップロード名。デフォルトは'file'。
+            json_without_img (bool, optional): JSONに画像を含めない場合はTrue。デフォルトはFalse。
         """
-        super().__init__(logger)
+        super().__init__(logger, json_without_img)
         self.fileup_name = fileup_name
-        self.config = dict(fileup_name=fileup_name)
+        self.config = dict(fileup_name=fileup_name, json_without_img=json_without_img)
         self.injection = after_http_injection.AfterHttpInjection(self.config, self.logger)
 
     def create_session(self, json_connectstr:str, img_connectstr:str, text_connectstr:str):

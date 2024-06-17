@@ -3,6 +3,7 @@ from iinfer.app import app, common, options
 from iinfer.app.commons import convert
 from pathlib import Path
 import bottle
+import bottle_websocket
 import datetime
 import glob
 import gevent
@@ -11,15 +12,17 @@ import iinfer
 import io
 import json
 import logging
+import numpy as np
 import os
 import re
+import queue
 import signal
 import subprocess
 import sys
 import threading
 import traceback
 import tempfile
-
+import time
 
 class Web(options.Options):
     def __init__(self, logger:logging.Logger, data:Path, redis_host:str = "localhost", redis_port:int = 6379, redis_password:str = None, svname:str = 'server', client_only:bool=False):
@@ -48,6 +51,7 @@ class Web(options.Options):
         if self.client_only:
             self.svname = 'client'
         common.mkdirs(self.data)
+        self.img_queue = queue.Queue(1000)
 
     def mk_curl_fileup(self, cmd_opt):
         if 'mode' not in cmd_opt or 'cmd' not in cmd_opt:
@@ -177,6 +181,7 @@ class Web(options.Options):
                 sys.stdout = captured_output = io.StringIO()
             try:
                 iinfer_app.main(args_list=opt_list, file_dict=file_dict)
+                self.logger.disabled = False # ログ出力を有効にする
                 if 'capture_stdout' in opt and opt['capture_stdout']:
                     output = captured_output.getvalue().strip()
                     output_size = len(output)
@@ -194,6 +199,8 @@ class Web(options.Options):
                 else:
                     output = [dict(warn='capture_stdout is off.')]
             except Exception as e:
+                self.logger.disabled = False # ログ出力を有効にする
+                self.logger.info(f'exec_cmd error. {traceback.format_exc()}')
                 output = [dict(warn=f'<pre>{html.escape(traceback.format_exc())}</pre>')]
             sys.stdout = old_stdout
             if 'stdout_log' in opt and opt['stdout_log']:
@@ -214,6 +221,7 @@ class Web(options.Options):
                     return ret
                 self.callback_return_cmd_exec_func(title, ret)
             except:
+                self.logger.warning(f'exec_cmd error.', exec_info=True)
                 if nothread:
                     return output
                 self.callback_return_cmd_exec_func(title, output)
@@ -579,6 +587,58 @@ class Web(options.Options):
         def filer_upload():
             return self.filer_upload(bottle.request)
 
+        @app.route('/showimg')
+        def showimg():
+            return bottle.static_file('showimg.html', root=static_root)
+
+        @app.route('/showimg/pub_img', method='POST')
+        def pub_img():
+            try:
+                tm = time.time()
+                self.logger.info(f'pub_img: start={tm}')
+                if bottle.request.content_type.startswith('multipart/form-data'):
+                    for fn in bottle.request.files.keys():
+                        filename = bottle.request.files[fn].filename
+                        self.img_queue.put((filename, bottle.request.files[fn].file.read()))
+                else:
+                    outputs = json.load(bottle.request.body)
+                    self.img_queue.put(outputs)
+                ret = self.to_str(dict(success='Added to queue.'))
+                self.logger.info(f'pub_img: {time.time()-tm}')
+                return ret
+            except:
+                self.logger.warning('pub_img error', exc_info=True)
+                return self.to_str(dict(warn=f'pub_img error. {traceback.format_exc()}'))
+
+        @app.route('/showimg/sub_img')
+        def sub_img():
+            wsock = bottle.request.environ.get('wsgi.websocket') # type: ignore
+            if not wsock:
+                bottle.abort(400, 'Expected WebSocket request.')
+            while True:
+                try:
+                    outputs = self.img_queue.get(block=True, timeout=0.1)
+                    if type(outputs) == tuple:
+                        fn = outputs[0]
+                        jpg_url = f"data:image/jpeg;base64,{convert.bytes2b64str(outputs[1])}"
+                        outputs = dict(output_image_name=fn)
+                        outputs['img_url'] = jpg_url
+                    elif 'output_image_shape' in outputs:
+                        img_npy = convert.b64str2npy(outputs["output_image"], outputs["output_image_shape"])
+                        jpg = convert.img2byte(convert.npy2img(img_npy), format='jpeg')
+                        jpg_url = f"data:image/jpeg;base64,{convert.bytes2b64str(jpg)}"
+                        del outputs["output_image"]
+                        del outputs["output_image_shape"]
+                        outputs['img_url'] = jpg_url
+                    wsock.send(json.dumps(outputs, default=common.default_json_enc))
+                except queue.Empty:
+                    pass
+                except:
+                    self.logger.warning('websocket error', exc_info=True)
+                    gevent.sleep(10)
+                finally:
+                    gevent.sleep(0.1)
+
         @app.route('/assets/<filename:path>')
         def assets(filename):
             return bottle.static_file(filename, root=static_root / 'assets')
@@ -608,7 +668,7 @@ class Web(options.Options):
             pid = os.getpid()
             f.write(str(pid))
             self.is_running = True
-            server = _WSGIRefServer(host=self.allow_host, port=self.listen_port)
+            server = _WSGIServer(host=self.allow_host, port=self.listen_port)
             th = threading.Thread(target=bottle.run, kwargs=dict(app=app, server=server))
             th.start()
             while self.is_running:
@@ -623,13 +683,31 @@ class Web(options.Options):
             self.logger.info(f"Stop bottle web. allow_host={self.allow_host} listen_port={self.listen_port}")
         Path("iinfer_web.pid").unlink(missing_ok=True)
 
-class _WSGIRefServer(bottle.WSGIRefServer):
+class _WSGIServer(bottle_websocket.GeventWebSocketServer):
+#class _WSGIServer(bottle.WSGIRefServer):
     """
     runメソッドでWSGIRefServerを起動する際に、make_serverの戻り値をインスタンス変数にするためのクラス
     """
     def __init__(self, host='127.0.0.1', port=8080, **options):
         super().__init__(host, port, **options)
 
+    def run(self, handler):
+        import logging
+        from gevent import pywsgi
+        from geventwebsocket.handler import WebSocketHandler
+        from geventwebsocket.logging import create_logger
+
+        # self.srvに代入することで、shutdownを実行できるようにする
+        self.srv = pywsgi.WSGIServer((self.host, self.port), handler, handler_class=WebSocketHandler)
+
+        if not self.quiet:
+            self.srv.logger = create_logger('geventwebsocket.logging')
+            self.srv.logger.setLevel(logging.INFO)
+            self.srv.logger.addHandler(logging.StreamHandler())
+
+        self.srv.serve_forever()
+
+    """
     def run(self, app): # pragma: no cover
         from wsgiref.simple_server import WSGIRequestHandler, WSGIServer
         from wsgiref.simple_server import make_server
@@ -653,3 +731,4 @@ class _WSGIRefServer(bottle.WSGIRefServer):
         self.srv = make_server(self.host, self.port, app, server_cls, handler_cls)
         self.srv.serve_forever()
         self.srv.server_close()
+    """

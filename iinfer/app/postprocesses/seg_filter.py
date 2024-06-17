@@ -7,7 +7,8 @@ import cv2
 import logging
 
 class SegFilter(postprocess.Postprocess):
-    def __init__(self, logger:logging.Logger, logits_th:float=-100.0, classes:List[int]=None, labels:List[str]=None, nodraw:bool=False, del_logits:bool=True):
+    def __init__(self, logger:logging.Logger, logits_th:float=-100.0, classes:List[int]=None, labels:List[str]=None, nodraw:bool=False, del_logits:bool=True,
+                 json_without_img:bool=False):
         """
         Segmentationの推論結果をフィルタリングする後処理クラスです。
         閾値に満たない推論結果を除外します。
@@ -19,8 +20,9 @@ class SegFilter(postprocess.Postprocess):
             labels (List[str]): ラベルのリスト
             nodraw (bool): 描画しない
             del_logits (bool): スコア要素を削除する
+            json_without_img (bool): JSONに画像を含めない場合はTrue。デフォルトはFalse。
         """
-        super().__init__(logger)
+        super().__init__(logger, json_without_img)
         self.config = dict(logits_th=logits_th, classes=classes, labels=labels, nodraw=nodraw, del_logits=del_logits)
         self.injection = after_seg_filter_injection.AfterSegFilterInjection(self.config, self.logger)
 

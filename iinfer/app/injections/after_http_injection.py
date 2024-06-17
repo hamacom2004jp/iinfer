@@ -5,6 +5,7 @@ from typing import Tuple, Dict, Any
 import datetime
 import io
 import requests
+import time
 
 class AfterHttpInjection(injection.AfterInjection):
 
@@ -32,12 +33,18 @@ class AfterHttpInjection(injection.AfterInjection):
         Returns:
             Tuple[Dict[str, Any], Image.Image]: 後処理後の推論結果と画像データのタプル
         """
+        #import http
+        #http.client.HTTPConnection.debuglevel=1
         req_session = requests.Session()
         try:
             url = self.get_config('outputs_url', None)
             if url is None:
                 self.add_warning(outputs, "No outputs_url in config")
             else:
+                json_without_img = self.get_config('json_without_img', False)
+                if json_without_img:
+                    del outputs['output_image']
+                    del outputs['output_image_shape']
                 result = self.post_json(url, req_session, outputs)
                 self.add_success(outputs, result)
         except Exception as e:
@@ -48,7 +55,7 @@ class AfterHttpInjection(injection.AfterInjection):
             if url is None:
                 self.add_warning(outputs, "No output_image_url in config")
             else:
-                result = self.post_img(req_session, outputs, output_image)
+                result = self.post_img(url, req_session, outputs, output_image)
                 self.add_success(outputs, result)
         except Exception as e:
             self.add_warning(outputs, str(e))
@@ -56,7 +63,7 @@ class AfterHttpInjection(injection.AfterInjection):
         return outputs, output_image
 
     def post_text(self, url, req_session:requests.Session, res_str:str):
-        res = req_session.post(url, data=res_str, verify=False)
+        res = req_session.post(url, data=res_str, verify=False, timeout=30)
         if res.status_code != 200:
             raise Exception(f"HTTP POST request failed. status_code={res.status_code} res.reason={res.reason} res.text={res.text} url={url}")
         try:
@@ -66,7 +73,10 @@ class AfterHttpInjection(injection.AfterInjection):
         return result
 
     def post_json(self, url, req_session:requests.Session, outputs:Dict[str, Any]):
-        res = req_session.post(url, json=outputs, verify=False)
+        tm = time.time()
+        self.logger.info(f'post_json start: {tm}')
+        res = req_session.post(url, json=outputs, verify=False, timeout=30)
+        self.logger.info(f'post_json end: {time.time()-tm}')
         if res.status_code != 200:
             raise Exception(f"HTTP POST request failed. status_code={res.status_code} res.reason={res.reason} res.text={res.text} url={url}")
         try:
@@ -86,7 +96,7 @@ class AfterHttpInjection(injection.AfterInjection):
         img_bytes = convert.img2byte(output_image, format=ext)
         file = {'file': (finename, io.BytesIO(img_bytes))}
 
-        res = req_session.post(url, files=file, verify=False)
+        res = req_session.post(url, files=file, verify=False, timeout=30)
         if res.status_code != 200:
             raise Exception(f"HTTP POST request failed. status_code={res.status_code} res.reason={res.reason} res.text={res.text} url={url}")
         try:

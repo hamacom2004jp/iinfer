@@ -379,7 +379,7 @@ class Server(filer.Filer):
         common.mkdirs(deploy_dir)
         def _save_s(file:str, data:bytes, ret_fn:bool=False):
             if file is None or data is None:
-                return False, file if ret_fn else None
+                return False, None
             file = deploy_dir / file
             with open(file, "wb") as f:
                 f.write(data)
@@ -399,8 +399,8 @@ class Server(filer.Filer):
             else:
                 ret, model_file = _save_s(model_file, model_bin, ret_fn=True)
 
-        ret, before_injection_conf = _save_s("before_injection_conf.json", before_injection_conf)
-        ret, after_injection_conf = _save_s("after_injection_conf.json", after_injection_conf)
+        ret, before_injection_conf = _save_s("before_injection_conf.json", before_injection_conf, ret_fn=True)
+        ret, after_injection_conf = _save_s("after_injection_conf.json", after_injection_conf, ret_fn=True)
 
         def _save_m(name:str, files:List[str], datas:List[bytes]):
             if files is not None and datas is None:
@@ -791,14 +791,14 @@ class Server(filer.Filer):
 
             if output_image is not None:
                 output = dict(success=outputs, output_image_name=output_image_name)
+                output_image_npy = convert.img2npy(output_image)
+                output_image_b64 = convert.npy2b64str(output_image_npy)
+                output['output_image'] = output_image_b64
+                output['output_image_shape'] = output_image_npy.shape
+                predict_process_end = time.perf_counter()
                 # 後処理を実行
                 output, output_image = _after_injection(reskey, name, output, output_image, session)
                 after_injections_end = time.perf_counter()
-                output_image_npy = convert.img2npy(output_image)
-                output_image_b64 = convert.npy2b64str(output_image_npy)
-                predict_process_end = time.perf_counter()
-                output['output_image'] = output_image_b64
-                output['output_image_shape'] = output_image_npy.shape
                 _set_perftime(output, predict_process_start, before_injections_end, predict_end,
                              tracker_end, after_injections_end, predict_process_end)
                 self.responce(reskey, output)

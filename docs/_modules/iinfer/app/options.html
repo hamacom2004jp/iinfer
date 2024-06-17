@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>iinfer.app.options &mdash; iinfer 2024/06/12 documentation</title>
+  <title>iinfer.app.options &mdash; iinfer 2024/06/17 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -15,7 +15,7 @@
   
         <script src="../../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=9df839e0"></script>
+        <script src="../../../_static/documentation_options.js?v=c5f1a75e"></script>
         <script src="../../../_static/doctools.js?v=9a2dae69"></script>
         <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -1112,6 +1112,9 @@
                         <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">&quot;stdin&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;bool&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">choise</span><span class="o">=</span><span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span>
                              <span class="n">discription_ja</span><span class="o">=</span><span class="s2">&quot;後処理させる推論結果を標準入力から読み込みます。&quot;</span><span class="p">,</span>
                              <span class="n">discription_en</span><span class="o">=</span><span class="s2">&quot;Read the inference result to be post-processed from standard input.&quot;</span><span class="p">),</span>
+                        <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">&quot;json_without_img&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;bool&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">choise</span><span class="o">=</span><span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span>
+                             <span class="n">discription_ja</span><span class="o">=</span><span class="s2">&quot;JSONの送信時に画像を含めず送信します。&quot;</span><span class="p">,</span>
+                             <span class="n">discription_en</span><span class="o">=</span><span class="s2">&quot;Send JSON without including images when sending JSON.&quot;</span><span class="p">),</span>
                         <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="s2">&quot;json_connectstr&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;str&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hide</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">choise</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                              <span class="n">discription_ja</span><span class="o">=</span><span class="s2">&quot;推論結果のJSONのPOST先URLを指定します。&quot;</span><span class="p">,</span>
                              <span class="n">discription_en</span><span class="o">=</span><span class="s2">&quot;Specify the POST destination URL of the JSON of the inference result.&quot;</span><span class="p">),</span>

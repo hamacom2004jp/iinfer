@@ -7,7 +7,8 @@ import cv2
 import logging
 
 class SegBBox(postprocess.Postprocess):
-    def __init__(self, logger:logging.Logger, del_segments:bool=True, nodraw:bool=False, nodraw_bbox:bool=False, nodraw_rbbox:bool=False, output_preview:bool=False):
+    def __init__(self, logger:logging.Logger, del_segments:bool=True, nodraw:bool=False, nodraw_bbox:bool=False, nodraw_rbbox:bool=False,
+                 output_preview:bool=False, json_without_img:bool=False):
         """
         Segmentationの推論結果をフィルタリングする後処理クラスです。
         閾値に満たない推論結果を除外します。
@@ -19,8 +20,9 @@ class SegBBox(postprocess.Postprocess):
             nodraw_bbox (bool): バウンディングボックスを描画しない
             nodraw_rbbox (bool): 回転バウンディングボックスを描画しない
             output_preview (bool): プレビューを出力する
+            json_without_img (bool): JSONに画像を含めない場合はTrue。デフォルトはFalse。
         """
-        super().__init__(logger)
+        super().__init__(logger, json_without_img)
         self.config = dict(nodraw=nodraw, nodraw_bbox=nodraw_bbox, nodraw_rbbox=nodraw_rbbox, del_segments=del_segments, output_preview=output_preview)
         self.injection = after_seg_bbox_injection.AfterSegBBoxInjection(self.config, self.logger)
 

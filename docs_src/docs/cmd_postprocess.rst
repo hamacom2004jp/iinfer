@@ -146,6 +146,7 @@ Face Detection and Recognitionで検知した顔特徴データを個所を切�
     "Option","Required","Description"
     "-i,--input_file <推論結果ファイル>","`--stdin` を指定しない場合〇","後処理させる推論結果をファイルで指定します。"
     "--stdin","`--input_file` を指定しない場合〇","後処理させる推論結果を標準入力から読み込みます。"
+    "--json_without_img","",JSONの送信時に画像を含めず送信します。"
     "--json_connectstr <URL>","〇","推論結果のJSONのPOST先URLを指定します。"
     "--img_connectstr <URL>","","推論結果の画像のPOST先URLを指定します。"
     "--text_connectstr <URL>","","推論結果のテキストのPOST先URLを指定します。"

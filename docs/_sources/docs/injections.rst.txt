@@ -173,15 +173,17 @@
         "output_image_url","str","推論結果画像をHTTP POSTする先のURL"
         "output_image_ext","str","推論結果画像をHTTP POSTするときの画像フォーマット。指定可能なのは `bmp` , `png` , `jpeg` "
         "output_image_prefix","str","推論結果画像をHTTP POSTするときのファイル名のプレフィックス"
+        "json_without_img","bool","画像を含まないJSONをPOSTする場合True"
 
     .. code-block:: json
 
         /** サンプル設定ファイル **/
         {
-            "outputs_url": "http://localhost:5000/outputs",
-            "output_image_url": "http://localhost:5000/output_image",
+            "outputs_url": "http://localhost:8081/showimg/pub_img",
+            "output_image_url": "http://localhost:8081/showimg/pub_img",
             "output_image_ext": "jpeg",
-            "output_image_prefix": "output_image_"
+            "output_image_prefix": "output_",
+            "json_without_img": true
         }
 
 - `after_seg_bbox_injection`

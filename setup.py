@@ -13,6 +13,7 @@ VERSION = version.__version__
 PYTHON_REQUIRES = '>=3.8'
 INSTALL_REQUIRES = [
     'argcomplete',
+    'async_timeout',
     'eel',
     'motpy',
     'opencv-python',

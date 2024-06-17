@@ -6,15 +6,17 @@ import logging
 import json
 
 class Postprocess(object):
-    def __init__(self, logger:logging.Logger):
+    def __init__(self, logger:logging.Logger, json_without_img:bool=False):
         """
         後処理クラスのベースクラスです。
         後処理クラスはこのクラスを継承してください。
         
         Args:
             logger (logging.Logger): ロガー
+            json_without_img (bool, optional): JSONに画像を含めない場合はTrue。デフォルトはFalse。
         """
         self.logger = logger
+        self.json_without_img = json_without_img
 
     def postprocess(self, json_session, img_session, text_session, res_str:str, output_image_file:str=None, timeout:int=60) -> Dict[str, Any]:
             """
@@ -40,8 +42,9 @@ class Postprocess(object):
                 if "output_image" in outputs and "output_image_shape" in outputs:
                     img_npy = convert.b64str2npy(outputs["output_image"], outputs["output_image_shape"])
                     output_image = convert.npy2img(img_npy)
-                    del outputs["output_image"]
-                    del outputs["output_image_shape"]
+                    if self.json_without_img:
+                        del outputs["output_image"]
+                        del outputs["output_image_shape"]
 
                 result = self.post_json(json_session, outputs, output_image)
 

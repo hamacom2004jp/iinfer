@@ -5,7 +5,7 @@ from typing import Dict, List, Any
 import logging
 
 class Csv(postprocess.Postprocess):
-    def __init__(self, logger:logging.Logger, out_headers:List[str]=None, noheader:bool=False):
+    def __init__(self, logger:logging.Logger, out_headers:List[str]=None, noheader:bool=False, json_without_img:bool=False):
         """
         JSONをCSVに変換する後処理クラスです。
         
@@ -13,8 +13,9 @@ class Csv(postprocess.Postprocess):
             logger (logging.Logger): ロガー
             out_headers (List[str], optional): 出力させるヘッダー. Defaults to None.
             noheader (bool, optional): ヘッダーを出力しない. Defaults to False.
+            json_without_img (bool, optional): JSONに画像を含めない場合はTrue. Defaults to False.
         """
-        super().__init__(logger)
+        super().__init__(logger, json_without_img)
         self.config = dict(out_headers=out_headers, noheader=noheader)
         self.injection = after_csv_injection.AfterCSVInjection(self.config, self.logger)
 

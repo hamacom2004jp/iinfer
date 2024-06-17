@@ -9,7 +9,7 @@ import numpy as np
 
 
 class DetClip(postprocess.Postprocess):
-    def __init__(self, logger:logging.Logger, image_type:str='capture', clip_margin:int=0):
+    def __init__(self, logger:logging.Logger, image_type:str='capture', clip_margin:int=0, json_without_img:bool=False):
         """
         Object Detectionの推論結果となったbbox部分を個別の画像として切り出す後処理クラスです。
         
@@ -18,8 +18,9 @@ class DetClip(postprocess.Postprocess):
             image_type (str): 切り出した画像のファイル形式
             clip_margin (int): bboxの周囲に余白を設けるピクセル数
             output_dir (Path): 切り出した画像を保存するディレクトリ
+            json_without_img (bool, optional): JSONに画像を含めない場合はTrue。デフォルトはFalse。
         """
-        super().__init__(logger)
+        super().__init__(logger, json_without_img)
         self.image_type = image_type
         self.clip_margin = clip_margin
 
