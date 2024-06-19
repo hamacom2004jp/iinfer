@@ -2,6 +2,7 @@ from iinfer import version
 from iinfer.app import app, common, options
 from iinfer.app.commons import convert
 from pathlib import Path
+from typing import List
 import bottle
 import bottle_websocket
 import datetime
@@ -25,7 +26,8 @@ import tempfile
 import time
 
 class Web(options.Options):
-    def __init__(self, logger:logging.Logger, data:Path, redis_host:str = "localhost", redis_port:int = 6379, redis_password:str = None, svname:str = 'server', client_only:bool=False):
+    def __init__(self, logger:logging.Logger, data:Path, redis_host:str = "localhost", redis_port:int = 6379, redis_password:str = None, svname:str = 'server',
+                 client_only:bool=False, filer_html:str=None, showimg_html:str=None, assets:List[str]=None):
         """
         iinferクライアント側のwebapiサービス
 
@@ -37,6 +39,9 @@ class Web(options.Options):
             redis_password (str, optional): Redisサーバーのパスワード. Defaults to None.
             svname (str, optional): 推論サーバーのサービス名. Defaults to 'server'.
             client_only (bool, optional): クライアントのみのサービスかどうか. Defaults to False.
+            filer_html (str, optional): ファイラーのHTMLファイル. Defaults to None.
+            showimg_html (str, optional): 画像表示のHTMLファイル. Defaults to None.
+            assets (List[str], optional): 静的ファイルのリスト. Defaults to None.
         """
         super().__init__()
         self.logger = logger
@@ -50,6 +55,12 @@ class Web(options.Options):
         self.client_only = client_only
         if self.client_only:
             self.svname = 'client'
+        self.filer_html = Path(filer_html) if filer_html is not None else None
+        self.showimg_html = Path(showimg_html) if showimg_html is not None else None
+        self.assets = [Path(a) for a in assets] if assets is not None else None
+        self.filer_html_data = None
+        self.showimg_html_data = None
+        self.assets_data = None
         common.mkdirs(self.data)
         self.img_queue = queue.Queue(1000)
 
@@ -469,7 +480,7 @@ class Web(options.Options):
 
     def versions_iinfer(self):
         return version.__description__.split('\n')
-        
+
     def versions_used(self):
         with open(Path(iinfer.__file__).parent / 'licenses' / 'files.txt', 'r', encoding='utf-8') as f:
             ret = []
@@ -512,8 +523,34 @@ class Web(options.Options):
         self.allow_host = allow_host
         self.listen_port = listen_port
         self.logger.info(f"Start bottle web. allow_host={self.allow_host} listen_port={self.listen_port}")
+
         app = bottle.Bottle()
         bottle.debug(True)
+
+        if self.filer_html is not None:
+            if not self.filer_html.is_file():
+                raise FileNotFoundError(f'filer_html is not found. ({self.filer_html})')
+            with open(self.filer_html, 'r', encoding='utf-8') as f:
+                self.filer_html_data = f.read()
+        if self.showimg_html is not None:
+            if not self.showimg_html.is_file():
+                raise FileNotFoundError(f'showimg_html is not found. ({self.showimg_html})')
+            with open(self.showimg_html, 'r', encoding='utf-8') as f:
+                self.showimg_html_data = f.read()
+        if self.assets is not None:
+            if type(self.assets) != list:
+                raise TypeError(f'assets is not list. ({self.assets})')
+            for i, asset in enumerate(self.assets):
+                if not asset.is_file():
+                    raise FileNotFoundError(f'asset is not found. ({asset})')
+                with open(asset, 'r', encoding='utf-8') as f:
+                    asset_data = f.read()
+                    def asset_func(asset_data):
+                        @app.route(f'/{asset.name}')
+                        def func():
+                            return asset_data
+                        return func
+                    asset_func(asset_data)
 
         @app.route('/bbforce_cmd')
         def bbforce_cmd():
@@ -581,6 +618,8 @@ class Web(options.Options):
 
         @app.route('/filer')
         def filer():
+            if self.filer_html_data is not None:
+                return self.filer_html_data
             return bottle.static_file('filer.html', root=static_root)
 
         @app.route('/filer/upload', method='POST')
@@ -589,6 +628,8 @@ class Web(options.Options):
 
         @app.route('/showimg')
         def showimg():
+            if self.showimg_html_data is not None:
+                return self.showimg_html_data
             return bottle.static_file('showimg.html', root=static_root)
 
         @app.route('/showimg/pub_img', method='POST')

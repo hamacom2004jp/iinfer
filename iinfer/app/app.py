@@ -5,9 +5,9 @@ from pathlib import Path
 import argparse
 import argcomplete
 import cv2
-import os
 import sys
 import time
+import traceback
 
 
 def main(args_list:list=None):
@@ -123,11 +123,17 @@ class IinferApp:
                     msg = {"warn":f"Please specify the --data option."}
                     common.print_format(msg, args.format, tm, args.output_json, args.output_json_append)
                     return 1, msg
-                self.web = web.Web(logger, Path(args.data), redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname, client_only=args.client_only)
-                self.web.start(args.allow_host, args.listen_port)
-                msg = {"success":"web complate."}
-                common.print_format(msg, args.format, tm, args.output_json, args.output_json_append)
-                return 0, msg
+                try:
+                    self.web = web.Web(logger, Path(args.data), redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname,
+                                    client_only=args.client_only, filer_html=args.filer_html, showimg_html=args.showimg_html, assets=args.assets)
+                    self.web.start(args.allow_host, args.listen_port)
+                    msg = {"success":"web complate."}
+                    common.print_format(msg, args.format, tm, args.output_json, args.output_json_append)
+                    return 0, msg
+                except Exception as e:
+                    msg = {"warn":f"Web server start error. {traceback.format_exc()}"}
+                    common.print_format(msg, args.format, tm, args.output_json, args.output_json_append)
+                    return 1, msg
             elif args.cmd == 'stop':
                 self.web = web.Web(logger, Path(args.data))
                 self.web.stop()
