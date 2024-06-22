@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>iinfer.app.gui &mdash; iinfer 2024/06/10 documentation</title>
+  <title>iinfer.app.gui &mdash; iinfer 2024/06/23 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -15,7 +15,7 @@
   
         <script src="../../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=0e783793"></script>
+        <script src="../../../_static/documentation_options.js?v=94d0cd35"></script>
         <script src="../../../_static/doctools.js?v=9a2dae69"></script>
         <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -112,16 +112,16 @@
             <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
 
         <span class="nd">@eel</span><span class="o">.</span><span class="n">expose</span>
-        <span class="k">def</span> <span class="nf">get_mode_opt</span><span class="p">():</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_mode_opt</span><span class="p">()</span>
+        <span class="k">def</span> <span class="nf">get_modes</span><span class="p">():</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_modes</span><span class="p">()</span>
 
         <span class="nd">@eel</span><span class="o">.</span><span class="n">expose</span>
-        <span class="k">def</span> <span class="nf">get_cmd_opt</span><span class="p">(</span><span class="n">mode</span><span class="p">):</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cmd_opt</span><span class="p">(</span><span class="n">mode</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">get_cmds</span><span class="p">(</span><span class="n">mode</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cmds</span><span class="p">(</span><span class="n">mode</span><span class="p">)</span>
 
         <span class="nd">@eel</span><span class="o">.</span><span class="n">expose</span>
-        <span class="k">def</span> <span class="nf">get_opt_opt</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_opt_opt</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span> <span class="n">cmd</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">get_cmd_choices</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cmd_choices</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span> <span class="n">cmd</span><span class="p">)</span>
 
         <span class="nd">@eel</span><span class="o">.</span><span class="n">expose</span>
         <span class="k">def</span> <span class="nf">list_cmd</span><span class="p">(</span><span class="n">kwd</span><span class="p">):</span>

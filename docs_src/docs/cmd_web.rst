@@ -22,9 +22,9 @@ Webサービス起動 : `iinfer -m web -c start <Option>`
     "--allow_host <接続許可するIP>","","省略した時は `0.0.0.0` を使用します。"
     "--listen_port <サービスポート>","","省略した時は `8081` を使用します。"
     "--client_only","","iinferサーバーへの接続を行わないようにします。"
-    "--filer_html","","`filer.html` を指定します。省略時はiinfer内蔵のHTMLファイルを使用します。"
-    "--showimg_html","","`filer.showimg_html` を指定します。省略時はiinfer内蔵のHTMLファイルを使用します。"
-    "--assets","","htmlファイルを使用する場合に必要なアセットファイルを指定します。"
+    "--filer_html <filer.htmlファイルのパス>","","`filer.html` を指定します。省略時はiinfer内蔵のHTMLファイルを使用します。"
+    "--showimg_html <showimg.htmlファイルのパス>","","`showimg.html` を指定します。省略時はiinfer内蔵のHTMLファイルを使用します。"
+    "--assets <jsやcssファイルのパス>","","htmlファイルを使用する場合に必要なアセットファイルを指定します。"
 
 
 Webサービス停止 : `iinfer -m web -c stop <Option>`

@@ -231,3 +231,27 @@
             "labels": [],
             "del_logits": true
         }
+
+- `after_showimg_injection`
+    
+        .. csv-table::
+            :widths: 20, 10, 70
+            :header-rows: 1
+    
+            "Option","Type","Description"
+            "host","str","Redisサーバーのサービスホストを指定します。省略時は localhost を使用します"
+            "port","int","Redisサーバーのサービスポートを指定します。省略時は 6379 を使用します"
+            "password","str","Redisサーバーのアクセスパスワード(任意)を指定します。省略時は password を使用します"
+            "svname","str","推論サーバーのサービス名を指定します。省略時は server を使用します"
+            "maxrecsize","int","推論結果の最大レコードサイズを指定します。省略時は 1000 を使用します"
+
+        .. code-block:: json
+    
+            /** サンプル設定ファイル **/
+            {
+                "host": "localhost",
+                "port": "6379",
+                "password": "password",
+                "svname": "server",
+                "maxrecsize": 1000
+            }

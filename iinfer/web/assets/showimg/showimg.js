@@ -102,37 +102,43 @@ $(() => {
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
       const img_url = data['img_url'];
-      const outputs = data['outputs'];
+      const outputs = data['success'];
       const elem = $($("#img_template").html());
       if (img_url) {
+        $('#img_container .col-12').removeClass('col-12').addClass('col-2').find('img').css('height', '200px');
+        elem.removeClass('col-2').addClass('col-12').find('img').css('height', 'calc(100vh - 300px)');
         elem.find('img').attr('src', img_url);
-        document.getElementById('img_container').appendChild(elem.get(0));
+        $('#img_container').prepend(elem.get(0));
+        if ($('#img_container .col-2').length > 6) {
+          $('#img_container .col-2:last').remove();
+        }
+      }
+      if (outputs) {
+        const elem = $("#out_container");
+        elem.html('');
+        render_result_func(elem, outputs);
+        table = elem.children('table');
+        thead = table.children('thead')
+        tbody = table.children('tbody');
+        tbody.children('tr').addClass('old');
+        thead.children('th').each((i, e) => {
+          const head_th = $(e);
+          tbody.append(`<tr data-col="${i}"></tr>`);
+          tr = tbody.children(`[data-col="${i}"]`);
+          tr.append(head_th);
+        });
+        thead.remove();
+        tbody.children('.old').each((i, e) => {
+          const body_tr = $(e);
+          body_tr.children('td').each((j, e) => {
+            const body_td = $(e);
+            const tr = tbody.children(`[data-col="${j}"]`)
+            tr.append(body_td);
+          });
+        });
+        tbody.children('.old').remove();
       }
     };
   }
   sub_img();
-  /**
-  eel.expose(js_console_modal_log_func);
-  function js_console_modal_log_func(line) {
-      const elem = $('#console_modal_log');
-      if (typeof line === 'object') {
-          line = JSON.stringify(line);
-      }
-      const text = elem.val() + line;
-      elem.val(text);
-      elem.get(0).setSelectionRange(text.length-1, text.length-1);
-  };
-
-  eel.expose(js_show_func);
-  function js_show_func(outputs, img_url) {
-      const elem = $($("#img_template").html());
-      if (img_url) {
-          elem.find('img').attr('src', img_url);
-          document.getElementById('img_container').appendChild(elem.get(0));
-      }
-      if (outputs && outputs['success'] && outputs['success'].length > 0) {
-      }
-  };
-  console.log(js_show_func);
-  */
 });

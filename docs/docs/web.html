@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Webモード &mdash; iinfer 2024/06/19 documentation</title>
+  <title>Webモード &mdash; iinfer 2024/06/23 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -16,7 +16,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=89938085"></script>
+        <script src="../_static/documentation_options.js?v=94d0cd35"></script>
         <script src="../_static/doctools.js?v=9a2dae69"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -55,6 +55,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#http-exec-cmd-title">コマンド実行 : <cite>http://&lt;ホスト&gt;:&lt;ポート&gt;/exec_cmd/&lt;title&gt;</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#http-exec-pipe-title">パイプライン実行 : <cite>http://&lt;ホスト&gt;:&lt;ポート&gt;/exec_pipe/&lt;title&gt;</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#http-filer">ファイラー表示 : <cite>http://&lt;ホスト&gt;:&lt;ポート&gt;/filer</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#http-showimg">推論結果表示 : <cite>http://&lt;ホスト&gt;:&lt;ポート&gt;/showimg</cite></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="command.html">コマンドリファレンス</a></li>
@@ -156,8 +157,17 @@
 <li><p>ファイラーを使用することで、ローカル(ブラウザ側)とサーバー(iinfer client 又は iinfer server)間で、ファイルをアップロード/ダウンロードすることが出来ます。</p></li>
 <li><p><strong>&lt;ホスト&gt;</strong> には、Webモードを起動したホスト名またはIPアドレスを指定します。</p></li>
 <li><p><strong>&lt;ポート&gt;</strong> には、Webモードを起動したポート番号を指定します。 <cite>--listen_port</cite> オプションで指定したポート番号です。</p></li>
+<li><p>ファイラー画面をカスタマイズする場合は、 <cite>--filer_html &lt;filer.htmlファイルのパス&gt;</cite> 、 <cite>--assets &lt;jsやcssファイルのパス&gt;</cite> などのオプションを指定してください。</p></li>
 </ul>
 <img alt="../_images/00401_web.jpg" src="../_images/00401_web.jpg" />
+</section>
+<section id="http-showimg">
+<h2>推論結果表示 : <cite>http://&lt;ホスト&gt;:&lt;ポート&gt;/showimg</cite><a class="headerlink" href="#http-showimg" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>ブラウザでこのURLにアクセスすると、推論結果を表示する画面が表示されます。</p></li>
+<li><p>推論結果画面に推論結果を表示するには、 <strong>client</strong> モードの <strong>deploy</strong> コマンドの <cite>--after_injection_type &lt;後処理タイプ&gt;</cite> で <cite>after_showimg_injection</cite> を指定する必要があります。</p></li>
+<li><p>推論結果画面をカスタマイズする場合は、 <cite>--showimg_html &lt;showimg.htmlファイルのパス&gt;</cite> 、 <cite>--assets &lt;jsやcssファイルのパス&gt;</cite> などのオプションを指定してください。</p></li>
+</ul>
 </section>
 </section>
 

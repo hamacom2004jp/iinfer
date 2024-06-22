@@ -29,14 +29,14 @@ const list_cmd_func_then = () => {
     }
     // コマンドカードクリック時の処理（モーダルダイアログを開く）
     const cmd_card_func = async (e) => {
-        const py_get_mode_opt = await eel.get_mode_opt()();
+        const py_get_modes = await eel.get_modes()();
         const cmd_modal = $('#cmd_modal');
-        cmd_modal.find('[name="mode"]').html(mkopt(py_get_mode_opt));
+        cmd_modal.find('[name="mode"]').html(mkopt(py_get_modes));
         // モード変更時の処理（モードに対するコマンド一覧を取得）
         const mode_change = async () => {
             const mode = cmd_modal.find('[name="mode"]').val();
-            const py_get_cmd_opt = await eel.get_cmd_opt(mode)();
-            cmd_modal.find('[name="cmd"]').html(mkopt(py_get_cmd_opt));
+            const py_get_cmds = await eel.get_cmds(mode)();
+            cmd_modal.find('[name="cmd"]').html(mkopt(py_get_cmds));
             const selected_mode = cmd_modal.find('[name="mode"] option:selected');
             cmd_modal.find('.mode_label').attr('title', selected_mode.attr('discription'));
             const row_content = cmd_modal.find('.row_content');
@@ -54,7 +54,7 @@ const list_cmd_func_then = () => {
             const cmd = cmd_modal.find('[name="cmd"]').val();
             const selected_cmd = cmd_modal.find('[name="cmd"] option:selected');
             cmd_modal.find('.cmd_label').attr('title', selected_cmd.attr('discription'));
-            const py_get_opt_opt = await eel.get_opt_opt(mode, cmd)();
+            const py_get_cmd_choices = await eel.get_cmd_choices(mode, cmd)();
             row_content.html('');
             // オプション一覧をフォームに追加
             const add_form_func = (i, row, next_elem) => {
@@ -149,13 +149,13 @@ const list_cmd_func_then = () => {
                 }
             }
             // 表示オプションを追加
-            py_get_opt_opt.filter(row => !row.hide).forEach((row, i) => add_form_func(i, row, null));
+            py_get_cmd_choices.filter(row => !row.hide).forEach((row, i) => add_form_func(i, row, null));
             // 高度なオプションを表示するリンクを追加
             const show_link = $('<div class="text-center card-hover mb-3"><a href="#">[ advanced options ]</a></div>');
             show_link.click(() => row_content.find('.row_content_hide').toggle());
             row_content.append(show_link);
             // 非表示オプションを追加
-            py_get_opt_opt.filter(row => row.hide).forEach((row, i) => add_form_func(i, row, null));
+            py_get_cmd_choices.filter(row => row.hide).forEach((row, i) => add_form_func(i, row, null));
         }
         //row_content.find('is-invalid, is-valid').removeClass('is-invalid').removeClass('is-valid');
         cmd_modal.find('[name="cmd"]').off('change');

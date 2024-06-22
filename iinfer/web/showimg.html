@@ -49,14 +49,14 @@
         <!-- 左右のスプリッター -->
         <div class="split-pane-divider" style="left:70%;border:solid 1px;"></div>
         <!-- 結果表示側 -->
-        <div id="out_container" class="split-pane-component"></div>
+        <div id="out_container" class="split-pane-component" style="left:70%;"></div>
     </div>
     <!-- 画像表示のテンプレ -->
     <div id="img_template" class="d-none">
         <div class="col-2 p-1">
             <div class="card card-hover">
                 <div class="card-body p-0">
-                    <img class="card-img" style="object-fit:scale-down;">
+                    <img class="card-img" style="object-fit:contain;">
                 </div>
             </div>
         </div>
@@ -161,5 +161,6 @@
 <script type="text/javascript" src="assets/jquery-resizable/jquery-resizable.min.js"></script>
 <script type="text/javascript" src="assets/jquery-resizable/jquery-resizable.min.js"></script>
 <script type="text/javascript" src="assets/split-pane/split-pane.js"></script>
+<script type="text/javascript" src="assets/iinfer/view_result.js"></script>
 <script type="text/javascript" src="assets/showimg/showimg.js"></script>
 </html>

@@ -2,7 +2,7 @@ from motpy import Detection, MultiObjectTracker
 from pathlib import Path
 from PIL import Image
 from iinfer.app import common, filer, predict, injection
-from iinfer.app.commons import convert, module
+from iinfer.app.commons import convert, module, redis_client
 from typing import List, Dict, Any, Tuple, Union
 import base64
 import datetime
@@ -33,8 +33,7 @@ class Server(filer.Filer):
         self.redis_host = redis_host
         self.redis_port = redis_port
         self.redis_password = redis_password
-        self.svname = f"sv-{svname}"
-        self.hbname = f"hb-{svname}"
+        self.svname = svname
         self.redis_cli = None
         self.sessions:Dict[str, Dict[str, Any]] = {}
         self.is_running = False
@@ -50,26 +49,11 @@ class Server(filer.Filer):
         """
         サーバー処理を開始する
         """
-        self.redis_cli = redis.Redis(host=self.redis_host, port=self.redis_port, db=0, password=self.redis_password)
-        i = 0
-        while i < retry_count or retry_count <= 0:
-            try:
-                self.logger.info(f"({i+1}/{retry_count if retry_count>0 else '-'}) connecting to the server. {self.redis_host}:{self.redis_port}")
-                self.redis_cli.ping()
-                i = 0
-                self.is_running = True
-                self._run_server()
-                break
-            except redis.exceptions.ConnectionError as e:
-                self.is_running = False
-                self.logger.error(f"fail to ping server. {e}")
-                if i >= retry_count and retry_count > 0:
-                    break
-                time.sleep(retry_interval if retry_interval > 0 else 5)
-                i += 1
-            except KeyboardInterrupt as e:
-                self.is_running = False
-                break
+        self.is_running = False
+        self.redis_cli = redis_client.RedisClient(self.logger, host=self.redis_host, port=self.redis_port, password=self.redis_password, svname=self.svname)
+        if self.redis_cli.check_server(find_svname=False, retry_count=retry_count, retry_interval=retry_interval, outstatus=True):
+            self.is_running = True
+            self._run_server()
 
     def list_server(self):
         """
@@ -78,7 +62,7 @@ class Server(filer.Filer):
         Returns:
             List[str]: サーバーのリスト
         """
-        self.redis_cli = redis.Redis(host=self.redis_host, port=self.redis_port, db=0, password=self.redis_password)
+        self.redis_cli = redis_client.RedisClient(self.logger, host=self.redis_host, port=self.redis_port, password=self.redis_password, svname=self.svname)
         hblist = self.redis_cli.keys("hb-*")
         svlist = []
         for hb in hblist:
@@ -99,6 +83,8 @@ class Server(filer.Filer):
             except redis.exceptions.ResponseError:
                 self.logger.warn(f"Failed to get ctime. {hb}", exc_info=True)
             svlist.append(dict(svname=svname, recive_cnt=recive_cnt, sccess_cnt=sccess_cnt, warn_cnt=warn_cnt, error_cnt=error_cnt))
+        if len(svlist) <= 0:
+            return {"warn": "No server is running."}
         return {"success": svlist}
 
     def _clean_server(self):
@@ -126,16 +112,16 @@ class Server(filer.Filer):
         sccess_cnt = 0
         warn_cnt = 0
         error_cnt = 0
-        self.redis_cli.hset(self.hbname, 'recive_cnt', str(recive_cnt))
-        self.redis_cli.hset(self.hbname, 'sccess_cnt', str(sccess_cnt))
-        self.redis_cli.hset(self.hbname, 'warn_cnt', str(warn_cnt))
-        self.redis_cli.hset(self.hbname, 'error_cnt', str(error_cnt))
+        self.redis_cli.hset(self.redis_cli.hbname, 'recive_cnt', recive_cnt)
+        self.redis_cli.hset(self.redis_cli.hbname, 'sccess_cnt', sccess_cnt)
+        self.redis_cli.hset(self.redis_cli.hbname, 'warn_cnt', warn_cnt)
+        self.redis_cli.hset(self.redis_cli.hbname, 'error_cnt', error_cnt)
         while self.is_running:
             try:
                 # ブロッキングリストから要素を取り出す
                 ctime = time.time()
-                self.redis_cli.hset(self.hbname, 'ctime', str(ctime))
-                result = self.redis_cli.blpop(self.svname, timeout=1)
+                self.redis_cli.hset(self.redis_cli.hbname, 'ctime', ctime)
+                result = self.redis_cli.blpop(self.redis_cli.svname)
                 if ctime - ltime > 10:
                     self._clean_server()
                     ltime = ctime
@@ -148,7 +134,7 @@ class Server(filer.Filer):
                     continue
                 st = None
                 recive_cnt += 1
-                self.redis_cli.hset(self.hbname, 'recive_cnt', str(recive_cnt))
+                self.redis_cli.hset(self.redis_cli.hbname, 'recive_cnt', recive_cnt)
 
                 if msg[0] == 'deploy':
                     if msg[7] == 'None':
@@ -237,7 +223,7 @@ class Server(filer.Filer):
                         st = self.predict(msg[1], msg[2], convert.b64str2str(msg[3]), output_image_name, nodraw)
                 elif msg[0] == 'stop_server':
                     self.is_running = False
-                    self.responce(msg[1], {"success": f"Successful stop server. svname={self.svname}"})
+                    self.redis_cli.rpush(msg[1], {"success": f"Successful stop server. svname={self.redis_cli.svname}"})
                     break
                 elif msg[0] == 'file_list':
                     svpath = convert.b64str2str(msg[2])
@@ -265,13 +251,13 @@ class Server(filer.Filer):
 
                 if st==self.RESP_SCCESS:
                     sccess_cnt += 1
-                    self.redis_cli.hset(self.hbname, 'sccess_cnt', str(sccess_cnt))
+                    self.redis_cli.hset(self.redis_cli.hbname, 'sccess_cnt', sccess_cnt)
                 elif st==self.RESP_WARN:
                     warn_cnt += 1
-                    self.redis_cli.hset(self.hbname, 'warn_cnt', str(warn_cnt))
+                    self.redis_cli.hset(self.redis_cli.hbname, 'warn_cnt', warn_cnt)
                 elif st==self.RESP_ERROR:
                     error_cnt += 1
-                    self.redis_cli.hset(self.hbname, 'error_cnt', str(error_cnt))
+                    self.redis_cli.hset(self.redis_cli.hbname, 'error_cnt', error_cnt)
             except redis.exceptions.TimeoutError:
                 pass
             except redis.exceptions.ConnectionError as e:
@@ -285,29 +271,16 @@ class Server(filer.Filer):
                 self.logger.error(f"Unknown error occurred. {e}", exc_info=True)
                 self.is_running = False
                 break
-        self.redis_cli.delete(self.svname)
-        self.redis_cli.delete(self.hbname)
-        self.logger.info(f"stop server. svname={self.svname}")
+        self.redis_cli.delete(self.redis_cli.svname)
+        self.redis_cli.delete(self.redis_cli.hbname)
+        self.logger.info(f"stop server. svname={self.redis_cli.svname}")
 
     def terminate_server(self):
         """
         サーバー処理を終了する
         """
-        if self.redis_cli is not None:
-            self.redis_cli.close()
-            self.redis_cli = None
+        self.redis_cli.close()
         self.logger.info(f"terminate server.")
-
-    def responce(self, reskey:str, result:dict):
-        """
-        処理結果をクライアントに返す
-
-        Args:
-            reskey (str): レスポンスキー
-            result (dict): レスポンスデータ
-        """
-        self.redis_cli.rpush(reskey, json.dumps(result, default=common.default_json_enc))
-        
 
     def deploy(self, reskey:str, name:str, model_img_width:int, model_img_height:int, predict_type:str,
                model_file:str, model_bin:bytes, model_conf_file:List[str], model_conf_bin:List[bytes],
@@ -342,38 +315,38 @@ class Server(filer.Filer):
         """
         if name is None or name == "":
             self.logger.warn(f"Name is empty.")
-            self.responce(reskey, {"warn": f"Name is empty."})
+            self.redis_cli.rpush(reskey, {"warn": f"Name is empty."})
             return self.RESP_WARN
         if model_file is None or model_file == "":
             self.logger.warn(f"model_file is empty.")
-            self.responce(reskey, {"warn": f"model_file is empty."})
+            self.redis_cli.rpush(reskey, {"warn": f"model_file is empty."})
             return self.RESP_WARN
         if model_img_width is None or model_img_width <= 0:
             self.logger.warn(f"Image width is invalid.")
-            self.responce(reskey, {"warn": f"Image width is invalid."})
+            self.redis_cli.rpush(reskey, {"warn": f"Image width is invalid."})
             return self.RESP_WARN
         if model_img_height is None or model_img_height <= 0:
             self.logger.warn(f"Image height is invalid.")
-            self.responce(reskey, {"warn": f"Image height is invalid."})
+            self.redis_cli.rpush(reskey, {"warn": f"Image height is invalid."})
             return self.RESP_WARN
 
         deploy_dir = self.data_dir / name
         if name in self.sessions:
             self.logger.warn(f"{name} has already started a session.")
-            self.responce(reskey, {"warn": f"{name} has already started a session."})
+            self.redis_cli.rpush(reskey, {"warn": f"{name} has already started a session."})
             return self.RESP_WARN
         if not overwrite and deploy_dir.exists():
             self.logger.warn(f"Could not be deployed. '{deploy_dir}' already exists")
-            self.responce(reskey, {"warn": f"Could not be deployed. '{deploy_dir}' already exists"})
+            self.redis_cli.rpush(reskey, {"warn": f"Could not be deployed. '{deploy_dir}' already exists"})
             return self.RESP_WARN
 
         if predict_type not in common.BASE_MODELS:
             self.logger.warn(f"Incorrect predict_type. '{predict_type}'")
-            self.responce(reskey, {"warn": f"Incorrect predict_type. '{predict_type}'"})
+            self.redis_cli.rpush(reskey, {"warn": f"Incorrect predict_type. '{predict_type}'"})
             return self.RESP_WARN
         if common.BASE_MODELS[predict_type]['required_model_conf']==True and model_conf_file is None:
             self.logger.warn(f"model_conf_file is None.")
-            self.responce(reskey, {"warn": f"model_conf_file is None."})
+            self.redis_cli.rpush(reskey, {"warn": f"model_conf_file is None."})
             return self.RESP_WARN
 
         common.mkdirs(deploy_dir)
@@ -405,11 +378,11 @@ class Server(filer.Filer):
         def _save_m(name:str, files:List[str], datas:List[bytes]):
             if files is not None and datas is None:
                 self.logger.warn(f"{name}_file is not None but {name}_bin is None.")
-                self.responce(reskey, {"warn": f"{name}_file is not None but {name}_bin is None."})
+                self.redis_cli.rpush(reskey, {"warn": f"{name}_file is not None but {name}_bin is None."})
                 return False, files
             if files is None and datas is not None:
                 self.logger.warn(f"{name}_file is None but {name}_bin is not None.")
-                self.responce(reskey, {"warn": f"{name}_file is None but {name}_bin is not None."})
+                self.redis_cli.rpush(reskey, {"warn": f"{name}_file is None but {name}_bin is not None."})
                 return False, files
             if files is not None:
                 files = [deploy_dir / cf for cf in files if cf is not None and cf != '']
@@ -458,7 +431,7 @@ class Server(filer.Filer):
                 returncode, _ = common.cmd(f'cd {self.data_dir} && git clone https://github.com/open-mmlab/mmpretrain.git', logger=self.logger)
                 if returncode != 0:
                     self.logger.error(f"Failed to git clone mmpretrain.")
-                    self.responce(reskey, {"error": f"Failed to git clone mmpretrain."})
+                    self.redis_cli.rpush(reskey, {"error": f"Failed to git clone mmpretrain."})
                     return self.RESP_ERROR
             shutil.copytree(self.data_dir / "mmpretrain" / "configs", deploy_dir / "configs", dirs_exist_ok=True)
             self.logger.info(f"Copy mmpretrain configs to {str(deploy_dir / 'configs')}")
@@ -467,7 +440,7 @@ class Server(filer.Filer):
                 returncode, _ = common.cmd(f'cd {self.data_dir} && git clone https://github.com/open-mmlab/mmdetection.git', logger=self.logger)
                 if returncode != 0:
                     self.logger.error(f"Failed to git clone mmdetection.")
-                    self.responce(reskey, {"error": f"Failed to git clone mmdetection."})
+                    self.redis_cli.rpush(reskey, {"error": f"Failed to git clone mmdetection."})
                     return self.RESP_ERROR
             shutil.copytree(self.data_dir / "mmdetection" / "configs", deploy_dir / "configs", dirs_exist_ok=True)
             self.logger.info(f"Copy mmdetection configs to {str(deploy_dir / 'configs')}")
@@ -476,7 +449,7 @@ class Server(filer.Filer):
                 returncode, _ = common.cmd(f'cd {self.data_dir} && git clone -b main https://github.com/open-mmlab/mmsegmentation.git', logger=self.logger)
                 if returncode != 0:
                     self.logger.error(f"Failed to git clone mmsegmentation.")
-                    self.responce(reskey, {"error": f"Failed to git clone mmsegmentation."})
+                    self.redis_cli.rpush(reskey, {"error": f"Failed to git clone mmsegmentation."})
                     return self.RESP_ERROR
             shutil.copytree(self.data_dir / "mmsegmentation" / "configs", deploy_dir / "configs", dirs_exist_ok=True)
             self.logger.info(f"Copy mmsegmentation configs to {str(deploy_dir / 'configs')}")
@@ -484,15 +457,15 @@ class Server(filer.Filer):
         try:
             ret, predict_obj = module.build_predict(conf["predict_type"], conf["custom_predict_file"], self.logger)
             if not ret:
-                self.responce(reskey, predict_obj)
+                self.redis_cli.rpush(reskey, predict_obj)
                 return self.RESP_WARN
             predict_obj.post_deploy(deploy_dir, conf)
         except Exception as e:
             self.logger.warn(f"Failed to load Predict: {e}", exc_info=True)
-            self.responce(reskey, {"warn": f"Failed to load Predict: {e}"})
+            self.redis_cli.rpush(reskey, {"warn": f"Failed to load Predict: {e}"})
             return self.RESP_WARN
 
-        self.responce(reskey, {"success": f"Save conf.json to {str(deploy_dir)}"})
+        self.redis_cli.rpush(reskey, {"success": f"Save conf.json to {str(deploy_dir)}"})
         return self.RESP_SCCESS
 
     def deploy_list(self, reskey:str):
@@ -544,7 +517,7 @@ class Server(filer.Filer):
                            before_injection_py=before_injection,
                            after_injection_py=after_injection)
                 deploy_list.append(row)
-        self.responce(reskey, {"success": deploy_list})
+        self.redis_cli.rpush(reskey, {"success": deploy_list})
         return self.RESP_SCCESS
 
     def undeploy(self, reskey:str, name:str):
@@ -557,19 +530,19 @@ class Server(filer.Filer):
         """
         if name is None or name == "":
             self.logger.warn(f"Name is empty.")
-            self.responce(reskey, {"warn": f"Name is empty."})
+            self.redis_cli.rpush(reskey, {"warn": f"Name is empty."})
             return self.RESP_WARN
         if name in self.sessions:
             self.logger.warn(f"{name} has already started a session.")
-            self.responce(reskey, {"warn": f"{name} has already started a session."})
+            self.redis_cli.rpush(reskey, {"warn": f"{name} has already started a session."})
             return self.RESP_WARN
         deploy_dir = self.data_dir / name
         if not deploy_dir.exists():
             self.logger.warn(f"{name} is not deployed.")
-            self.responce(reskey, {"warn": f"{name} is not deployed."})
+            self.redis_cli.rpush(reskey, {"warn": f"{name} is not deployed."})
             return self.RESP_WARN
         common.rmdirs(deploy_dir)
-        self.responce(reskey, {"success": f"Undeployed {name}. {str(deploy_dir)}"})
+        self.redis_cli.rpush(reskey, {"success": f"Undeployed {name}. {str(deploy_dir)}"})
         return self.RESP_SCCESS
 
     def start(self, reskey:str, name:str, model_provider:str, use_track:bool, gpuid:str):
@@ -585,17 +558,17 @@ class Server(filer.Filer):
         """
         if name is None or name == "":
             self.logger.warn(f"Name is empty.")
-            self.responce(reskey, {"warn": f"Name is empty."})
+            self.redis_cli.rpush(reskey, {"warn": f"Name is empty."})
             return self.RESP_WARN
         deploy_dir = self.data_dir / name
         if name in self.sessions:
             self.logger.warn(f"{name} has already started a session.")
-            self.responce(reskey, {"warn": f"{name} has already started a session."})
+            self.redis_cli.rpush(reskey, {"warn": f"{name} has already started a session."})
             return self.RESP_WARN
         conf_path = deploy_dir / "conf.json"
         if not conf_path.exists():
             self.logger.warn(f"Conf path {str(conf_path)} does not exist")
-            self.responce(reskey, {"warn": f"Conf path {str(conf_path)} does not exist"})
+            self.redis_cli.rpush(reskey, {"warn": f"Conf path {str(conf_path)} does not exist"})
             return self.RESP_WARN
         with open(conf_path, "r") as cf:
             conf = json.load(cf)
@@ -625,7 +598,7 @@ class Server(filer.Filer):
                     before_injections = module.load_before_injections(paths, before_injection_conf, self.logger)
             except Exception as e:
                 self.logger.warn(f"Failed to load before_injection: {e}", exc_info=True)
-                self.responce(reskey, {"warn": f"Failed to load before_injection: {e}"})
+                self.redis_cli.rpush(reskey, {"warn": f"Failed to load before_injection: {e}"})
                 return self.RESP_WARN
             try:
                 if "after_injection_conf" in conf and conf["after_injection_conf"] is not None:
@@ -645,26 +618,26 @@ class Server(filer.Filer):
                     after_injections = module.load_after_injections(paths, after_injection_conf, self.logger)
                 if type(model_path) is Path and not model_path.exists():
                     self.logger.warn(f"Model path {str(model_path)} does not exist")
-                    self.responce(reskey, {"warn": f"Model path {str(model_path)} does not exist"})
+                    self.redis_cli.rpush(reskey, {"warn": f"Model path {str(model_path)} does not exist"})
                     return self.RESP_WARN
             except Exception as e:
                 self.logger.warn(f"Failed to load after_injection: {e}", exc_info=True)
-                self.responce(reskey, {"warn": f"Failed to load after_injection: {e}"})
+                self.redis_cli.rpush(reskey, {"warn": f"Failed to load after_injection: {e}"})
                 return self.RESP_WARN
             try:
                 ret, predict_obj = module.build_predict(conf["predict_type"], conf["custom_predict_file"], self.logger)
                 if not ret:
-                    self.responce(reskey, predict_obj)
+                    self.redis_cli.rpush(reskey, predict_obj)
                     return self.RESP_WARN
             except Exception as e:
                 self.logger.warn(f"Failed to load Predict: {e}", exc_info=True)
-                self.responce(reskey, {"warn": f"Failed to load Predict: {e}"})
+                self.redis_cli.rpush(reskey, {"warn": f"Failed to load Predict: {e}"})
                 return self.RESP_WARN
             if "label_file" in conf and conf["label_file"] is not None:
                 label_file = Path(conf["label_file"])
                 if not label_file.exists():
                     self.logger.warn(f"label_file path {str(label_file)} does not exist")
-                    self.responce(reskey, {"warn": f"label_file path {str(label_file)} does not exist"})
+                    self.redis_cli.rpush(reskey, {"warn": f"label_file path {str(label_file)} does not exist"})
                     return self.RESP_WARN
                 with open(label_file, "r") as f:
                     labels = f.read().splitlines()
@@ -674,7 +647,7 @@ class Server(filer.Filer):
                 color_file = Path(conf["color_file"])
                 if not color_file.exists():
                     self.logger.warn(f"color_file path {str(color_file)} does not exist")
-                    self.responce(reskey, {"warn": f"color_file path {str(color_file)} does not exist"})
+                    self.redis_cli.rpush(reskey, {"warn": f"color_file path {str(color_file)} does not exist"})
                     return self.RESP_WARN
                 with open(color_file, "r") as f:
                     colors = f.read().splitlines()
@@ -695,10 +668,10 @@ class Server(filer.Filer):
                 )
             except Exception as e:
                 self.logger.warn(f"Failed to create session: {e}", exc_info=True)
-                self.responce(reskey, {"warn": f"Failed to create session: {e}"})
+                self.redis_cli.rpush(reskey, {"warn": f"Failed to create session: {e}"})
                 return self.RESP_WARN
         self.logger.info(f"Successful start of {name} session.")
-        self.responce(reskey, {"success": f"Successful start of {name} session."})
+        self.redis_cli.rpush(reskey, {"success": f"Successful start of {name} session."})
         return self.RESP_SCCESS
     
     def stop(self, reskey:str, name:str):
@@ -711,16 +684,16 @@ class Server(filer.Filer):
         """
         if name is None or name == "":
             self.logger.warn(f"Name is empty.")
-            self.responce(reskey, {"warn": f"Name is empty."})
+            self.redis_cli.rpush(reskey, {"warn": f"Name is empty."})
             return self.RESP_WARN
         if name not in self.sessions:
             self.logger.warn(f"{name} has not yet started a session.")
-            self.responce(reskey, {"warn": f"{name} has not yet started a session."})
+            self.redis_cli.rpush(reskey, {"warn": f"{name} has not yet started a session."})
             return self.RESP_WARN
         #self.sessions[name]['session'].close()
         del self.sessions[name]
         self.logger.info(f"Successful stop of {name} session.")
-        self.responce(reskey, {"success": f"Successful stop of {name} session."})
+        self.redis_cli.rpush(reskey, {"success": f"Successful stop of {name} session."})
         return self.RESP_SCCESS
 
     def predict(self, reskey:str, name:str, input_data:Union[Image.Image, str], output_image_name:str, nodraw:bool):
@@ -736,15 +709,15 @@ class Server(filer.Filer):
         """
         if name is None or name == "":
             self.logger.warn(f"Name is empty.")
-            self.responce(reskey, {"warn": f"Name is empty."})
+            self.redis_cli.rpush(reskey, {"warn": f"Name is empty."})
             return self.RESP_WARN
         if input_data is None:
             self.logger.warn(f"input_data is empty.")
-            self.responce(reskey, {"warn": f"input_data is empty."})
+            self.redis_cli.rpush(reskey, {"warn": f"input_data is empty."})
             return self.RESP_WARN
         if name not in self.sessions:
             self.logger.warn(f"{name} has not yet started a session.")
-            self.responce(reskey, {"warn": f"{name} has not yet started a session."})
+            self.redis_cli.rpush(reskey, {"warn": f"{name} has not yet started a session."})
             return self.RESP_WARN
         if nodraw is None:
             nodraw = False
@@ -801,7 +774,7 @@ class Server(filer.Filer):
                 after_injections_end = time.perf_counter()
                 _set_perftime(output, predict_process_start, before_injections_end, predict_end,
                              tracker_end, after_injections_end, predict_process_end)
-                self.responce(reskey, output)
+                self.redis_cli.rpush(reskey, output)
                 return self.RESP_SCCESS
             output = dict(success=outputs)
             # 後処理を実行
@@ -809,11 +782,11 @@ class Server(filer.Filer):
             after_injections_end = predict_process_end = time.perf_counter()
             _set_perftime(output, predict_process_start, before_injections_end, predict_end,
                             tracker_end, after_injections_end, predict_process_end)
-            self.responce(reskey, output)
+            self.redis_cli.rpush(reskey, output)
             return self.RESP_SCCESS
         except Exception as e:
             self.logger.warn(f"Failed to run inference: {e}", exc_info=True)
-            self.responce(reskey, {"warn": f"Failed to run inference: {e}"})
+            self.redis_cli.rpush(reskey, {"warn": f"Failed to run inference: {e}"})
             return self.RESP_WARN
 
     def file_list(self, reskey:str, current_path:str) -> int:
@@ -828,7 +801,7 @@ class Server(filer.Filer):
             int: レスポンスコード
         """
         rescode, msg = super().file_list(current_path)
-        self.responce(reskey, msg)
+        self.redis_cli.rpush(reskey, msg)
         return rescode
 
     def file_mkdir(self, reskey:str, current_path:str) -> int:
@@ -843,7 +816,7 @@ class Server(filer.Filer):
             int: レスポンスコード
         """
         rescode, msg = super().file_mkdir(current_path)
-        self.responce(reskey, msg)
+        self.redis_cli.rpush(reskey, msg)
         return rescode
     
     def file_rmdir(self, reskey:str, current_path:str) -> int:
@@ -858,7 +831,7 @@ class Server(filer.Filer):
             int: レスポンスコード
         """
         rescode, msg = super().file_rmdir(current_path)
-        self.responce(reskey, msg)
+        self.redis_cli.rpush(reskey, msg)
         return rescode
 
     def file_download(self, reskey:str, current_path:str) -> int:
@@ -873,7 +846,7 @@ class Server(filer.Filer):
             int: レスポンスコード
         """
         rescode, msg = super().file_download(current_path)
-        self.responce(reskey, msg)
+        self.redis_cli.rpush(reskey, msg)
         return rescode
 
     def file_upload(self, reskey:str, current_path:str, file_name:str, file_data:bytes) -> int:
@@ -890,7 +863,7 @@ class Server(filer.Filer):
             int: レスポンスコード
         """
         rescode, msg = super().file_upload(current_path, file_name, file_data)
-        self.responce(reskey, msg)
+        self.redis_cli.rpush(reskey, msg)
         return rescode
 
     def file_remove(self, reskey:str, current_path:str) -> int:
@@ -905,5 +878,5 @@ class Server(filer.Filer):
             int: レスポンスコード
         """
         rescode, msg = super().file_remove(current_path)
-        self.responce(reskey, msg)
+        self.redis_cli.rpush(reskey, msg)
         return rescode

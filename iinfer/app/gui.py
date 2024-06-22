@@ -19,16 +19,16 @@ class Gui(web.Web):
             return str(self.data)
 
         @eel.expose
-        def get_mode_opt():
-            return self.get_mode_opt()
+        def get_modes():
+            return self.get_modes()
 
         @eel.expose
-        def get_cmd_opt(mode):
-            return self.get_cmd_opt(mode)
+        def get_cmds(mode):
+            return self.get_cmds(mode)
 
         @eel.expose
-        def get_opt_opt(mode, cmd):
-            return self.get_opt_opt(mode, cmd)
+        def get_cmd_choices(mode, cmd):
+            return self.get_cmd_choices(mode, cmd)
 
         @eel.expose
         def list_cmd(kwd):

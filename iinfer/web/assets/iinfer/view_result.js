@@ -6,10 +6,19 @@ const cell_chop = (val) => {
 }
 // 実行結果をモーダルダイアログに表示
 const view_result_func = (title, result) => {
-    if (!result | Array.isArray(result) && result.length<=0) return;
     const result_modal = $('#result_modal');
     result_modal.find('.modal-title').text(title);
+    if (!result || result.length <= 0) {
+        result_modal.modal('show');
+        return;
+    }
     result_modal.find('.modal-body').html('');
+    render_result_func(result_modal.find('.modal-body'), result);
+    result_modal.modal('show');
+}
+
+const render_result_func = (target_elem, result) => {
+    if (!result | Array.isArray(result) && result.length<=0) return;
     const mk_table_func = () => {
         const table = $('<table class="table table-bordered table-hover table-sm"></table>');
         const table_head = $('<thead class="table-dark bg-dark"></thead>');
@@ -19,7 +28,7 @@ const view_result_func = (title, result) => {
         return table;
     }
     const table = mk_table_func();
-    result_modal.find('.modal-body').append(table);
+    target_elem.append(table);
     // list型の結果をテーブルに変換
     const list2table = (data, table_head, table_body) => {
         Object.keys(data).forEach(i => {
@@ -128,10 +137,9 @@ const view_result_func = (title, result) => {
         list2table(result, table_head, table_body);
     }
     else if(typeof result === "string" || result instanceof String){
-        $('#result_modal').find('.modal-body').html(result);
+        target_elem.html(result);
     }
     else {
         dict2table(result, table_head, table_body);
     }
-    result_modal.modal('show');
 }

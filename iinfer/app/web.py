@@ -1,6 +1,6 @@
 from iinfer import version
 from iinfer.app import app, common, options
-from iinfer.app.commons import convert
+from iinfer.app.commons import convert, redis_client
 from pathlib import Path
 from typing import List
 import bottle
@@ -68,7 +68,7 @@ class Web(options.Options):
         if 'mode' not in cmd_opt or 'cmd' not in cmd_opt:
             return ""
         curl_fileup = set()
-        for ref in self.get_opt_opt(cmd_opt['mode'], cmd_opt['cmd']):
+        for ref in self.get_cmd_choices(cmd_opt['mode'], cmd_opt['cmd']):
             if 'fileio' not in ref or ref['fileio'] != 'in':
                 continue
             if ref['opt'] in cmd_opt and cmd_opt[ref['opt']] != '':
@@ -102,7 +102,7 @@ class Web(options.Options):
         opt_path.unlink()
 
     def mk_opt_list(self, opt:dict):
-        opt_schema = self.get_opt_opt(opt['mode'], opt['cmd'])
+        opt_schema = self.get_cmd_choices(opt['mode'], opt['cmd'])
         opt_list = ['-m', opt['mode'], '-c', opt['cmd']]
         file_dict = dict()
         for key, val in opt.items():
@@ -227,7 +227,10 @@ class Web(options.Options):
                 try:
                     ret = [to_json(o) for o in output.split('\n') if o.strip() != '']
                 except:
-                    ret = to_json(output)
+                    try:
+                        ret = to_json(output)
+                    except:
+                        ret = output
                 if nothread:
                     return ret
                 self.callback_return_cmd_exec_func(title, ret)
@@ -343,7 +346,7 @@ class Web(options.Options):
                 if cmd_title == '':
                     continue
                 cmd_opt = self.load_cmd(cmd_title)
-                #cmd_ref = self.get_opt_opt(cmd_opt['mode'], cmd_opt['cmd'])
+                #cmd_ref = self.get_cmd_choices(cmd_opt['mode'], cmd_opt['cmd'])
                 #chk_stdin = len([ref for ref in cmd_ref if ref['opt'] == 'stdin']) > 0
                 #chk_input_file = len([ref for ref in cmd_ref if ref['opt'] == 'input_file']) > 0
                 if 'capture_stdout' in cmd_opt:
@@ -428,7 +431,7 @@ class Web(options.Options):
             if cmd_title == '':
                 continue
             cmd_opt = self.load_cmd(cmd_title)
-            cmd_ref = self.get_opt_opt(cmd_opt['mode'], cmd_opt['cmd'])
+            cmd_ref = self.get_cmd_choices(cmd_opt['mode'], cmd_opt['cmd'])
             chk_stdin = len([ref for ref in cmd_ref if ref['opt'] == 'stdin']) > 0
 
             if 'output_csv' in cmd_opt and cmd_opt['output_csv'] != '':
@@ -552,6 +555,10 @@ class Web(options.Options):
                         return func
                     asset_func(asset_data)
 
+        redis_cli = None
+        if not self.client_only:
+            redis_cli = redis_client.RedisClient(self.logger, host=self.redis_host, port=self.redis_port, password=self.redis_password, svname=self.svname)
+
         @app.route('/bbforce_cmd')
         def bbforce_cmd():
             self.bbforce_cmd()
@@ -658,27 +665,30 @@ class Web(options.Options):
                 bottle.abort(400, 'Expected WebSocket request.')
             while True:
                 try:
-                    outputs = self.img_queue.get(block=True, timeout=0.1)
-                    if type(outputs) == tuple:
-                        fn = outputs[0]
-                        jpg_url = f"data:image/jpeg;base64,{convert.bytes2b64str(outputs[1])}"
-                        outputs = dict(output_image_name=fn)
-                        outputs['img_url'] = jpg_url
-                    elif 'output_image_shape' in outputs:
+                    try:
+                        outputs = self.img_queue.get(block=True, timeout=0.001)
+                    except queue.Empty:
+                        if redis_cli is not None:
+                            cmd, outputs = redis_cli.recive_showimg()
+                    if outputs is None:
+                        gevent.sleep(0.1)
+                        continue
+                    if 'output_image_shape' in outputs:
                         img_npy = convert.b64str2npy(outputs["output_image"], outputs["output_image_shape"])
                         jpg = convert.img2byte(convert.npy2img(img_npy), format='jpeg')
                         jpg_url = f"data:image/jpeg;base64,{convert.bytes2b64str(jpg)}"
                         del outputs["output_image"]
                         del outputs["output_image_shape"]
                         outputs['img_url'] = jpg_url
+                    elif type(outputs) == tuple:
+                        fn = outputs[0]
+                        jpg_url = f"data:image/jpeg;base64,{convert.bytes2b64str(outputs[1])}"
+                        outputs = dict(output_image_name=fn)
+                        outputs['img_url'] = jpg_url
                     wsock.send(json.dumps(outputs, default=common.default_json_enc))
-                except queue.Empty:
-                    pass
                 except:
                     self.logger.warning('websocket error', exc_info=True)
                     gevent.sleep(10)
-                finally:
-                    gevent.sleep(0.1)
 
         @app.route('/assets/<filename:path>')
         def assets(filename):

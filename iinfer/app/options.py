@@ -1,3 +1,4 @@
+from typing import List, Dict, Any 
 from iinfer.app import common
 import os
 
@@ -10,10 +11,22 @@ class Options:
         self._options = dict()
         self.init_options()
 
-    def get_mode_opt(self):
+    def get_modes(self) -> List[Dict[str, str]]:
+        """
+        起動モードの選択肢を取得します。
+        Returns:
+            List[Dict[str, str]]: 起動モードの選択肢
+        """
         return [''] + [{key:val} for key,val in self._options["mode"].items() if type(val) == dict]
 
-    def get_cmd_opt(self, mode):
+    def get_cmds(self, mode:str) -> List[Dict[str, str]]:
+        """
+        コマンドの選択肢を取得します。
+        Args:
+            mode: 起動モード
+        Returns:
+            List[Dict[str, str]]: コマンドの選択肢
+        """
         if mode not in self._options["cmd"]:
             return ['Please select mode.']
         ret = [{key:val} for key,val in self._options["cmd"][mode].items() if type(val) == dict]
@@ -21,15 +34,48 @@ class Options:
             return [''] + ret
         return ['Please select mode.']
 
-    def get_cmd_attr(self, mode, cmd, attr):
+    def get_cmd_attr(self, mode:str, cmd:str, attr:str) -> Any:
+        """
+        コマンドの属性を取得します。
+        Args:
+            mode: 起動モード
+            cmd: コマンド
+            attr: 属性
+        Returns:
+            Any: 属性の値
+        """
         if mode not in self._options["cmd"]:
             return [f'Unknown mode. ({mode})']
         if cmd is None or cmd == "" or cmd not in self._options["cmd"][mode]:
             return []
         return self._options["cmd"][mode][cmd][attr]
 
-    def get_opt_opt(self, mode, cmd):
+    def get_cmd_choices(self, mode:str, cmd:str) -> List[Dict[str, Any]]:
+        """
+        コマンドのオプション一覧を取得します。
+        Args:
+            mode: 起動モード
+            cmd: コマンド
+        Returns:
+            List[Dict[str, Any]]: オプションの選択肢
+        """
         return self.get_cmd_attr(mode, cmd, "choise")
+
+    def get_cmd_opt(self, mode:str, cmd:str, opt:str) -> Dict[str, Any]:
+        """
+        コマンドのオプションを取得します。
+        Args:
+            mode: 起動モード
+            cmd: コマンド
+            opt: オプション
+        Returns:
+            Dict[str, Any]: オプションの値
+        """
+        opts = self.get_cmd_choices(mode, cmd)
+        for o in opts:
+            if 'opt' in o and o['opt'] == opt:
+                return o
+        return None
 
     def list_options(self):
         def _list(ret, key, val):
@@ -1579,10 +1625,10 @@ class Options:
                              discription_ja="iinferサーバーへの接続を行わないようにします。",
                              discription_en="Do not make connections to the iinfer server."),
                         dict(opt="filer_html", type="file", default=None, required=False, multi=False, hide=False, choise=None,
-                             discription_ja=" `filer.html` を指定します。省略時はiinfer内蔵のHTMLファイルを使用します。",
+                             discription_ja="`filer.html` を指定します。省略時はiinfer内蔵のHTMLファイルを使用します。",
                              discription_en="Specify `filer.html`. If omitted, the iinfer built-in HTML file is used."),
                         dict(opt="showimg_html", type="file", default=None, required=False, multi=False, hide=False, choise=None,
-                             discription_ja=" `showimg.html` を指定します。省略時はiinfer内蔵のHTMLファイルを使用します。",
+                             discription_ja="`showimg.html` を指定します。省略時はiinfer内蔵のHTMLファイルを使用します。",
                              discription_en="Specify `showimg.html`. If omitted, the iinfer built-in HTML file is used."),
                         dict(opt="assets", type="file", default=None, required=False, multi=True, hide=False, choise=None,
                              discription_ja="htmlファイルを使用する場合に必要なアセットファイルを指定します。",
