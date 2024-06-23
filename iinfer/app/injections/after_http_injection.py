@@ -35,47 +35,33 @@ class AfterHttpInjection(injection.AfterInjection):
         """
         #import http
         #http.client.HTTPConnection.debuglevel=1
-        req_session = requests.Session()
+        self.req_session = requests.Session()
         try:
             url = self.get_config('outputs_url', None)
-            if url is None:
-                self.add_warning(outputs, "No outputs_url in config")
-            else:
+            if url is not None:
                 json_without_img = self.get_config('json_without_img', False)
                 if json_without_img:
                     del outputs['output_image']
                     del outputs['output_image_shape']
-                result = self.post_json(url, req_session, outputs)
+                result = self.post_json(url, outputs)
                 self.add_success(outputs, result)
         except Exception as e:
             self.add_warning(outputs, str(e))
 
         try:
             url = self.get_config('output_image_url', None)
-            if url is None:
-                self.add_warning(outputs, "No output_image_url in config")
-            else:
-                result = self.post_img(url, req_session, outputs, output_image)
+            if url is not None:
+                result = self.post_img(url, outputs, output_image)
                 self.add_success(outputs, result)
         except Exception as e:
             self.add_warning(outputs, str(e))
 
         return outputs, output_image
 
-    def post_text(self, url, req_session:requests.Session, res_str:str):
-        res = req_session.post(url, data=res_str, verify=False, timeout=30)
-        if res.status_code != 200:
-            raise Exception(f"HTTP POST request failed. status_code={res.status_code} res.reason={res.reason} res.text={res.text} url={url}")
-        try:
-            result = res.json()
-        except:
-            result = dict(success=res.text)
-        return result
-
-    def post_json(self, url, req_session:requests.Session, outputs:Dict[str, Any]):
+    def post_json(self, url, outputs:Dict[str, Any]):
         tm = time.time()
         self.logger.info(f'post_json start: {tm}')
-        res = req_session.post(url, json=outputs, verify=False, timeout=30)
+        res = self.req_session.post(url, json=outputs, verify=False, timeout=30)
         self.logger.info(f'post_json end: {time.time()-tm}')
         if res.status_code != 200:
             raise Exception(f"HTTP POST request failed. status_code={res.status_code} res.reason={res.reason} res.text={res.text} url={url}")
@@ -85,7 +71,7 @@ class AfterHttpInjection(injection.AfterInjection):
             result = dict(success=res.text)
         return result
 
-    def post_img(self, url, req_session:requests.Session, outputs:Dict[str, Any], output_image:Image.Image):
+    def post_img(self, url, outputs:Dict[str, Any], output_image:Image.Image):
         finename = self.get_config('fileup_name', None)
         ext = self.get_config('output_image_ext', 'jpeg')
         if finename is None:
@@ -96,7 +82,7 @@ class AfterHttpInjection(injection.AfterInjection):
         img_bytes = convert.img2byte(output_image, format=ext)
         file = {'file': (finename, io.BytesIO(img_bytes))}
 
-        res = req_session.post(url, files=file, verify=False, timeout=30)
+        res = self.req_session.post(url, files=file, verify=False, timeout=30)
         if res.status_code != 200:
             raise Exception(f"HTTP POST request failed. status_code={res.status_code} res.reason={res.reason} res.text={res.text} url={url}")
         try:

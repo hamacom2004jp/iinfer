@@ -664,6 +664,7 @@ class Web(options.Options):
             if not wsock:
                 bottle.abort(400, 'Expected WebSocket request.')
             while True:
+                outputs = None
                 try:
                     try:
                         outputs = self.img_queue.get(block=True, timeout=0.001)
@@ -680,13 +681,19 @@ class Web(options.Options):
                         del outputs["output_image"]
                         del outputs["output_image_shape"]
                         outputs['img_url'] = jpg_url
+                        outputs['img_id'] = outputs['output_image_name'].strip()
                     elif type(outputs) == tuple:
                         fn = outputs[0]
                         jpg_url = f"data:image/jpeg;base64,{convert.bytes2b64str(outputs[1])}"
                         outputs = dict(output_image_name=fn)
                         outputs['img_url'] = jpg_url
+                        outputs['img_id'] = fn
                     wsock.send(json.dumps(outputs, default=common.default_json_enc))
                 except:
+                    if outputs is not None:
+                        self.img_queue.put(outputs) # エラーが発生した場合はキューに戻す
+                        gevent.sleep(0.001)
+                        continue
                     self.logger.warning('websocket error', exc_info=True)
                     gevent.sleep(10)
 

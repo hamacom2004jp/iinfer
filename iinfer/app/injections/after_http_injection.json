@@ -1,6 +1,8 @@
 {
+    "fileup_name": "file",
     "outputs_url": "http://localhost:8081/showimg/pub_img",
     "output_image_url": "http://localhost:8081/showimg/pub_img",
+    "text_url": "http://localhost:8081/showimg/pub_img",
     "output_image_ext": "jpeg",
     "output_image_prefix": "output_",
     "json_without_img": true

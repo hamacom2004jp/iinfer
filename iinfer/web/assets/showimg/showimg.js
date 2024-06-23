@@ -102,24 +102,39 @@ $(() => {
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
       const img_url = data['img_url'];
+      const img_id = data['img_id'];
       const outputs = data['success'];
       const elem = $($("#img_template").html());
       if (img_url) {
-        $('#img_container .col-12').removeClass('col-12').addClass('col-2').find('img').css('height', '200px');
-        elem.removeClass('col-2').addClass('col-12').find('img').css('height', 'calc(100vh - 300px)');
-        elem.find('img').attr('src', img_url);
-        $('#img_container').prepend(elem.get(0));
-        if ($('#img_container .col-2').length > 6) {
-          $('#img_container .col-2:last').remove();
-        }
+        const img_12_elem = $('#img_container .col-12').find('img').css('height', 'calc(100vh - 300px)').attr('img_id', img_id);
+        const img_elem = elem.find('img').css('height', '200px').attr('img_id', img_id);
+        img_12_elem.attr('src', img_url);
+        img_elem.attr('src', img_url);
+        const click_func = (e) => {
+          $('#img_container img').removeClass('card-selected');
+          const img_e = $(e.currentTarget).addClass('card-selected');
+          const img_id = img_e.attr('img_id');
+          const img_12 = $('#img_container .col-12').find('img');
+          if (img_12.attr('img_id') != img_id) {
+            img_12.attr('src', img_e.attr('src')).attr('img_id', img_id);
+          }
+          $("#out_container").children('table').hide();
+          $("#out_container").children(`table[img_id="${img_id}"]`).show();
+        };
+        img_12_elem.off('click').on('click', click_func);
+        img_elem.off('click').on('click', click_func);
+        $('#img_container .col-12').after(elem.get(0));
+        $('#img_container .col-2:gt(5)').remove();
       }
       if (outputs) {
         const elem = $("#out_container");
-        elem.html('');
+        elem.children('table:visible').hide();
+        elem.children('table:visible:gt(5)').remove();
         render_result_func(elem, outputs);
-        table = elem.children('table');
-        thead = table.children('thead')
-        tbody = table.children('tbody');
+        const table = elem.children('table:visible');
+        table.attr('img_id', img_id);
+        const thead = table.children('thead')
+        const tbody = table.children('tbody');
         tbody.children('tr').addClass('old');
         thead.children('th').each((i, e) => {
           const head_th = $(e);
@@ -127,6 +142,13 @@ $(() => {
           tr = tbody.children(`[data-col="${i}"]`);
           tr.append(head_th);
         });
+        const title_keys = elem.data('title_keys');
+        if (title_keys) {
+          for (const key of title_keys.split(',')) {
+            if (!outputs[key]) continue;
+            tbody.prepend(`<tr class="table_title fs-1" style="overflow-wrap:break-word;word-break:break-all;"><th colspan="2">${outputs[key]}</th></tr>`);
+          }
+        }
         thead.remove();
         tbody.children('.old').each((i, e) => {
           const body_tr = $(e);

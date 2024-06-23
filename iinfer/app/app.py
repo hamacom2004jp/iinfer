@@ -1,6 +1,6 @@
 from iinfer import version
 from iinfer.app import common, client, gui, install, options, postprocess, redis, server, web
-from iinfer.app.postprocesses import cls_jadge, csv, det_clip, det_face_store, det_filter, det_jadge, httpreq, seg_bbox, seg_filter
+from iinfer.app.postprocesses import cls_jadge, csv, det_clip, det_face_store, det_filter, det_jadge, httpreq, seg_bbox, seg_filter, showimg
 from pathlib import Path
 import argparse
 import argcomplete
@@ -340,16 +340,15 @@ class IinferApp:
 
         elif args.mode == 'postprocess':
             logger, _ = common.load_config(args.mode)
-            def _to_proc(f, proc:postprocess.Postprocess, json_connectstr, img_connectstr, text_connectstr, timeout,
-                         format, tm, output_json, output_json_append, output_image_file=None, output_csv=None):
+            def _to_proc(f, proc:postprocess.Postprocess, timeout, format, tm,
+                         output_json, output_json_append, output_image_file=None, output_csv=None):
                 try:
                     for line in f:
                         line = line.rstrip()
                         if line == "":
                             continue
                         try:
-                            json_session, img_session, text_session = proc.create_session(json_connectstr, img_connectstr, text_connectstr)
-                            ret = proc.postprocess(json_session, img_session, text_session, line, output_image_file=output_image_file, timeout=timeout)
+                            ret = proc.postprocess(line, output_image_file=output_image_file, timeout=timeout)
                             if output_csv is not None:
                                 with open(output_csv, 'a' if output_json_append else 'w', encoding="utf-8") as f:
                                     txt = common.print_format(ret, format, tm, output_json, output_json_append, stdout=False)
@@ -368,14 +367,14 @@ class IinferApp:
                     except:
                         pass
 
-            def _exec_proc(input_file, stdin, proc:postprocess.Postprocess, json_connectstr, img_connectstr, text_connectstr, timeout,
-                           format, tm, output_json, output_json_append, output_image_file=None, output_csv=None):
+            def _exec_proc(input_file, stdin, proc:postprocess.Postprocess, timeout, format, tm,
+                           output_json, output_json_append, output_image_file=None, output_csv=None):
                 if input_file is not None:
                     with open(input_file, 'r', encoding="UTF-8") as f:
-                        ret = _to_proc(f, proc, json_connectstr, img_connectstr, None, timeout, format, tm, output_json, output_json_append,
+                        ret = _to_proc(f, proc, timeout, format, tm, output_json, output_json_append,
                                        output_image_file=output_image_file, output_csv=output_csv)
                 elif stdin:
-                    ret = _to_proc(sys.stdin, proc, json_connectstr, img_connectstr, None, timeout, format, tm, output_json, output_json_append,
+                    ret = _to_proc(sys.stdin, proc, timeout, format, tm, output_json, output_json_append,
                                    output_image_file=output_image_file, output_csv=output_csv)
                 else:
                     msg = {"warn":f"Image file or stdin is empty."}
@@ -392,8 +391,8 @@ class IinferApp:
                 except Exception as e:
                     common.print_format({"warn":f"Invalid options. {e}"}, args.format, tm, args.output_json, args.output_json_append)
                     return 1, msg
-                code, ret = _exec_proc(args.input_file, args.stdin, proc, args.json_connectstr, args.img_connectstr, None, args.timeout,
-                                       args.format, tm, args.output_json, args.output_json_append, output_image_file=args.output_image)
+                code, ret = _exec_proc(args.input_file, args.stdin, proc, args.timeout, args.format, tm,
+                                       args.output_json, args.output_json_append, output_image_file=args.output_image)
                 if code != 0:
                     return code, ret
 
@@ -403,8 +402,8 @@ class IinferApp:
                 except Exception as e:
                     common.print_format({"warn":f"Invalid options. {e}"}, args.format, tm, args.output_json, args.output_json_append)
                     return 1, msg
-                code, ret = _exec_proc(args.input_file, args.stdin, proc, args.json_connectstr, args.img_connectstr, None, args.timeout,
-                                       False, tm, None, False, output_image_file=None, output_csv=args.output_csv)
+                code, ret = _exec_proc(args.input_file, args.stdin, proc, args.timeout, False, tm,
+                                       None, False, output_image_file=None, output_csv=args.output_csv)
                 if code != 0:
                     return code, ret
 
@@ -414,8 +413,8 @@ class IinferApp:
                 except Exception as e:
                     common.print_format({"warn":f"Invalid options. {e}"}, args.format, tm, args.output_json, args.output_json_append)
                     return 1, msg
-                code, ret = _exec_proc(args.input_file, args.stdin, proc, args.json_connectstr, args.img_connectstr, None, args.timeout,
-                                       False, tm, None, False, output_image_file=None, output_csv=args.output_csv)
+                code, ret = _exec_proc(args.input_file, args.stdin, proc, args.timeout, False, tm,
+                                       None, False, output_image_file=None, output_csv=args.output_csv)
                 if code != 0:
                     return code, ret
 
@@ -426,8 +425,8 @@ class IinferApp:
                 except Exception as e:
                     common.print_format({"warn":f"Invalid options. {e}"}, args.format, tm, args.output_json, args.output_json_append)
                     return 1, msg
-                code, ret = _exec_proc(args.input_file, args.stdin, proc, args.json_connectstr, args.img_connectstr, None, args.timeout,
-                                       False, tm, args.output_json, args.output_json_append, output_image_file=None)
+                code, ret = _exec_proc(args.input_file, args.stdin, proc, args.timeout, False, tm,
+                                       args.output_json, args.output_json_append, output_image_file=None)
                 if code != 0:
                     return code, ret
 
@@ -438,8 +437,8 @@ class IinferApp:
                 except Exception as e:
                     common.print_format({"warn":f"Invalid options. {e}"}, args.format, tm, args.output_json, args.output_json_append)
                     return 1, msg
-                code, ret = _exec_proc(args.input_file, args.stdin, proc, args.json_connectstr, args.img_connectstr, None, args.timeout,
-                                       args.format, tm, args.output_json, args.output_json_append, output_image_file=args.output_image)
+                code, ret = _exec_proc(args.input_file, args.stdin, proc, args.timeout, args.format, tm,
+                                       args.output_json, args.output_json_append, output_image_file=args.output_image)
                 if code != 0:
                     return code, ret
 
@@ -452,8 +451,8 @@ class IinferApp:
                 except Exception as e:
                     common.print_format({"warn":f"Invalid options. {e}"}, args.format, tm, args.output_json, args.output_json_append)
                     return 1, msg
-                code, ret = _exec_proc(args.input_file, args.stdin, proc, args.json_connectstr, args.img_connectstr, None, args.timeout,
-                                       args.format, tm, args.output_json, args.output_json_append, output_image_file=args.output_image)
+                code, ret = _exec_proc(args.input_file, args.stdin, proc, args.timeout, args.format, tm,
+                                       args.output_json, args.output_json_append, output_image_file=args.output_image)
                 if code != 0:
                     return code, ret
 
@@ -463,8 +462,8 @@ class IinferApp:
                 except Exception as e:
                     common.print_format({"warn":f"Invalid options. {e}"}, args.format, tm, args.output_json, args.output_json_append)
                     return 1, msg
-                code, ret = _exec_proc(args.input_file, args.stdin, proc, args.json_connectstr, args.img_connectstr, args.text_connectstr,
-                                       args.timeout, args.format, tm, None, False, output_image_file=None)
+                code, ret = _exec_proc(args.input_file, args.stdin, proc, args.timeout, args.format, tm,
+                                       None, False, output_image_file=None)
                 if code != 0:
                     return code, ret
 
@@ -475,8 +474,8 @@ class IinferApp:
                 except Exception as e:
                     common.print_format({"warn":f"Invalid options. {e}"}, args.format, tm, args.output_json, args.output_json_append)
                     return 1, msg
-                code, ret = _exec_proc(args.input_file, args.stdin, proc, args.json_connectstr, args.img_connectstr, None, args.timeout,
-                                       args.format, tm, args.output_json, args.output_json_append, output_image_file=args.output_image)
+                code, ret = _exec_proc(args.input_file, args.stdin, proc, args.timeout, args.format, tm,
+                                       args.output_json, args.output_json_append, output_image_file=args.output_image)
                 if code != 0:
                     return code, ret
 
@@ -487,8 +486,19 @@ class IinferApp:
                 except Exception as e:
                     common.print_format({"warn":f"Invalid options. {e}"}, args.format, tm, args.output_json, args.output_json_append)
                     return 1, msg
-                code, ret = _exec_proc(args.input_file, args.stdin, proc, args.json_connectstr, args.img_connectstr, None, args.timeout,
-                                       args.format, tm, args.output_json, args.output_json_append, output_image_file=args.output_image)
+                code, ret = _exec_proc(args.input_file, args.stdin, proc, args.timeout, args.format, tm,
+                                       args.output_json, args.output_json_append, output_image_file=args.output_image)
+                if code != 0:
+                    return code, ret
+
+            elif args.cmd == 'showimg':
+                try:
+                    proc = showimg.Showimg(logger, host=args.host, port=args.port, password=args.password, svname=args.svname, maxrecsize=args.maxrecsize)
+                except Exception as e:
+                    common.print_format({"warn":f"Invalid options. {e}"}, args.format, tm, args.output_json, args.output_json_append)
+                    return 1, msg
+                code, ret = _exec_proc(args.input_file, args.stdin, proc, args.timeout, args.format, tm,
+                                       None, None, output_image_file=None)
                 if code != 0:
                     return code, ret
 

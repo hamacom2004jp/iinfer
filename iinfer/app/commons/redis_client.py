@@ -51,7 +51,10 @@ class RedisClient(object):
 
     def blpop(self, name:str, timeout:int=1):
         return self.redis_cli.blpop(name, timeout=timeout)
-    
+
+    def lpop(self, name:str):
+        return self.redis_cli.lpop(name)
+
     def hset(self, name:str, key:str, value):
         self.redis_cli.hset(name, key, str(value))
 
@@ -167,13 +170,13 @@ class RedisClient(object):
             performance.append(dict(key="cl_svreqest", val=f"{time.perf_counter()-sreqtime:.3f}s"))
         return res_json
 
-    def recive_showimg(self, timeout:int=1):
+    def recive_showimg(self):
         if not self.check_server(find_svname=False):
             return None, None
-        result = self.blpop(self.siname, timeout=timeout)
+        result = self.lpop(self.siname)
         if result is None or len(result) <= 0:
             return None, None
-        msg = result[1].decode().split(' ')
+        msg = result.decode().split(' ')
         if len(msg) <= 0:
             return None, None
         cmd = msg[0]

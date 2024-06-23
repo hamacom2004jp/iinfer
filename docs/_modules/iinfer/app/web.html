@@ -841,6 +841,7 @@
             <span class="k">if</span> <span class="ow">not</span> <span class="n">wsock</span><span class="p">:</span>
                 <span class="n">bottle</span><span class="o">.</span><span class="n">abort</span><span class="p">(</span><span class="mi">400</span><span class="p">,</span> <span class="s1">&#39;Expected WebSocket request.&#39;</span><span class="p">)</span>
             <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="n">outputs</span> <span class="o">=</span> <span class="kc">None</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="k">try</span><span class="p">:</span>
                         <span class="n">outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">img_queue</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">block</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mf">0.001</span><span class="p">)</span>
@@ -857,13 +858,19 @@
                         <span class="k">del</span> <span class="n">outputs</span><span class="p">[</span><span class="s2">&quot;output_image&quot;</span><span class="p">]</span>
                         <span class="k">del</span> <span class="n">outputs</span><span class="p">[</span><span class="s2">&quot;output_image_shape&quot;</span><span class="p">]</span>
                         <span class="n">outputs</span><span class="p">[</span><span class="s1">&#39;img_url&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">jpg_url</span>
+                        <span class="n">outputs</span><span class="p">[</span><span class="s1">&#39;img_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">outputs</span><span class="p">[</span><span class="s1">&#39;output_image_name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
                     <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">outputs</span><span class="p">)</span> <span class="o">==</span> <span class="nb">tuple</span><span class="p">:</span>
                         <span class="n">fn</span> <span class="o">=</span> <span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
                         <span class="n">jpg_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;data:image/jpeg;base64,</span><span class="si">{</span><span class="n">convert</span><span class="o">.</span><span class="n">bytes2b64str</span><span class="p">(</span><span class="n">outputs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span>
                         <span class="n">outputs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">output_image_name</span><span class="o">=</span><span class="n">fn</span><span class="p">)</span>
                         <span class="n">outputs</span><span class="p">[</span><span class="s1">&#39;img_url&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">jpg_url</span>
+                        <span class="n">outputs</span><span class="p">[</span><span class="s1">&#39;img_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fn</span>
                     <span class="n">wsock</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">common</span><span class="o">.</span><span class="n">default_json_enc</span><span class="p">))</span>
                 <span class="k">except</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">outputs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">img_queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">outputs</span><span class="p">)</span> <span class="c1"># エラーが発生した場合はキューに戻す</span>
+                        <span class="n">gevent</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.001</span><span class="p">)</span>
+                        <span class="k">continue</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;websocket error&#39;</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
                     <span class="n">gevent</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
 

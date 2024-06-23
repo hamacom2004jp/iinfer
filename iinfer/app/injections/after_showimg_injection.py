@@ -42,30 +42,18 @@ class AfterShowimgInjection(injection.AfterInjection):
         port = self.get_config('port', self.default_port)
         password = self.get_config('password', self.default_password)
         svname = self.get_config('svname', self.default_svname)
+        maxrecsize = self.get_config('maxrecsize', 200)
         self.redis_cli = redis_client.RedisClient(self.logger, host=host, port=port, password=password, svname=svname)
 
         try:
             img_npy = convert.img2npy(output_image)
             outputs['output_image'] = convert.npy2b64str(img_npy)
             outputs['output_image_shape'] = img_npy.shape
-            result = self.post_json(outputs)
+            result = self.redis_cli.send_showimg('outputs', outputs, maxrecsize=maxrecsize)
             self.add_success(outputs, result)
+            del outputs['output_image']
+            del outputs['output_image_shape']
         except Exception as e:
             self.add_warning(outputs, str(e))
 
         return outputs, output_image
-
-    def post_text(self, res_str:str):
-        maxrecsize = self.get_config('maxrecsize', 200)
-        result = self.redis_cli.send_showimg('text', res_str, maxrecsize=maxrecsize)
-        return result
-
-    def post_json(self, outputs:Dict[str, Any]):
-        maxrecsize = self.get_config('maxrecsize', 200)
-        result = self.redis_cli.send_showimg('outputs', outputs, maxrecsize=maxrecsize)
-        return result
-
-    def post_img(self, outputs:Dict[str, Any], output_image:Image.Image):
-        maxrecsize = self.get_config('maxrecsize', 200)
-        result = self.redis_cli.send_showimg('output_image', outputs, output_image, maxrecsize=maxrecsize)
-        return result

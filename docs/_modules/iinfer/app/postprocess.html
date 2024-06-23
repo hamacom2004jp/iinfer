@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>iinfer.app.postprocess &mdash; iinfer 2024/06/17 documentation</title>
+  <title>iinfer.app.postprocess &mdash; iinfer 2024/06/23 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -15,7 +15,7 @@
   
         <script src="../../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=c5f1a75e"></script>
+        <script src="../../../_static/documentation_options.js?v=94d0cd35"></script>
         <script src="../../../_static/doctools.js?v=9a2dae69"></script>
         <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -88,142 +88,67 @@
              
   <h1>Source code for iinfer.app.postprocess</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">iinfer.app.commons</span> <span class="kn">import</span> <span class="n">convert</span>
+<span class="kn">from</span> <span class="nn">iinfer.app</span> <span class="kn">import</span> <span class="n">injection</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Any</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">json</span>
 
 <div class="viewcode-block" id="Postprocess">
 <a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.postprocess.Postprocess">[docs]</a>
 <span class="k">class</span> <span class="nc">Postprocess</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">json_without_img</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        後処理クラスのベースクラスです。</span>
 <span class="sd">        後処理クラスはこのクラスを継承してください。</span>
 <span class="sd">        </span>
 <span class="sd">        Args:</span>
 <span class="sd">            logger (logging.Logger): ロガー</span>
-<span class="sd">            json_without_img (bool, optional): JSONに画像を含めない場合はTrue。デフォルトはFalse。</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logger</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">json_without_img</span> <span class="o">=</span> <span class="n">json_without_img</span>
 
 <div class="viewcode-block" id="Postprocess.postprocess">
 <a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.postprocess.Postprocess.postprocess">[docs]</a>
-    <span class="k">def</span> <span class="nf">postprocess</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">json_session</span><span class="p">,</span> <span class="n">img_session</span><span class="p">,</span> <span class="n">text_session</span><span class="p">,</span> <span class="n">res_str</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">output_image_file</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">            ポストプロセスを実行します。</span>
+    <span class="k">def</span> <span class="nf">postprocess</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">res_str</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">output_image_file</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="n">outputs</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">res_str</span><span class="p">)</span>
+        <span class="n">output_image</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="s2">&quot;output_image&quot;</span> <span class="ow">in</span> <span class="n">outputs</span> <span class="ow">and</span> <span class="s2">&quot;output_image_shape&quot;</span> <span class="ow">in</span> <span class="n">outputs</span><span class="p">:</span>
+            <span class="n">img_npy</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">b64str2npy</span><span class="p">(</span><span class="n">outputs</span><span class="p">[</span><span class="s2">&quot;output_image&quot;</span><span class="p">],</span> <span class="n">outputs</span><span class="p">[</span><span class="s2">&quot;output_image_shape&quot;</span><span class="p">])</span>
+            <span class="n">output_image</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">npy2img</span><span class="p">(</span><span class="n">img_npy</span><span class="p">)</span>
+            <span class="k">del</span> <span class="n">outputs</span><span class="p">[</span><span class="s2">&quot;output_image&quot;</span><span class="p">]</span>
+            <span class="k">del</span> <span class="n">outputs</span><span class="p">[</span><span class="s2">&quot;output_image_shape&quot;</span><span class="p">]</span>
 
-<span class="sd">            Args:</span>
-<span class="sd">                json_session (任意): JSONセッション</span>
-<span class="sd">                img_session (任意): 画像セッション</span>
-<span class="sd">                text_session (任意): テキストセッション</span>
-<span class="sd">                res_str (str): 推論結果の文字列</span>
-<span class="sd">                output_image_file (str, optional): 出力画像ファイル名。デフォルトはNone。</span>
-<span class="sd">                timeout (int, optional): タイムアウト時間（秒）。デフォルトは60。</span>
+        <span class="n">result_outputs</span><span class="p">,</span> <span class="n">result_output_image</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">output_image</span><span class="p">)</span>
+        <span class="n">output_image_npy</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">output_image_b64</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">result_output_image</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">output_image_npy</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">img2npy</span><span class="p">(</span><span class="n">result_output_image</span><span class="p">)</span>
+            <span class="n">output_image_b64</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">npy2b64str</span><span class="p">(</span><span class="n">output_image_npy</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">output_image_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">exp</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">output_image_file</span><span class="p">)</span><span class="o">.</span><span class="n">suffix</span>
+                <span class="n">exp</span> <span class="o">=</span> <span class="n">exp</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="k">if</span> <span class="n">exp</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;.&#39;</span> <span class="k">else</span> <span class="n">exp</span>
+                <span class="n">convert</span><span class="o">.</span><span class="n">npy2imgfile</span><span class="p">(</span><span class="n">output_image_npy</span><span class="p">,</span> <span class="n">output_image_file</span><span class="o">=</span><span class="n">output_image_file</span><span class="p">,</span> <span class="n">image_type</span><span class="o">=</span><span class="n">exp</span><span class="p">)</span>
 
-<span class="sd">            Returns:</span>
-<span class="sd">                Dict[str, Any]: 処理結果(処理後の画像含む)</span>
-<span class="sd">            &quot;&quot;&quot;</span>
-            <span class="k">if</span> <span class="n">text_session</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_text</span><span class="p">(</span><span class="n">text_session</span><span class="p">,</span> <span class="n">res_str</span><span class="p">)</span>
-
-            <span class="k">if</span> <span class="n">json_session</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">outputs</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">res_str</span><span class="p">)</span>
-                <span class="n">output_image</span> <span class="o">=</span> <span class="kc">None</span>
-                <span class="k">if</span> <span class="s2">&quot;output_image&quot;</span> <span class="ow">in</span> <span class="n">outputs</span> <span class="ow">and</span> <span class="s2">&quot;output_image_shape&quot;</span> <span class="ow">in</span> <span class="n">outputs</span><span class="p">:</span>
-                    <span class="n">img_npy</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">b64str2npy</span><span class="p">(</span><span class="n">outputs</span><span class="p">[</span><span class="s2">&quot;output_image&quot;</span><span class="p">],</span> <span class="n">outputs</span><span class="p">[</span><span class="s2">&quot;output_image_shape&quot;</span><span class="p">])</span>
-                    <span class="n">output_image</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">npy2img</span><span class="p">(</span><span class="n">img_npy</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">json_without_img</span><span class="p">:</span>
-                        <span class="k">del</span> <span class="n">outputs</span><span class="p">[</span><span class="s2">&quot;output_image&quot;</span><span class="p">]</span>
-                        <span class="k">del</span> <span class="n">outputs</span><span class="p">[</span><span class="s2">&quot;output_image_shape&quot;</span><span class="p">]</span>
-
-                <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_json</span><span class="p">(</span><span class="n">json_session</span><span class="p">,</span> <span class="n">outputs</span><span class="p">,</span> <span class="n">output_image</span><span class="p">)</span>
-
-                <span class="k">if</span> <span class="n">img_session</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="o">==</span> <span class="nb">dict</span> <span class="ow">and</span> <span class="n">output_image</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                        <span class="n">output_image</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_img</span><span class="p">(</span><span class="n">img_session</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="n">output_image</span><span class="p">)</span>
-                        <span class="n">output_image_npy</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">img2npy</span><span class="p">(</span><span class="n">output_image</span><span class="p">)</span>
-                        <span class="n">output_image_b64</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">npy2b64str</span><span class="p">(</span><span class="n">output_image_npy</span><span class="p">)</span>
-                        <span class="k">if</span> <span class="n">output_image_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                            <span class="n">exp</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">output_image_file</span><span class="p">)</span><span class="o">.</span><span class="n">suffix</span>
-                            <span class="n">exp</span> <span class="o">=</span> <span class="n">exp</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="k">if</span> <span class="n">exp</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;.&#39;</span> <span class="k">else</span> <span class="n">exp</span>
-                            <span class="n">convert</span><span class="o">.</span><span class="n">npy2imgfile</span><span class="p">(</span><span class="n">output_image_npy</span><span class="p">,</span> <span class="n">output_image_file</span><span class="o">=</span><span class="n">output_image_file</span><span class="p">,</span> <span class="n">image_type</span><span class="o">=</span><span class="n">exp</span><span class="p">)</span>
-                        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">success</span><span class="o">=</span><span class="n">result</span><span class="p">,</span> <span class="n">output_image</span><span class="o">=</span><span class="n">output_image_b64</span><span class="p">,</span> <span class="n">output_image_shape</span><span class="o">=</span><span class="n">output_image_npy</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">output_image_name</span><span class="o">=</span><span class="n">outputs</span><span class="p">[</span><span class="s2">&quot;output_image_name&quot;</span><span class="p">])</span>
-                    
-            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">result</span>
-            <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">success</span><span class="o">=</span><span class="n">result</span><span class="p">)</span></div>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">result_outputs</span><span class="p">)</span> <span class="o">==</span> <span class="nb">dict</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">output_image_b64</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">success</span><span class="o">=</span><span class="n">result_outputs</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">success</span><span class="o">=</span><span class="n">result_outputs</span><span class="p">,</span> <span class="n">output_image</span><span class="o">=</span><span class="n">output_image_b64</span><span class="p">,</span> <span class="n">output_image_shape</span><span class="o">=</span><span class="n">output_image_npy</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">output_image_name</span><span class="o">=</span><span class="n">outputs</span><span class="p">[</span><span class="s2">&quot;output_image_name&quot;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">result_outputs</span></div>
 
 
-<div class="viewcode-block" id="Postprocess.create_session">
-<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.postprocess.Postprocess.create_session">[docs]</a>
-    <span class="k">def</span> <span class="nf">create_session</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">json_connectstr</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">img_connectstr</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">text_connectstr</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+<div class="viewcode-block" id="Postprocess.post">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.postprocess.Postprocess.post">[docs]</a>
+    <span class="k">def</span> <span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outputs</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">output_image</span><span class="p">:</span><span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        後処理のセッションを作成する関数です。</span>
-<span class="sd">        ここで後処理準備を完了するようにしてください。</span>
-<span class="sd">        戻り値の後処理セッションの型は問いません。</span>
+<span class="sd">        後処理を行う関数です。</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            json_connectstr (str): 推論結果後処理のセッション確立に必要な接続文字列</span>
-<span class="sd">            img_connectstr (str): 可視化画像後処理のセッション確立に必要な接続文字列</span>
-<span class="sd">            text_connectstr (str): テキストデータ処理のセッション確立に必要な接続文字列</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            推論結果後処理のセッション</span>
-<span class="sd">            可視化画像後処理のセッション</span>
-<span class="sd">            テキストデータ処理のセッション</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
-
-
-<div class="viewcode-block" id="Postprocess.post_text">
-<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.postprocess.Postprocess.post_text">[docs]</a>
-    <span class="k">def</span> <span class="nf">post_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text_session</span><span class="p">,</span> <span class="n">res_str</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        res_strに対して後処理を行う関数です。</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            text_session (任意): テキストセッション</span>
-<span class="sd">            res_str (text): 入力テキスト</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            str: 後処理結果</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
-
-
-<div class="viewcode-block" id="Postprocess.post_json">
-<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.postprocess.Postprocess.post_json">[docs]</a>
-    <span class="k">def</span> <span class="nf">post_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">json_session</span><span class="p">,</span> <span class="n">outputs</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">output_image</span><span class="p">:</span><span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        outputsに対して後処理を行う関数です。</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            json_session (任意): JSONセッション</span>
 <span class="sd">            outputs (Dict[str, Any]): 推論結果</span>
 <span class="sd">            output_image (Image.Image): 入力画像（RGB配列であること）</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            Dict[str, Any]: 後処理結果</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
-
-
-<div class="viewcode-block" id="Postprocess.post_img">
-<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.postprocess.Postprocess.post_img">[docs]</a>
-    <span class="k">def</span> <span class="nf">post_img</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">img_session</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">output_image</span><span class="p">:</span><span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        output_imageに対して後処理を行う関数です。</span>
-<span class="sd">        引数のimageはRGBですので、戻り値の出力画像もRGBにしてください。</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            img_session (任意): 画像セッション</span>
-<span class="sd">            result (Dict[str, Any]): 後処理結果</span>
-<span class="sd">            output_image (Image.Image): 入力画像（RGB配列であること）</span>
-
-<span class="sd">        Returns:</span>
 <span class="sd">            Image: 後処理結果</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>

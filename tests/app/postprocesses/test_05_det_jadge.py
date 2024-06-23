@@ -4,7 +4,7 @@ from iinfer.app.postprocesses.det_jadge import DetJadge
 import logging
 
 
-def test_post_json():
+def test_post():
     # DetJadgeクラスのコンストラクタに渡すパラメータ
     ok_score_th = 0.5
     ok_classes = [1, 2]
@@ -44,9 +44,9 @@ def test_post_json():
     )
 
     # post_jsonメソッドを呼び出し、結果を取得
-    result = det_jadge.post_json(json_session, json_data, output_image)
+    result, result_image = det_jadge.post(json_data, output_image)
 
     # 結果を検証
-    assert result['output_jadge_score'] == [0.7, 0.4, 0.0]
-    assert result['output_jadge_label'] == ['ok', 'ng', 'gray']
-    assert result['output_jadge'] == 'ng'
+    assert result['success']['output_jadge_score'] == [0.7, 0.4, 0.0]
+    assert result['success']['output_jadge_label'] == ['ok', 'ng', 'gray']
+    assert result['success']['output_jadge'] == 'ng'

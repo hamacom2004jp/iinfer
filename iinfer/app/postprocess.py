@@ -1,124 +1,58 @@
 from iinfer.app.commons import convert
+from iinfer.app import injection
 from pathlib import Path
 from PIL import Image
-from typing import Dict, Any
+from typing import Dict, Tuple, Any
 import logging
 import json
 
 class Postprocess(object):
-    def __init__(self, logger:logging.Logger, json_without_img:bool=False):
+    def __init__(self, logger:logging.Logger):
         """
         後処理クラスのベースクラスです。
         後処理クラスはこのクラスを継承してください。
         
         Args:
             logger (logging.Logger): ロガー
-            json_without_img (bool, optional): JSONに画像を含めない場合はTrue。デフォルトはFalse。
         """
         self.logger = logger
-        self.json_without_img = json_without_img
 
-    def postprocess(self, json_session, img_session, text_session, res_str:str, output_image_file:str=None, timeout:int=60) -> Dict[str, Any]:
-            """
-            ポストプロセスを実行します。
+    def postprocess(self, res_str:str, output_image_file:str=None, timeout:int=60) -> Dict[str, Any]:
+        outputs = json.loads(res_str)
+        output_image = None
+        if "output_image" in outputs and "output_image_shape" in outputs:
+            img_npy = convert.b64str2npy(outputs["output_image"], outputs["output_image_shape"])
+            output_image = convert.npy2img(img_npy)
+            del outputs["output_image"]
+            del outputs["output_image_shape"]
 
-            Args:
-                json_session (任意): JSONセッション
-                img_session (任意): 画像セッション
-                text_session (任意): テキストセッション
-                res_str (str): 推論結果の文字列
-                output_image_file (str, optional): 出力画像ファイル名。デフォルトはNone。
-                timeout (int, optional): タイムアウト時間（秒）。デフォルトは60。
+        result_outputs, result_output_image = self.post(outputs, output_image)
+        output_image_npy = None
+        output_image_b64 = None
+        if result_output_image is not None:
+            output_image_npy = convert.img2npy(result_output_image)
+            output_image_b64 = convert.npy2b64str(output_image_npy)
+            if output_image_file is not None:
+                exp = Path(output_image_file).suffix
+                exp = exp[1:] if exp[0] == '.' else exp
+                convert.npy2imgfile(output_image_npy, output_image_file=output_image_file, image_type=exp)
 
-            Returns:
-                Dict[str, Any]: 処理結果(処理後の画像含む)
-            """
-            if text_session is not None:
-                result = self.post_text(text_session, res_str)
+        if type(result_outputs) == dict:
+            if output_image_b64 is None:
+                return dict(success=result_outputs)
+            return dict(success=result_outputs, output_image=output_image_b64, output_image_shape=output_image_npy.shape, output_image_name=outputs["output_image_name"])
+        return result_outputs
 
-            if json_session is not None:
-                outputs = json.loads(res_str)
-                output_image = None
-                if "output_image" in outputs and "output_image_shape" in outputs:
-                    img_npy = convert.b64str2npy(outputs["output_image"], outputs["output_image_shape"])
-                    output_image = convert.npy2img(img_npy)
-                    if self.json_without_img:
-                        del outputs["output_image"]
-                        del outputs["output_image_shape"]
-
-                result = self.post_json(json_session, outputs, output_image)
-
-                if img_session is not None:
-                    if type(result) == dict and output_image is not None:
-                        output_image = self.post_img(img_session, result, output_image)
-                        output_image_npy = convert.img2npy(output_image)
-                        output_image_b64 = convert.npy2b64str(output_image_npy)
-                        if output_image_file is not None:
-                            exp = Path(output_image_file).suffix
-                            exp = exp[1:] if exp[0] == '.' else exp
-                            convert.npy2imgfile(output_image_npy, output_image_file=output_image_file, image_type=exp)
-                        return dict(success=result, output_image=output_image_b64, output_image_shape=output_image_npy.shape, output_image_name=outputs["output_image_name"])
-                    
-            if type(result) == str:
-                return result
-            return dict(success=result)
-
-    def create_session(self, json_connectstr:str, img_connectstr:str, text_connectstr:str):
+    def post(self, outputs:Dict[str, Any], output_image:Image.Image) -> Tuple[Dict[str, Any], Image.Image]:
         """
-        後処理のセッションを作成する関数です。
-        ここで後処理準備を完了するようにしてください。
-        戻り値の後処理セッションの型は問いません。
+        後処理を行う関数です。
 
         Args:
-            json_connectstr (str): 推論結果後処理のセッション確立に必要な接続文字列
-            img_connectstr (str): 可視化画像後処理のセッション確立に必要な接続文字列
-            text_connectstr (str): テキストデータ処理のセッション確立に必要な接続文字列
-
-        Returns:
-            推論結果後処理のセッション
-            可視化画像後処理のセッション
-            テキストデータ処理のセッション
-        """
-        raise NotImplementedError()
-
-    def post_text(self, text_session, res_str:str):
-        """
-        res_strに対して後処理を行う関数です。
-
-        Args:
-            text_session (任意): テキストセッション
-            res_str (text): 入力テキスト
-
-        Returns:
-            str: 後処理結果
-        """
-        raise NotImplementedError()
-
-    def post_json(self, json_session, outputs:Dict[str, Any], output_image:Image.Image):
-        """
-        outputsに対して後処理を行う関数です。
-
-        Args:
-            json_session (任意): JSONセッション
             outputs (Dict[str, Any]): 推論結果
             output_image (Image.Image): 入力画像（RGB配列であること）
 
         Returns:
             Dict[str, Any]: 後処理結果
-        """
-        raise NotImplementedError()
-
-    def post_img(self, img_session, result:Dict[str, Any], output_image:Image.Image):
-        """
-        output_imageに対して後処理を行う関数です。
-        引数のimageはRGBですので、戻り値の出力画像もRGBにしてください。
-
-        Args:
-            img_session (任意): 画像セッション
-            result (Dict[str, Any]): 後処理結果
-            output_image (Image.Image): 入力画像（RGB配列であること）
-
-        Returns:
             Image: 後処理結果
         """
         raise NotImplementedError()

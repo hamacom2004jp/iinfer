@@ -8,6 +8,9 @@
         box-shadow: 0 0 8px gray;
         cursor: pointer;
     }
+    .card-selected {
+        box-shadow: 0 0 8px red;
+    }
     </style>
 </head>
 <body lang="ja" class="overflow-hidden p-2">
@@ -45,11 +48,19 @@
     <!-- メインコンテナ -->
     <div id="main_container" class="container-fluid overflow-auto split-pane fixed-left" style="margin-top:40px;height:calc(100vh - 78px);">
         <!-- 画像表示側 -->
-        <div id="img_container" class="split-pane-component row" style="width:70%;"></div>
+        <div id="img_container" class="split-pane-component row" style="width:70%;">
+            <div class="col-12 p-1">
+                <div class="card card-hover">
+                    <div class="card-body p-0">
+                        <img class="card-img" style="object-fit:contain;">
+                    </div>
+                </div>
+            </div>
+        </div>
         <!-- 左右のスプリッター -->
         <div class="split-pane-divider" style="left:70%;border:solid 1px;"></div>
         <!-- 結果表示側 -->
-        <div id="out_container" class="split-pane-component" style="left:70%;"></div>
+        <div id="out_container" class="split-pane-component" style="left:70%;" data-title_keys="image_name,aaa"></div>
     </div>
     <!-- 画像表示のテンプレ -->
     <div id="img_template" class="d-none">
