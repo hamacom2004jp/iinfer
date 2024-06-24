@@ -1,5 +1,8 @@
 from iinfer import version
+from pathlib import Path
 from setuptools import setup
+from setuptools.command.install import install
+import platform
 
 
 DESCRIPTION = 'iinfer: An application that executes AI model files in onnx or mmlab format.'
@@ -51,6 +54,23 @@ with open('README.md', 'r', encoding='utf-8') as fp:
 LONG_DESCRIPTION = readme
 LONG_DESCRIPTION_CONTENT_TYPE = 'text/markdown'
 RESORCE_TEXT_FILES = dict(iinfer=['*.yml', 'extensions/*', 'extensions/*/*', 'extensions/*/*/*', 'docker/*', 'licenses/*', 'web/*', 'web/*/*', 'web/*/*/*', 'web/*/*/*/*', 'web/*/*/*/*/*'])
+
+class CustomInstallCommand(install):
+    def run(self):
+        super().run()
+        if platform.system() != 'Linux':
+            return
+        bashrc = Path.home() / '.bashrc'
+        if not bashrc.exists():
+            return
+        CMD = 'eval "$(register-python-argcomplete iinfer)"'
+        with open(bashrc, 'r') as fp:
+            for line in fp:
+                if line == CMD:
+                    return
+        with open(bashrc, 'a') as fp:
+            fp.write('\n'+CMD)
+
 setup(
     name=NAME,
     version=VERSION,
@@ -71,5 +91,6 @@ setup(
     install_requires=INSTALL_REQUIRES,
     package_data=RESORCE_TEXT_FILES,
     include_package_data=True,
-    entry_points=dict(console_scripts=['iinfer=iinfer.app.app:main'])
+    entry_points=dict(console_scripts=['iinfer=iinfer.app.app:main']),
+    cmdclass={'install': CustomInstallCommand},
 )

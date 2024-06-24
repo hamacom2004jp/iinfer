@@ -155,9 +155,9 @@ class Install(object):
 
     def _torch(self, install_use_gpu:bool=False):
         if install_use_gpu:
-            returncode, _ = common.cmd('pip install torch==2.1.0 torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118', logger=self.logger)
+            returncode, _ = common.cmd('pip install \'numpy<2.0\' torch==2.1.0 torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118', logger=self.logger)
         else:
-            returncode, _ = common.cmd('pip install torch==2.1.0 torchvision torchaudio', logger=self.logger)
+            returncode, _ = common.cmd('pip install \'numpy<2.0\' torch==2.1.0 torchvision torchaudio', logger=self.logger)
         if returncode != 0:
             self.logger.error(f"Failed to install torch torchvision torchaudio.")
             return {"error": f"Failed to install torch torchvision torchaudio."}

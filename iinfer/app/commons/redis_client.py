@@ -120,9 +120,9 @@ class RedisClient(object):
                 ctime = time.time()
                 if ctime - stime > timeout:
                     raise Exception(f"Response timed out.")
-                res = self.redis_cli.blpop([reskey], timeout=1)
+                res = self.redis_cli.lpop(reskey)
                 if res is None or len(res) <= 0:
-                    time.sleep(1)
+                    time.sleep(0.0001)
                     continue
                 return self._res_cmd(reskey, res, sreqtime)
             raise KeyboardInterrupt(f"Stop command.")
@@ -133,25 +133,20 @@ class RedisClient(object):
             self.logger.error(f"fail to execute command. cmd={cmd}, msg={e}", exc_info=True)
             return dict(error=f"fail to execute command. cmd={cmd}, msg={e}")
 
-    def _res_cmd(self, reskey:str, res_msg:List[str], sreqtime:float):
+    def _res_cmd(self, reskey:str, res_msg:bytes, sreqtime:float):
         """
         Redisサーバーからの応答を解析する
 
         Args:
             reskey (str): Redisサーバーからの応答のキー
-            res_msg (List[str]): Redisサーバーからの応答
+            res_msg (bytes): Redisサーバーからの応答
 
         Returns:
             dict: 解析された応答
         """
         self.redis_cli.delete(reskey)
-        if res_msg is None:
-            self.logger.error(f"Response timed out.")
-            return dict(error=f"Response timed out.")
-        if len(res_msg) <= 0:
-            self.logger.error(f"No response was received.")
-            return dict(error=f"No response was received.")
-        msg = res_msg[1].decode('utf-8')
+        reskbyte = len(res_msg) / 1024
+        msg = res_msg.decode('utf-8')
         res_json = json.loads(msg)
         msg_json = res_json.copy()
         if "output_image" in msg_json:
@@ -168,6 +163,7 @@ class RedisClient(object):
                 res_json["success"]["performance"] = []
             performance = res_json["success"]["performance"]
             performance.append(dict(key="cl_svreqest", val=f"{time.perf_counter()-sreqtime:.3f}s"))
+            performance.append(dict(key="cl_reskbyte", val=f"{reskbyte:.3f}KB"))
         return res_json
 
     def recive_showimg(self):

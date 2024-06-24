@@ -8,7 +8,7 @@ import logging
 
 class DetFilter(postprocess.Postprocess):
     def __init__(self, logger:logging.Logger, score_th:float=0.0, width_th:int=0, height_th:int=0, classes:List[int]=None, labels:List[str]=None,
-                 nodraw:bool=False, output_preview:bool=False, json_without_img:bool=False):
+                 nodraw:bool=False, output_preview:bool=False):
         """
         Object Detectionの推論結果をフィルタリングする後処理クラスです。
         閾値に満たない推論結果を除外します。
@@ -22,9 +22,8 @@ class DetFilter(postprocess.Postprocess):
             labels (List[str]): ラベルのリスト
             nodraw (bool): 描画しない
             output_preview (bool): プレビューを出力する
-            json_without_img (bool): JSONに画像を含めない場合はTrue。デフォルトはFalse。
         """
-        super().__init__(logger, json_without_img)
+        super().__init__(logger)
         self.config = dict(score_th=score_th, width_th=width_th, height_th=height_th,
                            classes=classes, labels=labels, nodraw=nodraw, output_preview=output_preview)
         self.injection = after_det_filter_injection.AfterDetFilterInjection(self.config, self.logger)

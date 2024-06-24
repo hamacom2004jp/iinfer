@@ -7,7 +7,7 @@ import numpy as np
 
 
 class DetFaceStore(det_clip.DetClip):
-    def __init__(self, logger:logging.Logger, face_threshold:float=0.0, image_type:str='capture', clip_margin:int=0, json_without_img:bool=False):
+    def __init__(self, logger:logging.Logger, face_threshold:float=0.0, image_type:str='capture', clip_margin:int=0):
         """
         face Detectionの推論結果となったbbox部分を個別の画像として切り出す後処理クラスです。
         
@@ -17,9 +17,8 @@ class DetFaceStore(det_clip.DetClip):
             image_type (str): 切り出した画像のファイル形式
             clip_margin (int): bboxの周囲に余白を設けるピクセル数
             output_dir (Path): 切り出した画像を保存するディレクトリ
-            json_without_img (bool, optional): JSONに画像を含めない場合はTrue。デフォルトはFalse。
         """
-        super().__init__(logger, image_type, clip_margin, json_without_img)
+        super().__init__(logger, image_type, clip_margin)
         self.face_threshold = face_threshold
 
 

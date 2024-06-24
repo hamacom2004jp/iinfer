@@ -141,8 +141,11 @@ $(() => {
     eel.expose(js_return_stream_log_func);
     function js_return_stream_log_func(result) {
         const size_th = 1024*1024*5;
-        view_result_func('stream log', result);
         const result_modal = $('#result_modal');
+        if (typeof result != 'object') {
+            result = result_modal.find('.modal-body').html()+result;
+        }
+        view_result_func('stream log', result);
         result_modal.find('.btn_window').click();
     };
 });

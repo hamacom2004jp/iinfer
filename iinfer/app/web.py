@@ -383,7 +383,10 @@ class Web(options.Options):
                             continue
                         try:
                             if len(o) < self.output_size_th:
-                                o = to_json(o)
+                                try:
+                                    o = to_json(o)
+                                except:
+                                    pass
                                 self.callback_return_stream_log_func(o)
                             else:
                                 o = [dict(warn=f'The captured stdout was discarded because its size was larger than {self.output_size_th} bytes.')]

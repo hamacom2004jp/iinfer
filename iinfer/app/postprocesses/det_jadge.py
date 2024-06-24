@@ -11,7 +11,7 @@ class DetJadge(postprocess.Postprocess):
                  ok_score_th:float=None, ok_classes:List[int]=None, ok_labels:List[str]=None,
                  ng_score_th:float=None, ng_classes:List[int]=None, ng_labels:List[str]=None,
                  ext_score_th:float=None, ext_classes:List[int]=None, ext_labels:List[str]=None,
-                 nodraw:bool=False, output_preview:bool=False, json_without_img:bool=False):
+                 nodraw:bool=False, output_preview:bool=False):
         """
         Object Detection推論結果のクラススコア元に、この画像としてOK/NG/Grayの判定結果を追加する後処理クラスです。
 
