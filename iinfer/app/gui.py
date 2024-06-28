@@ -4,7 +4,7 @@ import bottle
 import eel
 import logging
 import iinfer
-
+import json
 
 class Gui(web.Web):
     def __init__(self, logger:logging.Logger, data:Path):
@@ -102,28 +102,25 @@ class Gui(web.Web):
         def versions_iinfer():
             return self.versions_iinfer()
 
-        @eel.expose
+        @bottle.route('/gui/versions_used')
         def versions_used():
-            return self.versions_used()
+            bottle.response.content_type = 'application/json'
+            return json.dumps(self.versions_used())
         
         @bottle.route('/filer/upload', method='POST')
         def filer_upload():
             return self.filer_upload(bottle.request)
 
-        eel.js_console_modal_log_func('== console log start ==\n')
+        @bottle.route('/gui/callback')
+        def gui_callback():
+            return self.gui_callback()
+
+        @bottle.route('/gui/get_local_data')
+        def get_local_data():
+            return str(self.data)
+
+        self.callback_console_modal_log_func('== console log start ==\n')
         eel.start("gui.html", size=(width, height), block=True, port=web_port, host=web_host, close_callback=self.stop)
-
-    def callback_console_modal_log_func(self, output:dict):
-        eel.js_console_modal_log_func(output)
-    
-    def callback_return_cmd_exec_func(self, title, output:dict):
-        eel.js_return_cmd_exec_func(title, output)
-
-    def callback_return_pipe_exec_func(self, title, output):
-        eel.js_return_pipe_exec_func(title, output)
-
-    def callback_return_stream_log_func(self, output):
-        eel.js_return_stream_log_func(output)
 
     def stop(self, route, websockets):
         self.bbforce_cmd()

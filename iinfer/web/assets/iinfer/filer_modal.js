@@ -19,7 +19,7 @@ filer_modal_func = async (target_id, modal_title, current_path, call_back_func) 
 
     const reload_tree = async (target_id, current_node, current_path, file_list_elem) => {
         //dict(name=part, is_dir=path.is_dir(), path=str(path), children=children)
-        const py_list_tree = await eel.list_tree(current_path)();
+        const py_list_tree = await list_tree(current_path);
         current_node.html('');
         Object.entries(py_list_tree).forEach(([key, node]) => {
             if(!node['is_dir']) return;
@@ -100,3 +100,10 @@ filer_modal_func = async (target_id, modal_title, current_path, call_back_func) 
     await reload_tree(target_id, filer_modal.find('.tree-menu'), current_path, filer_modal.find('.file-list'));
     filer_modal.modal('show');
 };
+
+const list_tree = async (current_path) => {
+    const formData = new FormData();
+    formData.append('current_path', current_path);
+    const res = await fetch('/gui/list_tree', {method: 'POST', body: formData});
+    return await res.json();
+}

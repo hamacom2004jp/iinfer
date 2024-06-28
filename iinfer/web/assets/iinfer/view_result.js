@@ -18,7 +18,7 @@ const view_result_func = (title, result) => {
 }
 
 const render_result_func = (target_elem, result) => {
-    if (!result | Array.isArray(result) && result.length<=0) return;
+    if (!result || Array.isArray(result) && result.length<=0) return;
     const mk_table_func = () => {
         const table = $('<table class="table table-bordered table-hover table-sm"></table>');
         const table_head = $('<thead class="table-dark bg-dark"></thead>');

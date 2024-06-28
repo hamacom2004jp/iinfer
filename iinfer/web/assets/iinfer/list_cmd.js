@@ -2,7 +2,7 @@
 const list_cmd_func = async () => {
     $('#cmd_items').html('');
     const kwd = $('#cmd_kwd').val();
-    const py_list_cmd = await eel.list_cmd(kwd?`*${kwd}*`:'*')();
+    const py_list_cmd = await list_cmd(kwd?`*${kwd}*`:'*');
     py_list_cmd.forEach(row => {
         const elem = $($('#cmd_template').html());
         elem.find('.cmd_title').text(row.title);
@@ -29,13 +29,13 @@ const list_cmd_func_then = () => {
     }
     // コマンドカードクリック時の処理（モーダルダイアログを開く）
     const cmd_card_func = async (e) => {
-        const py_get_modes = await eel.get_modes()();
+        const py_get_modes = await get_modes();
         const cmd_modal = $('#cmd_modal');
         cmd_modal.find('[name="mode"]').html(mkopt(py_get_modes));
         // モード変更時の処理（モードに対するコマンド一覧を取得）
         const mode_change = async () => {
             const mode = cmd_modal.find('[name="mode"]').val();
-            const py_get_cmds = await eel.get_cmds(mode)();
+            const py_get_cmds = await get_cmds(mode);
             cmd_modal.find('[name="cmd"]').html(mkopt(py_get_cmds));
             const selected_mode = cmd_modal.find('[name="mode"] option:selected');
             cmd_modal.find('.mode_label').attr('title', selected_mode.attr('discription'));
@@ -54,7 +54,7 @@ const list_cmd_func_then = () => {
             const cmd = cmd_modal.find('[name="cmd"]').val();
             const selected_cmd = cmd_modal.find('[name="cmd"] option:selected');
             cmd_modal.find('.cmd_label').attr('title', selected_cmd.attr('discription'));
-            const py_get_cmd_choices = await eel.get_cmd_choices(mode, cmd)();
+            const py_get_cmd_choices = await get_cmd_choices(mode, cmd);
             row_content.html('');
             // オプション一覧をフォームに追加
             const add_form_func = (i, row, next_elem) => {
@@ -163,7 +163,7 @@ const list_cmd_func_then = () => {
         let modal_title = $(e.currentTarget).find('.cmd_title').text();
         if(modal_title != '') {
             // コマンドファイルの読み込み
-            const py_load_cmd = await eel.load_cmd(modal_title)();
+            const py_load_cmd = await load_cmd(modal_title);
             cmd_modal.find('[name="mode"]').val(py_load_cmd.mode);
             await mode_change();
             cmd_modal.find('[name="cmd"]').val(py_load_cmd.cmd);
@@ -208,86 +208,6 @@ const list_cmd_func_then = () => {
         cmd_modal.modal('show');
     }
     $('.cmd_card').off('click').on('click', cmd_card_func);
-    // コマンドフォームからパラメータを取得
-    get_param = (modal_elem) => {
-        modal_elem.find('.is-invalid, .is-valid').removeClass('is-invalid').removeClass('is-valid');
-        const opt = {};
-        const title = modal_elem.find('[name="title"]').val();
-        opt["mode"] = modal_elem.find('[name="mode"]').val();
-        opt["cmd"] = modal_elem.find('[name="cmd"]').val();
-        if(!opt["mode"]) delete opt["mode"];
-        if(!opt["cmd"]) delete opt["cmd"];
-        opt["title"] = title;
-        const isFloat = (i) => {
-            try {
-                n = Number(i);
-                return n % 1 !== 0;
-            } catch(e) {
-                return false;
-            }
-        }
-        const isInt = (i) => {
-            try {
-                n = Number(i);
-                return n % 1 === 0;
-            } catch(e) {
-                return false;
-            }
-        }
-        // フォームの入力値をチェック（不正な値があればフォームに'is-invalid'クラスを付加する）
-        modal_elem.find('.row_content, .row_content_common').find('input, select').each((i, elem) => {
-            const data_name = $(elem).attr('name');
-            let data_val = $(elem).val();
-            const data_type = $(elem).attr('param_data_type');
-            const data_multi = $(elem).attr('param_data_multi');
-            if ($(elem).attr('required') && (!data_val || data_val=='')) {
-                $(elem).addClass('is-invalid');
-            } else if (data_type=='int') {
-                if(data_val && data_val!='') {
-                    if(!isInt(data_val)) $(elem).addClass('is-invalid');
-                    else {
-                        $(elem).removeClass('is-invalid');
-                        $(elem).addClass('is-valid');
-                        data_val = parseInt(data_val);
-                    }
-                } else {
-                    $(elem).removeClass('is-invalid');
-                    $(elem).addClass('is-valid');
-                }
-            } else if (data_type=='float') {
-                if(data_val && data_val!='') {
-                    if(!isFloat(data_val) && !isInt(data_val)) $(elem).addClass('is-invalid');
-                    else {
-                        $(elem).removeClass('is-invalid');
-                        $(elem).addClass('is-valid');
-                        data_val = parseFloat(data_val);
-                    }
-                } else {
-                    $(elem).removeClass('is-invalid');
-                    $(elem).addClass('is-valid');
-                }
-            } else if (data_type=='bool') {
-                if(data_val!='true' && data_val!='false') $(elem).addClass('is-invalid');
-                else {
-                    data_val = data_val=='true';
-                    $(elem).removeClass('is-invalid');
-                    $(elem).addClass('is-valid');
-                }
-            } else {
-                $(elem).removeClass('is-invalid');
-                $(elem).addClass('is-valid');
-            }
-            if(data_multi=='true'){
-                if(!opt[data_name]) opt[data_name] = [];
-                if(data_val && data_val!='') opt[data_name].push(data_val);
-                else if(data_val==false) opt[data_name].push(data_val);
-            } else {
-                if(data_val && data_val!='') opt[data_name] = data_val;
-                else if(data_val==false) opt[data_name] = data_val;
-            }
-        });
-        return [title, opt];
-    }
     // コマンドファイルの保存
     $('#cmd_save').off('click').on('click', async () => {
         const cmd_modal = $('#cmd_modal');
@@ -296,7 +216,7 @@ const list_cmd_func_then = () => {
             return;
         }
         show_loading();
-        const result = await eel.save_cmd(title, opt)();
+        const result = await save_cmd(title, opt);
         await list_cmd_func();
         $('.cmd_card').off('click').on('click', cmd_card_func);
         if (result.success) alert(result.success);
@@ -309,7 +229,7 @@ const list_cmd_func_then = () => {
         const title = cmd_modal.find('[name="title"]').val();
         show_loading();
         if (window.confirm(`delete "${title}"?`)) {
-            await eel.del_cmd(title)();
+            await del_cmd(title);
             cmd_modal.modal('hide');
             await list_cmd_func();
             $('.cmd_card').off('click').on('click', cmd_card_func);
@@ -325,7 +245,11 @@ const list_cmd_func_then = () => {
         }
         show_loading();
         // コマンドの実行
-        eel.exec_cmd(title, opt)().then((result) => {});
+        exec_cmd(title, opt).then((result) => {
+            cmd_modal.modal('hide');
+            view_result_func(title, result);
+            hide_loading();
+        });
     });
     // RAW表示の実行
     $('#cmd_raw').off('click').on('click', async () => {
@@ -336,9 +260,150 @@ const list_cmd_func_then = () => {
         }
         show_loading();
         // コマンドの実行
-        eel.raw_cmd(title, opt)().then((result) => {
+        raw_cmd(title, opt).then((result) => {
             view_raw_func(title, result);
             hide_loading();
         });
     });
 };
+
+// コマンドフォームからパラメータを取得
+const get_param = (modal_elem) => {
+    modal_elem.find('.is-invalid, .is-valid').removeClass('is-invalid').removeClass('is-valid');
+    const opt = {};
+    const title = modal_elem.find('[name="title"]').val();
+    opt["mode"] = modal_elem.find('[name="mode"]').val();
+    opt["cmd"] = modal_elem.find('[name="cmd"]').val();
+    if(!opt["mode"]) delete opt["mode"];
+    if(!opt["cmd"]) delete opt["cmd"];
+    opt["title"] = title;
+    const isFloat = (i) => {
+        try {
+            n = Number(i);
+            return n % 1 !== 0;
+        } catch(e) {
+            return false;
+        }
+    }
+    const isInt = (i) => {
+        try {
+            n = Number(i);
+            return n % 1 === 0;
+        } catch(e) {
+            return false;
+        }
+    }
+    // フォームの入力値をチェック（不正な値があればフォームに'is-invalid'クラスを付加する）
+    modal_elem.find('.row_content, .row_content_common').find('input, select').each((i, elem) => {
+        const data_name = $(elem).attr('name');
+        let data_val = $(elem).val();
+        const data_type = $(elem).attr('param_data_type');
+        const data_multi = $(elem).attr('param_data_multi');
+        if ($(elem).attr('required') && (!data_val || data_val=='')) {
+            $(elem).addClass('is-invalid');
+        } else if (data_type=='int') {
+            if(data_val && data_val!='') {
+                if(!isInt(data_val)) $(elem).addClass('is-invalid');
+                else {
+                    $(elem).removeClass('is-invalid');
+                    $(elem).addClass('is-valid');
+                    data_val = parseInt(data_val);
+                }
+            } else {
+                $(elem).removeClass('is-invalid');
+                $(elem).addClass('is-valid');
+            }
+        } else if (data_type=='float') {
+            if(data_val && data_val!='') {
+                if(!isFloat(data_val) && !isInt(data_val)) $(elem).addClass('is-invalid');
+                else {
+                    $(elem).removeClass('is-invalid');
+                    $(elem).addClass('is-valid');
+                    data_val = parseFloat(data_val);
+                }
+            } else {
+                $(elem).removeClass('is-invalid');
+                $(elem).addClass('is-valid');
+            }
+        } else if (data_type=='bool') {
+            if(data_val!='true' && data_val!='false') $(elem).addClass('is-invalid');
+            else {
+                data_val = data_val=='true';
+                $(elem).removeClass('is-invalid');
+                $(elem).addClass('is-valid');
+            }
+        } else {
+            $(elem).removeClass('is-invalid');
+            $(elem).addClass('is-valid');
+        }
+        if(data_multi=='true'){
+            if(!opt[data_name]) opt[data_name] = [];
+            if(data_val && data_val!='') opt[data_name].push(data_val);
+            else if(data_val==false) opt[data_name].push(data_val);
+        } else {
+            if(data_val && data_val!='') opt[data_name] = data_val;
+            else if(data_val==false) opt[data_name] = data_val;
+        }
+    });
+    return [title, opt];
+}
+
+const list_cmd = async (kwd) => {
+    const formData = new FormData();
+    formData.append('kwd', kwd?`*${kwd}*`:'*');
+    const res = await fetch('/gui/list_cmd', {method: 'POST', body: formData});
+    return await res.json();
+}
+const get_modes = async (kwd) => {
+    const res = await fetch('/gui/get_modes', {method: 'GET'});
+    return await res.json();
+}
+const get_cmds = async (mode) => {
+    const formData = new FormData();
+    formData.append('mode', mode);
+    const res = await fetch('/gui/get_cmds', {method: 'POST', body: formData});
+    return await res.json();
+}
+const get_cmd_choices = async (mode, cmd) => {
+    const formData = new FormData();
+    formData.append('mode', mode);
+    formData.append('cmd', cmd);
+    const res = await fetch('/gui/get_cmd_choices', {method: 'POST', body: formData});
+    return await res.json();
+}
+const load_cmd = async (title) => {
+    const formData = new FormData();
+    formData.append('title', title);
+    const res = await fetch('/gui/load_cmd', {method: 'POST', body: formData});
+    return await res.json();
+}
+const save_cmd = async (title, opt) => {
+    const formData = new FormData();
+    formData.append('title', title);
+    formData.append('opt', JSON.stringify(opt));
+    const res = await fetch('/gui/save_cmd', {method: 'POST', body: formData});
+    return await res.json();
+}
+const del_cmd = async (title) => {
+    const formData = new FormData();
+    formData.append('title', title);
+    const res = await fetch('/gui/del_cmd', {method: 'POST', body: formData});
+    return await res.json();
+}
+const exec_cmd = async (title, opt) => {
+    const res = await fetch(`/exec_cmd/${title}`,
+        {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(opt)});
+    const text = await res.text();
+    try {
+        return JSON.parse(text);
+    } catch (e) {
+        return text;
+    }
+}
+const raw_cmd = async (title, opt) => {
+    const formData = new FormData();
+    formData.append('title', title);
+    formData.append('opt', JSON.stringify(opt));
+    const res = await fetch('/gui/raw_cmd', {method: 'POST', body: formData});
+    return await res.json();
+}

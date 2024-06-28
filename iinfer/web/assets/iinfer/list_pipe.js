@@ -2,7 +2,7 @@
 list_pipe_func = async () => {
     $('#pipe_items').html('');
     const kwd = $('#pipe_kwd').val();
-    const py_list_pipe = await eel.list_pipe(kwd?`*${kwd}*`:'*')();
+    const py_list_pipe = await list_pipe(kwd?`*${kwd}*`:'*');
     py_list_pipe.forEach(row => {
         const elem = $($('#pipe_template').html());
         elem.find('.pipe_title').text(row['title']);
@@ -47,9 +47,9 @@ list_pipe_func_then = () => {
         }
         if(modal_title != '') {
             // パイプラインファイルの読み込み
-            const py_list_cmd = await eel.list_cmd(null)();
+            const py_list_cmd = await list_cmd(null);
             const cmd_select = cmd_select_template_func(pipe_modal.find('.add_buton'), py_list_cmd)
-            const py_load_pipe = await eel.load_pipe(modal_title)();
+            const py_load_pipe = await load_pipe(modal_title);
             Object.entries(py_load_pipe).forEach(([key, val]) => {
                 if (typeof val === 'boolean') {
                     val = val.toString();
@@ -77,7 +77,7 @@ list_pipe_func_then = () => {
             pipe_modal.find('[name="title"]').val('');
             pipe_modal.find('[name="title"]').attr('readonly', false);
             pipe_modal.find('[name="description"]').val('');
-            const py_list_cmd = await eel.list_cmd(null)();
+            const py_list_cmd = await list_cmd(null);
             cmd_select_template_func(pipe_modal.find('.add_buton'), py_list_cmd)
         }
         pipe_modal.find('.modal-title').text(`Pipeline : ${modal_title}`);
@@ -92,7 +92,7 @@ list_pipe_func_then = () => {
             return;
         }
         show_loading();
-        const result = await eel.save_pipe(title, opt)();
+        const result = await save_pipe(title, opt);
         await list_pipe_func();
         $('.pipe_card').off('click').on('click', pipe_card_func);
         if (result['success']) alert(result['success']);
@@ -105,7 +105,7 @@ list_pipe_func_then = () => {
         const title = pipe_modal.find('[name="title"]').val();
         show_loading();
         if (window.confirm(`delete "${title}"?`)) {
-            await eel.del_pipe(title)();
+            await del_pipe(title);
             pipe_modal.modal('hide');
             await list_pipe_func();
             $('.pipe_card').off('click').on('click', pipe_card_func);
@@ -121,8 +121,10 @@ list_pipe_func_then = () => {
         }
         show_loading();
         // コマンドの実行
-        $('#loading').find('.bbforce').addClass('pipe_executed');
-        eel.exec_pipe(title, opt)().then((result) => {});
+        exec_pipe(title, opt).then((result) => {
+            pipe_modal.modal('hide');
+            hide_loading();
+        });
     });
     // RAW表示の実行
     $('#pipe_raw').off('click').on('click', async () => {
@@ -133,9 +135,47 @@ list_pipe_func_then = () => {
         }
         show_loading();
         // コマンドの実行
-        eel.raw_pipe(title, opt)().then((result) => {
+        raw_pipe(title, opt).then((result) => {
             view_raw_func(title, result);
             hide_loading();
         });
     });
 };
+
+const list_pipe = async (kwd) => {
+    const formData = new FormData();
+    formData.append('kwd', kwd?`*${kwd}*`:'*');
+    const res = await fetch('/gui/list_pipe', {method: 'POST', body: formData});
+    return await res.json();
+}
+const load_pipe = async (title) => {
+    const formData = new FormData();
+    formData.append('title', title);
+    const res = await fetch('/gui/load_pipe', {method: 'POST', body: formData});
+    return await res.json();
+}
+const save_pipe = async (title, opt) => {
+    const formData = new FormData();
+    formData.append('title', title);
+    formData.append('opt', JSON.stringify(opt));
+    const res = await fetch('/gui/save_pipe', {method: 'POST', body: formData});
+    return await res.json();
+}
+const del_pipe = async (title) => {
+    const formData = new FormData();
+    formData.append('title', title);
+    const res = await fetch('/gui/del_pipe', {method: 'POST', body: formData});
+    return await res.json();
+}
+const exec_pipe = async (title, opt) => {
+    const res = await fetch(`/exec_pipe/${title}`,
+        {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(opt)});
+    return await res.json();
+}
+const raw_pipe = async (title, opt) => {
+    const formData = new FormData();
+    formData.append('title', title);
+    formData.append('opt', JSON.stringify(opt));
+    const res = await fetch('/gui/raw_pipe', {method: 'POST', body: formData});
+    return await res.json();
+}

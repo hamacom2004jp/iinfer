@@ -3,6 +3,7 @@ from iinfer.app import app, common, options
 from iinfer.app.commons import convert, redis_client
 from pathlib import Path
 from typing import List
+import webbrowser
 import bottle
 import bottle_websocket
 import datetime
@@ -13,7 +14,6 @@ import iinfer
 import io
 import json
 import logging
-import numpy as np
 import os
 import re
 import queue
@@ -27,7 +27,7 @@ import time
 
 class Web(options.Options):
     def __init__(self, logger:logging.Logger, data:Path, redis_host:str = "localhost", redis_port:int = 6379, redis_password:str = None, svname:str = 'server',
-                 client_only:bool=False, filer_html:str=None, showimg_html:str=None, assets:List[str]=None):
+                 client_only:bool=False, filer_html:str=None, showimg_html:str=None, assets:List[str]=None, gui_mode:bool=False):
         """
         iinferクライアント側のwebapiサービス
 
@@ -42,6 +42,7 @@ class Web(options.Options):
             filer_html (str, optional): ファイラーのHTMLファイル. Defaults to None.
             showimg_html (str, optional): 画像表示のHTMLファイル. Defaults to None.
             assets (List[str], optional): 静的ファイルのリスト. Defaults to None.
+            gui_mode (bool, optional): GUIモードかどうか. Defaults to False.
         """
         super().__init__()
         self.logger = logger
@@ -61,8 +62,10 @@ class Web(options.Options):
         self.filer_html_data = None
         self.showimg_html_data = None
         self.assets_data = None
+        self.gui_mode = gui_mode
         common.mkdirs(self.data)
         self.img_queue = queue.Queue(1000)
+        self.cb_queue = queue.Queue(1000)
 
     def mk_curl_fileup(self, cmd_opt):
         if 'mode' not in cmd_opt or 'cmd' not in cmd_opt:
@@ -244,12 +247,6 @@ class Web(options.Options):
         th = threading.Thread(target=_exec_cmd, args=(self.container['iinfer_app'], title, opt, False))
         th.start()
         return [dict(warn='start_cmd')]
-    
-    def callback_console_modal_log_func(self, output:dict):
-        raise NotImplementedError('callback_console_modal_log_func is not implemented.')
-    
-    def callback_return_cmd_exec_func(self, title, output:dict):
-        raise NotImplementedError('callback_return_cmd_exec_func is not implemented.')
 
     def raw_cmd(self, title:str, opt:dict):
         self.logger.info(f"raw_cmd: title={title}, opt={opt}")
@@ -418,12 +415,6 @@ class Web(options.Options):
             return _exec_pipe(title, opt, self.container, True)
         gevent.spawn(_exec_pipe, title, opt, self.container)
         return dict(success='start_pipe')
-    
-    def callback_return_pipe_exec_func(self, title, output):
-        raise NotImplementedError('callback_return_pipe_exec_func is not implemented.')
-
-    def callback_return_stream_log_func(self, output:dict):
-        pass
 
     def raw_pipe(self, title, opt):
         self.logger.info(f"raw_pipe: title={title}, opt={opt}")
@@ -517,7 +508,35 @@ class Web(options.Options):
                     return str(ret)
         return 'upload success'
         #return f'upload {upload.filename}'
+
+    def callback_console_modal_log_func(self, output:dict):
+        self.cb_queue.put(('js_console_modal_log_func', None, output))
     
+    def callback_return_cmd_exec_func(self, title, output:dict):
+        self.cb_queue.put(('js_return_cmd_exec_func', title, output))
+
+    def callback_return_pipe_exec_func(self, title, output):
+        self.cb_queue.put(('js_return_pipe_exec_func', title, output))
+
+    def callback_return_stream_log_func(self, output):
+        self.cb_queue.put(('js_return_stream_log_func', None, output))
+
+    def gui_callback(self):
+        wsock = bottle.request.environ.get('wsgi.websocket') # type: ignore
+        if not wsock:
+            bottle.abort(400, 'Expected WebSocket request.')
+        while True:
+            outputs = None
+            try:
+                cmd, title, output = self.cb_queue.get(block=True, timeout=0.001)
+                outputs = dict(cmd=cmd, title=title, output=output)
+                wsock.send(json.dumps(outputs, default=common.default_json_enc))
+            except queue.Empty:
+                gevent.sleep(0.001)
+            except:
+                self.logger.warning('websocket error', exc_info=True)
+                gevent.sleep(10)
+
     def to_str(self, o):
         if type(o) == dict:
             return json.dumps(o, default=common.default_json_enc)
@@ -609,6 +628,8 @@ class Web(options.Options):
                                     tf.flush()
                                     opt['request_files'][fn] = tf.name
                                     if fn == 'input_file': opt['request_files']['stdin'] = False
+                elif bottle.request.content_type.startswith('application/json'):
+                    opt = bottle.request.json
                 else:
                     opt = self.load_pipe(title)
                 opt['capture_stdout'] = nothread = True
@@ -624,7 +645,131 @@ class Web(options.Options):
         def versions_iinfer():
             return self.versions_iinfer()
 
+        @app.route('/gui/callback')
+        def gui_callback():
+            return self.gui_callback()
+
         static_root = Path(__file__).parent.parent / 'web'
+
+        @app.route('/gui')
+        def gui():
+            return bottle.static_file('gui.html', root=static_root)
+
+        @app.route('/gui/list_tree', method='POST')
+        def list_tree():
+            current_path = bottle.request.forms.get('current_path')
+            ret = self.list_tree(current_path)
+            bottle.response.content_type = 'application/json'
+            return json.dumps(ret, default=common.default_json_enc)
+
+        @app.route('/gui/list_cmd', method='POST')
+        def list_cmd():
+            kwd = bottle.request.forms.get('kwd')
+            ret = self.list_cmd(kwd)
+            bottle.response.content_type = 'application/json'
+            return json.dumps(ret, default=common.default_json_enc)
+
+        @app.route('/gui/get_modes')
+        def get_modes():
+            ret = self.get_modes()
+            bottle.response.content_type = 'application/json'
+            return json.dumps(ret, default=common.default_json_enc)
+
+        @app.route('/gui/get_cmds', method='POST')
+        def get_cmds():
+            mode = bottle.request.forms.get('mode')
+            ret = self.get_cmds(mode)
+            bottle.response.content_type = 'application/json'
+            return json.dumps(ret, default=common.default_json_enc)
+
+        @app.route('/gui/get_cmd_choices', method='POST')
+        def get_cmd_choices():
+            mode = bottle.request.forms.get('mode')
+            cmd = bottle.request.forms.get('cmd')
+            ret = self.get_cmd_choices(mode, cmd)
+            bottle.response.content_type = 'application/json'
+            return json.dumps(ret, default=common.default_json_enc)
+
+        @app.route('/gui/load_cmd', method='POST')
+        def load_cmd():
+            title = bottle.request.forms.get('title')
+            ret = self.load_cmd(title)
+            bottle.response.content_type = 'application/json'
+            return json.dumps(ret, default=common.default_json_enc)
+
+        @app.route('/gui/save_cmd', method='POST')
+        def save_cmd():
+            title = bottle.request.forms.get('title')
+            opt = bottle.request.forms.get('opt')
+            ret = self.save_cmd(title, json.loads(opt))
+            bottle.response.content_type = 'application/json'
+            return json.dumps(ret, default=common.default_json_enc)
+
+        @app.route('/gui/del_cmd', method='POST')
+        def del_cmd():
+            title = bottle.request.forms.get('title')
+            self.del_cmd(title)
+            bottle.response.content_type = 'application/json'
+            return json.dumps({}, default=common.default_json_enc)
+
+        @app.route('/gui/raw_cmd', method='POST')
+        def raw_cmd():
+            title = bottle.request.forms.get('title')
+            opt = bottle.request.forms.get('opt')
+            ret = self.raw_cmd(title, json.loads(opt))
+            bottle.response.content_type = 'application/json'
+            return json.dumps(ret, default=common.default_json_enc)
+
+        @app.route('/gui/list_pipe', method='POST')
+        def list_pipe():
+            kwd = bottle.request.forms.get('kwd')
+            ret = self.list_pipe(kwd)
+            bottle.response.content_type = 'application/json'
+            return json.dumps(ret, default=common.default_json_enc)
+
+        @app.route('/gui/load_pipe', method='POST')
+        def load_pipe():
+            title = bottle.request.forms.get('title')
+            ret = self.load_pipe(title)
+            bottle.response.content_type = 'application/json'
+            return json.dumps(ret, default=common.default_json_enc)
+
+        @app.route('/gui/save_pipe', method='POST')
+        def save_pipe():
+            title = bottle.request.forms.get('title')
+            opt = bottle.request.forms.get('opt')
+            ret = self.save_pipe(title, json.loads(opt))
+            bottle.response.content_type = 'application/json'
+            return json.dumps(ret, default=common.default_json_enc)
+
+        @app.route('/gui/del_pipe', method='POST')
+        def del_pipe():
+            title = bottle.request.forms.get('title')
+            self.del_pipe(title)
+            bottle.response.content_type = 'application/json'
+            return json.dumps({}, default=common.default_json_enc)
+
+        @app.route('/gui/raw_pipe', method='POST')
+        def raw_pipe():
+            title = bottle.request.forms.get('title')
+            opt = bottle.request.forms.get('opt')
+            ret = self.raw_pipe(title, json.loads(opt))
+            bottle.response.content_type = 'application/json'
+            return json.dumps(ret, default=common.default_json_enc)
+
+        @app.route('/gui/load_capture', method='POST')
+        def load_capture():
+            current_path = bottle.request.forms.get('current_path')
+            ret = self.load_capture(current_path)
+            bottle.response.content_type = 'application/json'
+            return json.dumps(ret, default=common.default_json_enc)
+
+        @app.route('/gui/load_result', method='POST')
+        def load_result():
+            current_path = bottle.request.forms.get('current_path')
+            ret = self.load_result(current_path)
+            bottle.response.content_type = 'application/json'
+            return json.dumps(ret, default=common.default_json_enc)
 
         @app.route('/filer')
         def filer():
@@ -729,7 +874,7 @@ class Web(options.Options):
             pid = os.getpid()
             f.write(str(pid))
             self.is_running = True
-            server = _WSGIServer(host=self.allow_host, port=self.listen_port)
+            server = _WSGIServer(host=self.allow_host, port=self.listen_port, gui_mode=self.gui_mode)
             th = threading.Thread(target=bottle.run, kwargs=dict(app=app, server=server))
             th.start()
             while self.is_running:
@@ -749,8 +894,9 @@ class _WSGIServer(bottle_websocket.GeventWebSocketServer):
     """
     runメソッドでWSGIRefServerを起動する際に、make_serverの戻り値をインスタンス変数にするためのクラス
     """
-    def __init__(self, host='127.0.0.1', port=8080, **options):
+    def __init__(self, host='127.0.0.1', port:int=8080, gui_mode:bool=False, **options):
         super().__init__(host, port, **options)
+        self.gui_mode = gui_mode
 
     def run(self, handler):
         import logging
@@ -766,6 +912,8 @@ class _WSGIServer(bottle_websocket.GeventWebSocketServer):
             self.srv.logger.setLevel(logging.INFO)
             self.srv.logger.addHandler(logging.StreamHandler())
 
+        if self.gui_mode:
+            webbrowser.open(f'http://localhost:{self.port}/gui')
         self.srv.serve_forever()
 
     """

@@ -1,5 +1,5 @@
 from iinfer import version
-from iinfer.app import common, client, gui, install, options, postprocess, redis, server, web
+from iinfer.app import common, client, install, options, postprocess, redis, server, web
 from iinfer.app.postprocesses import cls_jadge, csv, det_clip, det_face_store, det_filter, det_jadge, httpreq, seg_bbox, seg_filter, showimg
 from pathlib import Path
 import argparse
@@ -106,7 +106,9 @@ class IinferApp:
                     msg = {"warn":f"Please specify the --data option."}
                     common.print_format(msg, args.format, tm, args.output_json, args.output_json_append)
                     return 1, msg
-                self.web = gui.Gui(logger, Path(args.data))
+                #self.web = gui.Gui(logger, Path(args.data))
+                self.web = web.Web(logger, Path(args.data), redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname,
+                                client_only=args.client_only, filer_html=args.filer_html, showimg_html=args.showimg_html, assets=args.assets, gui_mode=True)
                 self.web.start()
                 msg = {"success":"eel web complate."}
                 common.print_format(msg, args.format, tm, args.output_json, args.output_json_append)

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>iinfer.app.gui &mdash; iinfer 2024/06/23 documentation</title>
+  <title>iinfer.app.gui &mdash; iinfer 2024/06/28 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -15,7 +15,7 @@
   
         <script src="../../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=94d0cd35"></script>
+        <script src="../../../_static/documentation_options.js?v=80bb7450"></script>
         <script src="../../../_static/doctools.js?v=9a2dae69"></script>
         <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -93,7 +93,7 @@
 <span class="kn">import</span> <span class="nn">eel</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">iinfer</span>
-
+<span class="kn">import</span> <span class="nn">json</span>
 
 <div class="viewcode-block" id="Gui">
 <a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.gui.Gui">[docs]</a>
@@ -195,40 +195,25 @@
         <span class="k">def</span> <span class="nf">versions_iinfer</span><span class="p">():</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">versions_iinfer</span><span class="p">()</span>
 
-        <span class="nd">@eel</span><span class="o">.</span><span class="n">expose</span>
+        <span class="nd">@bottle</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/gui/versions_used&#39;</span><span class="p">)</span>
         <span class="k">def</span> <span class="nf">versions_used</span><span class="p">():</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">versions_used</span><span class="p">()</span>
+            <span class="n">bottle</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">content_type</span> <span class="o">=</span> <span class="s1">&#39;application/json&#39;</span>
+            <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">versions_used</span><span class="p">())</span>
         
         <span class="nd">@bottle</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/filer/upload&#39;</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;POST&#39;</span><span class="p">)</span>
         <span class="k">def</span> <span class="nf">filer_upload</span><span class="p">():</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">filer_upload</span><span class="p">(</span><span class="n">bottle</span><span class="o">.</span><span class="n">request</span><span class="p">)</span>
 
-        <span class="n">eel</span><span class="o">.</span><span class="n">js_console_modal_log_func</span><span class="p">(</span><span class="s1">&#39;== console log start ==</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="nd">@bottle</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/gui/callback&#39;</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">gui_callback</span><span class="p">():</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">gui_callback</span><span class="p">()</span>
+
+        <span class="nd">@bottle</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/gui/get_local_data&#39;</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">get_local_data</span><span class="p">():</span>
+            <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">callback_console_modal_log_func</span><span class="p">(</span><span class="s1">&#39;== console log start ==</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="n">eel</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="s2">&quot;gui.html&quot;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">),</span> <span class="n">block</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">web_port</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="n">web_host</span><span class="p">,</span> <span class="n">close_callback</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">stop</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="Gui.callback_console_modal_log_func">
-<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.gui.Gui.callback_console_modal_log_func">[docs]</a>
-    <span class="k">def</span> <span class="nf">callback_console_modal_log_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output</span><span class="p">:</span><span class="nb">dict</span><span class="p">):</span>
-        <span class="n">eel</span><span class="o">.</span><span class="n">js_console_modal_log_func</span><span class="p">(</span><span class="n">output</span><span class="p">)</span></div>
-
-    
-<div class="viewcode-block" id="Gui.callback_return_cmd_exec_func">
-<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.gui.Gui.callback_return_cmd_exec_func">[docs]</a>
-    <span class="k">def</span> <span class="nf">callback_return_cmd_exec_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">output</span><span class="p">:</span><span class="nb">dict</span><span class="p">):</span>
-        <span class="n">eel</span><span class="o">.</span><span class="n">js_return_cmd_exec_func</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">output</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="Gui.callback_return_pipe_exec_func">
-<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.gui.Gui.callback_return_pipe_exec_func">[docs]</a>
-    <span class="k">def</span> <span class="nf">callback_return_pipe_exec_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">output</span><span class="p">):</span>
-        <span class="n">eel</span><span class="o">.</span><span class="n">js_return_pipe_exec_func</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">output</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="Gui.callback_return_stream_log_func">
-<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.gui.Gui.callback_return_stream_log_func">[docs]</a>
-    <span class="k">def</span> <span class="nf">callback_return_stream_log_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output</span><span class="p">):</span>
-        <span class="n">eel</span><span class="o">.</span><span class="n">js_return_stream_log_func</span><span class="p">(</span><span class="n">output</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Gui.stop">

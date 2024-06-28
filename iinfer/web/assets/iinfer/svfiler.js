@@ -374,7 +374,7 @@ const filer = (svpath) => {
         modal.find('.filer_server').append(li_elem);
       });
       const cl = async () => {
-        const local_data = await eel.get_local_data()();
+        const local_data = await get_local_data();
         const a_elem = $(`<a class="dropdown-item" href="#" data-host="localhost" data-port="6379" data-password="password" data-svname="client" data-local_data="${local_data}">client</a>`);
         a_elem.off("click").on("click", mk_func(a_elem));
         const li_elem = $('<li class="filer_svnames"></li>').append(a_elem);

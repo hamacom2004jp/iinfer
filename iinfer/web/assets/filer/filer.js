@@ -131,7 +131,7 @@ fsapi.filer = (svpath, is_local) => {
         return xhr;
       },
       success: function(data) {
-        fsapi.message(data);
+        //fsapi.message(data);
         fsapi.tree(fsapi.right, svpath, fsapi.right.find('.tree-menu'), false);
       },
       error: function(data) {
