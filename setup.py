@@ -17,7 +17,8 @@ PYTHON_REQUIRES = '>=3.8'
 INSTALL_REQUIRES = [
     'argcomplete',
     'async_timeout',
-    'eel',
+    'bottle',
+    'bottle_websocket',
     'motpy',
     'opencv-python',
     'Pillow',
@@ -53,7 +54,7 @@ with open('README.md', 'r', encoding='utf-8') as fp:
     readme = fp.read()
 LONG_DESCRIPTION = readme
 LONG_DESCRIPTION_CONTENT_TYPE = 'text/markdown'
-RESORCE_TEXT_FILES = dict(iinfer=['*.yml', 'extensions/*', 'extensions/*/*', 'extensions/*/*/*', 'docker/*', 'licenses/*', 'web/*', 'web/*/*', 'web/*/*/*', 'web/*/*/*/*', 'web/*/*/*/*/*'])
+RESORCE_TEXT_FILES = dict(iinfer=['*.yml', 'extensions/*', 'extensions/*/*', 'extensions/*/*/*', 'docker/*', 'docker/*/*', 'licenses/*', 'web/*', 'web/*/*', 'web/*/*/*', 'web/*/*/*/*', 'web/*/*/*/*/*'])
 
 class CustomInstallCommand(install):
     def run(self):

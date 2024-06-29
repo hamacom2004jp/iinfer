@@ -37,7 +37,7 @@ class Install(object):
         else:
             return {"warn":f"Unsupported platform."}
 
-    def server(self, data:Path, install_iinfer:str='iinfer', install_onnx:bool=True,
+    def server(self, data:Path, install_iinfer_tgt:str='iinfer', install_onnx:bool=True,
                install_mmdet:bool=True, install_mmseg:bool=True, install_mmcls:bool=False, install_mmpretrain:bool=True,
                install_insightface=False, install_diffusers=True, install_llamaindex=True,
                install_tag:str=None, install_use_gpu:bool=False):
@@ -48,13 +48,21 @@ class Install(object):
         install_tag = f"_{install_tag}" if install_tag is not None else ''
         with open('Dockerfile', 'w', encoding='utf-8') as fp:
             text = read_text(f'{common.APP_ID}.docker', 'Dockerfile')
-            wheel = Path(install_iinfer)
+            wheel = Path(install_iinfer_tgt)
             if wheel.exists() and wheel.suffix == '.whl':
                 shutil.copy(wheel, Path('.').resolve() / wheel.name)
-                install_iinfer = f'/home/{user}/{wheel.name}'
-                text = text.replace('#{COPY_IINFER}', f'COPY {wheel.name} {install_iinfer}')
+                #install_iinfer = f'/home/{user}/{wheel.name}'
+                install_iinfer_tgt = f'/home/{user}/{wheel.name}'
+                text = text.replace('#{COPY_IINFER}', f'COPY {wheel.name} {install_iinfer_tgt}')
             else:
                 text = text.replace('#{COPY_IINFER}', '')
+
+            start_sh_src = Path(__file__).parent.parent / 'docker' / 'scripts'
+            #start_sh_tgt = f'/home/{user}/scripts'
+            start_sh_tgt = f'scripts'
+            shutil.copytree(start_sh_src, start_sh_tgt, dirs_exist_ok=True)
+            text = text.replace('#{COPY_IINFER_START}', f'COPY {start_sh_tgt} {start_sh_tgt}')
+
             install_use_gpu = '--install_use_gpu' if install_use_gpu else ''
             base_image = 'python:3.11.9-slim' #'python:3.8.18-slim'
             if install_use_gpu:
@@ -64,7 +72,7 @@ class Install(object):
             #text = text.replace('#{INSTALL_PYTHON}', f'RUN apt-get update && apt-get install -y python3.8 python3.8-distutils python3-pip python-is-python3' if install_use_gpu else '')
             text = text.replace('#{INSTALL_PYTHON}', f'RUN apt-get update && apt-get install -y python3.11 python3.11-distutils python3-pip python-is-python3' if install_use_gpu else '')
             text = text.replace('#{INSTALL_TAG}', install_tag)
-            text = text.replace('#{INSTALL_IINFER}', install_iinfer)
+            text = text.replace('#{INSTALL_IINFER}', install_iinfer_tgt)
             text = text.replace('#{INSTALL_ONNX}', f'RUN iinfer -m install -c onnx --data /home/{user}/.iinfer {install_use_gpu}' if install_onnx else '')
             text = text.replace('#{INSTALL_MMDET}', f'RUN iinfer -m install -c mmdet --data /home/{user}/.iinfer {install_use_gpu}' if install_mmdet else '')
             text = text.replace('#{INSTALL_MMSEG}', f'RUN iinfer -m install -c mmseg --data /home/{user}/.iinfer {install_use_gpu}' if install_mmseg else '')
@@ -98,15 +106,19 @@ class Install(object):
                     REDIS_HOST='${REDIS_HOST:-redis}',
                     REDIS_PORT='${REDIS_PORT:-6379}',
                     REDIS_PASSWORD='${REDIS_PASSWORD:-password}',
-                    SVNAME='${SVNAME:-server'+install_tag+'}'
+                    SVNAME='${SVNAME:-server'+install_tag+'}',
+                    LISTEN_PORT='${LISTEN_PORT:-8081}',
                 ),
                 networks=['backend'],
                 user=user,
+                ports=['${LISTEN_PORT:-8081}:${LISTEN_PORT:-8081}'],
+                privileged=True,
                 restart='always',
                 working_dir=f'/home/{user}',
                 volumes=[
-                    f'~/:/home/{user}/',
-                    f'{data}:/home/{user}/.iinfer'
+                    f'{data}:/home/{user}/.iinfer',
+                    f'/home/{user}/scripts:/home/{user}/scripts',
+                    '/dev/bus/usb/:/dev/bus/usb/:rw'
                 ]
             )
             fp.seek(0)

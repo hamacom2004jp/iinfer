@@ -17,7 +17,7 @@ handlers:
         backupCount: 5
         when : 'D'
         encoding : 'utf-8'
-        filename: server.log
+        filename: logs/server.log
 
 loggers:
     server:

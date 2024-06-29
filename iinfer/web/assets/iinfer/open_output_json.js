@@ -12,6 +12,6 @@ const open_output_json_func = (target_id) => {
 const load_result = async (current_path) => {
     const formData = new FormData();
     formData.append('current_path', current_path);
-    const res = await fetch('/gui/load_result', {method: 'POST', body: formData});
+    const res = await fetch('gui/load_result', {method: 'POST', body: formData});
     return await res.json();
 }

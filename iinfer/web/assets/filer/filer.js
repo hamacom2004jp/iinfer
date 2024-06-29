@@ -115,7 +115,7 @@ fsapi.filer = (svpath, is_local) => {
     param = {method: 'POST', body: formData};
     opt = fsapi.get_server_opt();
     $.ajax({ // fetchだとxhr.upload.onprogressが使えないため、$.ajaxを使用
-      url: `/filer/upload?host=${encodeURI(opt['host'])}&port=${encodeURI(opt['port'])}&password=${encodeURI(opt['password'])}&svname=${encodeURI(opt['svname'])}&svpath=${encodeURI(svpath)}&local_data=${encodeURI(opt['local_data'])}`,
+      url: `filer/upload?host=${encodeURI(opt['host'])}&port=${encodeURI(opt['port'])}&password=${encodeURI(opt['password'])}&svname=${encodeURI(opt['svname'])}&svpath=${encodeURI(svpath)}&local_data=${encodeURI(opt['local_data'])}`,
       type: 'POST',
       processData: false,
       contentType: false,
@@ -463,7 +463,7 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
             year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit'
           });
           const tr = $('<tr>'
-              + `<td><img src="/assets/tree-menu/image/${png}"></td>`
+              + `<td><img src="assets/tree-menu/image/${png}"></td>`
               + '<td>'
                 + '<div class="droudown">'
                   + `<a class="dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">${_n['name']}</a>`
@@ -592,7 +592,7 @@ fsapi.local_exec_cmd = async (opt) => {
   return {"warn": "Unknown command."}
 };
 fsapi.sv_exec_cmd = async (opt) => {
-  return fetch('/exec_cmd', {
+  return fetch('exec_cmd', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -606,7 +606,7 @@ fsapi.message = (res) => {
   hide_loading();
 }
 $(()=>{
-  fetch('/get_server_opt', {method: 'GET'}).then(res => res.json()).then(opt => {
+  fetch('get_server_opt', {method: 'GET'}).then(res => res.json()).then(opt => {
     fsapi.initargs = opt;
     fsapi.right.find('.filer_host').val(fsapi.initargs['host']);
     fsapi.right.find('.filer_port').val(fsapi.initargs['port']);

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>iinfer.app.web &mdash; iinfer 2024/06/28 documentation</title>
+  <title>iinfer.app.web &mdash; iinfer 2024/06/29 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -15,7 +15,7 @@
   
         <script src="../../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=80bb7450"></script>
+        <script src="../../../_static/documentation_options.js?v=24c3f049"></script>
         <script src="../../../_static/doctools.js?v=9a2dae69"></script>
         <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -263,7 +263,7 @@
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="k">pass</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="p">[</span><span class="s1">&#39;pipe_proc&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">send_signal</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">CTRL_C_EVENT</span><span class="p">)</span>
+        <span class="c1">#    self.container[&#39;pipe_proc&#39;].send_signal(signal.CTRL_C_EVENT)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="p">[</span><span class="s1">&#39;pipe_proc&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="k">pass</span></div>
@@ -502,7 +502,7 @@
                 <span class="n">has_warn</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="k">if</span> <span class="n">has_warn</span><span class="p">:</span> <span class="k">return</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">container</span><span class="p">[</span><span class="s1">&#39;pipe_proc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">cmdline</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">,</span> 
+                <span class="n">container</span><span class="p">[</span><span class="s1">&#39;pipe_proc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">cmdline</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">,</span>
                                                         <span class="n">stdout</span><span class="o">=</span><span class="p">(</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span> <span class="k">if</span> <span class="n">capture_stdout</span> <span class="k">else</span> <span class="kc">None</span><span class="p">),</span>
                                                         <span class="n">stderr</span><span class="o">=</span><span class="p">(</span><span class="n">subprocess</span><span class="o">.</span><span class="n">STDOUT</span> <span class="k">if</span> <span class="n">capture_stdout</span> <span class="k">else</span> <span class="kc">None</span><span class="p">))</span>
                 <span class="n">output</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
@@ -831,6 +831,10 @@
 
         <span class="n">static_root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s1">&#39;web&#39;</span>
 
+        <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">index</span><span class="p">():</span>
+            <span class="k">return</span> <span class="n">bottle</span><span class="o">.</span><span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;/gui&#39;</span><span class="p">)</span>
+        
         <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/gui&#39;</span><span class="p">)</span>
         <span class="k">def</span> <span class="nf">gui</span><span class="p">():</span>
             <span class="k">return</span> <span class="n">bottle</span><span class="o">.</span><span class="n">static_file</span><span class="p">(</span><span class="s1">&#39;gui.html&#39;</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="n">static_root</span><span class="p">)</span>
@@ -1058,7 +1062,7 @@
             <span class="n">th</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">bottle</span><span class="o">.</span><span class="n">run</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">app</span><span class="o">=</span><span class="n">app</span><span class="p">,</span> <span class="n">server</span><span class="o">=</span><span class="n">server</span><span class="p">))</span>
             <span class="n">th</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
             <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_running</span><span class="p">:</span>
-                <span class="n">gevent</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+                <span class="n">gevent</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
             <span class="n">server</span><span class="o">.</span><span class="n">srv</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
         <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;iinfer_web.pid&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 

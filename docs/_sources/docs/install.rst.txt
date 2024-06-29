@@ -167,6 +167,9 @@
         sudo apt update
         sudo apt install -y language-pack-ja manpages-ja manpages-ja-dev
         sudo update-locale LANG=ja_JP.UTF-8
+        sudo apt install -y linux-tools-5.4.0-77-generic hwdata
+        sudo update-alternatives --install /usr/local/bin/usbip usbip /usr/lib/linux-tools/5.4.0-77-generic/usbip 20
+
 
 3. Dockerインストール（bash上で実行）
 

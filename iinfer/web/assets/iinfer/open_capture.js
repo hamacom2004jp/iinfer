@@ -12,6 +12,6 @@ const open_capture_func = (target_id) => {
 const load_capture = async (current_path) => {
     const formData = new FormData();
     formData.append('current_path', current_path);
-    const res = await fetch('/gui/load_capture', {method: 'POST', body: formData});
+    const res = await fetch('gui/load_capture', {method: 'POST', body: formData});
     return await res.json();
 }

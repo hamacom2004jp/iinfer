@@ -19,7 +19,7 @@ $(() => {
   change_dark_mode(window.matchMedia('(prefers-color-scheme: dark)').matches);
   // copyright情報取得
   const copyright_func = async () => {
-    const response = await fetch('/copyright');
+    const response = await fetch('copyright');
     const copyright = await response.text();
     $('.copyright').text(copyright);
   };
@@ -28,7 +28,7 @@ $(() => {
   $('#versions_modal').on('shown.bs.modal	', () => {
     // iinferのバージョン情報取得
     const versions_iinfer_func = async () => {
-      const response = await fetch('/versions_iinfer');
+      const response = await fetch('versions_iinfer');
       const versions_iinfer = await response.json();
       $('#versions_iinfer').html('');
       versions_iinfer.forEach((v, i) => {
@@ -47,7 +47,7 @@ $(() => {
     versions_iinfer_func();
     // usedのバージョン情報取得
     const versions_used_func = async () => {
-      const response = await fetch('/versions_used');
+      const response = await fetch('versions_used');
       const versions_used = await response.json();
       $('#versions_used').html('');
       const div = $('<div class="overflow-auto" style="height:calc(100vh - 260px);"></div>');
@@ -95,10 +95,11 @@ $(() => {
       }
   });
   const sub_img = () => {
-    const protocol = window.location.protocol.endsWith('s') ? 'wss' : 'ws';
+    const protocol = window.location.protocol.endsWith('s') ? 'wss:' : 'ws:';
     const host = window.location.hostname;
     const port = window.location.port;
-    const ws = new WebSocket(`${protocol}://${host}:${port}/showimg/sub_img`);
+    const path = window.location.pathname;
+    const ws = new WebSocket(`${protocol}//${host}:${port}${path}/sub_img`);
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
       const img_url = data['img_url'];

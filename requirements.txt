@@ -1,7 +1,8 @@
 argcomplete
 async_timeout
+bottle
+bottle_websocket
 collectlicense
-eel
 motpy
 opencv-python
 Pillow

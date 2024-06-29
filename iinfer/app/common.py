@@ -30,6 +30,20 @@ def copy_sample(dst:Path=Path.cwd()/'sample'):
     src = Path(__file__).parent.parent / 'extensions'
     shutil.copytree(src, dst)
 
+def mklogdir(logdir:Path=Path.cwd()/'logs') -> Path:
+    """
+    ログディレクトリを作成します。
+
+    Args:
+        logdir (Path, optional): ログディレクトリのパス. Defaults to Path.cwd()/'log'.
+
+    Returns:
+        作成したログディレ作成したログディレクトリのパス
+    """
+    if not logdir.exists():
+        return mkdirs(logdir)
+    return logdir
+
 def load_config(mode:str) -> Tuple[logging.Logger, dict]:
     """
     指定されたモードのロガーと設定を読み込みます。

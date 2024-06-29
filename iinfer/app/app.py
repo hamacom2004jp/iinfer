@@ -20,6 +20,7 @@ class IinferApp:
         self.cl = None
         self.web = None
         common.copy_sample()
+        common.mklogdir()
 
     def main(self, args_list:list=None, file_dict:dict=dict()):
         """

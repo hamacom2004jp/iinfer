@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>インストール &mdash; iinfer 2024/06/28 documentation</title>
+  <title>インストール &mdash; iinfer 2024/06/29 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -16,7 +16,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=80bb7450"></script>
+        <script src="../_static/documentation_options.js?v=24c3f049"></script>
         <script src="../_static/doctools.js?v=9a2dae69"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -305,6 +305,8 @@ sudo<span class="w"> </span>sed<span class="w"> </span>-i.bak<span class="w"> </
 sudo<span class="w"> </span>apt<span class="w"> </span>update
 sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>language-pack-ja<span class="w"> </span>manpages-ja<span class="w"> </span>manpages-ja-dev
 sudo<span class="w"> </span>update-locale<span class="w"> </span><span class="nv">LANG</span><span class="o">=</span>ja_JP.UTF-8
+sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>linux-tools-5.4.0-77-generic<span class="w"> </span>hwdata
+sudo<span class="w"> </span>update-alternatives<span class="w"> </span>--install<span class="w"> </span>/usr/local/bin/usbip<span class="w"> </span>usbip<span class="w"> </span>/usr/lib/linux-tools/5.4.0-77-generic/usbip<span class="w"> </span><span class="m">20</span>
 </pre></div>
 </div>
 </div></blockquote>

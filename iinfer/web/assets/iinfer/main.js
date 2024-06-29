@@ -152,22 +152,22 @@ $(() => {
 });
 
 const copyright = async () => {
-    const res = await fetch('/copyright', {method: 'GET'});
+    const res = await fetch('copyright', {method: 'GET'});
     return await res.text();
 }
 const versions_iinfer = async () => {
-    const res = await fetch('/versions_iinfer', {method: 'GET'});
+    const res = await fetch('versions_iinfer', {method: 'GET'});
     return await res.json();
 }
 const versions_used = async () => {
-    const res = await fetch('/versions_used', {method: 'GET'});
+    const res = await fetch('versions_used', {method: 'GET'});
     return await res.json();
 }
 const get_local_data = async () => {
-    const res = await fetch('/gui/get_local_data', {method: 'GET'});
+    const res = await fetch('gui/get_local_data', {method: 'GET'});
     return await res.text();
 }
 const bbforce_cmd = async () => {
-    const res = await fetch('/bbforce_cmd', {method: 'GET'});
+    const res = await fetch('bbforce_cmd', {method: 'GET'});
     return await res.json();
 }

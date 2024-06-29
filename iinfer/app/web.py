@@ -152,7 +152,7 @@ class Web(options.Options):
         except Exception as e:
             pass
         try:
-            self.container['pipe_proc'].send_signal(signal.CTRL_C_EVENT)
+        #    self.container['pipe_proc'].send_signal(signal.CTRL_C_EVENT)
             self.container['pipe_proc'].terminate()
         except Exception as e:
             pass
@@ -367,7 +367,7 @@ class Web(options.Options):
                 has_warn = True
             if has_warn: return
             try:
-                container['pipe_proc'] = subprocess.Popen(cmdline, shell=True, text=True, encoding='utf-8', 
+                container['pipe_proc'] = subprocess.Popen(cmdline, shell=True, text=True, encoding='utf-8',
                                                         stdout=(subprocess.PIPE if capture_stdout else None),
                                                         stderr=(subprocess.STDOUT if capture_stdout else None))
                 output = ""
@@ -651,6 +651,10 @@ class Web(options.Options):
 
         static_root = Path(__file__).parent.parent / 'web'
 
+        @app.route('/')
+        def index():
+            return bottle.redirect('/gui')
+        
         @app.route('/gui')
         def gui():
             return bottle.static_file('gui.html', root=static_root)
@@ -878,7 +882,7 @@ class Web(options.Options):
             th = threading.Thread(target=bottle.run, kwargs=dict(app=app, server=server))
             th.start()
             while self.is_running:
-                gevent.sleep(0.01)
+                gevent.sleep(1)
             server.srv.shutdown()
         Path("iinfer_web.pid").unlink(missing_ok=True)
 

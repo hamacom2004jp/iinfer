@@ -351,47 +351,47 @@ const get_param = (modal_elem) => {
 const list_cmd = async (kwd) => {
     const formData = new FormData();
     formData.append('kwd', kwd?`*${kwd}*`:'*');
-    const res = await fetch('/gui/list_cmd', {method: 'POST', body: formData});
+    const res = await fetch('gui/list_cmd', {method: 'POST', body: formData});
     return await res.json();
 }
 const get_modes = async (kwd) => {
-    const res = await fetch('/gui/get_modes', {method: 'GET'});
+    const res = await fetch('gui/get_modes', {method: 'GET'});
     return await res.json();
 }
 const get_cmds = async (mode) => {
     const formData = new FormData();
     formData.append('mode', mode);
-    const res = await fetch('/gui/get_cmds', {method: 'POST', body: formData});
+    const res = await fetch('gui/get_cmds', {method: 'POST', body: formData});
     return await res.json();
 }
 const get_cmd_choices = async (mode, cmd) => {
     const formData = new FormData();
     formData.append('mode', mode);
     formData.append('cmd', cmd);
-    const res = await fetch('/gui/get_cmd_choices', {method: 'POST', body: formData});
+    const res = await fetch('gui/get_cmd_choices', {method: 'POST', body: formData});
     return await res.json();
 }
 const load_cmd = async (title) => {
     const formData = new FormData();
     formData.append('title', title);
-    const res = await fetch('/gui/load_cmd', {method: 'POST', body: formData});
+    const res = await fetch('gui/load_cmd', {method: 'POST', body: formData});
     return await res.json();
 }
 const save_cmd = async (title, opt) => {
     const formData = new FormData();
     formData.append('title', title);
     formData.append('opt', JSON.stringify(opt));
-    const res = await fetch('/gui/save_cmd', {method: 'POST', body: formData});
+    const res = await fetch('gui/save_cmd', {method: 'POST', body: formData});
     return await res.json();
 }
 const del_cmd = async (title) => {
     const formData = new FormData();
     formData.append('title', title);
-    const res = await fetch('/gui/del_cmd', {method: 'POST', body: formData});
+    const res = await fetch('gui/del_cmd', {method: 'POST', body: formData});
     return await res.json();
 }
 const exec_cmd = async (title, opt) => {
-    const res = await fetch(`/exec_cmd/${title}`,
+    const res = await fetch(`exec_cmd/${title}`,
         {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(opt)});
     const text = await res.text();
     try {
@@ -404,6 +404,6 @@ const raw_cmd = async (title, opt) => {
     const formData = new FormData();
     formData.append('title', title);
     formData.append('opt', JSON.stringify(opt));
-    const res = await fetch('/gui/raw_cmd', {method: 'POST', body: formData});
+    const res = await fetch('gui/raw_cmd', {method: 'POST', body: formData});
     return await res.json();
 }

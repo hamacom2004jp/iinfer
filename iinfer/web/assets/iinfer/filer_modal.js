@@ -70,7 +70,7 @@ filer_modal_func = async (target_id, modal_title, current_path, call_back_func) 
                     table_body.append(tr_elem);
                     const td = $(`<td><a href="#" class="folder-close">${n['name']}</a></td>`);
                     td.find('a').click(mk_file_func(target_id, $(`#${k}`), n['path']));
-                    tr_elem.append($('<td><img src="/assets/tree-menu/image/folder-close.png"></td>'));
+                    tr_elem.append($('<td><img src="assets/tree-menu/image/folder-close.png"></td>'));
                     tr_elem.append(td);
                     tr_elem.append($(`<td>${n['size']}</td>`));
                     tr_elem.append($(`<td>${n['last']}</td>`));
@@ -104,6 +104,6 @@ filer_modal_func = async (target_id, modal_title, current_path, call_back_func) 
 const list_tree = async (current_path) => {
     const formData = new FormData();
     formData.append('current_path', current_path);
-    const res = await fetch('/gui/list_tree', {method: 'POST', body: formData});
+    const res = await fetch('gui/list_tree', {method: 'POST', body: formData});
     return await res.json();
 }
