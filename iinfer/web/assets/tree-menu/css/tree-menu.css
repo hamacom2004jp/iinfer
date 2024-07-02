@@ -24,13 +24,13 @@
     background-repeat: no-repeat;
 }
 .tree-menu a.file {
-    background-image: url(/assets/tree-menu/image/file.png);
+    background-image: url(../image/file.png);
 }
 .tree-menu a.folder-close {
-    background-image: url(/assets/tree-menu/image/folder-close.png);
+    background-image: url(../image/folder-close.png);
 }
 .tree-menu a.folder-open {
-    background-image: url(/assets/tree-menu/image/folder-open.png);
+    background-image: url(../image/folder-open.png);
     font-weight: bold;
 }
 .tree-menu a:link {

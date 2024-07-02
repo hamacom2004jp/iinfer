@@ -474,7 +474,7 @@ class Client(object):
         res_json = self.redis_cli.send_cmd('file_rmdir', [convert.str2b64str(str(svpath))], timeout=timeout)
         return res_json
     
-    def file_download(self, svpath:str, download_file:Path, local_data:Path = None, timeout:int = 60):
+    def file_download(self, svpath:str, download_file:Path, local_data:Path = None, rpath:str="", timeout:int = 60):
         """
         サーバー上のファイルをダウンロードする
 
@@ -482,6 +482,7 @@ class Client(object):
             svpath (Path): サーバー上のファイルパス
             download_file (Path): ローカルのファイルパス
             local_data (Path, optional): ローカルを参照させる場合のデータフォルダ. Defaults to None.
+            rpath (str, optional): リクエストパス. Defaults to "".
             timeout (int, optional): タイムアウト時間. Defaults to 60.
 
         Returns:
@@ -493,6 +494,8 @@ class Client(object):
         else:
             res_json = self.redis_cli.send_cmd('file_download', [convert.str2b64str(str(svpath))], timeout=timeout)
         if "success" in res_json:
+            res_json["success"]["rpath"] = rpath
+            res_json["success"]["svpath"] = svpath
             if download_file is not None:
                 if download_file.is_dir():
                     download_file = download_file / res_json["success"]["name"]

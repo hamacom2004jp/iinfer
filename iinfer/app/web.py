@@ -279,6 +279,23 @@ class Web(options.Options):
                     children = {}
             path_tree[path_key] = dict(name=part, is_dir=path.is_dir(), path=str(path), children=children, size=path.stat().st_size, last=ts2str(path.stat().st_mtime))
         return path_tree
+    
+    def list_downloads(self, current_path, root_path=None):
+        if type(current_path) == str:
+            current_path = current_path[1:] if current_path.startswith('/') else current_path
+            current_path = self.data if current_path is None or current_path=='' else self.data / current_path
+            root_path = current_path
+        if current_path.is_file():
+            svpath = str(current_path).replace(str(self.data), '')
+            rpath = str(current_path).replace(str(root_path), '')[1:]
+            rpath = str(Path(root_path.name) / rpath)
+            #dlpath = cpath.replace(str(Path(rpath).parent), '')
+            return [dict(svpath=svpath, rpath=rpath)]
+        download_files = []
+        if current_path.is_dir():
+            for f in current_path.iterdir():
+                download_files = download_files + self.list_downloads(f, root_path)
+        return download_files
 
     def load_result(self, current_path):
         current_path = Path(current_path)
@@ -653,11 +670,18 @@ class Web(options.Options):
 
         @app.route('/')
         def index():
-            return bottle.redirect('/gui')
+            return bottle.redirect('gui')
         
         @app.route('/gui')
         def gui():
             return bottle.static_file('gui.html', root=static_root)
+
+        @app.route('/gui/list_downloads', method='POST')
+        def list_downloads():
+            current_path = bottle.request.forms.get('current_path')
+            ret = self.list_downloads(current_path)
+            bottle.response.content_type = 'application/json'
+            return json.dumps(ret, default=common.default_json_enc)
 
         @app.route('/gui/list_tree', method='POST')
         def list_tree():

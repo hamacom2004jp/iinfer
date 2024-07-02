@@ -2,38 +2,39 @@ const fsapi = {};
 fsapi.left = $('#left_container');
 fsapi.right = $('#right_container');
 fsapi.loading = $('#loading');
+fsapi.progress = (_min, _max, _now, _text, _show, _cycle) => {
+  const prog_elem = $('.progress');
+  const bar_elem = prog_elem.find('.progress-bar');
+  const bar_text = bar_elem.find('.progress-bar-text');
+  if(_show) prog_elem.removeClass('d-none');
+  else prog_elem.addClass('d-none');
+  prog_elem.attr('aria-valuemin', _min);
+  prog_elem.attr('aria-valuemax', _max);
+  prog_elem.attr('aria-valuenow', _now);
+  if (!_cycle) {
+    const par = Math.floor((_now / (_max-_min)) * 10000) / 100
+    bar_elem.css('left', 'auto').css('width', `${par}%`);
+    bar_text.text(`${par.toFixed(2)}% ( ${_now} / ${_max} ) ${_text}`);
+    clearTimeout(progress_handle);
+  } else {
+    let maxwidth = prog_elem.css('width');
+    maxwidth = parseInt(maxwidth.replace('px', ''));
+    let left = bar_elem.css('left');
+    if (!left || left=='auto') left = 0;
+    else left = parseInt(left.replace('px', ''));
+    if (left > maxwidth) left = -200;
+    left += 2;
+    bar_elem.css('width', '200px').css('position', 'relative').css('left', `${left}px`);
+    bar_text.text('Server processing...');
+    var progress_handle = setTimeout(() => {
+      if (!fsapi.loading.is('.d-none')) fsapi.progress(_min, _max, _now, _text, _show, _cycle);
+    }, 20);
+  }
+};
 fsapi.filer = (svpath, is_local) => {
   // ファイルアップロード ========================================================
   const upload = async (event) => {
     show_loading();
-    const progress = (_min, _max, _now, _text, _show, _cycle) => {
-      const prog_elem = $('.progress');
-      const bar_elem = prog_elem.find('.progress-bar');
-      if(_show) prog_elem.removeClass('d-none');
-      else prog_elem.addClass('d-none');
-      prog_elem.attr('aria-valuemin', _min);
-      prog_elem.attr('aria-valuemax', _max);
-      prog_elem.attr('aria-valuenow', _now);
-      if (!_cycle) {
-        const par = Math.floor((_now / (_max-_min)) * 10000) / 100
-        bar_elem.css('left', 'auto').css('width', `${par}%`);
-        bar_elem.text(`${par}% ( ${_now} / ${_max} ) ${_text}`);
-        clearTimeout(progress_handle);
-      } else {
-        let maxwidth = prog_elem.css('width');
-        maxwidth = parseInt(maxwidth.replace('px', ''));
-        let left = bar_elem.css('left');
-        if (!left || left=='auto') left = 0;
-        else left = parseInt(left.replace('px', ''));
-        if (left > maxwidth) left = -200;
-        left += 2;
-        bar_elem.css('width', '200px').css('position', 'relative').css('left', `${left}px`);
-        bar_elem.text('Server processing...');
-        var progress_handle = setTimeout(() => {
-          if (!fsapi.loading.is('.d-none')) progress(_min, _max, _now, _text, _show, _cycle);
-        }, 20);
-      }
-    }
     // https://qiita.com/KokiSakano/items/a122bc0a1a368c697643
     const files = [];
     const searchFile = async (entry) => {
@@ -125,7 +126,7 @@ fsapi.filer = (svpath, is_local) => {
         const xhr = $.ajaxSettings.xhr();
         xhr.upload.onprogress = function(e) {
           if (e.lengthComputable) {
-            progress(0, e.total, e.loaded, '', true, e.total==e.loaded);
+            fsapi.progress(0, e.total, e.loaded, '', true, e.total==e.loaded);
           }
         };
         return xhr;
@@ -143,39 +144,79 @@ fsapi.filer = (svpath, is_local) => {
   }
   // ファイルダウンロード ==============================================================
   const download = (event) => {
+    if (!fsapi.left.find('.filer_address').val()) {
+      fsapi.message({warn: 'Please select a local directory before downloading.'});
+      return;
+    }
     show_loading();
-    const opt = fsapi.get_server_opt();
-    opt['mode'] = 'client';
-    opt['cmd'] = 'file_download';
-    opt['capture_stdout'] = true;
-    opt['svpath'] = event.originalEvent.dataTransfer.getData('path');
-    fsapi.sv_exec_cmd(opt).then(async res => {
-      if(!res[0] || !res[0]['success']) {
-        fsapi.message(res);
-        return;
-      }
-      const mk_blob = (base64) => {
-        const bin = atob(base64.replace(/^.*,/, ''));
-        const buffer = new Uint8Array(bin.length);
-        for (i=0; i<bin.length; i++) buffer[i] = bin.charCodeAt(i);
-        const blob = new Blob([buffer.buffer], {type: 'application/octet-stream'});
-        return blob;
-      }
-      const down_dir = fsapi.handles[fsapi.left.find('.filer_address').val()];
-      if (!down_dir) {
-        fsapi.message({warn: 'Please select a local directory before downloading.'});
-        return;
-      }
-      const down_file = await down_dir.getFileHandle(res[0]['success']['name'], {create: true});
-      const writable = await down_file.createWritable();
-      const blob = mk_blob(res[0]['success']['data']);
-      await writable.write(blob);
-      await writable.close();
-    }).catch((e) => {
-      console.log(e);
-    }).finally(() => {
-      hide_loading();
-      fsapi.tree(fsapi.left, fsapi.left.find('.filer_address').val(), fsapi.left.find('.tree-menu'), true);
+    const formData = new FormData();
+    formData.append('current_path', event.originalEvent.dataTransfer.getData('path'));
+    fetch('gui/list_downloads', {method: 'POST', body: formData}).then(async res => {
+      const list_downloads = await res.json();
+      const jobs = [];
+      fsapi.download_now = 0;
+      fsapi.progress(0, list_downloads.length, fsapi.download_now, '', true, false)
+      list_downloads.forEach(async path => {
+        opt['mode'] = 'client';
+        opt['cmd'] = 'file_download';
+        opt['capture_stdout'] = true;
+        opt['svpath'] = path['svpath'];
+        opt['rpath'] = path['rpath'];
+        //opt['svpath'] = event.originalEvent.dataTransfer.getData('path');
+        jobs.push(fsapi.sv_exec_cmd(opt).then(async res => {
+          if(!res[0] || !res[0]['success']) {
+            fsapi.download_now ++;
+            fsapi.progress(0, list_downloads.length, fsapi.download_now, '', true, false)
+            fsapi.message(res);
+            return;
+          }
+          const mk_blob = (base64) => {
+            const bin = atob(base64.replace(/^.*,/, ''));
+            const buffer = new Uint8Array(bin.length);
+            for (i=0; i<bin.length; i++) buffer[i] = bin.charCodeAt(i);
+            const blob = new Blob([buffer.buffer], {type: 'application/octet-stream'});
+            return blob;
+          }
+          const file_name = res[0]['success']['name'];
+          const file_svpath = res[0]['success']['svpath'];
+          const rpath = res[0]['success']['rpath'];
+          let file_path = fsapi.left.find('.filer_address').val() + '/' + rpath;
+          file_path = file_path.replaceAll("\\","/").replaceAll("//","/");
+          fsapi.progress(0, list_downloads.length, fsapi.download_now, file_path, true, false)
+          const file_path_parts = file_path.split('/');
+          let dh = fsapi.handles['/'];
+          for (let i=0; i<file_path_parts.length-1; i++){
+            const part = file_path_parts[i];
+            if (!part) continue;
+            try {
+              dh = await dh.getDirectoryHandle(part, {create: true});
+              fsapi.handles[file_path_parts.slice(0, i+1).join('/')] = dh;
+            } catch (e) {
+              continue;
+            }
+          }
+          try {
+            const down_dir = fsapi.handles[file_path_parts.slice(0, -1).join('/')];
+            const down_file = await down_dir.getFileHandle(file_name, {create: true});
+            const writable = await down_file.createWritable();
+            const blob = mk_blob(res[0]['success']['data']);
+            await writable.write(blob);
+            await writable.close();
+          } catch (e) {
+            console.log(e);
+          }
+          fsapi.download_now ++;
+          fsapi.progress(0, list_downloads.length, fsapi.download_now, file_path, true, false)
+        }).catch((e) => {
+          console.log(e);
+        }));
+      });
+      Promise.all(jobs).then(() => {
+        hide_loading();
+        fsapi.progress(0, list_downloads.length, fsapi.download_now, '', false, false)
+        fsapi.download_now = 0;
+        fsapi.tree(fsapi.left, fsapi.left.find('.filer_address').val(), fsapi.left.find('.tree-menu'), true);
+      });
     });
   };
   // 表示 ==============================================================
@@ -577,7 +618,7 @@ fsapi.local_exec_cmd = async (opt) => {
   else if (opt['mode'] == 'client' && (opt['cmd'] == 'file_remove' || opt['cmd'] == 'file_rmdir')) {
     const parts = opt['svpath'].split('/');
     const dir = parts.slice(0, -1).join('/');
-    const entry = fsapi.handles[dir];
+    const entry = fsapi.handles[dir?dir:"/"];
     try {
       await entry.removeEntry(parts[parts.length-1], {recursive: false});
     } catch (e) {

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>iinfer.app.web &mdash; iinfer 2024/06/29 documentation</title>
+  <title>iinfer.app.web &mdash; iinfer 2024/07/02 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -15,7 +15,7 @@
   
         <script src="../../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=24c3f049"></script>
+        <script src="../../../_static/documentation_options.js?v=ebf1d5be"></script>
         <script src="../../../_static/doctools.js?v=9a2dae69"></script>
         <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -402,6 +402,26 @@
                     <span class="n">children</span> <span class="o">=</span> <span class="p">{}</span>
             <span class="n">path_tree</span><span class="p">[</span><span class="n">path_key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">part</span><span class="p">,</span> <span class="n">is_dir</span><span class="o">=</span><span class="n">path</span><span class="o">.</span><span class="n">is_dir</span><span class="p">(),</span> <span class="n">path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">),</span> <span class="n">children</span><span class="o">=</span><span class="n">children</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">path</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span><span class="p">,</span> <span class="n">last</span><span class="o">=</span><span class="n">ts2str</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_mtime</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">path_tree</span></div>
+
+    
+<div class="viewcode-block" id="Web.list_downloads">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.list_downloads">[docs]</a>
+    <span class="k">def</span> <span class="nf">list_downloads</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_path</span><span class="p">,</span> <span class="n">root_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">current_path</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
+            <span class="n">current_path</span> <span class="o">=</span> <span class="n">current_path</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="k">if</span> <span class="n">current_path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="n">current_path</span>
+            <span class="n">current_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="k">if</span> <span class="n">current_path</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">current_path</span><span class="o">==</span><span class="s1">&#39;&#39;</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">/</span> <span class="n">current_path</span>
+            <span class="n">root_path</span> <span class="o">=</span> <span class="n">current_path</span>
+        <span class="k">if</span> <span class="n">current_path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+            <span class="n">svpath</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">current_path</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">),</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+            <span class="n">rpath</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">current_path</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">root_path</span><span class="p">),</span> <span class="s1">&#39;&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">:]</span>
+            <span class="n">rpath</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">root_path</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="o">/</span> <span class="n">rpath</span><span class="p">)</span>
+            <span class="c1">#dlpath = cpath.replace(str(Path(rpath).parent), &#39;&#39;)</span>
+            <span class="k">return</span> <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">svpath</span><span class="o">=</span><span class="n">svpath</span><span class="p">,</span> <span class="n">rpath</span><span class="o">=</span><span class="n">rpath</span><span class="p">)]</span>
+        <span class="n">download_files</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">current_path</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">current_path</span><span class="o">.</span><span class="n">iterdir</span><span class="p">():</span>
+                <span class="n">download_files</span> <span class="o">=</span> <span class="n">download_files</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">list_downloads</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">root_path</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">download_files</span></div>
 
 
 <div class="viewcode-block" id="Web.load_result">
@@ -833,11 +853,18 @@
 
         <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
         <span class="k">def</span> <span class="nf">index</span><span class="p">():</span>
-            <span class="k">return</span> <span class="n">bottle</span><span class="o">.</span><span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;/gui&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">bottle</span><span class="o">.</span><span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;gui&#39;</span><span class="p">)</span>
         
         <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/gui&#39;</span><span class="p">)</span>
         <span class="k">def</span> <span class="nf">gui</span><span class="p">():</span>
             <span class="k">return</span> <span class="n">bottle</span><span class="o">.</span><span class="n">static_file</span><span class="p">(</span><span class="s1">&#39;gui.html&#39;</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="n">static_root</span><span class="p">)</span>
+
+        <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/gui/list_downloads&#39;</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;POST&#39;</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">list_downloads</span><span class="p">():</span>
+            <span class="n">current_path</span> <span class="o">=</span> <span class="n">bottle</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">forms</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;current_path&#39;</span><span class="p">)</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">list_downloads</span><span class="p">(</span><span class="n">current_path</span><span class="p">)</span>
+            <span class="n">bottle</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">content_type</span> <span class="o">=</span> <span class="s1">&#39;application/json&#39;</span>
+            <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">ret</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">common</span><span class="o">.</span><span class="n">default_json_enc</span><span class="p">)</span>
 
         <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/gui/list_tree&#39;</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;POST&#39;</span><span class="p">)</span>
         <span class="k">def</span> <span class="nf">list_tree</span><span class="p">():</span>

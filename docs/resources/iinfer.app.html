@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>iinfer.app package &mdash; iinfer 2024/06/29 documentation</title>
+  <title>iinfer.app package &mdash; iinfer 2024/07/02 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -16,7 +16,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=24c3f049"></script>
+        <script src="../_static/documentation_options.js?v=ebf1d5be"></script>
         <script src="../_static/doctools.js?v=9a2dae69"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -311,7 +311,7 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.client.Client.file_download">
-<span class="sig-name descname"><span class="pre">file_download</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">svpath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">60</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/client.html#Client.file_download"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.client.Client.file_download" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">file_download</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">svpath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rpath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">60</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/client.html#Client.file_download"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.client.Client.file_download" title="Link to this definition"></a></dt>
 <dd><p>サーバー上のファイルをダウンロードする</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -319,6 +319,7 @@
 <li><p><strong>svpath</strong> (<em>Path</em>) -- サーバー上のファイルパス</p></li>
 <li><p><strong>download_file</strong> (<em>Path</em>) -- ローカルのファイルパス</p></li>
 <li><p><strong>local_data</strong> (<em>Path</em><em>, </em><em>optional</em>) -- ローカルを参照させる場合のデータフォルダ. Defaults to None.</p></li>
+<li><p><strong>rpath</strong> (<em>str</em><em>, </em><em>optional</em>) -- リクエストパス. Defaults to &quot;&quot;.</p></li>
 <li><p><strong>timeout</strong> (<em>int</em><em>, </em><em>optional</em>) -- タイムアウト時間. Defaults to 60.</p></li>
 </ul>
 </dd>
@@ -1710,6 +1711,11 @@ return dict(output_boxes=final_boxes, output_scores=final_scores, output_classes
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.web.Web.list_cmd">
 <span class="sig-name descname"><span class="pre">list_cmd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kwd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.list_cmd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.list_cmd" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.web.Web.list_downloads">
+<span class="sig-name descname"><span class="pre">list_downloads</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.list_downloads"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.list_downloads" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
