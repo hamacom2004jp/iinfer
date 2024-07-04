@@ -196,7 +196,8 @@ fsapi.filer = (svpath, is_local) => {
             }
           }
           try {
-            const down_dir = fsapi.handles[file_path_parts.slice(0, -1).join('/')];
+            const dir_path = file_path_parts.slice(0, -1).join('/');
+            const down_dir = fsapi.handles[dir_path?dir_path:"/"];
             const down_file = await down_dir.getFileHandle(file_name, {create: true});
             const writable = await down_file.createWritable();
             const blob = mk_blob(res[0]['success']['data']);

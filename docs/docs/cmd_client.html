@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>コマンドリファレンス（clientモード） &mdash; iinfer 2024/07/02 documentation</title>
+  <title>コマンドリファレンス（clientモード） &mdash; iinfer 2024/07/05 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -16,7 +16,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=ebf1d5be"></script>
+        <script src="../_static/documentation_options.js?v=20784573"></script>
         <script src="../_static/doctools.js?v=9a2dae69"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -215,6 +215,14 @@
 <td></td>
 <td><p>デプロイ済みであっても上書きする指定</p></td>
 </tr>
+<tr class="row-even"><td><p>--retry_count &lt;リトライ回数&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーへの再接続回数を指定。0以下を指定すると永遠に再接続を行う。</p></td>
+</tr>
+<tr class="row-odd"><td><p>--retry_interval &lt;リトライ間隔&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーに再接続までの秒数を指定</p></td>
+</tr>
 <tr class="row-even"><td><p>--timeout &lt;タイムアウト&gt;</p></td>
 <td></td>
 <td><p>サーバーの応答が返ってくるまでの最大待ち時間を指定</p></td>
@@ -252,6 +260,14 @@
 <tr class="row-odd"><td><p>--svname &lt;推論サービス名&gt;</p></td>
 <td></td>
 <td><p>推論サーバーのサービス名を指定します。省略時は <cite>server</cite> を使用します</p></td>
+</tr>
+<tr class="row-even"><td><p>--retry_count &lt;リトライ回数&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーへの再接続回数を指定。0以下を指定すると永遠に再接続を行う。</p></td>
+</tr>
+<tr class="row-odd"><td><p>--retry_interval &lt;リトライ間隔&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーに再接続までの秒数を指定</p></td>
 </tr>
 <tr class="row-even"><td><p>--timeout &lt;タイムアウト&gt;</p></td>
 <td></td>
@@ -294,6 +310,14 @@
 <tr class="row-even"><td><p>-n,--name &lt;登録名&gt;</p></td>
 <td><p>〇</p></td>
 <td><p>AIモデルの登録名を指定します</p></td>
+</tr>
+<tr class="row-odd"><td><p>--retry_count &lt;リトライ回数&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーへの再接続回数を指定。0以下を指定すると永遠に再接続を行う。</p></td>
+</tr>
+<tr class="row-even"><td><p>--retry_interval &lt;リトライ間隔&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーに再接続までの秒数を指定</p></td>
 </tr>
 <tr class="row-odd"><td><p>--timeout &lt;タイムアウト&gt;</p></td>
 <td></td>
@@ -349,6 +373,14 @@
 <td></td>
 <td><p>GPUのディバイスIDを指定します。</p></td>
 </tr>
+<tr class="row-even"><td><p>--retry_count &lt;リトライ回数&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーへの再接続回数を指定。0以下を指定すると永遠に再接続を行う。</p></td>
+</tr>
+<tr class="row-odd"><td><p>--retry_interval &lt;リトライ間隔&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーに再接続までの秒数を指定</p></td>
+</tr>
 <tr class="row-even"><td><p>--timeout &lt;タイムアウト&gt;</p></td>
 <td></td>
 <td><p>サーバーの応答が返ってくるまでの最大待ち時間</p></td>
@@ -394,6 +426,14 @@
 <tr class="row-even"><td><p>-n,--name &lt;登録名&gt;</p></td>
 <td><p>〇</p></td>
 <td><p>AIモデルの登録名を指定します</p></td>
+</tr>
+<tr class="row-odd"><td><p>--retry_count &lt;リトライ回数&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーへの再接続回数を指定。0以下を指定すると永遠に再接続を行う。</p></td>
+</tr>
+<tr class="row-even"><td><p>--retry_interval &lt;リトライ間隔&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーに再接続までの秒数を指定</p></td>
 </tr>
 <tr class="row-odd"><td><p>--timeout &lt;タイムアウト&gt;</p></td>
 <td></td>
@@ -460,6 +500,14 @@
 <tr class="row-even"><td><p>-P,--output_preview</p></td>
 <td></td>
 <td><p>推論結果画像を <cite>cv2.imshow</cite> で表示します</p></td>
+</tr>
+<tr class="row-odd"><td><p>--retry_count &lt;リトライ回数&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーへの再接続回数を指定。0以下を指定すると永遠に再接続を行う。</p></td>
+</tr>
+<tr class="row-even"><td><p>--retry_interval &lt;リトライ間隔&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーに再接続までの秒数を指定</p></td>
 </tr>
 <tr class="row-odd"><td><p>--timeout &lt;タイムアウト&gt;</p></td>
 <td></td>
@@ -607,6 +655,14 @@
 <td></td>
 <td><p>ローカルを参照させる場合のデータフォルダのパスを指定します。</p></td>
 </tr>
+<tr class="row-even"><td><p>--retry_count &lt;リトライ回数&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーへの再接続回数を指定。0以下を指定すると永遠に再接続を行う。</p></td>
+</tr>
+<tr class="row-odd"><td><p>--retry_interval &lt;リトライ間隔&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーに再接続までの秒数を指定</p></td>
+</tr>
 <tr class="row-even"><td><p>--timeout &lt;タイムアウト&gt;</p></td>
 <td></td>
 <td><p>サーバーの応答が返ってくるまでの最大待ち時間</p></td>
@@ -657,6 +713,14 @@
 <td></td>
 <td><p>ローカルを参照させる場合のデータフォルダのパスを指定します。</p></td>
 </tr>
+<tr class="row-even"><td><p>--retry_count &lt;リトライ回数&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーへの再接続回数を指定。0以下を指定すると永遠に再接続を行う。</p></td>
+</tr>
+<tr class="row-odd"><td><p>--retry_interval &lt;リトライ間隔&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーに再接続までの秒数を指定</p></td>
+</tr>
 <tr class="row-even"><td><p>--timeout &lt;タイムアウト&gt;</p></td>
 <td></td>
 <td><p>サーバーの応答が返ってくるまでの最大待ち時間</p></td>
@@ -706,6 +770,14 @@
 <tr class="row-odd"><td><p>--local_data &lt;データフォルダ&gt;</p></td>
 <td></td>
 <td><p>ローカルを参照させる場合のデータフォルダのパスを指定します。</p></td>
+</tr>
+<tr class="row-even"><td><p>--retry_count &lt;リトライ回数&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーへの再接続回数を指定。0以下を指定すると永遠に再接続を行う。</p></td>
+</tr>
+<tr class="row-odd"><td><p>--retry_interval &lt;リトライ間隔&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーに再接続までの秒数を指定</p></td>
 </tr>
 <tr class="row-even"><td><p>--timeout &lt;タイムアウト&gt;</p></td>
 <td></td>
@@ -761,6 +833,14 @@
 <td></td>
 <td><p>ローカルを参照させる場合のデータフォルダのパスを指定します。</p></td>
 </tr>
+<tr class="row-odd"><td><p>--retry_count &lt;リトライ回数&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーへの再接続回数を指定。0以下を指定すると永遠に再接続を行う。</p></td>
+</tr>
+<tr class="row-even"><td><p>--retry_interval &lt;リトライ間隔&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーに再接続までの秒数を指定</p></td>
+</tr>
 <tr class="row-odd"><td><p>--timeout &lt;タイムアウト&gt;</p></td>
 <td></td>
 <td><p>サーバーの応答が返ってくるまでの最大待ち時間</p></td>
@@ -815,6 +895,14 @@
 <td></td>
 <td><p>ローカルを参照させる場合のデータフォルダのパスを指定します。</p></td>
 </tr>
+<tr class="row-odd"><td><p>--retry_count &lt;リトライ回数&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーへの再接続回数を指定。0以下を指定すると永遠に再接続を行う。</p></td>
+</tr>
+<tr class="row-even"><td><p>--retry_interval &lt;リトライ間隔&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーに再接続までの秒数を指定</p></td>
+</tr>
 <tr class="row-odd"><td><p>--timeout &lt;タイムアウト&gt;</p></td>
 <td></td>
 <td><p>サーバーの応答が返ってくるまでの最大待ち時間</p></td>
@@ -864,6 +952,14 @@
 <tr class="row-odd"><td><p>--local_data &lt;データフォルダ&gt;</p></td>
 <td></td>
 <td><p>ローカルを参照させる場合のデータフォルダのパスを指定します。</p></td>
+</tr>
+<tr class="row-even"><td><p>--retry_count &lt;リトライ回数&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーへの再接続回数を指定。0以下を指定すると永遠に再接続を行う。</p></td>
+</tr>
+<tr class="row-odd"><td><p>--retry_interval &lt;リトライ間隔&gt;</p></td>
+<td></td>
+<td><p>Redisサーバーに再接続までの秒数を指定</p></td>
 </tr>
 <tr class="row-even"><td><p>--timeout &lt;タイムアウト&gt;</p></td>
 <td></td>

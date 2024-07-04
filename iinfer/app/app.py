@@ -85,7 +85,7 @@ class IinferApp:
                     common.print_format(msg, args.format, tm, args.output_json, args.output_json_append)
                     return 1, msg
                 cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
-                ret = cl.stop_server(timeout=args.timeout)
+                ret = cl.stop_server(retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
                 common.print_format(ret, args.format, tm, args.output_json, args.output_json_append)
                 if 'success' not in ret:
                     return 1, ret
@@ -171,31 +171,33 @@ class IinferApp:
                                 args.custom_predict_py, label_file=args.label_file, color_file=args.color_file,
                                 before_injection_conf=args.before_injection_conf, before_injection_type=args.before_injection_type, before_injection_py=args.before_injection_py,
                                 after_injection_conf=args.after_injection_conf, after_injection_type=args.after_injection_type, after_injection_py=args.after_injection_py,
-                                overwrite=args.overwrite, timeout=args.timeout)
+                                overwrite=args.overwrite, retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
                 common.print_format(ret, args.format, tm, args.output_json, args.output_json_append)
                 if 'success' not in ret:
                     return 1, ret
 
             elif args.cmd == 'deploy_list':
-                ret = self.cl.deploy_list(timeout=args.timeout)
+                ret = self.cl.deploy_list(retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
                 common.print_format(ret, args.format, tm, args.output_json, args.output_json_append)
                 if 'success' not in ret:
                     return 1, ret
 
             elif args.cmd == 'undeploy':
-                ret = self.cl.undeploy(args.name, timeout=args.timeout)
+                ret = self.cl.undeploy(args.name, retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
                 common.print_format(ret, args.format, tm, args.output_json, args.output_json_append)
                 if 'success' not in ret:
                     return 1, ret
 
             elif args.cmd == 'start':
-                ret = self.cl.start(args.name, model_provider=args.model_provider, use_track=args.use_track, gpuid=args.gpuid, timeout=args.timeout)
+                ret = self.cl.start(args.name, model_provider=args.model_provider, use_track=args.use_track, gpuid=args.gpuid,
+                                    retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
                 common.print_format(ret, args.format, tm, args.output_json, args.output_json_append)
                 if 'success' not in ret:
                     return 1, ret
 
             elif args.cmd == 'stop':
-                ret = self.cl.stop(args.name, timeout=args.timeout)
+                ret = self.cl.stop(args.name,
+                                   retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
                 common.print_format(ret, args.format, tm, args.output_json, args.output_json_append)
                 if 'success' not in ret:
                     return 1, ret
@@ -204,8 +206,8 @@ class IinferApp:
                 try:
                     if args.input_file is not None:
                         ret = self.cl.predict(args.name, image_file=args.input_file, pred_input_type=args.pred_input_type,
-                                                output_image_file=args.output_image, output_preview=args.output_preview,
-                                                nodraw=args.nodraw, timeout=args.timeout)
+                                                output_image_file=args.output_image, output_preview=args.output_preview, nodraw=args.nodraw,
+                                                retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
                         if type(ret) is list:
                             for r in ret:
                                 common.print_format(r, args.format, tm, args.output_json, args.output_json_append)
@@ -221,15 +223,15 @@ class IinferApp:
                         if args.pred_input_type in ['capture', 'prompt']:
                             for line in sys.stdin:
                                 ret = self.cl.predict(args.name, image=line, pred_input_type=args.pred_input_type,
-                                                      output_image_file=args.output_image, output_preview=args.output_preview,
-                                                      nodraw=args.nodraw, timeout=args.timeout)
+                                                      output_image_file=args.output_image, output_preview=args.output_preview, nodraw=args.nodraw,
+                                                      retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
                                 common.print_format(ret, args.format, tm, args.output_json, args.output_json_append)
                                 tm = time.perf_counter()
                                 args.output_json_append = True
                         else:
                             ret = self.cl.predict(args.name, image=sys.stdin.buffer.read(), pred_input_type=args.pred_input_type,
-                                                  output_image_file=args.output_image, output_preview=args.output_preview,
-                                                  nodraw=args.nodraw, timeout=args.timeout)
+                                                  output_image_file=args.output_image, output_preview=args.output_preview, nodraw=args.nodraw,
+                                                  retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
                             common.print_format(ret, args.format, tm, args.output_json, args.output_json_append)
                             tm = time.perf_counter()
                     else:
@@ -244,21 +246,24 @@ class IinferApp:
 
             elif args.cmd == 'file_list':
                 local_data = Path(args.local_data.replace('"','')) if args.local_data is not None else None
-                ret = self.cl.file_list(args.svpath.replace('"',''), local_data=local_data, timeout=args.timeout)
+                ret = self.cl.file_list(args.svpath.replace('"',''), local_data=local_data,
+                                        retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
                 common.print_format(ret, args.format, tm, args.output_json, args.output_json_append)
                 if 'success' not in ret:
                     return 1, ret
             
             elif args.cmd == 'file_mkdir':
                 local_data = Path(args.local_data.replace('"','')) if args.local_data is not None else None
-                ret = self.cl.file_mkdir(args.svpath.replace('"',''), local_data=local_data, timeout=args.timeout)
+                ret = self.cl.file_mkdir(args.svpath.replace('"',''), local_data=local_data,
+                                         retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
                 common.print_format(ret, args.format, tm, args.output_json, args.output_json_append)
                 if 'success' not in ret:
                     return 1, ret
             
             elif args.cmd == 'file_rmdir':
                 local_data = Path(args.local_data.replace('"','')) if args.local_data is not None else None
-                ret = self.cl.file_rmdir(args.svpath.replace('"',''), local_data=local_data, timeout=args.timeout)
+                ret = self.cl.file_rmdir(args.svpath.replace('"',''), local_data=local_data,
+                                         retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
                 common.print_format(ret, args.format, tm, args.output_json, args.output_json_append)
                 if 'success' not in ret:
                     return 1, ret
@@ -266,7 +271,8 @@ class IinferApp:
             elif args.cmd == 'file_download':
                 local_data = Path(args.local_data.replace('"','')) if args.local_data is not None else None
                 download_file = Path(args.download_file.replace('"','')) if args.download_file is not None else None
-                ret = self.cl.file_download(args.svpath.replace('"',''), download_file, local_data=local_data, rpath=args.rpath, timeout=args.timeout)
+                ret = self.cl.file_download(args.svpath.replace('"',''), download_file, local_data=local_data, rpath=args.rpath,
+                                            retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
                 common.print_format(ret, args.format, tm, args.output_json, args.output_json_append)
                 if 'success' not in ret:
                     return 1, ret
@@ -274,14 +280,16 @@ class IinferApp:
             elif args.cmd == 'file_upload':
                 local_data = Path(args.local_data.replace('"','')) if args.local_data is not None else None
                 upload_file = Path(args.upload_file.replace('"','')) if args.upload_file is not None else None
-                ret = self.cl.file_upload(args.svpath.replace('"',''), upload_file, local_data=local_data, timeout=args.timeout)
+                ret = self.cl.file_upload(args.svpath.replace('"',''), upload_file, local_data=local_data,
+                                          retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
                 common.print_format(ret, args.format, tm, args.output_json, args.output_json_append)
                 if 'success' not in ret:
                     return 1, ret
 
             elif args.cmd == 'file_remove':
                 local_data = Path(args.local_data.replace('"','')) if args.local_data is not None else None
-                ret = self.cl.file_remove(args.svpath.replace('"',''), local_data=local_data, timeout=args.timeout)
+                ret = self.cl.file_remove(args.svpath.replace('"',''), local_data=local_data,
+                                          retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
                 common.print_format(ret, args.format, tm, args.output_json, args.output_json_append)
                 if 'success' not in ret:
                     return 1, ret

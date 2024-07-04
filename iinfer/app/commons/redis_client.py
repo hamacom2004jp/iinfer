@@ -73,6 +73,15 @@ class RedisClient(object):
     def check_server(self, find_svname:bool=False, retry_count:int=20, retry_interval:int=5, outstatus:bool=False):
         """
         Redisサーバーにpingを送信し、応答があるか確認する
+
+        Args:
+            find_svname (bool, optional): サーバー名が存在するか確認する. Defaults to False.
+            retry_count (int, optional): リトライ回数. Defaults to 20.
+            retry_interval (int, optional): リトライ間隔. Defaults to 5.
+            outstatus (bool, optional): ステータスを出力する. Defaults to False.
+
+        Returns:
+            bool: 接続成功時はTrue、失敗時はFalse
         """
         i = 0
         while i < retry_count or retry_count <= 0:
@@ -96,13 +105,16 @@ class RedisClient(object):
             except KeyboardInterrupt as e:
                 return False
 
-    def send_cmd(self, cmd:str, params:List[str], timeout:int = 60):
+    def send_cmd(self, cmd:str, params:List[str], retry_count:int=20, retry_interval:int=5, outstatus:bool=False, timeout:int = 60):
         """
         コマンドをRedisサーバーに送信し、応答を取得する
 
         Args:
             cmd (str): コマンド
             params (List[str]): コマンドのパラメータ
+            retry_count (int, optional): リトライ回数. Defaults to 20.
+            retry_interval (int, optional): リトライ間隔. Defaults to 5.
+            outstatus (bool, optional): ステータスを出力する. Defaults to False.
             timeout (int, optional): タイムアウト時間. Defaults to 60.
 
         Returns:
@@ -110,7 +122,7 @@ class RedisClient(object):
         """
         try:
             sreqtime = time.perf_counter()
-            if not self.check_server(find_svname=True):
+            if not self.check_server(find_svname=True, retry_count=retry_count, retry_interval=retry_interval, outstatus=outstatus):
                 return dict(error=f"Connected server failed or server not found. svname={self.svname.split('-')[1]}")
             reskey = common.random_string()
             self.redis_cli.rpush(self.svname, f"{cmd} {reskey} {' '.join([str(p) for p in params])}")

@@ -107,10 +107,11 @@ $(() => {
         event.returnValue = 'Check';
     });*/
     const gui_callback = () => {
-        const protocol = window.location.protocol.endsWith('s') ? 'wss' : 'ws';
+        const protocol = window.location.protocol.endsWith('s:') ? 'wss' : 'ws';
         const host = window.location.hostname;
         const port = window.location.port;
-        const ws = new WebSocket(`${protocol}://${host}:${port}/gui/callback`);
+        const path = window.location.pathname;
+        const ws = new WebSocket(`${protocol}://${host}:${port}${path}/callback`);
         ws.onmessage = (event) => {
             const data = JSON.parse(event.data);
             const cmd = data['cmd'];

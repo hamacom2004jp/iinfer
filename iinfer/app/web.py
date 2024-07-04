@@ -267,7 +267,7 @@ class Web(options.Options):
         def ts2str(ts):
             return datetime.datetime.fromtimestamp(ts)
         for i, part in enumerate(current_path.parts):
-            path = Path('/'.join(current_path.parts[:i+1]))
+            path = Path('/'.join(current_path.parts[:i+1]).replace('//', '/'))
             if not os.access(path, os.R_OK):
                 continue
             path_key = mk_key(path)

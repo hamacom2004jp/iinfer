@@ -28,7 +28,7 @@ def copy_sample(dst:Path=Path.cwd()/'sample'):
     if dst.exists():
         return
     src = Path(__file__).parent.parent / 'extensions'
-    shutil.copytree(src, dst)
+    shutil.copytree(src, dst, dirs_exist_ok=True)
 
 def mklogdir(logdir:Path=Path.cwd()/'logs') -> Path:
     """

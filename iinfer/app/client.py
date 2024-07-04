@@ -36,7 +36,8 @@ class Client(object):
     def deploy(self, name:str, model_img_width:int, model_img_height:int, model_file:str, model_conf_file:List[Path], predict_type:str,
                custom_predict_py:Path, label_file:Path, color_file:Path,
                before_injection_conf:Path, before_injection_type:List[str], before_injection_py:List[Path],
-               after_injection_conf:Path, after_injection_type:List[str], after_injection_py:List[Path], overwrite:bool, timeout:int = 60):
+               after_injection_conf:Path, after_injection_type:List[str], after_injection_py:List[Path], overwrite:bool,
+               retry_count:int=3, retry_interval:int=5, timeout:int = 60):
         """
         モデルをRedisサーバーにデプロイする
 
@@ -57,6 +58,8 @@ class Client(object):
             after_injection_conf (Path): 推論後処理設定ファイルのパス
             after_injection_py (List[Path]): 推論後処理スクリプトのパス
             overwrite (bool): モデルを上書きするかどうか
+            retry_count (int, optional): リトライ回数. Defaults to 3.
+            retry_interval (int, optional): リトライ間隔. Defaults to 5.
             timeout (int, optional): タイムアウト時間. Defaults to 60.
 
         Returns:
@@ -156,25 +159,34 @@ class Client(object):
                                            model_conf_file_name, model_conf_bytes_b64,
                                            custom_predict_py_b64, label_file_b64, color_file_b64,
                                            before_injection_conf_b64, before_injection_type, before_injection_py_name, before_injection_py_b64,
-                                           after_injection_conf_b64, after_injection_type, after_injection_py_name, after_injection_py_b64, overwrite], timeout=timeout)
+                                           after_injection_conf_b64, after_injection_type, after_injection_py_name, after_injection_py_b64, overwrite],
+                                           retry_count=retry_count, retry_interval=retry_interval, outstatus=False, timeout=timeout)
         return res_json
 
-    def deploy_list(self, timeout:int = 60):
+    def deploy_list(self, retry_count:int=3, retry_interval:int=5, timeout:int = 60):
         """
         デプロイされたモデルのリストを取得する
+
+        Args:
+            retry_count (int, optional): リトライ回数. Defaults to 3.
+            retry_interval (int, optional): リトライ間隔. Defaults to 5.
+            timeout (int, optional): タイムアウト時間. Defaults to 60.
 
         Returns:
             dict: Redisサーバーからの応答
         """
-        res_json = self.redis_cli.send_cmd('deploy_list', [], timeout=timeout)
+        res_json = self.redis_cli.send_cmd('deploy_list', [],
+                                           retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
         return res_json
 
-    def undeploy(self, name:str, timeout:int = 60):
+    def undeploy(self, name:str, retry_count:int=3, retry_interval:int=5, timeout:int = 60):
         """
         モデルをRedisサーバーからアンデプロイする
 
         Args:
             name (str): モデル名
+            retry_count (int, optional): リトライ回数. Defaults to 3.
+            retry_interval (int, optional): リトライ間隔. Defaults to 5.
             timeout (int, optional): タイムアウト時間. Defaults to 60.
 
         Returns:
@@ -183,10 +195,12 @@ class Client(object):
         if name is None or name == "":
             self.logger.error(f"name is empty.")
             return {"error": f"name is empty."}
-        res_json = self.redis_cli.send_cmd('undeploy', [name], timeout=timeout)
+        res_json = self.redis_cli.send_cmd('undeploy', [name],
+                                           retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
         return res_json
 
-    def start(self, name:str, model_provider:str = 'CPUExecutionProvider', use_track:bool=False, gpuid:int=None, timeout:int = 60):
+    def start(self, name:str, model_provider:str = 'CPUExecutionProvider', use_track:bool=False, gpuid:int=None,
+              retry_count:int=3, retry_interval:int=5, timeout:int = 60):
         """
         モデルをRedisサーバーで起動する
 
@@ -195,6 +209,8 @@ class Client(object):
             model_provider (str, optional): 推論実行時のモデルプロバイダー。デフォルトは'CPUExecutionProvider'。
             use_track (bool): Multi Object Trackerを使用するかどうか, by default False
             gpuid (int): GPU ID, by default None
+            retry_count (int, optional): リトライ回数. Defaults to 3.
+            retry_interval (int, optional): リトライ間隔. Defaults to 5.
             timeout (int, optional): タイムアウト時間. Defaults to 60.
 
         Returns:
@@ -206,15 +222,19 @@ class Client(object):
         if model_provider is None or model_provider == "":
             self.logger.error(f"model_provider is empty.")
             return {"error": f"model_provider is empty."}
-        res_json = self.redis_cli.send_cmd('start', [name, model_provider, str(use_track), str(gpuid)], timeout=timeout)
+        res_json = self.redis_cli.send_cmd('start', [name, model_provider, str(use_track), str(gpuid)],
+                                           retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
         return res_json
 
-    def stop(self, name:str, timeout:int = 60):
+    def stop(self, name:str,
+             retry_count:int=3, retry_interval:int=5, timeout:int = 60):
         """
         モデルをRedisサーバーで停止する
 
         Args:
             name (str): モデル名
+            retry_count (int, optional): リトライ回数. Defaults to 3.
+            retry_interval (int, optional): リトライ間隔. Defaults to 5.
             timeout (int, optional): タイムアウト時間. Defaults to 60.
 
         Returns:
@@ -223,15 +243,29 @@ class Client(object):
         if name is None or name == "":
             self.logger.error(f"name is empty.")
             return {"error": f"name is empty."}
-        res_json = self.redis_cli.send_cmd('stop', [name], timeout=timeout)
+        res_json = self.redis_cli.send_cmd('stop', [name],
+                                           retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
         return res_json
 
 
-    def stop_server(self, timeout:int = 60):
-        res_json = self.redis_cli.send_cmd('stop_server', [], timeout=timeout)
+    def stop_server(self, retry_count:int=3, retry_interval:int=5, timeout:int = 60):
+        """
+        Redisサーバーを停止する
+
+        Args:
+            retry_count (int, optional): リトライ回数. Defaults to 3.
+            retry_interval (int, optional): リトライ間隔. Defaults to 5.
+            timeout (int, optional): タイムアウト時間. Defaults to 60.
+
+        Returns:
+            dict: Redisサーバーからの応答
+        """
+        res_json = self.redis_cli.send_cmd('stop_server', [], retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
         return res_json
 
-    def predict(self, name:str, image = None, image_file = None, image_file_enable:bool=True, pred_input_type:str = 'jpeg', output_image_file:str = None, output_preview:bool=False, nodraw:bool=False, timeout:int = 60):
+    def predict(self, name:str, image = None, image_file = None, image_file_enable:bool=True, pred_input_type:str = 'jpeg',
+                output_image_file:str = None, output_preview:bool=False, nodraw:bool=False,
+                retry_count:int=3, retry_interval:int=5, timeout:int = 60):
         """
         画像をRedisサーバーに送信し、推論結果を取得する
 
@@ -244,6 +278,8 @@ class Client(object):
             output_image_file (str, optional): 予測結果の画像ファイルのパス. Defaults to None.
             output_preview (bool, optional): 予測結果の画像をプレビューするかどうか. Defaults to False.
             nodraw (bool, optional): 描画フラグ. Defaults to False.
+            retry_count (int, optional): リトライ回数. Defaults to 3.
+            retry_interval (int, optional): リトライ間隔. Defaults to 5.
             timeout (int, optional): タイムアウト時間. Defaults to 60.
 
         Returns:
@@ -290,7 +326,8 @@ class Client(object):
                         else:
                             img_npy = convert.imgbytes2npy(convert.b64str2bytes(img))
                         res_json = self.predict(name, image=img_npy, image_file=fn, image_file_enable=False,
-                                                output_image_file=output_image_file, output_preview=output_preview, nodraw=nodraw, timeout=timeout)
+                                                output_image_file=output_image_file, output_preview=output_preview, nodraw=nodraw,
+                                                retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
                         res_list.append(res_json)
                     if len(res_list) <= 0:
                         return {"warn": f"capture file is no data."}
@@ -311,7 +348,8 @@ class Client(object):
                             continue
                         img_npy = convert.b64str2npy(res_json["output_image"], shape=res_json["output_image_shape"])
                         res_json = self.predict(name, image=img_npy, image_file=Path(res_json['output_image_name']), image_file_enable=False,
-                                                output_image_file=output_image_file, output_preview=output_preview, nodraw=nodraw, timeout=timeout)
+                                                output_image_file=output_image_file, output_preview=output_preview, nodraw=nodraw,
+                                                retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
                         res_list.append(res_json)
                     if len(res_list) <= 0:
                         return {"warn": f"output_json file is no data."}
@@ -331,7 +369,8 @@ class Client(object):
                         prompt_data = line.strip().split(',')
                         fn = Path(prompt_data[2].strip())
                         res_json = self.predict(name, image=line, image_file=fn, image_file_enable=False, pred_input_type='prompt',
-                                                output_image_file=output_image_file, output_preview=output_preview, nodraw=nodraw, timeout=timeout)
+                                                output_image_file=output_image_file, output_preview=output_preview, nodraw=nodraw,
+                                                retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
                         res_list.append(res_json)
                     if len(res_list) <= 0:
                         return {"warn": f"prompt file is no data."}
@@ -386,12 +425,14 @@ class Client(object):
         eimgloadtime = time.perf_counter()
         if pred_input_type == 'prompt':
             res_json = self.redis_cli.send_cmd('predict',
-                                  [name, prompt_b64, str(nodraw), str(-1), str(-1), str(-1), image_file], timeout=timeout)
+                                  [name, prompt_b64, str(nodraw), str(-1), str(-1), str(-1), image_file],
+                                  retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
         else:
             npy_b64 = convert.npy2b64str(img_npy)
             res_json = self.redis_cli.send_cmd('predict',
                                   [name, npy_b64, str(nodraw), str(img_npy.shape[0]), str(img_npy.shape[1]),
-                                  str(img_npy.shape[2] if len(img_npy.shape) > 2 else '-1'), image_file], timeout=timeout)
+                                  str(img_npy.shape[2] if len(img_npy.shape) > 2 else '-1'), image_file],
+                                  retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
         soutputtime = time.perf_counter()
         if "output_image" in res_json and "output_image_shape" in res_json:
             img_npy = convert.b64str2npy(res_json["output_image"], res_json["output_image_shape"])
@@ -417,13 +458,16 @@ class Client(object):
             performance.append(dict(key="cl_pred", val=f"{epredtime-spredtime:.3f}s"))
         return res_json
     
-    def file_list(self, svpath:str, local_data:Path = None, timeout:int = 60):
+    def file_list(self, svpath:str, local_data:Path = None,
+                  retry_count:int=3, retry_interval:int=5, timeout:int = 60):
         """
         サーバー上のファイルリストを取得する
 
         Args:
             svpath (Path): サーバー上のファイルパス
             local_data (Path, optional): ローカルを参照させる場合のデータフォルダ. Defaults to None.
+            retry_count (int, optional): リトライ回数. Defaults to 3.
+            retry_interval (int, optional): リトライ間隔. Defaults to 5.
             timeout (int, optional): タイムアウト時間. Defaults to 60.
 
         Returns:
@@ -433,16 +477,20 @@ class Client(object):
             f = filer.Filer(local_data, self.logger)
             _, res_json = f.file_list(svpath)
             return res_json
-        res_json = self.redis_cli.send_cmd('file_list', [convert.str2b64str(str(svpath))], timeout=timeout)
+        res_json = self.redis_cli.send_cmd('file_list', [convert.str2b64str(str(svpath))],
+                                           retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
         return res_json
 
-    def file_mkdir(self, svpath:str, local_data:Path = None, timeout:int = 60):
+    def file_mkdir(self, svpath:str, local_data:Path = None,
+                   retry_count:int=3, retry_interval:int=5, timeout:int = 60):
         """
         サーバー上にディレクトリを作成する
 
         Args:
             svpath (Path): サーバー上のディレクトリパス
             local_data (Path, optional): ローカルを参照させる場合のデータフォルダ. Defaults to None.
+            retry_count (int, optional): リトライ回数. Defaults to 3.
+            retry_interval (int, optional): リトライ間隔. Defaults to 5.
             timeout (int, optional): タイムアウト時間. Defaults to 60.
 
         Returns:
@@ -452,16 +500,20 @@ class Client(object):
             f = filer.Filer(local_data, self.logger)
             _, res_json = f.file_mkdir(svpath)
             return res_json
-        res_json = self.redis_cli.send_cmd('file_mkdir', [convert.str2b64str(str(svpath))], timeout=timeout)
+        res_json = self.redis_cli.send_cmd('file_mkdir', [convert.str2b64str(str(svpath))],
+                                           retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
         return res_json
     
-    def file_rmdir(self, svpath:str, local_data:Path = None, timeout:int = 60):
+    def file_rmdir(self, svpath:str, local_data:Path = None,
+                   retry_count:int=3, retry_interval:int=5, timeout:int = 60):
         """
         サーバー上のディレクトリを削除する
 
         Args:
             svpath (Path): サーバー上のディレクトリパス
             local_data (Path, optional): ローカルを参照させる場合のデータフォルダ. Defaults to None.
+            retry_count (int, optional): リトライ回数. Defaults to 3.
+            retry_interval (int, optional): リトライ間隔. Defaults to 5.
             timeout (int, optional): タイムアウト時間. Defaults to 60.
 
         Returns:
@@ -471,10 +523,12 @@ class Client(object):
             f = filer.Filer(local_data, self.logger)
             _, res_json = f.file_rmdir(svpath)
             return res_json
-        res_json = self.redis_cli.send_cmd('file_rmdir', [convert.str2b64str(str(svpath))], timeout=timeout)
+        res_json = self.redis_cli.send_cmd('file_rmdir', [convert.str2b64str(str(svpath))],
+                                           retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
         return res_json
     
-    def file_download(self, svpath:str, download_file:Path, local_data:Path = None, rpath:str="", timeout:int = 60):
+    def file_download(self, svpath:str, download_file:Path, local_data:Path = None, rpath:str="",
+                      retry_count:int=3, retry_interval:int=5, timeout:int = 60):
         """
         サーバー上のファイルをダウンロードする
 
@@ -483,6 +537,8 @@ class Client(object):
             download_file (Path): ローカルのファイルパス
             local_data (Path, optional): ローカルを参照させる場合のデータフォルダ. Defaults to None.
             rpath (str, optional): リクエストパス. Defaults to "".
+            retry_count (int, optional): リトライ回数. Defaults to 3.
+            retry_interval (int, optional): リトライ間隔. Defaults to 5.
             timeout (int, optional): タイムアウト時間. Defaults to 60.
 
         Returns:
@@ -492,7 +548,8 @@ class Client(object):
             f = filer.Filer(local_data, self.logger)
             _, res_json = f.file_download(svpath)
         else:
-            res_json = self.redis_cli.send_cmd('file_download', [convert.str2b64str(str(svpath))], timeout=timeout)
+            res_json = self.redis_cli.send_cmd('file_download', [convert.str2b64str(str(svpath))],
+                                               retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
         if "success" in res_json:
             res_json["success"]["rpath"] = rpath
             res_json["success"]["svpath"] = svpath
@@ -508,7 +565,8 @@ class Client(object):
                     res_json["success"]["download_file"] = str(download_file.absolute())
         return res_json
     
-    def file_upload(self, svpath:str, upload_file:Path, local_data:Path = None, timeout:int = 60):
+    def file_upload(self, svpath:str, upload_file:Path, local_data:Path = None,
+                    retry_count:int=3, retry_interval:int=5, timeout:int = 60):
         """
         サーバー上にファイルをアップロードする
 
@@ -516,6 +574,8 @@ class Client(object):
             svpath (Path): サーバー上のファイルパス
             upload_file (Path): ローカルのファイルパス
             local_data (Path, optional): ローカルを参照させる場合のデータフォルダ. Defaults to None.
+            retry_count (int, optional): リトライ回数. Defaults to 3.
+            retry_interval (int, optional): リトライ間隔. Defaults to 5.
             timeout (int, optional): タイムアウト時間. Defaults to 60.
 
         Returns:
@@ -538,16 +598,20 @@ class Client(object):
             res_json = self.redis_cli.send_cmd('file_upload',
                                   [convert.str2b64str(str(svpath)),
                                    convert.str2b64str(upload_file.name),
-                                   convert.bytes2b64str(f.read())], timeout=timeout)
+                                   convert.bytes2b64str(f.read())],
+                                   retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
             return res_json
 
-    def file_remove(self, svpath:str, local_data:Path = None, timeout:int = 60):
+    def file_remove(self, svpath:str, local_data:Path = None,
+                    retry_count:int=3, retry_interval:int=5, timeout:int = 60):
         """
         サーバー上のファイルを削除する
 
         Args:
             svpath (Path): サーバー上のファイルパス
             local_data (Path, optional): ローカルを参照させる場合のデータフォルダ. Defaults to None.
+            retry_count (int, optional): リトライ回数. Defaults to 3.
+            retry_interval (int, optional): リトライ間隔. Defaults to 5.
             timeout (int, optional): タイムアウト時間. Defaults to 60.
 
         Returns:
@@ -557,7 +621,8 @@ class Client(object):
             f = filer.Filer(local_data, self.logger)
             _, res_json = f.file_remove(svpath)
             return res_json
-        res_json = self.redis_cli.send_cmd('file_remove', [convert.str2b64str(str(svpath))], timeout=timeout)
+        res_json = self.redis_cli.send_cmd('file_remove', [convert.str2b64str(str(svpath))],
+                                           retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
         return res_json
 
     def capture(self, capture_device='0', image_type:str='capture', capture_frame_width:int=None, capture_frame_height:int=None, capture_fps:int=1000, output_preview:bool=False):

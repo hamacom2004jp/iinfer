@@ -95,7 +95,7 @@ $(() => {
       }
   });
   const sub_img = () => {
-    const protocol = window.location.protocol.endsWith('s') ? 'wss:' : 'ws:';
+    const protocol = window.location.protocol.endsWith('s:') ? 'wss:' : 'ws:';
     const host = window.location.hostname;
     const port = window.location.port;
     const path = window.location.pathname;
