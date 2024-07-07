@@ -493,7 +493,8 @@ class Web(options.Options):
         return version.__copyright__
 
     def versions_iinfer(self):
-        return version.__description__.split('\n')
+        logo = [version.__logo__]
+        return logo + version.__description__.split('\n')
 
     def versions_used(self):
         with open(Path(iinfer.__file__).parent / 'licenses' / 'files.txt', 'r', encoding='utf-8') as f:

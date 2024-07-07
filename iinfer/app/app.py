@@ -64,8 +64,9 @@ class IinferApp:
             ret = {"success":f"Save options file. {args.useopt}"}
 
         if args.version:
-            common.print_format(version.__description__, False, tm, None, False)
-            return 0, version.__description__
+            v = version.__logo__ + '\n' + version.__description__
+            common.print_format(v, False, tm, None, False)
+            return 0, v
         elif args.mode == 'server':
             logger, _ = common.load_config(args.mode)
             if args.cmd == 'start':

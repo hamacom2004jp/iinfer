@@ -7,12 +7,6 @@ services:
       TZ: Asia/Tokyo
       REDIS_PORT: 6379
       REDIS_PASSWORD: password
-    networks:
-      - backend
     ports:
       - 6379:6379
     restart: always
-
-networks:
-  backend:
-    driver: bridge
