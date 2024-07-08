@@ -40,7 +40,7 @@ class Install(object):
     def server(self, data:Path, install_iinfer_tgt:str='iinfer', install_onnx:bool=True,
                install_mmdet:bool=True, install_mmseg:bool=True, install_mmcls:bool=False, install_mmpretrain:bool=True,
                install_insightface=False, install_diffusers=True, install_llamaindex=True,
-               install_tag:str=None, install_use_gpu:bool=False):
+               install_from:str=None, install_tag:str=None, install_use_gpu:bool=False):
         if platform.system() == 'Windows':
             return {"warn": f"Build server command is Unsupported in windows platform."}
         from importlib.resources import read_text
@@ -67,6 +67,8 @@ class Install(object):
             base_image = 'python:3.11.9-slim' #'python:3.8.18-slim'
             if install_use_gpu:
                 base_image = 'nvidia/cuda:12.4.1-cudnn-runtime-ubuntu22.04' if install_llamaindex else 'nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu22.04'
+            if install_from is not None and install_from != '':
+                base_image = install_from
             text = text.replace('#{FROM}', f'FROM {base_image}')
             text = text.replace('${MKUSER}', user)
             #text = text.replace('#{INSTALL_PYTHON}', f'RUN apt-get update && apt-get install -y python3.8 python3.8-distutils python3-pip python-is-python3' if install_use_gpu else '')
@@ -94,13 +96,6 @@ class Install(object):
             services[f'iinfer_server{install_tag}'] = dict(
                 image=f'hamacom/iinfer:{version.__version__}{install_tag}',
                 container_name=f'iinfer_server{install_tag}',
-                deploy=dict(
-                    resources=dict(
-                        reservations=dict(
-                            devices=[dict(capabilities=['gpu'])]
-                        )
-                    )
-                ),
                 environment=dict(
                     TZ='Asia/Tokyo',
                     REDIS_HOST='${REDIS_HOST:-redis}',
@@ -109,7 +104,6 @@ class Install(object):
                     SVNAME='${SVNAME:-server'+install_tag+'}',
                     LISTEN_PORT='${LISTEN_PORT:-8081}',
                 ),
-                networks=['backend'],
                 user=user,
                 ports=['${LISTEN_PORT:-8081}:${LISTEN_PORT:-8081}'],
                 privileged=True,
@@ -121,6 +115,14 @@ class Install(object):
                     '/dev/bus/usb/:/dev/bus/usb/:rw'
                 ]
             )
+            if install_use_gpu:
+                services[f'iinfer_server{install_tag}']['deploy'] = dict(
+                    resources=dict(reservations=dict(devices=[dict(
+                        driver='nvidia',
+                        count=1,
+                        capabilities=['gpu']
+                    )]))
+                )
             fp.seek(0)
             yaml.dump(comp, fp)
         cmd = f'docker build -t hamacom/iinfer:{version.__version__}{install_tag} -f Dockerfile .'

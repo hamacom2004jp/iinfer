@@ -142,6 +142,7 @@
     "--install_insightface","","dockerイメージ内に `insightface` をインストールします。※1"
     "--install_diffusers","","dockerイメージ内に `diffusers` をインストールします。※1"
     "--install_llamaindex","","dockerイメージ内に `llamaindex` をインストールします。※1"
+    "--install_from <イメージ名>","","作成するdockerイメージの元となるFROMイメージを指定します。"
     "--install_tag <追加のタグ名>","","指定すると作成するdockerイメージのタグ名に追記出来ます。"
     "--install_use_gpu","","GPUを使用するモジュール構成でインストールします。"
     

@@ -570,7 +570,7 @@ class IinferApp:
                 ret = self.inst.server(Path(args.data), args.install_iinfer, install_onnx=onnx,
                                 install_mmdet=mmdet, install_mmseg=mmseg, install_mmcls=mmcls, install_mmpretrain=mmpretrain,
                                 install_insightface=insightface, install_diffusers=diffusers, install_llamaindex=llamaindex,
-                                install_tag=args.install_tag, install_use_gpu=args.install_use_gpu)
+                                install_from=args.install_from, install_tag=args.install_tag, install_use_gpu=args.install_use_gpu)
                 common.print_format(ret, args.format, tm, args.output_json, args.output_json_append)
                 if 'success' not in ret:
                     return 1, ret

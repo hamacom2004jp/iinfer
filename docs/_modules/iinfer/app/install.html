@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>iinfer.app.install &mdash; iinfer 2024/06/29 documentation</title>
+  <title>iinfer.app.install &mdash; iinfer 2024/07/08 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -15,7 +15,7 @@
   
         <script src="../../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=24c3f049"></script>
+        <script src="../../../_static/documentation_options.js?v=5be2e8c2"></script>
         <script src="../../../_static/doctools.js?v=9a2dae69"></script>
         <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -136,7 +136,7 @@
     <span class="k">def</span> <span class="nf">server</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="n">install_iinfer_tgt</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s1">&#39;iinfer&#39;</span><span class="p">,</span> <span class="n">install_onnx</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                <span class="n">install_mmdet</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">install_mmseg</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">install_mmcls</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">install_mmpretrain</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                <span class="n">install_insightface</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">install_diffusers</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">install_llamaindex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-               <span class="n">install_tag</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">install_use_gpu</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+               <span class="n">install_from</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">install_tag</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">install_use_gpu</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;Windows&#39;</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;warn&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Build server command is Unsupported in windows platform.&quot;</span><span class="p">}</span>
         <span class="kn">from</span> <span class="nn">importlib.resources</span> <span class="kn">import</span> <span class="n">read_text</span>
@@ -163,6 +163,8 @@
             <span class="n">base_image</span> <span class="o">=</span> <span class="s1">&#39;python:3.11.9-slim&#39;</span> <span class="c1">#&#39;python:3.8.18-slim&#39;</span>
             <span class="k">if</span> <span class="n">install_use_gpu</span><span class="p">:</span>
                 <span class="n">base_image</span> <span class="o">=</span> <span class="s1">&#39;nvidia/cuda:12.4.1-cudnn-runtime-ubuntu22.04&#39;</span> <span class="k">if</span> <span class="n">install_llamaindex</span> <span class="k">else</span> <span class="s1">&#39;nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu22.04&#39;</span>
+            <span class="k">if</span> <span class="n">install_from</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">install_from</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+                <span class="n">base_image</span> <span class="o">=</span> <span class="n">install_from</span>
             <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;#</span><span class="si">{FROM}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;FROM </span><span class="si">{</span><span class="n">base_image</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
             <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;$</span><span class="si">{MKUSER}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">user</span><span class="p">)</span>
             <span class="c1">#text = text.replace(&#39;#{INSTALL_PYTHON}&#39;, f&#39;RUN apt-get update &amp;&amp; apt-get install -y python3.8 python3.8-distutils python3-pip python-is-python3&#39; if install_use_gpu else &#39;&#39;)</span>
@@ -190,13 +192,6 @@
             <span class="n">services</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;iinfer_server</span><span class="si">{</span><span class="n">install_tag</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
                 <span class="n">image</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;hamacom/iinfer:</span><span class="si">{</span><span class="n">version</span><span class="o">.</span><span class="n">__version__</span><span class="si">}{</span><span class="n">install_tag</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
                 <span class="n">container_name</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;iinfer_server</span><span class="si">{</span><span class="n">install_tag</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
-                <span class="n">deploy</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
-                    <span class="n">resources</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
-                        <span class="n">reservations</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
-                            <span class="n">devices</span><span class="o">=</span><span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;gpu&#39;</span><span class="p">])]</span>
-                        <span class="p">)</span>
-                    <span class="p">)</span>
-                <span class="p">),</span>
                 <span class="n">environment</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
                     <span class="n">TZ</span><span class="o">=</span><span class="s1">&#39;Asia/Tokyo&#39;</span><span class="p">,</span>
                     <span class="n">REDIS_HOST</span><span class="o">=</span><span class="s1">&#39;${REDIS_HOST:-redis}&#39;</span><span class="p">,</span>
@@ -205,7 +200,6 @@
                     <span class="n">SVNAME</span><span class="o">=</span><span class="s1">&#39;${SVNAME:-server&#39;</span><span class="o">+</span><span class="n">install_tag</span><span class="o">+</span><span class="s1">&#39;}&#39;</span><span class="p">,</span>
                     <span class="n">LISTEN_PORT</span><span class="o">=</span><span class="s1">&#39;$</span><span class="si">{LISTEN_PORT:-8081}</span><span class="s1">&#39;</span><span class="p">,</span>
                 <span class="p">),</span>
-                <span class="n">networks</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;backend&#39;</span><span class="p">],</span>
                 <span class="n">user</span><span class="o">=</span><span class="n">user</span><span class="p">,</span>
                 <span class="n">ports</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;$</span><span class="si">{LISTEN_PORT:-8081}</span><span class="s1">:$</span><span class="si">{LISTEN_PORT:-8081}</span><span class="s1">&#39;</span><span class="p">],</span>
                 <span class="n">privileged</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -217,6 +211,14 @@
                     <span class="s1">&#39;/dev/bus/usb/:/dev/bus/usb/:rw&#39;</span>
                 <span class="p">]</span>
             <span class="p">)</span>
+            <span class="k">if</span> <span class="n">install_use_gpu</span><span class="p">:</span>
+                <span class="n">services</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;iinfer_server</span><span class="si">{</span><span class="n">install_tag</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">][</span><span class="s1">&#39;deploy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+                    <span class="n">resources</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">reservations</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">devices</span><span class="o">=</span><span class="p">[</span><span class="nb">dict</span><span class="p">(</span>
+                        <span class="n">driver</span><span class="o">=</span><span class="s1">&#39;nvidia&#39;</span><span class="p">,</span>
+                        <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                        <span class="n">capabilities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;gpu&#39;</span><span class="p">]</span>
+                    <span class="p">)]))</span>
+                <span class="p">)</span>
             <span class="n">fp</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
             <span class="n">yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">comp</span><span class="p">,</span> <span class="n">fp</span><span class="p">)</span>
         <span class="n">cmd</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;docker build -t hamacom/iinfer:</span><span class="si">{</span><span class="n">version</span><span class="o">.</span><span class="n">__version__</span><span class="si">}{</span><span class="n">install_tag</span><span class="si">}</span><span class="s1"> -f Dockerfile .&#39;</span>
