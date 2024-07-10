@@ -26,9 +26,31 @@
                 <ul class="navbar-nav">
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="viewMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            WebCap
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li class="dropdown dropend">
+                                <button class="btn btn-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Camera
+                                </button>
+                                <ul id="camera" class="dropdown-menu">
+                                </ul>
+                            </li>
+                            <li class="dropdown dropend">
+                                <button class="btn btn-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Pipeline
+                                </button>
+                                <ul id="webcap" class="dropdown-menu" title="Here you can select a pipeline that registers the 'webcap' command in 'web' mode as its first command.">
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="viewMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             View
                         </a>
-                        <ul class="dropdown-menu" aria-labelledby="viewMenuLink">
+                        <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="#" onclick="change_dark_mode();">Change Dark Mode</a></li>
                             <li><a class="dropdown-item" href="#" onclick="$(`#console_modal`).modal(`show`);">Console log</a></li>
                         </ul>
@@ -173,6 +195,8 @@
 <script type="text/javascript" src="assets/jquery-resizable/jquery-resizable.min.js"></script>
 <script type="text/javascript" src="assets/jquery-resizable/jquery-resizable.min.js"></script>
 <script type="text/javascript" src="assets/split-pane/split-pane.js"></script>
+<script type="text/javascript" src="assets/iinfer/list_cmd.js"></script>
+<script type="text/javascript" src="assets/iinfer/list_pipe.js"></script>
 <script type="text/javascript" src="assets/iinfer/view_result.js"></script>
 <script type="text/javascript" src="assets/showimg/showimg.js"></script>
 </html>

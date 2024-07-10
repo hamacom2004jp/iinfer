@@ -14,9 +14,30 @@ const hide_loading = () => {
   const progress = $('#progress');
   progress.addClass('d-none');
 }
+const webcap = {}
+webcap.init = () => {
+  list_pipe(null).then((result) => {
+    const webcap_elem = $('#webcap');
+    result.forEach(async (pipe) => {
+      if (!pipe || pipe.pipe_cmd.length == 0) return;
+      cmd = await load_cmd(pipe.pipe_cmd[0]);
+      if (!cmd || cmd.mode != 'web' || cmd.cmd != 'webcap') return;
+      url = `http://localhost:${cmd.listen_port}/webcap/pub_img`
+      if (cmd.access_url) url = cmd.access_url;
+      const elem = $(`<li class="dropdown dropend"><a class="dropdown-item" href="#" onclick="webcap.change_webcap_mode('${pipe.title}', '${url}');">${pipe.title}</a></li>`);
+      webcap_elem.append(elem);
+    });
+    const elem = $(`<li class="dropdown dropend"><a class="dropdown-item" href="#" onclick="webcap.change_webcap_mode(null, null);">&lt; Not use webcap &gt;</a></li>`);
+    webcap_elem.append(elem);
+  });
+};
+webcap.change_webcap_mode = (title) => {
+};
 $(() => {
   // ダークモード対応
   change_dark_mode(window.matchMedia('(prefers-color-scheme: dark)').matches);
+  // webcapモード初期化
+  webcap.init();
   // copyright情報取得
   const copyright_func = async () => {
     const response = await fetch('copyright');

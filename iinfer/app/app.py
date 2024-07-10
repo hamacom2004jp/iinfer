@@ -144,6 +144,31 @@ class IinferApp:
                 msg = {"success":"web complate."}
                 common.print_format(msg, args.format, tm, args.output_json, args.output_json_append)
                 return 0, msg
+            elif args.cmd == 'webcap':
+                self.web = web.Web(logger, Path(args.data))
+                count = 0
+                append = False
+                try:
+                    for t,b64,h,w,c,fn in self.web.webcap(args.allow_host, args.listen_port, image_type=args.image_type,
+                                                        capture_frame_width=args.capture_frame_width, capture_frame_height=args.capture_frame_height,
+                                                        capture_fps=args.capture_fps, output_preview=args.output_preview):
+
+                        ret = f"{t},"+b64+f",{h},{w},{c},{fn}"
+                        if args.output_csv is not None:
+                            with open(args.output_csv, 'a' if append else 'w', encoding="utf-8") as f:
+                                print(ret, file=f)
+                                append = True
+                        else: common.print_format(ret, False, tm, None, False)
+                        tm = time.perf_counter()
+                        count += 1
+                        if args.capture_count > 0 and count >= args.capture_count:
+                            break
+                finally:
+                    try:
+                        cv2.destroyWindow('preview')
+                    except:
+                        pass
+
             else:
                 msg = {"warn":f"Unkown command."}
                 common.print_format(msg, args.format, tm, args.output_json, args.output_json_append)

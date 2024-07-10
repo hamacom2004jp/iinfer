@@ -625,7 +625,8 @@ class Client(object):
                                            retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
         return res_json
 
-    def capture(self, capture_device='0', image_type:str='capture', capture_frame_width:int=None, capture_frame_height:int=None, capture_fps:int=1000, output_preview:bool=False):
+    def capture(self, capture_device='0', image_type:str='capture', capture_frame_width:int=None, capture_frame_height:int=None,
+                capture_fps:int=1000, output_preview:bool=False):
         """
         ビデオをキャプチャしてその結果を出力する
 
@@ -634,7 +635,7 @@ class Client(object):
             image_type (str, optional): 画像の形式. Defaults to 'capture'.
             capture_frame_width (int): キャプチャするビデオのフレーム幅, by default None
             capture_frame_height (int): キャプチャするビデオのフレーム高さ, by default None
-            capture_fps (int): キャプチャするビデオのフレームレート, by default 10
+            capture_fps (int): キャプチャするビデオのフレームレート, by default 1000
             output_preview (bool, optional): 予測結果の画像をプレビューするかどうか. Defaults to False.
         """
         if capture_device.isdecimal():

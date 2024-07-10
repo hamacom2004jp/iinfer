@@ -6,6 +6,7 @@ from typing import List
 import webbrowser
 import bottle
 import bottle_websocket
+import cv2
 import datetime
 import glob
 import gevent
@@ -565,7 +566,7 @@ class Web(options.Options):
     def start(self, allow_host:str="0.0.0.0", listen_port:int=8081):
         self.allow_host = allow_host
         self.listen_port = listen_port
-        self.logger.info(f"Start bottle web. allow_host={self.allow_host} listen_port={self.listen_port}")
+        self.logger.info(f"Start web. allow_host={self.allow_host} listen_port={self.listen_port}")
 
         app = bottle.Bottle()
         bottle.debug(True)
@@ -866,7 +867,7 @@ class Web(options.Options):
                         outputs['img_url'] = jpg_url
                         outputs['img_id'] = fn
                     wsock.send(json.dumps(outputs, default=common.default_json_enc))
-                except:
+                except Exception as e:
                     if outputs is not None:
                         self.img_queue.put(outputs) # エラーが発生した場合はキューに戻す
                         gevent.sleep(0.001)
@@ -917,6 +918,58 @@ class Web(options.Options):
             os.kill(int(pid), signal.CTRL_C_EVENT)
             self.logger.info(f"Stop bottle web. allow_host={self.allow_host} listen_port={self.listen_port}")
         Path("iinfer_web.pid").unlink(missing_ok=True)
+
+    def webcap(self, allow_host:str="0.0.0.0", listen_port:int=8082,
+               image_type:str='capture', capture_frame_width:int=None, capture_frame_height:int=None,
+               capture_fps:int=5, output_preview:bool=False):
+        self.allow_host = allow_host
+        self.listen_port = listen_port
+        self.logger.info(f"Start web. allow_host={self.allow_host} listen_port={self.listen_port}")
+
+        app = bottle.Bottle()
+        bottle.debug(True)
+
+        @app.route('/webcap/pub_img')
+        def pub_img():
+            wsock = bottle.request.environ.get('wsgi.websocket') # type: ignore
+            if not wsock:
+                bottle.abort(400, 'Expected WebSocket request.')
+            interval = float(1 / capture_fps)
+            while True:
+                try:
+                    start = time.perf_counter()
+                    cap = wsock.receive()
+                    if cap is None:
+                        gevent.sleep(0.001)
+                        continue
+                    output_image_name = datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")
+                    img_npy = convert.imgbytes2npy(convert.b64str2bytes(cap))
+                    if capture_frame_width is not None and capture_frame_height is not None:
+                        frame = cv2.resize(frame, (capture_frame_width, capture_frame_height), interpolation=cv2.INTER_NEAREST)
+                    img_npy = convert.bgr2rgb(frame)
+                    if output_preview:
+                        # RGB画像をBGR画像に変換
+                        cv2.imshow('preview', convert.bgr2rgb(img_npy))
+                        cv2.waitKey(1)
+                    img_b64 = None
+                    if image_type == 'capture' or image_type is None:
+                        image_type = 'capture'
+                        img_b64 = convert.npy2b64str(img_npy)
+                    else:
+                        img_b64 = convert.bytes2b64str(convert.npy2imgfile(img_npy, image_type=image_type))
+                    output_image_name = f"{output_image_name}.{image_type}"
+                    yield image_type, img_b64, img_npy.shape[0], img_npy.shape[1], img_npy.shape[2] if len(img_npy.shape) > 2 else -1, output_image_name
+
+                    end = time.perf_counter()
+                    if interval - (end - start) > 0:
+                        time.sleep(interval - (end - start))
+                except Exception as e:
+                    self.logger.warning('wsock error', exc_info=True)
+                    break
+            self.logger.info('wsock disconnected')
+
+        server = _WSGIServer(host=self.allow_host, port=self.listen_port, gui_mode=self.gui_mode)
+        bottle.run(app=app, server=server, host=allow_host, port=listen_port)
 
 class _WSGIServer(bottle_websocket.GeventWebSocketServer):
 #class _WSGIServer(bottle.WSGIRefServer):
