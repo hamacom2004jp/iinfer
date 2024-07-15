@@ -150,11 +150,13 @@ $(() => {
           tr = tbody.children(`[data-col="${i}"]`);
           tr.append(head_th);
         });
-        for (const key of outputs_key) {
-          const val = outputs[key];
-          if (!val) continue;
-          tbody.prepend(`<tr class="table_title fs-1" style="overflow-wrap:break-word;word-break:break-all;"><th colspan="2">${outputs[key]}</th></tr>`);
-        }
+        const filter_outputs = {};
+        filter_output(outputs, outputs_key, filter_outputs);
+        Object.keys(dst_outputs).forEach((key) => {
+          const val = dst_outputs[key];
+          if (!val) return;
+          tbody.prepend(`<tr class="table_title fs-1" style="overflow-wrap:break-word;word-break:break-all;"><th colspan="2">${val}</th></tr>`);
+        });  
         thead.remove();
         tbody.children('.old').each((i, e) => {
           const body_tr = $(e);
@@ -167,6 +169,19 @@ $(() => {
         tbody.children('.old').remove();
       }
     };
+    const filter_output = (src, keys, dst) => {
+      for (const key of keys) {
+        if (src[key]) {
+          dst[key] = src[key];
+          continue;
+        }
+        if (typeof src !== 'object') continue;
+        Object.keys(src).forEach((k) => {
+          if (typeof src[k] !== 'object') return;
+          filter_output(src[k], keys, dst);
+        });
+      }
+    }
   }
   sub_img();
 });
