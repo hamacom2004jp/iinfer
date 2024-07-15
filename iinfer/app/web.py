@@ -3,7 +3,7 @@ from iinfer.app import app, common, options
 from iinfer.app.commons import convert, redis_client
 from pathlib import Path
 from typing import List
-import webbrowser
+import ctypes
 import bottle
 import bottle_websocket
 import cv2
@@ -25,10 +25,11 @@ import threading
 import traceback
 import tempfile
 import time
+import webbrowser
 
 class Web(options.Options):
     def __init__(self, logger:logging.Logger, data:Path, redis_host:str = "localhost", redis_port:int = 6379, redis_password:str = None, svname:str = 'server',
-                 client_only:bool=False, filer_html:str=None, showimg_html:str=None, assets:List[str]=None, gui_mode:bool=False):
+                 client_only:bool=False, filer_html:str=None, showimg_html:str=None, webcap_html:str=None, assets:List[str]=None, gui_mode:bool=False):
         """
         iinferクライアント側のwebapiサービス
 
@@ -42,6 +43,7 @@ class Web(options.Options):
             client_only (bool, optional): クライアントのみのサービスかどうか. Defaults to False.
             filer_html (str, optional): ファイラーのHTMLファイル. Defaults to None.
             showimg_html (str, optional): 画像表示のHTMLファイル. Defaults to None.
+            webcap_html (str, optional): ウェブカメラのHTMLファイル. Defaults to None.
             assets (List[str], optional): 静的ファイルのリスト. Defaults to None.
             gui_mode (bool, optional): GUIモードかどうか. Defaults to False.
         """
@@ -59,12 +61,15 @@ class Web(options.Options):
             self.svname = 'client'
         self.filer_html = Path(filer_html) if filer_html is not None else None
         self.showimg_html = Path(showimg_html) if showimg_html is not None else None
+        self.webcap_html = Path(webcap_html) if webcap_html is not None else None
         self.assets = [Path(a) for a in assets] if assets is not None else None
         self.filer_html_data = None
         self.showimg_html_data = None
+        self.webcap_html_data = None
         self.assets_data = None
         self.gui_mode = gui_mode
         common.mkdirs(self.data)
+        self.pipe_th = None
         self.img_queue = queue.Queue(1000)
         self.cb_queue = queue.Queue(1000)
 
@@ -245,7 +250,7 @@ class Web(options.Options):
                 self.callback_return_cmd_exec_func(title, output)
         if nothread:
             return _exec_cmd(self.container['iinfer_app'], title, opt, True)
-        th = threading.Thread(target=_exec_cmd, args=(self.container['iinfer_app'], title, opt, False))
+        th = RaiseThread(target=_exec_cmd, args=(self.container['iinfer_app'], title, opt, False))
         th.start()
         return [dict(warn='start_cmd')]
 
@@ -312,7 +317,7 @@ class Web(options.Options):
                         img_bytes = convert.npy2imgfile(img_npy, image_type='jpeg')
                         res_json["output_image"] = convert.bytes2b64str(img_bytes)
                     ret.append(res_json)
-            return ret
+                return ret
         except:
             return {'warn': f'An error occurred while reading the file.: {current_path}'}
 
@@ -336,7 +341,7 @@ class Web(options.Options):
                     else:
                         res_json["output_image"] = cel[1]
                     ret.append(res_json)
-            return ret
+                return ret
         except:
             return {'warn': f'An error occurred while reading the file.: {current_path}'}
     
@@ -346,7 +351,7 @@ class Web(options.Options):
         paths = glob.glob(str(self.data / f"pipe-{kwd}.json"))
         return [common.loadopt(path) for path in paths]
 
-    def exec_pipe(self, title, opt, nothread=False):
+    def exec_pipe(self, title, opt, nothread=False, capture_stdin=False):
         self.logger.info(f"exec_pipe: title={title}, opt={opt}")
         def to_json(o):
             res_json = json.loads(o)
@@ -355,7 +360,7 @@ class Web(options.Options):
                 img_bytes = convert.npy2imgfile(img_npy, image_type='png')
                 res_json["output_image"] = convert.bytes2b64str(img_bytes)
             return res_json
-        def _exec_pipe(title, opt, container, nothread=False):
+        def _exec_pipe(title, opt, container, nothread=False, capture_stdin=False):
             capture_stdout = True
             for i, cmd_title in enumerate(opt['pipe_cmd']):
                 if cmd_title == '':
@@ -386,6 +391,7 @@ class Web(options.Options):
             if has_warn: return
             try:
                 container['pipe_proc'] = subprocess.Popen(cmdline, shell=True, text=True, encoding='utf-8',
+                                                        stdin=(subprocess.PIPE if capture_stdin else None),
                                                         stdout=(subprocess.PIPE if capture_stdout else None),
                                                         stderr=(subprocess.STDOUT if capture_stdout else None))
                 output = ""
@@ -430,8 +436,12 @@ class Web(options.Options):
                     return output
                 self.callback_return_pipe_exec_func(title, output)
         if nothread:
-            return _exec_pipe(title, opt, self.container, True)
-        gevent.spawn(_exec_pipe, title, opt, self.container)
+            return _exec_pipe(title, opt, self.container, True, capture_stdin)
+        if self.pipe_th is not None:
+            self.pipe_th.raise_exception()
+        self.pipe_th = RaiseThread(target=_exec_pipe, args=(title, opt, self.container, False, capture_stdin))
+        self.pipe_th.start()
+        #gevent.spawn(_exec_pipe, title, opt, self.container, False, capture_stdin)
         return dict(success='start_pipe')
 
     def raw_pipe(self, title, opt):
@@ -503,7 +513,7 @@ class Web(options.Options):
             for i, line in enumerate(f.readlines()):
                 parts = line.strip().split('\t')
                 ret.append(parts)
-        return ret
+            return ret
     
     def filer_upload(self, request:bottle.Request):
         q = request.query
@@ -563,13 +573,13 @@ class Web(options.Options):
             return json.dumps(o, default=common.default_json_enc)
         return str(o)
 
-    def start(self, allow_host:str="0.0.0.0", listen_port:int=8081):
+    def start(self, allow_host:str="0.0.0.0", listen_port:int=8081, outputs_key:List[str]=[]):
         self.allow_host = allow_host
         self.listen_port = listen_port
+        self.outputs_key = outputs_key
         self.logger.info(f"Start web. allow_host={self.allow_host} listen_port={self.listen_port}")
 
         app = bottle.Bottle()
-        bottle.debug(True)
 
         if self.filer_html is not None:
             if not self.filer_html.is_file():
@@ -581,6 +591,11 @@ class Web(options.Options):
                 raise FileNotFoundError(f'showimg_html is not found. ({self.showimg_html})')
             with open(self.showimg_html, 'r', encoding='utf-8') as f:
                 self.showimg_html_data = f.read()
+        if self.webcap_html is not None:
+            if not self.webcap_html.is_file():
+                raise FileNotFoundError(f'webcap_html is not found. ({self.webcap_html})')
+            with open(self.webcap_html, 'r', encoding='utf-8') as f:
+                self.webcap_html_data = f.read()
         if self.assets is not None:
             if type(self.assets) != list:
                 raise TypeError(f'assets is not list. ({self.assets})')
@@ -599,6 +614,12 @@ class Web(options.Options):
         redis_cli = None
         if not self.client_only:
             redis_cli = redis_client.RedisClient(self.logger, host=self.redis_host, port=self.redis_port, password=self.redis_password, svname=self.svname)
+
+        @app.hook('after_request')
+        def enable_cors():
+            if not 'Origin' in bottle.request.headers.keys():
+                return
+            bottle.response.headers['Access-Control-Allow-Origin'] = bottle.request.headers['Origin']
 
         @app.route('/bbforce_cmd')
         def bbforce_cmd():
@@ -651,7 +672,7 @@ class Web(options.Options):
                     opt = bottle.request.json
                 else:
                     opt = self.load_pipe(title)
-                opt['capture_stdout'] = nothread = True
+                opt['capture_stdout'] = nothread = False
                 opt['stdout_log'] = False
                 return self.to_str(self.exec_pipe(title, opt, nothread))
             except:
@@ -836,13 +857,14 @@ class Web(options.Options):
                 self.logger.warning('pub_img error', exc_info=True)
                 return self.to_str(dict(warn=f'pub_img error. {traceback.format_exc()}'))
 
+        @app.route('/webcap/sub_img')
         @app.route('/showimg/sub_img')
         def sub_img():
             wsock = bottle.request.environ.get('wsgi.websocket') # type: ignore
             if not wsock:
                 bottle.abort(400, 'Expected WebSocket request.')
             while True:
-                outputs = None
+                outputs:dict = None
                 try:
                     try:
                         outputs = self.img_queue.get(block=True, timeout=0.001)
@@ -852,6 +874,9 @@ class Web(options.Options):
                     if outputs is None:
                         gevent.sleep(0.1)
                         continue
+                    outputs['outputs_key'] = self.outputs_key
+                    if outputs['outputs_key'] is None:
+                        outputs['outputs_key'] = [k for k in outputs['success'].keys()] if 'success' in outputs else []
                     if 'output_image_shape' in outputs:
                         img_npy = convert.b64str2npy(outputs["output_image"], outputs["output_image_shape"])
                         jpg = convert.img2byte(convert.npy2img(img_npy), format='jpeg')
@@ -879,6 +904,14 @@ class Web(options.Options):
         def assets(filename):
             return bottle.static_file(filename, root=static_root / 'assets')
 
+        @app.route('/webcap')
+        def webcap():
+            if self.webcap_html_data is not None:
+                return self.webcap_html_data
+            res:bottle.HTTPResponse = bottle.static_file('webcap.html', root=static_root)
+            res.headers['Access-Control-Allow-Origin'] = '*'
+            return res
+
         @app.route('/copyright')
         def copyright():
             return self.copyright()
@@ -900,17 +933,20 @@ class Web(options.Options):
             bottle.response.content_type = 'application/json'
             return json.dumps(self.versions_used())
 
-        with open("iinfer_web.pid", mode="w", encoding="utf-8") as f:
-            pid = os.getpid()
-            f.write(str(pid))
-            self.is_running = True
-            server = _WSGIServer(host=self.allow_host, port=self.listen_port, gui_mode=self.gui_mode)
-            th = threading.Thread(target=bottle.run, kwargs=dict(app=app, server=server))
-            th.start()
+        self.is_running = True
+        server = _WSGIServer(host=self.allow_host, port=self.listen_port, gui_mode=self.gui_mode)
+        th = RaiseThread(target=bottle.run, kwargs=dict(app=app, server=server))
+        th.start()
+        try:
             while self.is_running:
                 gevent.sleep(1)
+            th.raise_exception()
+        except KeyboardInterrupt:
+            th.raise_exception()
+        try:
             server.srv.shutdown()
-        Path("iinfer_web.pid").unlink(missing_ok=True)
+        except:
+            pass
 
     def stop(self):
         with open("iinfer_web.pid", mode="r", encoding="utf-8") as f:
@@ -920,37 +956,40 @@ class Web(options.Options):
         Path("iinfer_web.pid").unlink(missing_ok=True)
 
     def webcap(self, allow_host:str="0.0.0.0", listen_port:int=8082,
-               image_type:str='capture', capture_frame_width:int=None, capture_frame_height:int=None,
-               capture_fps:int=5, output_preview:bool=False):
+               image_type:str='capture', outputs_key:List[str]=None, capture_frame_width:int=None, capture_frame_height:int=None,
+               capture_count:int=5, capture_fps:int=5):
         self.allow_host = allow_host
         self.listen_port = listen_port
+        self.image_type = image_type
+        self.outputs_key = outputs_key
+        self.capture_frame_width = capture_frame_width
+        self.capture_frame_height = capture_frame_height
+        self.capture_count = capture_count
+        self.capture_fps = capture_fps
+        self.count = 0
         self.logger.info(f"Start web. allow_host={self.allow_host} listen_port={self.listen_port}")
 
         app = bottle.Bottle()
-        bottle.debug(True)
 
-        @app.route('/webcap/pub_img')
+        @app.route('/webcap/pub_img', method='POST')
         def pub_img():
-            wsock = bottle.request.environ.get('wsgi.websocket') # type: ignore
-            if not wsock:
-                bottle.abort(400, 'Expected WebSocket request.')
-            interval = float(1 / capture_fps)
-            while True:
-                try:
-                    start = time.perf_counter()
-                    cap = wsock.receive()
+            if not bottle.request.content_type.startswith('multipart/form-data'):
+                bottle.abort(400, 'Expected multipart request.')
+                return
+            bottle.response.headers['Access-Control-Allow-Origin'] = '*'
+
+            image_type = self.image_type
+            try:
+                tm = time.perf_counter()
+                for fn in bottle.request.files.keys():
+                    cap:bytes = bottle.request.files[fn].file.read()
                     if cap is None:
-                        gevent.sleep(0.001)
                         continue
                     output_image_name = datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")
+                    cap = cap.decode().replace('data:image/jpeg;base64,','')
                     img_npy = convert.imgbytes2npy(convert.b64str2bytes(cap))
-                    if capture_frame_width is not None and capture_frame_height is not None:
-                        frame = cv2.resize(frame, (capture_frame_width, capture_frame_height), interpolation=cv2.INTER_NEAREST)
-                    img_npy = convert.bgr2rgb(frame)
-                    if output_preview:
-                        # RGB画像をBGR画像に変換
-                        cv2.imshow('preview', convert.bgr2rgb(img_npy))
-                        cv2.waitKey(1)
+                    if self.capture_frame_width is not None and self.capture_frame_height is not None:
+                        img_npy = cv2.resize(img_npy, (self.capture_frame_width, self.capture_frame_height), interpolation=cv2.INTER_NEAREST)
                     img_b64 = None
                     if image_type == 'capture' or image_type is None:
                         image_type = 'capture'
@@ -958,27 +997,49 @@ class Web(options.Options):
                     else:
                         img_b64 = convert.bytes2b64str(convert.npy2imgfile(img_npy, image_type=image_type))
                     output_image_name = f"{output_image_name}.{image_type}"
-                    yield image_type, img_b64, img_npy.shape[0], img_npy.shape[1], img_npy.shape[2] if len(img_npy.shape) > 2 else -1, output_image_name
 
-                    end = time.perf_counter()
-                    if interval - (end - start) > 0:
-                        time.sleep(interval - (end - start))
-                except Exception as e:
-                    self.logger.warning('wsock error', exc_info=True)
-                    break
-            self.logger.info('wsock disconnected')
+                    t, b64, h, w, c, fn = image_type, img_b64, img_npy.shape[0], img_npy.shape[1], img_npy.shape[2] if len(img_npy.shape) > 2 else -1, output_image_name
+                    ret = f"{t},"+b64+f",{h},{w},{c},{fn}"
+                    common.print_format(ret, False, tm, None, False)
+                    tm = time.perf_counter()
+                    self.count += 1
+                if self.capture_count > 0 and self.count >= self.capture_count:
+                    self.is_running = False
+                    exit(0)
 
-        server = _WSGIServer(host=self.allow_host, port=self.listen_port, gui_mode=self.gui_mode)
-        bottle.run(app=app, server=server, host=allow_host, port=listen_port)
+            except Exception as e:
+                self.logger.warning('pub_img error', exc_info=True)
+                return self.to_str(dict(warn=f'pub_img error. {traceback.format_exc()}'))
+
+            ret = self.to_str(dict(success='pub_img to stdout.'))
+            return ret
+
+        self.is_running = True
+        server = _WSGIServer(host=self.allow_host, port=self.listen_port, gui_mode=self.gui_mode, webcap=True)
+        th = RaiseThread(target=bottle.run, kwargs=dict(app=app, server=server, host=allow_host, port=listen_port))
+        th.start()
+        try:
+            while self.is_running:
+                gevent.sleep(1)
+            th.raise_exception()
+        except KeyboardInterrupt:
+            th.raise_exception()
+        try:
+            server.srv.shutdown()
+        except:
+            pass
+        finally:
+            exit(0)
 
 class _WSGIServer(bottle_websocket.GeventWebSocketServer):
 #class _WSGIServer(bottle.WSGIRefServer):
     """
     runメソッドでWSGIRefServerを起動する際に、make_serverの戻り値をインスタンス変数にするためのクラス
     """
-    def __init__(self, host='127.0.0.1', port:int=8080, gui_mode:bool=False, **options):
+    def __init__(self, host='127.0.0.1', port:int=8080, gui_mode:bool=False, webcap:bool=False, **options):
         super().__init__(host, port, **options)
         self.gui_mode = gui_mode
+        self.webcap = webcap
 
     def run(self, handler):
         import logging
@@ -991,35 +1052,36 @@ class _WSGIServer(bottle_websocket.GeventWebSocketServer):
 
         if not self.quiet:
             self.srv.logger = create_logger('geventwebsocket.logging')
-            self.srv.logger.setLevel(logging.INFO)
+            self.srv.logger.setLevel(logging.INFO if not self.webcap else logging.NOTSET)
             self.srv.logger.addHandler(logging.StreamHandler())
 
+        if self.webcap:
+            sys.stderr.write(f"webcap ready.\n") # webcapのwebsocketの接続接続開始の合図
         if self.gui_mode:
             webbrowser.open(f'http://localhost:{self.port}/gui')
         self.srv.serve_forever()
 
-    """
-    def run(self, app): # pragma: no cover
-        from wsgiref.simple_server import WSGIRequestHandler, WSGIServer
-        from wsgiref.simple_server import make_server
-        import socket
+class RaiseThread(threading.Thread):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._run = self.run
+        self.run = self.set_id_and_run
 
-        class FixedHandler(WSGIRequestHandler):
-            def address_string(self): # Prevent reverse DNS lookups please.
-                return self.client_address[0]
-            def log_request(*args, **kw):
-                if not self.quiet:
-                    return WSGIRequestHandler.log_request(*args, **kw)
+    def set_id_and_run(self):
+        self.id = threading.get_native_id()
+        self._run()
 
-        handler_cls = self.options.get('handler_class', FixedHandler)
-        server_cls  = self.options.get('server_class', WSGIServer)
-
-        if ':' in self.host: # Fix wsgiref for IPv6 addresses.
-            if getattr(server_cls, 'address_family') == socket.AF_INET:
-                class server_cls(server_cls):
-                    address_family = socket.AF_INET6
-        # self.srvに代入することで、shutdownを実行できるようにする
-        self.srv = make_server(self.host, self.port, app, server_cls, handler_cls)
-        self.srv.serve_forever()
-        self.srv.server_close()
-    """
+    def get_id(self):
+        return self.id
+        
+    def raise_exception(self):
+        res = ctypes.pythonapi.PyThreadState_SetAsyncExc(
+            ctypes.c_long(self.get_id()), 
+            ctypes.py_object(SystemExit)
+        )
+        if res > 1:
+            ctypes.pythonapi.PyThreadState_SetAsyncExc(
+                ctypes.c_long(self.get_id()), 
+                0
+            )
+            print('Failure in raising exception')

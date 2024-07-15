@@ -110,7 +110,8 @@ class IinferApp:
                     return 1, msg
                 #self.web = gui.Gui(logger, Path(args.data))
                 self.web = web.Web(logger, Path(args.data), redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname,
-                                client_only=args.client_only, filer_html=args.filer_html, showimg_html=args.showimg_html, assets=args.assets, gui_mode=True)
+                                   client_only=args.client_only, filer_html=args.filer_html, showimg_html=args.showimg_html, webcap_html=args.webcap_html,
+                                   assets=args.assets, gui_mode=True)
                 self.web.start()
                 msg = {"success":"eel web complate."}
                 common.print_format(msg, args.format, tm, args.output_json, args.output_json_append)
@@ -129,8 +130,9 @@ class IinferApp:
                     return 1, msg
                 try:
                     self.web = web.Web(logger, Path(args.data), redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname,
-                                    client_only=args.client_only, filer_html=args.filer_html, showimg_html=args.showimg_html, assets=args.assets)
-                    self.web.start(args.allow_host, args.listen_port)
+                                    client_only=args.client_only, filer_html=args.filer_html, showimg_html=args.showimg_html, webcap_html=args.webcap_html,
+                                    assets=args.assets)
+                    self.web.start(args.allow_host, args.listen_port, outputs_key=args.outputs_key)
                     msg = {"success":"web complate."}
                     common.print_format(msg, args.format, tm, args.output_json, args.output_json_append)
                     return 0, msg
@@ -146,23 +148,10 @@ class IinferApp:
                 return 0, msg
             elif args.cmd == 'webcap':
                 self.web = web.Web(logger, Path(args.data))
-                count = 0
-                append = False
                 try:
-                    for t,b64,h,w,c,fn in self.web.webcap(args.allow_host, args.listen_port, image_type=args.image_type,
-                                                        capture_frame_width=args.capture_frame_width, capture_frame_height=args.capture_frame_height,
-                                                        capture_fps=args.capture_fps, output_preview=args.output_preview):
-
-                        ret = f"{t},"+b64+f",{h},{w},{c},{fn}"
-                        if args.output_csv is not None:
-                            with open(args.output_csv, 'a' if append else 'w', encoding="utf-8") as f:
-                                print(ret, file=f)
-                                append = True
-                        else: common.print_format(ret, False, tm, None, False)
-                        tm = time.perf_counter()
-                        count += 1
-                        if args.capture_count > 0 and count >= args.capture_count:
-                            break
+                    self.web.webcap(args.allow_host, args.listen_port, image_type=args.image_type, outputs_key=args.outputs_key,
+                                    capture_frame_width=args.capture_frame_width, capture_frame_height=args.capture_frame_height,
+                                    capture_count=args.capture_count, capture_fps=args.capture_fps)
                 finally:
                     try:
                         cv2.destroyWindow('preview')
@@ -380,6 +369,7 @@ class IinferApp:
             def _to_proc(f, proc:postprocess.Postprocess, timeout, format, tm,
                          output_json, output_json_append, output_image_file=None, output_csv=None):
                 try:
+                    ret = None
                     for line in f:
                         line = line.rstrip()
                         if line == "":
@@ -570,32 +560,20 @@ class IinferApp:
                     return 1, ret
 
             elif args.cmd == 'server':
-                install_set = not (args.install_onnx or args.install_mmdet or args.install_mmseg or args.install_mmcls or \
-                                   args.install_mmpretrain or args.install_insightface or args.install_diffusers or args.install_llamaindex)
-                onnx = install_set
-                mmdet = install_set
-                mmseg = install_set
-                mmcls = False
-                mmpretrain = install_set
-                insightface = False
-                diffusers = install_set
-                llamaindex = install_set
-                onnx = args.install_onnx if args.install_onnx else onnx
-                mmdet = args.install_mmdet if args.install_mmdet else mmdet
-                mmseg = args.install_mmseg if args.install_mmseg else mmseg
-                mmcls = args.install_mmcls if args.install_mmcls else mmcls
-                mmpretrain = args.install_mmpretrain if args.install_mmpretrain else mmpretrain
-                insightface = args.install_insightface if args.install_insightface else insightface
-                diffusers = args.install_diffusers if args.install_diffusers else diffusers
-                llamaindex = args.install_llamaindex if args.install_llamaindex else llamaindex
                 if args.data is None:
                     msg = {"warn":f"Please specify the --data option."}
                     common.print_format(msg, args.format, tm, args.output_json, args.output_json_append)
                     return 1, msg
-                ret = self.inst.server(Path(args.data), args.install_iinfer, install_onnx=onnx,
-                                install_mmdet=mmdet, install_mmseg=mmseg, install_mmcls=mmcls, install_mmpretrain=mmpretrain,
-                                install_insightface=insightface, install_diffusers=diffusers, install_llamaindex=llamaindex,
-                                install_from=args.install_from, install_tag=args.install_tag, install_use_gpu=args.install_use_gpu)
+                ret = self.inst.server(Path(args.data), args.install_iinfer,
+                                       install_onnx=args.install_onnx,
+                                       install_mmdet=args.install_mmdet,
+                                       install_mmseg=args.install_mmseg,
+                                       install_mmcls=args.install_mmcls,
+                                       install_mmpretrain=args.install_mmpretrain,
+                                       install_insightface=args.install_insightface,
+                                       install_diffusers=args.install_diffusers,
+                                       install_llamaindex=args.install_llamaindex,
+                                       install_from=args.install_from, install_tag=args.install_tag, install_use_gpu=args.install_use_gpu)
                 common.print_format(ret, args.format, tm, args.output_json, args.output_json_append)
                 if 'success' not in ret:
                     return 1, ret

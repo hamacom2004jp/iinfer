@@ -73,13 +73,17 @@ class Server(filer.Filer):
             error_cnt = -1
             try:
                 if self.redis_cli.hexists(hb, 'recive_cnt'):
-                    recive_cnt = int(self.redis_cli.hget(hb, 'recive_cnt').decode())
+                    val = self.redis_cli.hget(hb, 'recive_cnt')
+                    recive_cnt = int(val.decode()) if val is not None else -1
                 if self.redis_cli.hexists(hb, 'sccess_cnt'):
-                    sccess_cnt = int(self.redis_cli.hget(hb, 'sccess_cnt').decode())
+                    val = self.redis_cli.hget(hb, 'sccess_cnt')
+                    sccess_cnt = int(val.decode()) if val is not None else -1
                 if self.redis_cli.hexists(hb, 'sccess_cnt'):
-                    warn_cnt = int(self.redis_cli.hget(hb, 'warn_cnt').decode())
+                    val = self.redis_cli.hget(hb, 'warn_cnt')
+                    warn_cnt = int(val.decode()) if val is not None else -1
                 if self.redis_cli.hexists(hb, 'sccess_cnt'):
-                    error_cnt = int(self.redis_cli.hget(hb, 'error_cnt').decode())
+                    val = self.redis_cli.hget(hb, 'error_cnt')
+                    error_cnt = int(val.decode()) if val is not None else -1
             except redis.exceptions.ResponseError:
                 self.logger.warn(f"Failed to get ctime. {hb}", exc_info=True)
             svlist.append(dict(svname=svname, recive_cnt=recive_cnt, sccess_cnt=sccess_cnt, warn_cnt=warn_cnt, error_cnt=error_cnt))

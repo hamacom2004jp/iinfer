@@ -24,5 +24,6 @@
     "--client_only","","iinferサーバーへの接続を行わないようにします。"
     "--filer_html <filer.htmlファイルのパス>","","`filer.html` を指定します。省略時はiinfer内蔵のHTMLファイルを使用します。"
     "--showimg_html <showimg.htmlファイルのパス>","","`showimg.html` を指定します。省略時はiinfer内蔵のHTMLファイルを使用します。"
+    "--webcap_html <webcap.htmlファイルのパス>","","`webcap.html` を指定します。省略時はiinfer内蔵のHTMLファイルを使用します。"
     "--assets <jsやcssファイルのパス>","","htmlファイルを使用する場合に必要なアセットファイルを指定します。"
 

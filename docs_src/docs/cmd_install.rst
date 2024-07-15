@@ -134,18 +134,17 @@
     "Option","Required","Description"
     "--data <データフォルダ>","","省略した時は `$HONE/.iinfer` を使用します。"
     "--install_iinfer <iinferモジュール名>","","省略した時は `iinfer` を使用します。 `iinfer==0.7.2` といった指定も可能です。"
-    "--install_onnx","","dockerイメージ内に `onnxruntime` をインストールします。※1"
-    "--install_mmdet","","dockerイメージ内に `mmdetection` をインストールします。※1"
-    "--install_mmseg","","dockerイメージ内に `mmsegmentation` をインストールします。※1"
-    "--install_mmcls","","dockerイメージ内に `mmclassification` をインストールします。※1,2"
-    "--install_mmpretrain","","dockerイメージ内に `mmpretrain` をインストールします。※1"
-    "--install_insightface","","dockerイメージ内に `insightface` をインストールします。※1"
-    "--install_diffusers","","dockerイメージ内に `diffusers` をインストールします。※1"
-    "--install_llamaindex","","dockerイメージ内に `llamaindex` をインストールします。※1"
+    "--install_onnx","","dockerイメージ内に `onnxruntime` をインストールします。"
+    "--install_mmdet","","dockerイメージ内に `mmdetection` をインストールします。"
+    "--install_mmseg","","dockerイメージ内に `mmsegmentation` をインストールします。"
+    "--install_mmcls","","dockerイメージ内に `mmclassification` をインストールします。※1"
+    "--install_mmpretrain","","dockerイメージ内に `mmpretrain` をインストールします。"
+    "--install_insightface","","dockerイメージ内に `insightface` をインストールします。"
+    "--install_diffusers","","dockerイメージ内に `diffusers` をインストールします。"
+    "--install_llamaindex","","dockerイメージ内に `llamaindex` をインストールします。"
     "--install_from <イメージ名>","","作成するdockerイメージの元となるFROMイメージを指定します。"
     "--install_tag <追加のタグ名>","","指定すると作成するdockerイメージのタグ名に追記出来ます。"
     "--install_use_gpu","","GPUを使用するモジュール構成でインストールします。"
     
 
-- ※1 : これらのオプションを何れも指定しない場合、 `--install_mmcls` `--install_insightface` 以外すべてをインストールします。
-- ※2 : `mmclassification` と `mmpretrain` はバージョンによって共存できない場合があります。
+- ※1 : `mmclassification` と `mmpretrain` はバージョンによって共存できない場合があります。

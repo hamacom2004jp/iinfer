@@ -14,30 +14,9 @@ const hide_loading = () => {
   const progress = $('#progress');
   progress.addClass('d-none');
 }
-const webcap = {}
-webcap.init = () => {
-  list_pipe(null).then((result) => {
-    const webcap_elem = $('#webcap');
-    result.forEach(async (pipe) => {
-      if (!pipe || pipe.pipe_cmd.length == 0) return;
-      cmd = await load_cmd(pipe.pipe_cmd[0]);
-      if (!cmd || cmd.mode != 'web' || cmd.cmd != 'webcap') return;
-      url = `http://localhost:${cmd.listen_port}/webcap/pub_img`
-      if (cmd.access_url) url = cmd.access_url;
-      const elem = $(`<li class="dropdown dropend"><a class="dropdown-item" href="#" onclick="webcap.change_webcap_mode('${pipe.title}', '${url}');">${pipe.title}</a></li>`);
-      webcap_elem.append(elem);
-    });
-    const elem = $(`<li class="dropdown dropend"><a class="dropdown-item" href="#" onclick="webcap.change_webcap_mode(null, null);">&lt; Not use webcap &gt;</a></li>`);
-    webcap_elem.append(elem);
-  });
-};
-webcap.change_webcap_mode = (title) => {
-};
 $(() => {
   // ダークモード対応
   change_dark_mode(window.matchMedia('(prefers-color-scheme: dark)').matches);
-  // webcapモード初期化
-  webcap.init();
   // copyright情報取得
   const copyright_func = async () => {
     const response = await fetch('copyright');
@@ -45,7 +24,9 @@ $(() => {
     $('.copyright').text(copyright);
   };
   copyright_func();
-  $('.split-pane').splitPane();
+  if ($('.split-pane').length > 0) {
+    $('.split-pane').splitPane();
+  }
   $('#versions_modal').on('shown.bs.modal	', () => {
     // iinferのバージョン情報取得
     const versions_iinfer_func = async () => {
@@ -129,6 +110,7 @@ $(() => {
       const data = JSON.parse(event.data);
       const img_url = data['img_url'];
       const img_id = data['img_id'];
+      const outputs_key = data['outputs_key'];
       const outputs = data['success'];
       const elem = $($("#img_template").html());
       if (img_url) {
@@ -168,12 +150,10 @@ $(() => {
           tr = tbody.children(`[data-col="${i}"]`);
           tr.append(head_th);
         });
-        const title_keys = elem.data('title_keys');
-        if (title_keys) {
-          for (const key of title_keys.split(',')) {
-            if (!outputs[key]) continue;
-            tbody.prepend(`<tr class="table_title fs-1" style="overflow-wrap:break-word;word-break:break-all;"><th colspan="2">${outputs[key]}</th></tr>`);
-          }
+        for (const key of outputs_key) {
+          const val = outputs[key];
+          if (!val) continue;
+          tbody.prepend(`<tr class="table_title fs-1" style="overflow-wrap:break-word;word-break:break-all;"><th colspan="2">${outputs[key]}</th></tr>`);
         }
         thead.remove();
         tbody.children('.old').each((i, e) => {

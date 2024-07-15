@@ -63,7 +63,7 @@ class Install(object):
             shutil.copytree(start_sh_src, start_sh_tgt, dirs_exist_ok=True)
             text = text.replace('#{COPY_IINFER_START}', f'COPY {start_sh_tgt} {start_sh_tgt}')
 
-            install_use_gpu = '--install_use_gpu' if install_use_gpu else ''
+            install_use_gpu_opt = '--install_use_gpu' if install_use_gpu else ''
             base_image = 'python:3.11.9-slim' #'python:3.8.18-slim'
             if install_use_gpu:
                 base_image = 'nvidia/cuda:12.4.1-cudnn-runtime-ubuntu22.04' if install_llamaindex else 'nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu22.04'
@@ -75,14 +75,14 @@ class Install(object):
             text = text.replace('#{INSTALL_PYTHON}', f'RUN apt-get update && apt-get install -y python3.11 python3.11-distutils python3-pip python-is-python3' if install_use_gpu else '')
             text = text.replace('#{INSTALL_TAG}', install_tag)
             text = text.replace('#{INSTALL_IINFER}', install_iinfer_tgt)
-            text = text.replace('#{INSTALL_ONNX}', f'RUN iinfer -m install -c onnx --data /home/{user}/.iinfer {install_use_gpu}' if install_onnx else '')
-            text = text.replace('#{INSTALL_MMDET}', f'RUN iinfer -m install -c mmdet --data /home/{user}/.iinfer {install_use_gpu}' if install_mmdet else '')
-            text = text.replace('#{INSTALL_MMSEG}', f'RUN iinfer -m install -c mmseg --data /home/{user}/.iinfer {install_use_gpu}' if install_mmseg else '')
-            text = text.replace('#{INSTALL_MMCLS}', f'RUN iinfer -m install -c mmcls --data /home/{user}/.iinfer {install_use_gpu}' if install_mmcls else '')
-            text = text.replace('#{INSTALL_MMPRETRAIN}', f'RUN iinfer -m install -c mmpretrain --data /home/{user}/.iinfer {install_use_gpu}' if install_mmpretrain else '')
-            text = text.replace('#{INSTALL_INSIGHTFACE}', f'RUN iinfer -m install -c insightface --data /home/{user}/.iinfer {install_use_gpu}' if install_insightface else '')
-            text = text.replace('#{INSTALL_DIFFUSERS}', f'RUN iinfer -m install -c diffusers --data /home/{user}/.iinfer {install_use_gpu}' if install_diffusers else '')
-            text = text.replace('#{INSTALL_LLAMAINDEX}', f'RUN iinfer -m install -c llamaindex --data /home/{user}/.iinfer {install_use_gpu}' if install_llamaindex else '')
+            text = text.replace('#{INSTALL_ONNX}', f'RUN iinfer -m install -c onnx --data /home/{user}/.iinfer {install_use_gpu_opt}' if install_onnx else '')
+            text = text.replace('#{INSTALL_MMDET}', f'RUN iinfer -m install -c mmdet --data /home/{user}/.iinfer {install_use_gpu_opt}' if install_mmdet else '')
+            text = text.replace('#{INSTALL_MMSEG}', f'RUN iinfer -m install -c mmseg --data /home/{user}/.iinfer {install_use_gpu_opt}' if install_mmseg else '')
+            text = text.replace('#{INSTALL_MMCLS}', f'RUN iinfer -m install -c mmcls --data /home/{user}/.iinfer {install_use_gpu_opt}' if install_mmcls else '')
+            text = text.replace('#{INSTALL_MMPRETRAIN}', f'RUN iinfer -m install -c mmpretrain --data /home/{user}/.iinfer {install_use_gpu_opt}' if install_mmpretrain else '')
+            text = text.replace('#{INSTALL_INSIGHTFACE}', f'RUN iinfer -m install -c insightface --data /home/{user}/.iinfer {install_use_gpu_opt}' if install_insightface else '')
+            text = text.replace('#{INSTALL_DIFFUSERS}', f'RUN iinfer -m install -c diffusers --data /home/{user}/.iinfer {install_use_gpu_opt}' if install_diffusers else '')
+            text = text.replace('#{INSTALL_LLAMAINDEX}', f'RUN iinfer -m install -c llamaindex --data /home/{user}/.iinfer {install_use_gpu_opt}' if install_llamaindex else '')
             fp.write(text)
         docker_compose_path = Path('docker-compose.yml')
         if not docker_compose_path.exists():

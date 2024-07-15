@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>iinfer.app.web &mdash; iinfer 2024/07/07 documentation</title>
+  <title>iinfer.app.web &mdash; iinfer 2024/07/15 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -15,7 +15,7 @@
   
         <script src="../../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=b3f84b00"></script>
+        <script src="../../../_static/documentation_options.js?v=44b79537"></script>
         <script src="../../../_static/doctools.js?v=9a2dae69"></script>
         <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -92,9 +92,10 @@
 <span class="kn">from</span> <span class="nn">iinfer.app.commons</span> <span class="kn">import</span> <span class="n">convert</span><span class="p">,</span> <span class="n">redis_client</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
-<span class="kn">import</span> <span class="nn">webbrowser</span>
+<span class="kn">import</span> <span class="nn">ctypes</span>
 <span class="kn">import</span> <span class="nn">bottle</span>
 <span class="kn">import</span> <span class="nn">bottle_websocket</span>
+<span class="kn">import</span> <span class="nn">cv2</span>
 <span class="kn">import</span> <span class="nn">datetime</span>
 <span class="kn">import</span> <span class="nn">glob</span>
 <span class="kn">import</span> <span class="nn">gevent</span>
@@ -113,12 +114,13 @@
 <span class="kn">import</span> <span class="nn">traceback</span>
 <span class="kn">import</span> <span class="nn">tempfile</span>
 <span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">webbrowser</span>
 
 <div class="viewcode-block" id="Web">
 <a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web">[docs]</a>
 <span class="k">class</span> <span class="nc">Web</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">Options</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="n">redis_host</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;localhost&quot;</span><span class="p">,</span> <span class="n">redis_port</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="mi">6379</span><span class="p">,</span> <span class="n">redis_password</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">svname</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;server&#39;</span><span class="p">,</span>
-                 <span class="n">client_only</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">filer_html</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">showimg_html</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">assets</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">gui_mode</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+                 <span class="n">client_only</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">filer_html</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">showimg_html</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">webcap_html</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">assets</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">gui_mode</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        iinferクライアント側のwebapiサービス</span>
 
@@ -132,6 +134,7 @@
 <span class="sd">            client_only (bool, optional): クライアントのみのサービスかどうか. Defaults to False.</span>
 <span class="sd">            filer_html (str, optional): ファイラーのHTMLファイル. Defaults to None.</span>
 <span class="sd">            showimg_html (str, optional): 画像表示のHTMLファイル. Defaults to None.</span>
+<span class="sd">            webcap_html (str, optional): ウェブカメラのHTMLファイル. Defaults to None.</span>
 <span class="sd">            assets (List[str], optional): 静的ファイルのリスト. Defaults to None.</span>
 <span class="sd">            gui_mode (bool, optional): GUIモードかどうか. Defaults to False.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -149,12 +152,15 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">svname</span> <span class="o">=</span> <span class="s1">&#39;client&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">filer_html</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">filer_html</span><span class="p">)</span> <span class="k">if</span> <span class="n">filer_html</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">showimg_html</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">showimg_html</span><span class="p">)</span> <span class="k">if</span> <span class="n">showimg_html</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">webcap_html</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">webcap_html</span><span class="p">)</span> <span class="k">if</span> <span class="n">webcap_html</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assets</span> <span class="o">=</span> <span class="p">[</span><span class="n">Path</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">assets</span><span class="p">]</span> <span class="k">if</span> <span class="n">assets</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">filer_html_data</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">showimg_html_data</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">webcap_html_data</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assets_data</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">gui_mode</span> <span class="o">=</span> <span class="n">gui_mode</span>
         <span class="n">common</span><span class="o">.</span><span class="n">mkdirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipe_th</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">img_queue</span> <span class="o">=</span> <span class="n">queue</span><span class="o">.</span><span class="n">Queue</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cb_queue</span> <span class="o">=</span> <span class="n">queue</span><span class="o">.</span><span class="n">Queue</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
 
@@ -361,7 +367,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">callback_return_cmd_exec_func</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">output</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">nothread</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">_exec_cmd</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="p">[</span><span class="s1">&#39;iinfer_app&#39;</span><span class="p">],</span> <span class="n">title</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
-        <span class="n">th</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">_exec_cmd</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="p">[</span><span class="s1">&#39;iinfer_app&#39;</span><span class="p">],</span> <span class="n">title</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
+        <span class="n">th</span> <span class="o">=</span> <span class="n">RaiseThread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">_exec_cmd</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="p">[</span><span class="s1">&#39;iinfer_app&#39;</span><span class="p">],</span> <span class="n">title</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
         <span class="n">th</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
         <span class="k">return</span> <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="s1">&#39;start_cmd&#39;</span><span class="p">)]</span></div>
 
@@ -440,7 +446,7 @@
                         <span class="n">img_bytes</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">npy2imgfile</span><span class="p">(</span><span class="n">img_npy</span><span class="p">,</span> <span class="n">image_type</span><span class="o">=</span><span class="s1">&#39;jpeg&#39;</span><span class="p">)</span>
                         <span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;output_image&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">bytes2b64str</span><span class="p">(</span><span class="n">img_bytes</span><span class="p">)</span>
                     <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res_json</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">ret</span>
+                <span class="k">return</span> <span class="n">ret</span>
         <span class="k">except</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;warn&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;An error occurred while reading the file.: </span><span class="si">{</span><span class="n">current_path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">}</span></div>
 
@@ -467,7 +473,7 @@
                     <span class="k">else</span><span class="p">:</span>
                         <span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;output_image&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cel</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
                     <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res_json</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">ret</span>
+                <span class="k">return</span> <span class="n">ret</span>
         <span class="k">except</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;warn&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;An error occurred while reading the file.: </span><span class="si">{</span><span class="n">current_path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">}</span></div>
 
@@ -483,7 +489,7 @@
 
 <div class="viewcode-block" id="Web.exec_pipe">
 <a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.exec_pipe">[docs]</a>
-    <span class="k">def</span> <span class="nf">exec_pipe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">nothread</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">exec_pipe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">nothread</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">capture_stdin</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;exec_pipe: title=</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2">, opt=</span><span class="si">{</span><span class="n">opt</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">def</span> <span class="nf">to_json</span><span class="p">(</span><span class="n">o</span><span class="p">):</span>
             <span class="n">res_json</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
@@ -492,7 +498,7 @@
                 <span class="n">img_bytes</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">npy2imgfile</span><span class="p">(</span><span class="n">img_npy</span><span class="p">,</span> <span class="n">image_type</span><span class="o">=</span><span class="s1">&#39;png&#39;</span><span class="p">)</span>
                 <span class="n">res_json</span><span class="p">[</span><span class="s2">&quot;output_image&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">bytes2b64str</span><span class="p">(</span><span class="n">img_bytes</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">res_json</span>
-        <span class="k">def</span> <span class="nf">_exec_pipe</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">container</span><span class="p">,</span> <span class="n">nothread</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">_exec_pipe</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">container</span><span class="p">,</span> <span class="n">nothread</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">capture_stdin</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
             <span class="n">capture_stdout</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">cmd_title</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">opt</span><span class="p">[</span><span class="s1">&#39;pipe_cmd&#39;</span><span class="p">]):</span>
                 <span class="k">if</span> <span class="n">cmd_title</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
@@ -523,6 +529,7 @@
             <span class="k">if</span> <span class="n">has_warn</span><span class="p">:</span> <span class="k">return</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">container</span><span class="p">[</span><span class="s1">&#39;pipe_proc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">cmdline</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">,</span>
+                                                        <span class="n">stdin</span><span class="o">=</span><span class="p">(</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span> <span class="k">if</span> <span class="n">capture_stdin</span> <span class="k">else</span> <span class="kc">None</span><span class="p">),</span>
                                                         <span class="n">stdout</span><span class="o">=</span><span class="p">(</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span> <span class="k">if</span> <span class="n">capture_stdout</span> <span class="k">else</span> <span class="kc">None</span><span class="p">),</span>
                                                         <span class="n">stderr</span><span class="o">=</span><span class="p">(</span><span class="n">subprocess</span><span class="o">.</span><span class="n">STDOUT</span> <span class="k">if</span> <span class="n">capture_stdout</span> <span class="k">else</span> <span class="kc">None</span><span class="p">))</span>
                 <span class="n">output</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
@@ -567,8 +574,12 @@
                     <span class="k">return</span> <span class="n">output</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">callback_return_pipe_exec_func</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">output</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">nothread</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">_exec_pipe</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
-        <span class="n">gevent</span><span class="o">.</span><span class="n">spawn</span><span class="p">(</span><span class="n">_exec_pipe</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">_exec_pipe</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">capture_stdin</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipe_th</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pipe_th</span><span class="o">.</span><span class="n">raise_exception</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipe_th</span> <span class="o">=</span> <span class="n">RaiseThread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">_exec_pipe</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">capture_stdin</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipe_th</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="c1">#gevent.spawn(_exec_pipe, title, opt, self.container, False, capture_stdin)</span>
         <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">success</span><span class="o">=</span><span class="s1">&#39;start_pipe&#39;</span><span class="p">)</span></div>
 
 
@@ -661,7 +672,7 @@
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()):</span>
                 <span class="n">parts</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span>
                 <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">ret</span></div>
+            <span class="k">return</span> <span class="n">ret</span></div>
 
     
 <div class="viewcode-block" id="Web.filer_upload">
@@ -745,13 +756,13 @@
 
 <div class="viewcode-block" id="Web.start">
 <a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.start">[docs]</a>
-    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">allow_host</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s2">&quot;0.0.0.0&quot;</span><span class="p">,</span> <span class="n">listen_port</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">8081</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">allow_host</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s2">&quot;0.0.0.0&quot;</span><span class="p">,</span> <span class="n">listen_port</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">8081</span><span class="p">,</span> <span class="n">outputs_key</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="p">[]):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">allow_host</span> <span class="o">=</span> <span class="n">allow_host</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">listen_port</span> <span class="o">=</span> <span class="n">listen_port</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Start bottle web. allow_host=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">allow_host</span><span class="si">}</span><span class="s2"> listen_port=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">listen_port</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outputs_key</span> <span class="o">=</span> <span class="n">outputs_key</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Start web. allow_host=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">allow_host</span><span class="si">}</span><span class="s2"> listen_port=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">listen_port</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="n">app</span> <span class="o">=</span> <span class="n">bottle</span><span class="o">.</span><span class="n">Bottle</span><span class="p">()</span>
-        <span class="n">bottle</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">filer_html</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">filer_html</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
@@ -763,6 +774,11 @@
                 <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;showimg_html is not found. (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">showimg_html</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
             <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">showimg_html</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">showimg_html_data</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">webcap_html</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">webcap_html</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;webcap_html is not found. (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">webcap_html</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">webcap_html</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">webcap_html_data</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">assets</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">assets</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">list</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;assets is not list. (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">assets</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
@@ -781,6 +797,12 @@
         <span class="n">redis_cli</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">client_only</span><span class="p">:</span>
             <span class="n">redis_cli</span> <span class="o">=</span> <span class="n">redis_client</span><span class="o">.</span><span class="n">RedisClient</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">redis_host</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">redis_port</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">redis_password</span><span class="p">,</span> <span class="n">svname</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">svname</span><span class="p">)</span>
+
+        <span class="nd">@app</span><span class="o">.</span><span class="n">hook</span><span class="p">(</span><span class="s1">&#39;after_request&#39;</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">enable_cors</span><span class="p">():</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="s1">&#39;Origin&#39;</span> <span class="ow">in</span> <span class="n">bottle</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">return</span>
+            <span class="n">bottle</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s1">&#39;Access-Control-Allow-Origin&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bottle</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s1">&#39;Origin&#39;</span><span class="p">]</span>
 
         <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/bbforce_cmd&#39;</span><span class="p">)</span>
         <span class="k">def</span> <span class="nf">bbforce_cmd</span><span class="p">():</span>
@@ -833,7 +855,7 @@
                     <span class="n">opt</span> <span class="o">=</span> <span class="n">bottle</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">json</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">opt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_pipe</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
-                <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;capture_stdout&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nothread</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;capture_stdout&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nothread</span> <span class="o">=</span> <span class="kc">False</span>
                 <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;stdout_log&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exec_pipe</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">nothread</span><span class="p">))</span>
             <span class="k">except</span><span class="p">:</span>
@@ -1018,13 +1040,14 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;pub_img error&#39;</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_str</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;pub_img error. </span><span class="si">{</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">))</span>
 
+        <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/webcap/sub_img&#39;</span><span class="p">)</span>
         <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/showimg/sub_img&#39;</span><span class="p">)</span>
         <span class="k">def</span> <span class="nf">sub_img</span><span class="p">():</span>
             <span class="n">wsock</span> <span class="o">=</span> <span class="n">bottle</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;wsgi.websocket&#39;</span><span class="p">)</span> <span class="c1"># type: ignore</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">wsock</span><span class="p">:</span>
                 <span class="n">bottle</span><span class="o">.</span><span class="n">abort</span><span class="p">(</span><span class="mi">400</span><span class="p">,</span> <span class="s1">&#39;Expected WebSocket request.&#39;</span><span class="p">)</span>
             <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-                <span class="n">outputs</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">outputs</span><span class="p">:</span><span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="k">try</span><span class="p">:</span>
                         <span class="n">outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">img_queue</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">block</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mf">0.001</span><span class="p">)</span>
@@ -1034,6 +1057,9 @@
                     <span class="k">if</span> <span class="n">outputs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                         <span class="n">gevent</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
                         <span class="k">continue</span>
+                    <span class="n">outputs</span><span class="p">[</span><span class="s1">&#39;outputs_key&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputs_key</span>
+                    <span class="k">if</span> <span class="n">outputs</span><span class="p">[</span><span class="s1">&#39;outputs_key&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">outputs</span><span class="p">[</span><span class="s1">&#39;outputs_key&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">outputs</span><span class="p">[</span><span class="s1">&#39;success&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span> <span class="k">if</span> <span class="s1">&#39;success&#39;</span> <span class="ow">in</span> <span class="n">outputs</span> <span class="k">else</span> <span class="p">[]</span>
                     <span class="k">if</span> <span class="s1">&#39;output_image_shape&#39;</span> <span class="ow">in</span> <span class="n">outputs</span><span class="p">:</span>
                         <span class="n">img_npy</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">b64str2npy</span><span class="p">(</span><span class="n">outputs</span><span class="p">[</span><span class="s2">&quot;output_image&quot;</span><span class="p">],</span> <span class="n">outputs</span><span class="p">[</span><span class="s2">&quot;output_image_shape&quot;</span><span class="p">])</span>
                         <span class="n">jpg</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">img2byte</span><span class="p">(</span><span class="n">convert</span><span class="o">.</span><span class="n">npy2img</span><span class="p">(</span><span class="n">img_npy</span><span class="p">),</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;jpeg&#39;</span><span class="p">)</span>
@@ -1049,7 +1075,7 @@
                         <span class="n">outputs</span><span class="p">[</span><span class="s1">&#39;img_url&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">jpg_url</span>
                         <span class="n">outputs</span><span class="p">[</span><span class="s1">&#39;img_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fn</span>
                     <span class="n">wsock</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">common</span><span class="o">.</span><span class="n">default_json_enc</span><span class="p">))</span>
-                <span class="k">except</span><span class="p">:</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">outputs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">img_queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">outputs</span><span class="p">)</span> <span class="c1"># エラーが発生した場合はキューに戻す</span>
                         <span class="n">gevent</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.001</span><span class="p">)</span>
@@ -1060,6 +1086,14 @@
         <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/assets/&lt;filename:path&gt;&#39;</span><span class="p">)</span>
         <span class="k">def</span> <span class="nf">assets</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">bottle</span><span class="o">.</span><span class="n">static_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="n">static_root</span> <span class="o">/</span> <span class="s1">&#39;assets&#39;</span><span class="p">)</span>
+
+        <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/webcap&#39;</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">webcap</span><span class="p">():</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">webcap_html_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">webcap_html_data</span>
+            <span class="n">res</span><span class="p">:</span><span class="n">bottle</span><span class="o">.</span><span class="n">HTTPResponse</span> <span class="o">=</span> <span class="n">bottle</span><span class="o">.</span><span class="n">static_file</span><span class="p">(</span><span class="s1">&#39;webcap.html&#39;</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="n">static_root</span><span class="p">)</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s1">&#39;Access-Control-Allow-Origin&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;*&#39;</span>
+            <span class="k">return</span> <span class="n">res</span>
 
         <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/copyright&#39;</span><span class="p">)</span>
         <span class="k">def</span> <span class="nf">copyright</span><span class="p">():</span>
@@ -1082,17 +1116,20 @@
             <span class="n">bottle</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">content_type</span> <span class="o">=</span> <span class="s1">&#39;application/json&#39;</span>
             <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">versions_used</span><span class="p">())</span>
 
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;iinfer_web.pid&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">pid</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">()</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">pid</span><span class="p">))</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">is_running</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="n">server</span> <span class="o">=</span> <span class="n">_WSGIServer</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">allow_host</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">listen_port</span><span class="p">,</span> <span class="n">gui_mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">gui_mode</span><span class="p">)</span>
-            <span class="n">th</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">bottle</span><span class="o">.</span><span class="n">run</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">app</span><span class="o">=</span><span class="n">app</span><span class="p">,</span> <span class="n">server</span><span class="o">=</span><span class="n">server</span><span class="p">))</span>
-            <span class="n">th</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_running</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">server</span> <span class="o">=</span> <span class="n">_WSGIServer</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">allow_host</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">listen_port</span><span class="p">,</span> <span class="n">gui_mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">gui_mode</span><span class="p">)</span>
+        <span class="n">th</span> <span class="o">=</span> <span class="n">RaiseThread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">bottle</span><span class="o">.</span><span class="n">run</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">app</span><span class="o">=</span><span class="n">app</span><span class="p">,</span> <span class="n">server</span><span class="o">=</span><span class="n">server</span><span class="p">))</span>
+        <span class="n">th</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
             <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_running</span><span class="p">:</span>
                 <span class="n">gevent</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">th</span><span class="o">.</span><span class="n">raise_exception</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
+            <span class="n">th</span><span class="o">.</span><span class="n">raise_exception</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
             <span class="n">server</span><span class="o">.</span><span class="n">srv</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
-        <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;iinfer_web.pid&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span></div>
 
 
 <div class="viewcode-block" id="Web.stop">
@@ -1103,6 +1140,85 @@
             <span class="n">os</span><span class="o">.</span><span class="n">kill</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">pid</span><span class="p">),</span> <span class="n">signal</span><span class="o">.</span><span class="n">CTRL_C_EVENT</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Stop bottle web. allow_host=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">allow_host</span><span class="si">}</span><span class="s2"> listen_port=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">listen_port</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;iinfer_web.pid&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Web.webcap">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.webcap">[docs]</a>
+    <span class="k">def</span> <span class="nf">webcap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">allow_host</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s2">&quot;0.0.0.0&quot;</span><span class="p">,</span> <span class="n">listen_port</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">8082</span><span class="p">,</span>
+               <span class="n">image_type</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s1">&#39;capture&#39;</span><span class="p">,</span> <span class="n">outputs_key</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">capture_frame_width</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">capture_frame_height</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+               <span class="n">capture_count</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">capture_fps</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">allow_host</span> <span class="o">=</span> <span class="n">allow_host</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">listen_port</span> <span class="o">=</span> <span class="n">listen_port</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_type</span> <span class="o">=</span> <span class="n">image_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outputs_key</span> <span class="o">=</span> <span class="n">outputs_key</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">capture_frame_width</span> <span class="o">=</span> <span class="n">capture_frame_width</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">capture_frame_height</span> <span class="o">=</span> <span class="n">capture_frame_height</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">capture_count</span> <span class="o">=</span> <span class="n">capture_count</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">capture_fps</span> <span class="o">=</span> <span class="n">capture_fps</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Start web. allow_host=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">allow_host</span><span class="si">}</span><span class="s2"> listen_port=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">listen_port</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">app</span> <span class="o">=</span> <span class="n">bottle</span><span class="o">.</span><span class="n">Bottle</span><span class="p">()</span>
+
+        <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/webcap/pub_img&#39;</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;POST&#39;</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">pub_img</span><span class="p">():</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">bottle</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">content_type</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;multipart/form-data&#39;</span><span class="p">):</span>
+                <span class="n">bottle</span><span class="o">.</span><span class="n">abort</span><span class="p">(</span><span class="mi">400</span><span class="p">,</span> <span class="s1">&#39;Expected multipart request.&#39;</span><span class="p">)</span>
+                <span class="k">return</span>
+            <span class="n">bottle</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s1">&#39;Access-Control-Allow-Origin&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;*&#39;</span>
+
+            <span class="n">image_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_type</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">tm</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+                <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">bottle</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">files</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">cap</span><span class="p">:</span><span class="nb">bytes</span> <span class="o">=</span> <span class="n">bottle</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="n">fn</span><span class="p">]</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">cap</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">continue</span>
+                    <span class="n">output_image_name</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">%H%M%S</span><span class="si">%f</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="n">cap</span> <span class="o">=</span> <span class="n">cap</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;data:image/jpeg;base64,&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+                    <span class="n">img_npy</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">imgbytes2npy</span><span class="p">(</span><span class="n">convert</span><span class="o">.</span><span class="n">b64str2bytes</span><span class="p">(</span><span class="n">cap</span><span class="p">))</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">capture_frame_width</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">capture_frame_height</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">img_npy</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">img_npy</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">capture_frame_width</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">capture_frame_height</span><span class="p">),</span> <span class="n">interpolation</span><span class="o">=</span><span class="n">cv2</span><span class="o">.</span><span class="n">INTER_NEAREST</span><span class="p">)</span>
+                    <span class="n">img_b64</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="k">if</span> <span class="n">image_type</span> <span class="o">==</span> <span class="s1">&#39;capture&#39;</span> <span class="ow">or</span> <span class="n">image_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">image_type</span> <span class="o">=</span> <span class="s1">&#39;capture&#39;</span>
+                        <span class="n">img_b64</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">npy2b64str</span><span class="p">(</span><span class="n">img_npy</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">img_b64</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">bytes2b64str</span><span class="p">(</span><span class="n">convert</span><span class="o">.</span><span class="n">npy2imgfile</span><span class="p">(</span><span class="n">img_npy</span><span class="p">,</span> <span class="n">image_type</span><span class="o">=</span><span class="n">image_type</span><span class="p">))</span>
+                    <span class="n">output_image_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">output_image_name</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">image_type</span><span class="si">}</span><span class="s2">&quot;</span>
+
+                    <span class="n">t</span><span class="p">,</span> <span class="n">b64</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">fn</span> <span class="o">=</span> <span class="n">image_type</span><span class="p">,</span> <span class="n">img_b64</span><span class="p">,</span> <span class="n">img_npy</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">img_npy</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">img_npy</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">img_npy</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">output_image_name</span>
+                    <span class="n">ret</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s2">,&quot;</span><span class="o">+</span><span class="n">b64</span><span class="o">+</span><span class="sa">f</span><span class="s2">&quot;,</span><span class="si">{</span><span class="n">h</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">w</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">c</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">fn</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="n">common</span><span class="o">.</span><span class="n">print_format</span><span class="p">(</span><span class="n">ret</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+                    <span class="n">tm</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">capture_count</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">count</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">capture_count</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">is_running</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;pub_img error&#39;</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_str</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;pub_img error. </span><span class="si">{</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">))</span>
+
+            <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_str</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">success</span><span class="o">=</span><span class="s1">&#39;pub_img to stdout.&#39;</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">ret</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_running</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">server</span> <span class="o">=</span> <span class="n">_WSGIServer</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">allow_host</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">listen_port</span><span class="p">,</span> <span class="n">gui_mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">gui_mode</span><span class="p">,</span> <span class="n">webcap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">th</span> <span class="o">=</span> <span class="n">RaiseThread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">bottle</span><span class="o">.</span><span class="n">run</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">app</span><span class="o">=</span><span class="n">app</span><span class="p">,</span> <span class="n">server</span><span class="o">=</span><span class="n">server</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="n">allow_host</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">listen_port</span><span class="p">))</span>
+        <span class="n">th</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_running</span><span class="p">:</span>
+                <span class="n">gevent</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">th</span><span class="o">.</span><span class="n">raise_exception</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
+            <span class="n">th</span><span class="o">.</span><span class="n">raise_exception</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">server</span><span class="o">.</span><span class="n">srv</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span></div>
 </div>
 
 
@@ -1111,9 +1227,10 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    runメソッドでWSGIRefServerを起動する際に、make_serverの戻り値をインスタンス変数にするためのクラス</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="s1">&#39;127.0.0.1&#39;</span><span class="p">,</span> <span class="n">port</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">8080</span><span class="p">,</span> <span class="n">gui_mode</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="s1">&#39;127.0.0.1&#39;</span><span class="p">,</span> <span class="n">port</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">8080</span><span class="p">,</span> <span class="n">gui_mode</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">webcap</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">gui_mode</span> <span class="o">=</span> <span class="n">gui_mode</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">webcap</span> <span class="o">=</span> <span class="n">webcap</span>
 
     <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">handler</span><span class="p">):</span>
         <span class="kn">import</span> <span class="nn">logging</span>
@@ -1126,38 +1243,51 @@
 
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">quiet</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">srv</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">create_logger</span><span class="p">(</span><span class="s1">&#39;geventwebsocket.logging&#39;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">srv</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">srv</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span> <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">webcap</span> <span class="k">else</span> <span class="n">logging</span><span class="o">.</span><span class="n">NOTSET</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">srv</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">())</span>
 
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">webcap</span><span class="p">:</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;webcap ready.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span> <span class="c1"># webcapのwebsocketの接続接続開始の合図</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">gui_mode</span><span class="p">:</span>
             <span class="n">webbrowser</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;http://localhost:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="si">}</span><span class="s1">/gui&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">srv</span><span class="o">.</span><span class="n">serve_forever</span><span class="p">()</span>
 
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    def run(self, app): # pragma: no cover</span>
-<span class="sd">        from wsgiref.simple_server import WSGIRequestHandler, WSGIServer</span>
-<span class="sd">        from wsgiref.simple_server import make_server</span>
-<span class="sd">        import socket</span>
+<div class="viewcode-block" id="RaiseThread">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.RaiseThread">[docs]</a>
+<span class="k">class</span> <span class="nc">RaiseThread</span><span class="p">(</span><span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_run</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_id_and_run</span>
 
-<span class="sd">        class FixedHandler(WSGIRequestHandler):</span>
-<span class="sd">            def address_string(self): # Prevent reverse DNS lookups please.</span>
-<span class="sd">                return self.client_address[0]</span>
-<span class="sd">            def log_request(*args, **kw):</span>
-<span class="sd">                if not self.quiet:</span>
-<span class="sd">                    return WSGIRequestHandler.log_request(*args, **kw)</span>
+<div class="viewcode-block" id="RaiseThread.set_id_and_run">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.RaiseThread.set_id_and_run">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_id_and_run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">get_native_id</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_run</span><span class="p">()</span></div>
 
-<span class="sd">        handler_cls = self.options.get(&#39;handler_class&#39;, FixedHandler)</span>
-<span class="sd">        server_cls  = self.options.get(&#39;server_class&#39;, WSGIServer)</span>
 
-<span class="sd">        if &#39;:&#39; in self.host: # Fix wsgiref for IPv6 addresses.</span>
-<span class="sd">            if getattr(server_cls, &#39;address_family&#39;) == socket.AF_INET:</span>
-<span class="sd">                class server_cls(server_cls):</span>
-<span class="sd">                    address_family = socket.AF_INET6</span>
-<span class="sd">        # self.srvに代入することで、shutdownを実行できるようにする</span>
-<span class="sd">        self.srv = make_server(self.host, self.port, app, server_cls, handler_cls)</span>
-<span class="sd">        self.srv.serve_forever()</span>
-<span class="sd">        self.srv.server_close()</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="RaiseThread.get_id">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.RaiseThread.get_id">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span></div>
+
+        
+<div class="viewcode-block" id="RaiseThread.raise_exception">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.RaiseThread.raise_exception">[docs]</a>
+    <span class="k">def</span> <span class="nf">raise_exception</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">pythonapi</span><span class="o">.</span><span class="n">PyThreadState_SetAsyncExc</span><span class="p">(</span>
+            <span class="n">ctypes</span><span class="o">.</span><span class="n">c_long</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_id</span><span class="p">()),</span> 
+            <span class="n">ctypes</span><span class="o">.</span><span class="n">py_object</span><span class="p">(</span><span class="ne">SystemExit</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">res</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">ctypes</span><span class="o">.</span><span class="n">pythonapi</span><span class="o">.</span><span class="n">PyThreadState_SetAsyncExc</span><span class="p">(</span>
+                <span class="n">ctypes</span><span class="o">.</span><span class="n">c_long</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_id</span><span class="p">()),</span> 
+                <span class="mi">0</span>
+            <span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Failure in raising exception&#39;</span><span class="p">)</span></div>
+</div>
+
 </pre></div>
 
            </div>

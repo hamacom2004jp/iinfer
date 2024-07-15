@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>コマンドリファレンス（webモード） &mdash; iinfer 2024/07/08 documentation</title>
+  <title>コマンドリファレンス（webモード） &mdash; iinfer 2024/07/15 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -16,7 +16,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=5be2e8c2"></script>
+        <script src="../_static/documentation_options.js?v=44b79537"></script>
         <script src="../_static/doctools.js?v=9a2dae69"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -62,6 +62,7 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Web</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#web-iinfer-m-web-c-start-option">Webサービス起動 : <cite>iinfer -m web -c start &lt;Option&gt;</cite></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#web-iinfer-m-web-c-stop-option">Webサービス停止 : <cite>iinfer -m web -c stop &lt;Option&gt;</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#webcap-iinfer-m-web-c-webcap-option">Webcap起動 : <cite>iinfer -m web -c webcap &lt;Option&gt;</cite></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_postprocess.html">後処理</a></li>
@@ -156,13 +157,21 @@
 <td></td>
 <td><p>iinferサーバーへの接続を行わないようにします。</p></td>
 </tr>
-<tr class="row-even"><td><p>--filer_html &lt;filer.htmlファイルのパス&gt;</p></td>
+<tr class="row-even"><td><p>--outputs_key &lt;表示項目&gt;</p></td>
+<td></td>
+<td><p>showimg及びwebcap画面で表示する項目を指定します。省略した場合は全ての項目を表示します。</p></td>
+</tr>
+<tr class="row-odd"><td><p>--filer_html &lt;filer.htmlファイルのパス&gt;</p></td>
 <td></td>
 <td><p><cite>filer.html</cite> を指定します。省略時はiinfer内蔵のHTMLファイルを使用します。</p></td>
 </tr>
-<tr class="row-odd"><td><p>--showimg_html &lt;showimg.htmlファイルのパス&gt;</p></td>
+<tr class="row-even"><td><p>--showimg_html &lt;showimg.htmlファイルのパス&gt;</p></td>
 <td></td>
 <td><p><cite>showimg.html</cite> を指定します。省略時はiinfer内蔵のHTMLファイルを使用します。</p></td>
+</tr>
+<tr class="row-odd"><td><p>--webcap_html &lt;webcap.htmlファイルのパス&gt;</p></td>
+<td></td>
+<td><p><cite>webcap.html</cite> を指定します。省略時はiinfer内蔵のHTMLファイルを使用します。</p></td>
 </tr>
 <tr class="row-even"><td><p>--assets &lt;jsやcssファイルのパス&gt;</p></td>
 <td></td>
@@ -189,6 +198,60 @@
 <tr class="row-even"><td><p>--data &lt;データフォルダ&gt;</p></td>
 <td></td>
 <td><p>省略した時は <cite>$HONE/.iinfer</cite> を使用します。</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="webcap-iinfer-m-web-c-webcap-option">
+<h2>Webcap起動 : <cite>iinfer -m web -c webcap &lt;Option&gt;</cite><a class="headerlink" href="#webcap-iinfer-m-web-c-webcap-option" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 10.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>--allow_host &lt;接続許可するIP&gt;</p></td>
+<td></td>
+<td><p>省略した時は <cite>0.0.0.0</cite> を使用します。</p></td>
+</tr>
+<tr class="row-odd"><td><p>--listen_port &lt;サービスポート&gt;</p></td>
+<td></td>
+<td><p>省略した時は <cite>8082</cite> を使用します。</p></td>
+</tr>
+<tr class="row-even"><td><p>--image_type &lt;出力する画像タイプ&gt;</p></td>
+<td></td>
+<td><p>出力する画像のタイプを指定する。指定可能な画像タイプは <cite>bmp</cite> , <cite>png</cite> , <cite>jpeg</cite> , <cite>capture</cite></p></td>
+</tr>
+<tr class="row-odd"><td><p>--outputs_key &lt;表示項目&gt;</p></td>
+<td></td>
+<td><p>webcap画面で表示する項目を指定します。省略した場合は全ての項目を表示します。</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_frame_width &lt;キャプチャーサイズ(横px)&gt;</p></td>
+<td></td>
+<td><p>キャプチャーする画像の横px。受信した画像をリサイズする。</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_frame_height &lt;キャプチャーサイズ(縦px)&gt;</p></td>
+<td></td>
+<td><p>キャプチャーする画像の縦px。受信した画像をリサイズする。</p></td>
+</tr>
+<tr class="row-even"><td><p>--capture_fps &lt;キャプチャーFPS&gt;</p></td>
+<td></td>
+<td><p>キャプチャーする画像のFPS。webcap画面側がこの間隔で送信する。</p></td>
+</tr>
+<tr class="row-odd"><td><p>--capture_count &lt;キャプチャー回数&gt;</p></td>
+<td></td>
+<td><p>キャプチャーする回数。指定した回数受信したら終了する。</p></td>
+</tr>
+<tr class="row-even"><td><p>--access_url &lt;webcapのURL&gt;</p></td>
+<td></td>
+<td><p>クライアントからアクセスするときのURL。省略した時は <cite>http://localhost:&lt;listen_port&gt;/webcap/pub_img</cite> を使用する。</p></td>
 </tr>
 </tbody>
 </table>
