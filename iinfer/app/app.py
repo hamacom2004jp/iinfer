@@ -573,7 +573,9 @@ class IinferApp:
                                        install_insightface=args.install_insightface,
                                        install_diffusers=args.install_diffusers,
                                        install_llamaindex=args.install_llamaindex,
-                                       install_from=args.install_from, install_tag=args.install_tag, install_use_gpu=args.install_use_gpu)
+                                       install_from=args.install_from,
+                                       install_no_python=args.install_no_python,
+                                       install_tag=args.install_tag, install_use_gpu=args.install_use_gpu)
                 common.print_format(ret, args.format, tm, args.output_json, args.output_json_append)
                 if 'success' not in ret:
                     return 1, ret

@@ -31,9 +31,9 @@ def load_custom_predict(custom_predict_py:Path, logger:logging.Logger) -> predic
             return obj(logger)
     raise BaseException(f"Predict class not found.({custom_predict_py})")
 
-def build_predict(predict_type:str, custom_predict_file:str, logger:logging.Logger) -> Tuple[bool, predict.Predict]:
+def build_predict(predict_type:str, custom_predict_py:str, logger:logging.Logger) -> Tuple[bool, predict.Predict]:
     if predict_type == 'Custom':
-        custom_predict_py = Path(custom_predict_file) if custom_predict_file is not None else None
+        custom_predict_py = Path(custom_predict_py) if custom_predict_py is not None else None
         if custom_predict_py is None:
             logger.warn(f"predict_type is Custom but custom_predict_py is None.")
             return False, {"warn": f"predict_type is Custom but custom_predict_py is None."}

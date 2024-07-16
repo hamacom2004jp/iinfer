@@ -344,14 +344,15 @@ class Server(filer.Filer):
             self.redis_cli.rpush(reskey, {"warn": f"Could not be deployed. '{deploy_dir}' already exists"})
             return self.RESP_WARN
 
-        if predict_type not in common.BASE_MODELS:
-            self.logger.warn(f"Incorrect predict_type. '{predict_type}'")
-            self.redis_cli.rpush(reskey, {"warn": f"Incorrect predict_type. '{predict_type}'"})
-            return self.RESP_WARN
-        if common.BASE_MODELS[predict_type]['required_model_conf']==True and model_conf_file is None:
-            self.logger.warn(f"model_conf_file is None.")
-            self.redis_cli.rpush(reskey, {"warn": f"model_conf_file is None."})
-            return self.RESP_WARN
+        if predict_type != "Custom":
+            if predict_type not in common.BASE_MODELS:
+                self.logger.warn(f"Incorrect predict_type. '{predict_type}'")
+                self.redis_cli.rpush(reskey, {"warn": f"Incorrect predict_type. '{predict_type}'"})
+                return self.RESP_WARN
+            if common.BASE_MODELS[predict_type]['required_model_conf']==True and model_conf_file is None:
+                self.logger.warn(f"model_conf_file is None.")
+                self.redis_cli.rpush(reskey, {"warn": f"model_conf_file is None."})
+                return self.RESP_WARN
 
         common.mkdirs(deploy_dir)
         def _save_s(file:str, data:bytes, ret_fn:bool=False):
@@ -363,18 +364,17 @@ class Server(filer.Filer):
                 self.logger.info(f"Save {file} to {str(deploy_dir)}")
             return True, file if ret_fn else None
 
-        if common.BASE_MODELS[predict_type]['required_model_weight']:
-            if model_file.startswith("http") and (model_bin is None or model_bin == ''):
-                model_path = deploy_dir / urllib.parse.urlparse(model_file).path.split('/')[-1]
-                if not model_path.exists():
-                    self.logger.info(f"Downloading. {model_file}")
-                    urllib.request.urlretrieve(model_file, model_path)
-                    self.logger.info(f"Save {model_path}")
-                else:
-                    self.logger.info(f"Already exists. {model_path}")
-                model_file = model_path
+        if model_file.startswith("http") and (model_bin is None or model_bin == ''):
+            model_path = deploy_dir / urllib.parse.urlparse(model_file).path.split('/')[-1]
+            if not model_path.exists():
+                self.logger.info(f"Downloading. {model_file}")
+                urllib.request.urlretrieve(model_file, model_path)
+                self.logger.info(f"Save {model_path}")
             else:
-                ret, model_file = _save_s(model_file, model_bin, ret_fn=True)
+                self.logger.info(f"Already exists. {model_path}")
+            model_file = model_path
+        else:
+            ret, model_file = _save_s(model_file, model_bin, ret_fn=True)
 
         ret, before_injection_conf = _save_s("before_injection_conf.json", before_injection_conf, ret_fn=True)
         ret, after_injection_conf = _save_s("after_injection_conf.json", after_injection_conf, ret_fn=True)
@@ -423,7 +423,7 @@ class Server(filer.Filer):
             color_file = None
         with open(deploy_dir / "conf.json", "w") as f:
             conf = dict(model_img_width=model_img_width, model_img_height=model_img_height, predict_type=predict_type,
-                        model_file=model_file, model_conf_file=model_conf_file, custom_predict_file=(custom_predict_file if custom_predict_file is not None else None),
+                        model_file=model_file, model_conf_file=model_conf_file, custom_predict_py=(custom_predict_file if custom_predict_file is not None else None),
                         label_file=label_file, color_file=color_file, before_injection_conf=before_injection_conf, after_injection_conf=after_injection_conf,
                         before_injection_type=before_injection_type, after_injection_type=after_injection_type,
                         before_injection_py=before_injection_py, after_injection_py=after_injection_py)
@@ -459,7 +459,7 @@ class Server(filer.Filer):
             self.logger.info(f"Copy mmsegmentation configs to {str(deploy_dir / 'configs')}")
 
         try:
-            ret, predict_obj = module.build_predict(conf["predict_type"], conf["custom_predict_file"], self.logger)
+            ret, predict_obj = module.build_predict(conf["predict_type"], conf["custom_predict_py"], self.logger)
             if not ret:
                 self.redis_cli.rpush(reskey, predict_obj)
                 return self.RESP_WARN
@@ -509,12 +509,12 @@ class Server(filer.Filer):
                         after_injection = 'exists'
                 if "after_injection_type" in conf and conf["after_injection_type"] is not None and len(conf["after_injection_type"]) > 0:
                     after_injection = 'enabled'
-                custom_predict_file = 'exists' if "custom_predict_file" in conf and conf["custom_predict_file"] is not None and Path(conf["custom_predict_file"]).exists() else None
+                custom_predict_py = 'exists' if "custom_predict_py" in conf and conf["custom_predict_py"] is not None and Path(conf["custom_predict_py"]).exists() else None
                 label_file = 'exists' if "label_file" in conf and conf["label_file"] is not None and Path(conf["label_file"]).exists() else None
                 color_file = 'exists' if "color_file" in conf and conf["color_file"] is not None and Path(conf["color_file"]).exists() else None
                 row = dict(name=dir.name,
                            input=(conf["model_img_width"], conf["model_img_height"]), model_file=model_file.name, model_conf_file=model_conf_file,
-                           predict_type=conf["predict_type"], custom_predict=custom_predict_file,
+                           predict_type=conf["predict_type"], custom_predict=custom_predict_py,
                            label_file=label_file, color_file=color_file,
                            session=dir.name in self.sessions,
                            mot=dir.name in self.sessions and self.sessions[dir.name]['tracker'] is not None,
@@ -629,7 +629,7 @@ class Server(filer.Filer):
                 self.redis_cli.rpush(reskey, {"warn": f"Failed to load after_injection: {e}"})
                 return self.RESP_WARN
             try:
-                ret, predict_obj = module.build_predict(conf["predict_type"], conf["custom_predict_file"], self.logger)
+                ret, predict_obj = module.build_predict(conf["predict_type"], conf["custom_predict_py"], self.logger)
                 if not ret:
                     self.redis_cli.rpush(reskey, predict_obj)
                     return self.RESP_WARN

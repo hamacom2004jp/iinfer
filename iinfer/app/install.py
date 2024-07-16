@@ -40,7 +40,7 @@ class Install(object):
     def server(self, data:Path, install_iinfer_tgt:str='iinfer', install_onnx:bool=True,
                install_mmdet:bool=True, install_mmseg:bool=True, install_mmcls:bool=False, install_mmpretrain:bool=True,
                install_insightface=False, install_diffusers=True, install_llamaindex=True,
-               install_from:str=None, install_tag:str=None, install_use_gpu:bool=False):
+               install_from:str=None, install_no_python:bool=False, install_tag:str=None, install_use_gpu:bool=False):
         if platform.system() == 'Windows':
             return {"warn": f"Build server command is Unsupported in windows platform."}
         from importlib.resources import read_text
@@ -72,7 +72,7 @@ class Install(object):
             text = text.replace('#{FROM}', f'FROM {base_image}')
             text = text.replace('${MKUSER}', user)
             #text = text.replace('#{INSTALL_PYTHON}', f'RUN apt-get update && apt-get install -y python3.8 python3.8-distutils python3-pip python-is-python3' if install_use_gpu else '')
-            text = text.replace('#{INSTALL_PYTHON}', f'RUN apt-get update && apt-get install -y python3.11 python3.11-distutils python3-pip python-is-python3' if install_use_gpu else '')
+            text = text.replace('#{INSTALL_PYTHON}', f'RUN apt-get update && apt-get install -y python3.11 python3.11-distutils python3-pip python-is-python3' if not install_no_python else '')
             text = text.replace('#{INSTALL_TAG}', install_tag)
             text = text.replace('#{INSTALL_IINFER}', install_iinfer_tgt)
             text = text.replace('#{INSTALL_ONNX}', f'RUN iinfer -m install -c onnx --data /home/{user}/.iinfer {install_use_gpu_opt}' if install_onnx else '')

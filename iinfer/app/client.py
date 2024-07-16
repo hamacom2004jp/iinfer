@@ -1,6 +1,6 @@
 from pathlib import Path
 from iinfer.app import common, filer
-from iinfer.app.commons import convert, redis_client
+from iinfer.app.commons import convert, module, redis_client
 from typing import List
 import base64
 import cv2
@@ -77,21 +77,24 @@ class Client(object):
         if predict_type is None:
             self.logger.error(f"predict_type is empty.")
             return {"error": f"predict_type is empty."}
-        if predict_type not in common.BASE_MODELS:
+        if predict_type not in common.BASE_MODELS and predict_type != "Custom":
             self.logger.error(f"Unknown predict_type. {predict_type}")
             return {"error": f"Unknown predict_type. {predict_type}"}
-        if model_img_width is None or model_img_width <= 0:
-            model_img_width = common.BASE_MODELS[predict_type]['image_width']
-        if model_img_height is None or model_img_height <= 0:
-            model_img_height = common.BASE_MODELS[predict_type]['image_height']
         if predict_type == 'Custom':
             if custom_predict_py is None or not custom_predict_py.exists():
                 self.logger.error(f"custom_predict_py path {str(custom_predict_py)} does not exist")
                 return {"error": f"custom_predict_py path {str(custom_predict_py)} does not exist"}
             with open(custom_predict_py, "rb") as pf:
                 custom_predict_py_b64 = base64.b64encode(pf.read()).decode('utf-8')
+            pred = module.load_custom_predict(custom_predict_py, self.logger)
+            model_img_width = pred.IMAGE_WIDTH
+            model_img_height = pred.IMAGE_HEIGHT
         else:
             custom_predict_py_b64 = None
+            if model_img_width is None or model_img_width <= 0:
+                model_img_width = common.BASE_MODELS[predict_type]['image_width']
+            if model_img_height is None or model_img_height <= 0:
+                model_img_height = common.BASE_MODELS[predict_type]['image_height']
         if before_injection_type is not None and len(before_injection_type) > 0:
             for t in before_injection_type:
                 if t not in common.BASE_BREFORE_INJECTIONS:
@@ -123,14 +126,13 @@ class Client(object):
         ret, after_injection_conf_b64 = _conf_b64("after_injection_conf", after_injection_conf)
         if not ret: return after_injection_conf_b64
         if model_file is not None and not model_file.startswith("http://") and not model_file.startswith("https://"):
-            if common.BASE_MODELS[predict_type]['required_model_weight']:
-                model_file = Path(model_file)
-                if model_file.exists():
-                    with open(model_file, "rb") as mf:
-                        model_bytes_b64 = base64.b64encode(mf.read()).decode('utf-8')
-                else:
-                    self.logger.error(f"model_file {model_file} does not exist")
-                    return {"error": f"model_file {model_file} does not exist"}
+            model_file = Path(model_file)
+            if model_file.exists():
+                with open(model_file, "rb") as mf:
+                    model_bytes_b64 = base64.b64encode(mf.read()).decode('utf-8')
+            elif predict_type != 'Custom' and common.BASE_MODELS[predict_type]['required_model_weight']:
+                self.logger.error(f"model_file {model_file} does not exist")
+                return {"error": f"model_file {model_file} does not exist"}
             else:
                 model_bytes_b64 = None
         else:
