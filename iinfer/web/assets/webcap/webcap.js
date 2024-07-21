@@ -29,14 +29,14 @@ webcap.init = () => {
       if (!pipe || pipe.pipe_cmd.length == 0) continue;
       // pipe_cmdの最初の要素にwebcapコマンドがあるか確認
       const webcap_cmd = await load_cmd(pipe.pipe_cmd[0]);
-      if (!webcap_cmd || webcap_cmd.mode != 'web' || webcap_cmd.cmd != 'webcap') continue;
-      url = `${window.location.protocol}//localhost:${webcap_cmd.listen_port}/webcap/pub_img`
-      if (webcap_cmd.access_url) url = webcap_cmd.access_url;
       const outputs_key_str = webcap_cmd.outputs_key ? webcap_cmd.outputs_key.join(',') : "";
+      if (!webcap_cmd || webcap_cmd.mode != 'web' || webcap_cmd.cmd != 'webcap') continue;
+      url = `webcap/pub_img/${webcap_cmd.listen_port}`
+      if (webcap_cmd.access_url) url = webcap_cmd.access_url;
       // pipe_cmdの最後の要素にshowimgコマンドがあるか確認
       const showimg_cmd = await load_cmd(pipe.pipe_cmd[pipe.pipe_cmd.length - 1]);
       if (!showimg_cmd || showimg_cmd.mode != 'postprocess' || showimg_cmd.cmd != 'showimg') continue;
-      const elem = $(`<li class="dropdown-submenu"><a class="dropdown-item" href="#" onclick="webcap.change_pipeline('${pipe.title}', '${url}', '${outputs_key_str}');">${pipe.title}</a></li>`);
+      const elem = $(`<li class="dropdown-submenu"><span class="ps-2 ${pipe.title}"/><a class="d-inline ps-2 dropdown-item" href="#" onclick="webcap.change_pipeline('${pipe.title}', '${url}', '${outputs_key_str}');">${pipe.title}</a></li>`);
       pipeline_elem.append(elem);
       webcap.change_pipeline(pipe.title, url, outputs_key_str);
     }
@@ -45,6 +45,7 @@ webcap.init = () => {
       pipeline_elem.append(elem);
       webcap.change_pipeline(null, null, outputs_key_str);
     }
+    hide_loading();
   });
   $('#rec_error').off('click').on('click', () => {
     webcap.message('Please select pipeline and Camera.');
@@ -68,10 +69,10 @@ webcap.init = () => {
     webcap.camera = {};
     videoDevices.map(videoDevice => {
       if (!videoDevice.deviceId) return;
-      const elem = $(`<li class="dropdown-submenu"><a class="dropdown-item" href="#" onclick="webcap.change_camera('${videoDevice.deviceId}', '${videoDevice.label}');">${videoDevice.label}</a></li>`);
+      const elem = $(`<li class="dropdown-submenu"><span class="ps-2 ${videoDevice.deviceId}"/><a class="d-inline ps-2 dropdown-item" href="#" onclick="webcap.change_camera('${videoDevice.deviceId}', '${videoDevice.label}');">${videoDevice.label}</a></li>`);
       camera_elem.append(elem);
-      webcap.change_camera(videoDevice.deviceId, videoDevice.label);
     });
+    camera_elem.find('.dropdown-submenu .dropdown-item:first').click();
   };
   camera_selection();
   /** イベントハンドラの設定 */
@@ -98,7 +99,10 @@ webcap.get_camera_const = async (title) => {
     webcap.camera.cmd = {};
     webcap.camera.capture_fps = 10;
     return {
-      video: {width: 640, height: 480},
+      video: {
+        width: 640,
+        height: 480
+      },
       audio: false,
     };
   }
@@ -107,6 +111,9 @@ webcap.get_camera_const = async (title) => {
   webcap.camera.cmd = cmd;
   const constraints = {
     video: {
+      deviceId: {
+        exact: webcap.camera.deviceId
+      },
       width: cmd.capture_frame_width,
       height: cmd.capture_frame_height
     },
@@ -116,8 +123,13 @@ webcap.get_camera_const = async (title) => {
 };
 /** カメラの切り替え */
 webcap.change_camera = (deviceId, label) => {
+  webcap.video.pause();
+  webcap.video.srcObject = null
   webcap.camera.deviceId = deviceId;
   webcap.camera.label = label;
+  const camera_elem = $('#camera');
+  camera_elem.find('.dropdown-submenu span').html("&nbsp;");
+  camera_elem.find(`.${deviceId}`).text("*");
   webcap.stream();
 };
 /** カメラ映像取得 */
@@ -161,6 +173,10 @@ webcap.change_pipeline = (title, url, outputs_key_str) => {
   $('#pause').hide();
   $('#rec_error').hide();
   $('#navi_title').text(`WebCap ( ${title} )`);
+  const pipeline_elem = $('#pipeline');
+  pipeline_elem.find('.dropdown-submenu span').text("&nbsp;");
+  pipeline_elem.find(`.${title}`).text("*");
+  fetch(webcap.pipeline.url, {method: "GET", mode:'cors'});
 };
 /** カメラ映像をwebcapに送信開始 */
 webcap.rec_start = () => {
@@ -172,11 +188,13 @@ webcap.rec_start = () => {
   $('#rec').hide();
   $('#pause').show();
   webcap.pipeline.is_rec = true;
+  show_loading();
 };
 /** カメラ映像をwebcapに送信停止 */
 webcap.rec_stop = () => {
   $('#rec').show();
   $('#pause').hide();
+  hide_loading();
   webcap.pipeline.is_rec = false;
 };
 /** アスペクト比計算 */
@@ -222,6 +240,11 @@ webcap.rec = () => {
   const blob = new Blob([capimg], {type:"application/octet-stream"});
   formData.append('files', blob);
   fetch(webcap.pipeline.url, {method: "POST", mode:'cors', body: formData}).then((res) => {
+    hide_loading();
+    if (!res.ok) {
+      webcap.message(`Error: ${res.status} ${res.statusText}\nCould not connect to webcap process.`);
+      webcap.rec_stop();
+    }
   }).catch((e) => {
     webcap.message(`Error: ${e} ${webcap.pipeline.url}`);
     webcap.rec_stop();
@@ -246,8 +269,6 @@ webcap.callback = () => {
     if (img_url) {
       const img = new Image();
       img.onload = () => {
-        //const aspect = webcap.calc_aspect(img.width, img.height, webcap.canvas.width, webcap.canvas.height);
-        //webcap.canvas_2d.drawImage(img, aspect[0], aspect[1], aspect[2], aspect[3]);
         webcap.canvas_2d.drawImage(img, 0, 0, webcap.canvas.width, webcap.canvas.height);
       }
       img.src = img_url;
@@ -285,6 +306,7 @@ webcap.callback = () => {
   }
 }
 $(() => {
+  show_loading();
   // ダークモード対応
   change_dark_mode(window.matchMedia('(prefers-color-scheme: dark)').matches);
   // copyright情報取得

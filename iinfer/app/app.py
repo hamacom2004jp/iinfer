@@ -5,6 +5,7 @@ from pathlib import Path
 import argparse
 import argcomplete
 import cv2
+import logging
 import sys
 import time
 import traceback
@@ -67,8 +68,10 @@ class IinferApp:
             v = version.__logo__ + '\n' + version.__description__
             common.print_format(v, False, tm, None, False)
             return 0, v
-        elif args.mode == 'server':
-            logger, _ = common.load_config(args.mode)
+        logger, _ = common.load_config(args.mode, debug=args.debug)
+        if logger.level == logging.DEBUG:
+            logger.debug(f"app.main: args.mode={args.mode}, args.cmd={args.cmd}")
+        if args.mode == 'server':
             if args.cmd == 'start':
                 if args.data is None:
                     msg = {"warn":f"Please specify the --data option."}
@@ -102,7 +105,6 @@ class IinferApp:
                 return 1, msg
 
         elif args.mode == 'gui':
-            logger, _ = common.load_config(args.mode)
             if args.cmd == 'start':
                 if args.data is None:
                     msg = {"warn":f"Please specify the --data option."}
@@ -122,7 +124,6 @@ class IinferApp:
                 return 1, msg
 
         elif args.mode == 'web':
-            logger, _ = common.load_config(args.mode)
             if args.cmd == 'start':
                 if args.data is None:
                     msg = {"warn":f"Please specify the --data option."}
@@ -164,7 +165,6 @@ class IinferApp:
                 return 1, msg
             
         elif args.mode == 'client':
-            logger, _ = common.load_config(args.mode)
             if args.svname is None:
                 msg = {"warn":f"Please specify the --svname option."}
                 common.print_format(msg, args.format, tm, args.output_json, args.output_json_append)
@@ -220,12 +220,17 @@ class IinferApp:
             elif args.cmd == 'predict':
                 try:
                     if args.input_file is not None:
+                        if self.cl.logger.level == logging.DEBUG:
+                            self.cl.logger.debug(f"app.main: args.mode={args.mode}, args.cmd={args.cmd}, args.name={args.name}, args.input_file={args.input_file}")
                         ret = self.cl.predict(args.name, image_file=args.input_file, pred_input_type=args.pred_input_type,
                                                 output_image_file=args.output_image, output_preview=args.output_preview, nodraw=args.nodraw,
                                                 retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
                         if type(ret) is list:
                             for r in ret:
                                 common.print_format(r, args.format, tm, args.output_json, args.output_json_append)
+                                if self.cl.logger.level == logging.DEBUG:
+                                    ret_str = common.to_str(r, slise=100)
+                                    self.cl.logger.debug(f"app.main: args.mode={args.mode}, args.cmd={args.cmd}, ret={ret_str}")
                                 tm = time.perf_counter()
                                 args.output_json_append = True
                         else:
@@ -234,24 +239,41 @@ class IinferApp:
                         if args.pred_input_type is None:
                             msg = {"warn":f"Please specify the --pred_input_type option."}
                             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append)
+                            if self.cl.logger.level == logging.DEBUG:
+                                msg_str = common.to_str(msg, slise=100)
+                                self.cl.logger.debug(f"app.main: args.mode={args.mode}, args.cmd={args.cmd}, msg={msg_str}")
                             return 1, msg
                         if args.pred_input_type in ['capture', 'prompt']:
                             for line in sys.stdin:
+                                if self.cl.logger.level == logging.DEBUG:
+                                    line_str = common.to_str(line, slise=100)
+                                    self.cl.logger.debug(f"app.main: args.mode={args.mode}, args.cmd={args.cmd}, args.name={args.name}, image={line_str}")
                                 ret = self.cl.predict(args.name, image=line, pred_input_type=args.pred_input_type,
                                                       output_image_file=args.output_image, output_preview=args.output_preview, nodraw=args.nodraw,
                                                       retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
                                 common.print_format(ret, args.format, tm, args.output_json, args.output_json_append)
+                                if self.cl.logger.level == logging.DEBUG:
+                                    ret_str = common.to_str(ret, slise=100)
+                                    self.cl.logger.debug(f"app.main: args.mode={args.mode}, args.cmd={args.cmd}, ret={ret_str}")
                                 tm = time.perf_counter()
                                 args.output_json_append = True
                         else:
+                            if self.cl.logger.level == logging.DEBUG:
+                                self.cl.logger.debug(f"app.main: args.mode={args.mode}, args.cmd={args.cmd}, args.name={args.name}, image=<stdin>")
                             ret = self.cl.predict(args.name, image=sys.stdin.buffer.read(), pred_input_type=args.pred_input_type,
                                                   output_image_file=args.output_image, output_preview=args.output_preview, nodraw=args.nodraw,
                                                   retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
                             common.print_format(ret, args.format, tm, args.output_json, args.output_json_append)
+                            if self.cl.logger.level == logging.DEBUG:
+                                ret_str = common.to_str(ret, slise=100)
+                                self.cl.logger.debug(f"app.main: args.mode={args.mode}, args.cmd={args.cmd}, ret={ret_str}")
                             tm = time.perf_counter()
                     else:
                         msg = {"warn":f"Image file or stdin is empty."}
                         common.print_format(msg, args.format, tm, args.output_json, args.output_json_append)
+                        if self.cl.logger.level == logging.DEBUG:
+                            msg_str = common.to_str(msg, slise=100)
+                            self.cl.logger.debug(f"app.main: args.mode={args.mode}, args.cmd={args.cmd}, msg={msg_str}")
                         return 1, msg
                 finally:
                     try:
@@ -365,7 +387,6 @@ class IinferApp:
                 return 1, msg
 
         elif args.mode == 'postprocess':
-            logger, _ = common.load_config(args.mode)
             def _to_proc(f, proc:postprocess.Postprocess, timeout, format, tm,
                          output_json, output_json_append, output_image_file=None, output_csv=None):
                 try:
@@ -375,6 +396,9 @@ class IinferApp:
                         if line == "":
                             continue
                         try:
+                            if proc.logger.level == logging.DEBUG:
+                                line_str = common.to_str(line, slise=100)
+                                proc.logger.debug(f"app.main: args.mode={args.mode}, args.cmd={args.cmd}, proc={proc}, line={line_str}")
                             ret = proc.postprocess(line, output_image_file=output_image_file, timeout=timeout)
                             if output_csv is not None:
                                 with open(output_csv, 'a' if output_json_append else 'w', encoding="utf-8") as f:
@@ -535,7 +559,6 @@ class IinferApp:
                 return 1, msg
 
         elif args.mode == 'redis':
-            logger, _ = common.load_config(args.mode)
             rd = redis.Redis(logger=logger, wsl_name=args.wsl_name, wsl_user=args.wsl_user)
             if args.cmd == 'docker_run':
                 ret = rd.docker_run(args.port, args.password)
@@ -551,7 +574,6 @@ class IinferApp:
                 return 1, msg
 
         elif args.mode == 'install':
-            logger, _ = common.load_config(args.mode)
             self.inst = install.Install(logger=logger)
             if args.cmd == 'redis':
                 ret = self.inst.redis()

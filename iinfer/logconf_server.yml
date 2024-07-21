@@ -7,22 +7,22 @@ formatters:
 handlers:
     std:
         class: logging.StreamHandler
-        level: DEBUG
+        level: INFO
         formatter: fmt
         stream: ext://sys.stdout
     server:
         class: logging.handlers.TimedRotatingFileHandler
-        level: DEBUG
+        level: INFO
         formatter: fmt
         backupCount: 5
         when : 'D'
         encoding : 'utf-8'
-        filename: logs/server.log
+        filename: logs/iinfer_server.log
 
 loggers:
     server:
         handlers: [server, std]
-        level: DEBUG
+        level: INFO
         qualname: server
  
 #root:

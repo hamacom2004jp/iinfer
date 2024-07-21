@@ -44,12 +44,13 @@ def mklogdir(logdir:Path=Path.cwd()/'logs') -> Path:
         return mkdirs(logdir)
     return logdir
 
-def load_config(mode:str) -> Tuple[logging.Logger, dict]:
+def load_config(mode:str, debug:bool=False) -> Tuple[logging.Logger, dict]:
     """
     指定されたモードのロガーと設定を読み込みます。
 
     Args:
         mode (str): モード名
+        debug (bool, optional): デバッグモード. Defaults to False
 
     Returns:
         logger (logging.Logger): ロガー
@@ -58,6 +59,11 @@ def load_config(mode:str) -> Tuple[logging.Logger, dict]:
     log_config = yaml.safe_load(resource_string(APP_ID, f"logconf_{mode}.yml"))
     logging.config.dictConfig(log_config)
     logger = logging.getLogger(mode)
+    if debug:
+        logger.setLevel(logging.DEBUG)
+        for handler in logger.handlers:
+            handler.setLevel(logging.DEBUG)
+        logger.info("Use debug mode logging.")
     config = yaml.safe_load(resource_string(APP_ID, "config.yml"))
     return logger, config
 
@@ -265,6 +271,19 @@ def print_format(data:dict, format:bool, tm:float, output_json:str=None, output_
             pass
     return txt
 
+def to_str(o, slise=-1):
+    ret = ""
+    if type(o) == dict:
+        ret = json.dumps(o, default=default_json_enc)
+    elif type(o) == list and len(o) > 0 and type(o[0]) == dict:
+        ret = json.dumps(o, default=default_json_enc)
+    else:
+        ret = str(o)
+    if slise < 0:
+        return ret
+    ret = ret[0:slise]
+    return len(ret) > 100 and ret + '...' or ret
+
 BASE_MODELS = {}
 BASE_BREFORE_INJECTIONS = {}
 BASE_AFTER_INJECTIONS = {}
@@ -296,7 +315,8 @@ def cmd(cmd:str, logger:logging.Logger, strip:bool=False):
     Returns:
         Tuple[int, str]: コマンドの戻り値と出力
     """
-    logger.debug(f"cmd:{cmd}")
+    if logger.level == logging.DEBUG:
+        logger.debug(f"common.cmd:{cmd}")
     proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     output = None
     while proc.returncode is None:
@@ -308,7 +328,9 @@ def cmd(cmd:str, logger:logging.Logger, strip:bool=False):
                 output = out.decode(enc).rstrip()
                 #if platform.system() == 'Windows' or strip:
                 #    output = output.rstrip()
-                logger.debug(f"output:{output}")
+                if logger.level == logging.DEBUG:
+                    output_str = to_str(output, slise=100)
+                    logger.debug(f"common.cmd:output={output_str}")
                 break
             except UnicodeDecodeError:
                 pass

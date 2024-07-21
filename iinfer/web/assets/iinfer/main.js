@@ -120,7 +120,7 @@ $(() => {
             const data = JSON.parse(event.data);
             const cmd = data['cmd'];
             const title = data['title'];
-            const output = data['output'];
+            let output = data['output'];
             if (cmd == 'js_console_modal_log_func') {
                 const elem = $('#console_modal_log');
                 if (typeof output === 'object') {
@@ -146,7 +146,7 @@ $(() => {
                 const size_th = 1024*1024*5;
                 const result_modal = $('#result_modal');
                 if (typeof output != 'object') {
-                    output = result_modal.find('.modal-body').html()+output;
+                    output = result_modal.find('.modal-body').html() +'<br/>'+ output;
                 }
                 view_result_func('stream log', output);
                 result_modal.find('.btn_window').click();

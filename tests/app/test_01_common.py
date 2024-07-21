@@ -9,17 +9,17 @@ import logging
 
 
 def test_load_config():
-    logger, _ = common.load_config("client")
+    logger, _ = common.load_config("client", debug=True)
     assert logger.name == 'client'
-    logger, _ = common.load_config("gui")
+    logger, _ = common.load_config("gui", debug=True)
     assert logger.name == 'gui'
-    logger, _ = common.load_config("postprocess")
+    logger, _ = common.load_config("postprocess", debug=True)
     assert logger.name == 'postprocess'
-    logger, _ = common.load_config("server")
+    logger, _ = common.load_config("server", debug=True)
     assert logger.name == 'server'
-    logger, _ = common.load_config("redis")
+    logger, _ = common.load_config("redis", debug=True)
     assert logger.name == 'redis'
-    logger, _ = common.load_config("install")
+    logger, _ = common.load_config("install", debug=True)
     assert logger.name == 'install'
 
 def test_default_json_enc():

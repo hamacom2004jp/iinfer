@@ -7,22 +7,22 @@ formatters:
 handlers:
     std:
         class: logging.StreamHandler
-        level: DEBUG
+        level: INFO
         formatter: fmt
         stream: ext://sys.stdout
     install:
         class: logging.handlers.TimedRotatingFileHandler
-        level: DEBUG
+        level: INFO
         formatter: fmt
         backupCount: 5
         when : 'D'
         encoding : 'utf-8'
-        filename: logs/install.log
+        filename: logs/iinfer_install.log
 
 loggers:
     install:
         handlers: [install, std]
-        level: DEBUG
+        level: INFO
         qualname: install
  
 #root:

@@ -29,6 +29,7 @@ const list_cmd_func_then = () => {
     }
     // コマンドカードクリック時の処理（モーダルダイアログを開く）
     const cmd_card_func = async (e) => {
+        show_loading();
         const py_get_modes = await get_modes();
         const cmd_modal = $('#cmd_modal');
         cmd_modal.find('[name="mode"]').html(mkopt(py_get_modes));
@@ -206,6 +207,7 @@ const list_cmd_func_then = () => {
         cmd_modal.find('.modal-title').text(`Command : ${modal_title}`);
         cmd_modal.find('.row_content_hide').hide();
         cmd_modal.modal('show');
+        hide_loading();
     }
     $('.cmd_card').off('click').on('click', cmd_card_func);
     // コマンドファイルの保存

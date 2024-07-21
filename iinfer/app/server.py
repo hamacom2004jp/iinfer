@@ -265,14 +265,14 @@ class Server(filer.Filer):
             except redis.exceptions.TimeoutError:
                 pass
             except redis.exceptions.ConnectionError as e:
-                self.logger.error(f"Connection to the server was lost. {e}")
+                self.logger.warning(f"Connection to the server was lost. {e}")
                 self.is_running = False
                 break
             except KeyboardInterrupt as e:
                 self.is_running = False
                 break
             except Exception as e:
-                self.logger.error(f"Unknown error occurred. {e}", exc_info=True)
+                self.logger.warning(f"Unknown error occurred. {e}", exc_info=True)
                 self.is_running = False
                 break
         self.redis_cli.delete(self.redis_cli.svname)
@@ -434,7 +434,7 @@ class Server(filer.Filer):
             if not (self.data_dir / "mmpretrain").exists():
                 returncode, _ = common.cmd(f'cd {self.data_dir} && git clone https://github.com/open-mmlab/mmpretrain.git', logger=self.logger)
                 if returncode != 0:
-                    self.logger.error(f"Failed to git clone mmpretrain.")
+                    self.logger.warning(f"Failed to git clone mmpretrain.")
                     self.redis_cli.rpush(reskey, {"error": f"Failed to git clone mmpretrain."})
                     return self.RESP_ERROR
             shutil.copytree(self.data_dir / "mmpretrain" / "configs", deploy_dir / "configs", dirs_exist_ok=True)
@@ -443,7 +443,7 @@ class Server(filer.Filer):
             if not (self.data_dir / "mmdetection").exists():
                 returncode, _ = common.cmd(f'cd {self.data_dir} && git clone https://github.com/open-mmlab/mmdetection.git', logger=self.logger)
                 if returncode != 0:
-                    self.logger.error(f"Failed to git clone mmdetection.")
+                    self.logger.warning(f"Failed to git clone mmdetection.")
                     self.redis_cli.rpush(reskey, {"error": f"Failed to git clone mmdetection."})
                     return self.RESP_ERROR
             shutil.copytree(self.data_dir / "mmdetection" / "configs", deploy_dir / "configs", dirs_exist_ok=True)
@@ -452,7 +452,7 @@ class Server(filer.Filer):
             if not (self.data_dir / "mmsegmentation").exists():
                 returncode, _ = common.cmd(f'cd {self.data_dir} && git clone -b main https://github.com/open-mmlab/mmsegmentation.git', logger=self.logger)
                 if returncode != 0:
-                    self.logger.error(f"Failed to git clone mmsegmentation.")
+                    self.logger.warning(f"Failed to git clone mmsegmentation.")
                     self.redis_cli.rpush(reskey, {"error": f"Failed to git clone mmsegmentation."})
                     return self.RESP_ERROR
             shutil.copytree(self.data_dir / "mmsegmentation" / "configs", deploy_dir / "configs", dirs_exist_ok=True)
@@ -629,6 +629,7 @@ class Server(filer.Filer):
                 self.redis_cli.rpush(reskey, {"warn": f"Failed to load after_injection: {e}"})
                 return self.RESP_WARN
             try:
+                conf["custom_predict_py"] = conf["custom_predict_py"] if "custom_predict_py" in conf else None
                 ret, predict_obj = module.build_predict(conf["predict_type"], conf["custom_predict_py"], self.logger)
                 if not ret:
                     self.redis_cli.rpush(reskey, predict_obj)

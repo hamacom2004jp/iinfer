@@ -21,6 +21,7 @@ INSTALL_REQUIRES = [
     'bottle_websocket',
     'motpy',
     'opencv-python',
+    'numpy',
     'Pillow',
     'pyyaml',
     'redis',

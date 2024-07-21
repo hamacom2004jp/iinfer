@@ -2,6 +2,7 @@ from iinfer.app import common
 from iinfer.app.commons import convert
 from PIL import Image
 from typing import List, Dict, Any
+import datetime
 import logging
 import json
 import redis
@@ -46,7 +47,7 @@ class RedisClient(object):
         elif type(value) is str:
             self.redis_cli.rpush(name, value)
         else:
-            self.logger.error(f"Unsupported type. {type(value)}")
+            self.logger.warning(f"Unsupported type. {type(value)}")
             raise Exception(f"Unsupported type. {type(value)}")
 
     def blpop(self, name:str, timeout:int=1):
@@ -139,10 +140,10 @@ class RedisClient(object):
                 return self._res_cmd(reskey, res, sreqtime)
             raise KeyboardInterrupt(f"Stop command.")
         except KeyboardInterrupt as e:
-            self.logger.error(f"Stop command. cmd={cmd}", exc_info=True)
+            self.logger.warning(f"Stop command. cmd={cmd}", exc_info=True)
             return dict(error=f"Stop command. cmd={cmd}")
         except Exception as e:
-            self.logger.error(f"fail to execute command. cmd={cmd}, msg={e}", exc_info=True)
+            self.logger.warning(f"fail to execute command. cmd={cmd}, msg={e}", exc_info=True)
             return dict(error=f"fail to execute command. cmd={cmd}, msg={e}")
 
     def _res_cmd(self, reskey:str, res_msg:bytes, sreqtime:float):
@@ -164,11 +165,13 @@ class RedisClient(object):
         if "output_image" in msg_json:
             msg_json["output_image"] = "binary"
         if "error" in res_json:
-            self.logger.error(str(msg_json))
+            self.logger.warning(common.to_str(msg_json))
         if "warn" in res_json:
-            self.logger.warning(str(msg_json))
+            self.logger.warning(common.to_str(msg_json))
         if "success" in res_json:
-            self.logger.info(str(msg_json))
+            if self.logger.level == logging.DEBUG:
+                msg_str = common.to_str(msg_json, slise=100)
+                self.logger.debug(f"redis_client._res_cmd: msg={msg_str}")
             if type(res_json["success"]) is not dict:
                 res_json["success"] = dict(data=res_json["success"])
             if "performance" not in res_json["success"]:
@@ -185,6 +188,9 @@ class RedisClient(object):
         if result is None or len(result) <= 0:
             return None, None
         msg = result.decode().split(' ')
+        if self.logger.level == logging.DEBUG:
+            msg_str = common.to_str(msg, slise=100)
+            self.logger.debug(f"redis_client.recive_showimg: self.siname={self.siname}, msg={msg_str}")
         if len(msg) <= 0:
             return None, None
         cmd = msg[0]
@@ -232,6 +238,9 @@ class RedisClient(object):
             return dict(warn=f"Cancelled execution of showimg. '{self.siname}' list is full. llen={llen} maxrecsize={maxrecsize}")
         try:
             if cmd == "outputs":
+                if self.logger.level == logging.DEBUG:
+                    outputs_str = common.to_str(outputs, slise=100)
+                    self.logger.debug(f"redis_client.send_showimg: self.siname={self.siname}, cmd={cmd}, outputs={outputs_str}")
                 value = convert.str2b64str(json.dumps(outputs, default=common.default_json_enc))
                 self.redis_cli.rpush(self.siname, f"{cmd} {value}")
             elif cmd == "output_image":

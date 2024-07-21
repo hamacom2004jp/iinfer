@@ -14,6 +14,7 @@ list_pipe_func = async () => {
 list_pipe_func_then = () => {
     // パイプラインカードクリック時の処理（モーダルダイアログを開く）
     const pipe_card_func = async (e) => {
+        show_loading();
         const pipe_modal = $('#pipe_modal');
         pipe_modal.find('.is-invalid, .is-valid').removeClass('is-invalid').removeClass('is-valid');
         let row_content = pipe_modal.find('.row_content');
@@ -82,6 +83,7 @@ list_pipe_func_then = () => {
         }
         pipe_modal.find('.modal-title').text(`Pipeline : ${modal_title}`);
         pipe_modal.modal('show');
+        hide_loading();
     }
     $('.pipe_card').off('click').on('click', pipe_card_func);
     // パイプラインファイルの保存
@@ -123,7 +125,7 @@ list_pipe_func_then = () => {
         // コマンドの実行
         exec_pipe(title, opt).then((result) => {
             pipe_modal.modal('hide');
-            hide_loading();
+            //hide_loading();
         });
     });
     // RAW表示の実行

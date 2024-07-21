@@ -1,3 +1,4 @@
+from geventwebsocket.exceptions import WebSocketError
 from iinfer import version
 from iinfer.app import app, common, options
 from iinfer.app.commons import convert, redis_client
@@ -11,12 +12,14 @@ import datetime
 import glob
 import gevent
 import html
+#import httpx
 import iinfer
 import io
 import json
 import logging
 import os
 import re
+import requests
 import queue
 import signal
 import subprocess
@@ -72,6 +75,8 @@ class Web(options.Options):
         self.pipe_th = None
         self.img_queue = queue.Queue(1000)
         self.cb_queue = queue.Queue(1000)
+        #self.webcap_client = httpx.Client()
+        self.webcap_client = requests.Session()
 
     def mk_curl_fileup(self, cmd_opt):
         if 'mode' not in cmd_opt or 'cmd' not in cmd_opt:
@@ -89,6 +94,8 @@ class Web(options.Options):
     def list_cmd(self, kwd):
         if kwd is None or kwd == '':
             kwd = '*'
+        if self.logger.level == logging.DEBUG:
+            self.logger.debug(f"web.list_cmd: kwd={kwd}")
         paths = glob.glob(str(self.data / f"cmd-{kwd}.json"))
         ret = [common.loadopt(path) for path in paths]
         return ret
@@ -103,6 +110,8 @@ class Web(options.Options):
 
     def load_cmd(self, title):
         opt_path = self.data / f"cmd-{title}.json"
+        if self.logger.level == logging.DEBUG:
+            self.logger.debug(f"web.load_cmd: title={title}, opt_path={opt_path}")
         return common.loadopt(opt_path)
 
     def del_cmd(self, title):
@@ -144,7 +153,8 @@ class Web(options.Options):
         return opt_list, file_dict
 
     def bbforce_cmd(self):
-        self.logger.info(f"bbforce_cmd")
+        if self.logger.level == logging.DEBUG:
+            self.logger.debug(f"web.bbforce_cmd")
         try:
             self.container['iinfer_app'].sv.is_running = False
         except Exception as e:
@@ -255,7 +265,8 @@ class Web(options.Options):
         return [dict(warn='start_cmd')]
 
     def raw_cmd(self, title:str, opt:dict):
-        self.logger.info(f"raw_cmd: title={title}, opt={opt}")
+        if self.logger.level == logging.DEBUG:
+            self.logger.debug(f"web.raw_cmd: title={title}, opt={opt}")
         opt_list, _ = self.mk_opt_list(opt)
         if 'stdout_log' in opt: del opt['stdout_log']
         if 'capture_stdout' in opt: del opt['capture_stdout']
@@ -265,6 +276,8 @@ class Web(options.Options):
                 dict(type='curlcmd',raw=f'curl {curl_cmd_file} http://localhost:8081/exec_cmd/{title}')]
 
     def list_tree(self, current_path):
+        if self.logger.level == logging.DEBUG:
+            self.logger.debug(f"web.list_tree: current_path={current_path}")
         current_path = Path.cwd() if current_path is None or current_path=='' else Path(current_path)
         current_path = current_path if current_path.is_dir() else current_path.parent
         path_tree = {}
@@ -287,6 +300,8 @@ class Web(options.Options):
         return path_tree
     
     def list_downloads(self, current_path, root_path=None):
+        if self.logger.level == logging.DEBUG:
+            self.logger.debug(f"web.list_downloads: current_path={current_path}, root_path={root_path}")
         if type(current_path) == str:
             current_path = current_path[1:] if current_path.startswith('/') else current_path
             current_path = self.data if current_path is None or current_path=='' else self.data / current_path
@@ -304,6 +319,8 @@ class Web(options.Options):
         return download_files
 
     def load_result(self, current_path):
+        if self.logger.level == logging.DEBUG:
+            self.logger.debug(f"web.load_result: current_path={current_path}")
         current_path = Path(current_path)
         if not current_path.is_file():
             return {'warn': f'A non-file was selected.: {current_path}'}
@@ -322,6 +339,8 @@ class Web(options.Options):
             return {'warn': f'An error occurred while reading the file.: {current_path}'}
 
     def load_capture(self, current_path):
+        if self.logger.level == logging.DEBUG:
+            self.logger.debug(f"web.load_capture: current_path={current_path}")
         current_path = Path(current_path)
         if not current_path.is_file():
             return {'warn': f'A non-file was selected.: {current_path}'}
@@ -348,6 +367,8 @@ class Web(options.Options):
     def list_pipe(self, kwd):
         if kwd is None or kwd == '':
             kwd = '*'
+        if self.logger.level == logging.DEBUG:
+            self.logger.debug(f"web.list_pipe: kwd={kwd}")
         paths = glob.glob(str(self.data / f"pipe-{kwd}.json"))
         return [common.loadopt(path) for path in paths]
 
@@ -445,7 +466,8 @@ class Web(options.Options):
         return dict(success='start_pipe')
 
     def raw_pipe(self, title, opt):
-        self.logger.info(f"raw_pipe: title={title}, opt={opt}")
+        if self.logger.level == logging.DEBUG:
+            self.logger.debug(f"web.raw_pipe: title={title}, opt={opt}")
         cmdlines = []
         errormsg = []
         curl_cmd_file = ""
@@ -498,16 +520,24 @@ class Web(options.Options):
 
     def load_pipe(self, title):
         opt_path = self.data / f"pipe-{title}.json"
+        if self.logger.level == logging.DEBUG:
+            self.logger.debug(f"web.load_pipe: title={title}")
         return common.loadopt(opt_path)
 
     def copyright(self):
+        if self.logger.level == logging.DEBUG:
+            self.logger.debug(f"web.copyright")
         return version.__copyright__
 
     def versions_iinfer(self):
+        if self.logger.level == logging.DEBUG:
+            self.logger.debug(f"web.versions_iinfer")
         logo = [version.__logo__]
         return logo + version.__description__.split('\n')
 
     def versions_used(self):
+        if self.logger.level == logging.DEBUG:
+            self.logger.debug(f"web.versions_used")
         with open(Path(iinfer.__file__).parent / 'licenses' / 'files.txt', 'r', encoding='utf-8') as f:
             ret = []
             for i, line in enumerate(f.readlines()):
@@ -518,6 +548,7 @@ class Web(options.Options):
     def filer_upload(self, request:bottle.Request):
         q = request.query
         svpath = q['svpath']
+        self.logger.info(f"filer_upload: svpath={svpath}")
         opt = dict(mode='client', cmd='file_upload',
                    host=q['host'], port=q['port'], password=q['password'], svname=q['svname'],
                    local_data=q['local_data'])
@@ -539,39 +570,51 @@ class Web(options.Options):
         #return f'upload {upload.filename}'
 
     def callback_console_modal_log_func(self, output:dict):
+        if self.logger.level == logging.DEBUG:
+            output_str = common.to_str(output, slise=100)
+            self.logger.debug(f"web.callback_console_modal_log_func: output={output_str}")
         self.cb_queue.put(('js_console_modal_log_func', None, output))
     
     def callback_return_cmd_exec_func(self, title, output:dict):
+        if self.logger.level == logging.DEBUG:
+            output_str = common.to_str(output, slise=100)
+            self.logger.debug(f"web.callback_return_cmd_exec_func: output={output_str}")
         self.cb_queue.put(('js_return_cmd_exec_func', title, output))
 
     def callback_return_pipe_exec_func(self, title, output):
+        if self.logger.level == logging.DEBUG:
+            output_str = common.to_str(output, slise=100)
+            self.logger.debug(f"web.callback_return_pipe_exec_func: title={title}, output={output_str}")
         self.cb_queue.put(('js_return_pipe_exec_func', title, output))
 
     def callback_return_stream_log_func(self, output):
+        if self.logger.level == logging.DEBUG:
+            output_str = common.to_str(output, slise=100)
+            self.logger.debug(f"web.callback_return_stream_log_func: output={output_str}")
         self.cb_queue.put(('js_return_stream_log_func', None, output))
 
     def gui_callback(self):
         wsock = bottle.request.environ.get('wsgi.websocket') # type: ignore
+        if self.logger.level == logging.DEBUG:
+            self.logger.debug(f"web.gui_callback: connected")
         if not wsock:
             bottle.abort(400, 'Expected WebSocket request.')
+            return
         while True:
             outputs = None
             try:
                 cmd, title, output = self.cb_queue.get(block=True, timeout=0.001)
+                if self.logger.level == logging.DEBUG:
+                    output_str = common.to_str(output, slise=100)
+                    self.logger.debug(f"web.gui_callback: cmd={cmd}, title={title}, output={output_str}")
                 outputs = dict(cmd=cmd, title=title, output=output)
                 wsock.send(json.dumps(outputs, default=common.default_json_enc))
             except queue.Empty:
                 gevent.sleep(0.001)
-            except:
-                self.logger.warning('websocket error', exc_info=True)
-                gevent.sleep(10)
-
-    def to_str(self, o):
-        if type(o) == dict:
-            return json.dumps(o, default=common.default_json_enc)
-        elif type(o) == list and len(o) > 0 and type(o[0]) == dict:
-            return json.dumps(o, default=common.default_json_enc)
-        return str(o)
+            except Exception as e:
+                self.logger.warning('web.gui_callback: websocket error. {e}')
+                bottle.abort(400, 'Expected WebSocket request.')
+                return
 
     def start(self, allow_host:str="0.0.0.0", listen_port:int=8081, outputs_key:List[str]=[]):
         self.allow_host = allow_host
@@ -643,9 +686,9 @@ class Web(options.Options):
                     opt = self.load_cmd(title)
                 opt['capture_stdout'] = nothread = True
                 opt['stdout_log'] = False
-                return self.to_str(self.exec_cmd(title, opt, nothread))
+                return common.to_str(self.exec_cmd(title, opt, nothread))
             except:
-                return self.to_str(dict(warn=f'Command "{title}" failed. {traceback.format_exc()}'))
+                return common.to_str(dict(warn=f'Command "{title}" failed. {traceback.format_exc()}'))
 
         @app.route('/exec_pipe/<title>')
         @app.route('/exec_pipe/<title>', method='POST')
@@ -674,9 +717,9 @@ class Web(options.Options):
                     opt = self.load_pipe(title)
                 opt['capture_stdout'] = nothread = False
                 opt['stdout_log'] = False
-                return self.to_str(self.exec_pipe(title, opt, nothread))
+                return common.to_str(self.exec_pipe(title, opt, nothread))
             except:
-                return self.to_str(dict(warn=f'Pipeline "{title}" failed. {traceback.format_exc()}'))
+                return common.to_str(dict(warn=f'Pipeline "{title}" failed. {traceback.format_exc()}'))
             finally:
                 for tfname in upfiles.values():
                     os.unlink(tfname)
@@ -842,25 +885,26 @@ class Web(options.Options):
         def pub_img():
             try:
                 tm = time.time()
-                self.logger.info(f'pub_img: start={tm}')
                 if bottle.request.content_type.startswith('multipart/form-data'):
                     for fn in bottle.request.files.keys():
                         filename = bottle.request.files[fn].filename
                         self.img_queue.put((filename, bottle.request.files[fn].file.read()))
+                        if self.logger.level == logging.DEBUG:
+                            self.logger.debug(f"web.pub_img: filename={filename}")
                 else:
-                    outputs = json.load(bottle.request.body)
-                    self.img_queue.put(outputs)
-                ret = self.to_str(dict(success='Added to queue.'))
-                self.logger.info(f'pub_img: {time.time()-tm}')
+                    raise ValueError('Expected multipart request.')
+                ret = common.to_str(dict(success='Added to queue.'))
                 return ret
             except:
                 self.logger.warning('pub_img error', exc_info=True)
-                return self.to_str(dict(warn=f'pub_img error. {traceback.format_exc()}'))
+                return common.to_str(dict(warn=f'pub_img error. {traceback.format_exc()}'))
 
         @app.route('/webcap/sub_img')
         @app.route('/showimg/sub_img')
         def sub_img():
             wsock = bottle.request.environ.get('wsgi.websocket') # type: ignore
+            if self.logger.level == logging.DEBUG:
+                self.logger.debug(f"web.sub_img: connected")
             if not wsock:
                 bottle.abort(400, 'Expected WebSocket request.')
             while True:
@@ -875,8 +919,19 @@ class Web(options.Options):
                         gevent.sleep(0.1)
                         continue
                     outputs['outputs_key'] = self.outputs_key
-                    if outputs['outputs_key'] is None:
-                        outputs['outputs_key'] = [k for k in outputs['success'].keys()] if 'success' in outputs else []
+                    if outputs['outputs_key'] is None or len(outputs['outputs_key']) <= 0:
+                        def _get_outputs_key(src:dict, dst:list):
+                            for key in src.keys():
+                                if isinstance(src[key], dict):
+                                    _get_outputs_key(src[key], dst)
+                                else:
+                                    dst.append(key)
+                        outputs_key = []
+                        _get_outputs_key(outputs['success'], outputs_key)
+                        outputs['outputs_key'] = list(set(outputs_key))
+                    if self.logger.level == logging.DEBUG:
+                        output_str = common.to_str(outputs, slise=100)
+                        self.logger.debug(f"web.sub_img: self.outputs_key={outputs['outputs_key']}, output_str={output_str}")
                     if 'output_image_shape' in outputs:
                         img_npy = convert.b64str2npy(outputs["output_image"], outputs["output_image_shape"])
                         jpg = convert.img2byte(convert.npy2img(img_npy), format='jpeg')
@@ -892,25 +947,61 @@ class Web(options.Options):
                         outputs['img_url'] = jpg_url
                         outputs['img_id'] = fn
                     wsock.send(json.dumps(outputs, default=common.default_json_enc))
-                except Exception as e:
+                except:
                     if outputs is not None:
                         self.img_queue.put(outputs) # エラーが発生した場合はキューに戻す
-                        gevent.sleep(0.001)
-                        continue
-                    self.logger.warning('websocket error', exc_info=True)
-                    gevent.sleep(10)
+                    self.logger.warning('web.start.sub_img:websocket error', exc_info=True)
+                    bottle.abort(400, 'Expected WebSocket request.')
+                    return
 
         @app.route('/assets/<filename:path>')
         def assets(filename):
+            if self.logger.level == logging.DEBUG:
+                self.logger.debug(f"web.assets: filename={filename}")
             return bottle.static_file(filename, root=static_root / 'assets')
 
         @app.route('/webcap')
         def webcap():
+            if self.logger.level == logging.DEBUG:
+                self.logger.debug(f"web.webcap")
             if self.webcap_html_data is not None:
                 return self.webcap_html_data
             res:bottle.HTTPResponse = bottle.static_file('webcap.html', root=static_root)
             res.headers['Access-Control-Allow-Origin'] = '*'
             return res
+
+        @app.route('/webcap/pub_img/<port:int>', method='GET')
+        def pub_img_proxy_chk(port:int):
+            try:
+                # 事前に接続テストすることで、keepaliveを有効にしておく（画像送信時のTCP接続が高速化できる）
+                responce = self.webcap_client.get(f'http://localhost:{port}/webcap/pub_img')
+                return "ok"
+            except:
+                return "ng"
+
+        @app.route('/webcap/pub_img/<port:int>', method='POST')
+        def pub_img_proxy(port:int):
+            if self.logger.level == logging.DEBUG:
+                self.logger.debug(f"web.pub_img_proxy: port=http://localhost:{port}/webcap/pub_img, headers={dict(bottle.request.headers)}")
+            if not bottle.request.content_type.startswith('multipart/form-data'):
+                bottle.abort(400, 'Expected multipart request.')
+                return
+            try:
+                tm = time.perf_counter()
+                files = [['files',(fn, bottle.request.files[fn].file.read(), bottle.request.files[fn].content_type)] for fn in bottle.request.files.keys()]
+                responce = self.webcap_client.post(f'http://localhost:{port}/webcap/pub_img', files=files)
+                for h in responce.headers:
+                    bottle.response.headers[h] = responce.headers[h]
+                content = responce.content
+                if self.logger.level == logging.DEBUG:
+                    output_str = common.to_str(content.decode("utf-8"), slise=100)
+                    self.logger.debug(f"web.pub_img_proxy: res_status={responce.status_code}, res_headers={responce.headers}, res_content={output_str}")
+                bottle.response.status = responce.status_code
+                return responce.content
+            except Exception as e:
+                self.logger.warning(f'web.start.pub_img_proxy: pub_img_proxy closed. {e}')
+                bottle.abort(502, 'Could not connect to webcap process.')
+                return
 
         @app.route('/copyright')
         def copyright():
@@ -925,6 +1016,8 @@ class Web(options.Options):
         def get_server_opt():
             opt = dict(host=self.redis_host, port=self.redis_port, password=self.redis_password, svname=self.svname,
                        data=str(self.data), client_only=self.client_only)
+            if self.logger.level == logging.DEBUG:
+                self.logger.debug(f"web.get_server_opt: opt={opt}")
             bottle.response.content_type = 'application/json'
             return json.dumps(opt)
 
@@ -967,12 +1060,14 @@ class Web(options.Options):
         self.capture_count = capture_count
         self.capture_fps = capture_fps
         self.count = 0
-        self.logger.info(f"Start web. allow_host={self.allow_host} listen_port={self.listen_port}")
+        self.logger.info(f"Start webcap. allow_host={self.allow_host} listen_port={self.listen_port}")
 
         app = bottle.Bottle()
 
         @app.route('/webcap/pub_img', method='POST')
-        def pub_img():
+        def pub_img_webcap():
+            if self.logger.level == logging.DEBUG:
+                self.logger.debug(f"web.pub_img_webcap: headers={dict(bottle.request.headers)}")
             if not bottle.request.content_type.startswith('multipart/form-data'):
                 bottle.abort(400, 'Expected multipart request.')
                 return
@@ -987,6 +1082,9 @@ class Web(options.Options):
                         continue
                     output_image_name = datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")
                     cap = cap.decode().replace('data:image/jpeg;base64,','')
+                    if self.logger.level == logging.DEBUG:
+                        ret_str = common.to_str(cap, slise=100)
+                        self.logger.debug(f"web.pub_img_webcap: cap={ret_str}")
                     img_npy = convert.imgbytes2npy(convert.b64str2bytes(cap))
                     if self.capture_frame_width is not None and self.capture_frame_height is not None:
                         img_npy = cv2.resize(img_npy, (self.capture_frame_width, self.capture_frame_height), interpolation=cv2.INTER_NEAREST)
@@ -1000,18 +1098,24 @@ class Web(options.Options):
 
                     t, b64, h, w, c, fn = image_type, img_b64, img_npy.shape[0], img_npy.shape[1], img_npy.shape[2] if len(img_npy.shape) > 2 else -1, output_image_name
                     ret = f"{t},"+b64+f",{h},{w},{c},{fn}"
+                    if self.logger.level == logging.DEBUG:
+                        ret_str = common.to_str(ret, slise=100)
+                        self.logger.debug(f"web.pub_img_webcap: ret={ret_str}")
                     common.print_format(ret, False, tm, None, False)
                     tm = time.perf_counter()
                     self.count += 1
                 if self.capture_count > 0 and self.count >= self.capture_count:
                     self.is_running = False
+                    yield
+                    gevent.sleep(10)
+                    self.logger.info(f"Exit webcap. allow_host={self.allow_host} listen_port={self.listen_port}")
                     exit(0)
 
             except Exception as e:
-                self.logger.warning('pub_img error', exc_info=True)
-                return self.to_str(dict(warn=f'pub_img error. {traceback.format_exc()}'))
+                self.logger.warning('pub_img_webcap error', exc_info=True)
+                return common.to_str(dict(warn=f'pub_img_webcap error. {traceback.format_exc()}'))
 
-            ret = self.to_str(dict(success='pub_img to stdout.'))
+            ret = common.to_str(dict(success='pub_img_webcap to stdout.'))
             return ret
 
         self.is_running = True
@@ -1029,6 +1133,7 @@ class Web(options.Options):
         except:
             pass
         finally:
+            self.logger.info(f"Exit webcap. allow_host={self.allow_host} listen_port={self.listen_port}")
             exit(0)
 
 class _WSGIServer(bottle_websocket.GeventWebSocketServer):

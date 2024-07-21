@@ -15,6 +15,7 @@ const view_result_func = (title, result) => {
     result_modal.find('.modal-body').html('');
     render_result_func(result_modal.find('.modal-body'), result);
     result_modal.modal('show');
+    hide_loading();
 }
 
 const render_result_func = (target_elem, result) => {

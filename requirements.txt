@@ -5,6 +5,7 @@ bottle_websocket
 collectlicense
 motpy
 opencv-python
+numpy
 Pillow
 wxPython
 pytest

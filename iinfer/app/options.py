@@ -141,6 +141,11 @@ class Options:
             discription_ja="指定しているオプションを `-u` で指定したファイルに保存します。",
             discription_en="Save the specified options to the file specified by `-u`.",
             choise=[True, False])
+        self._options["debug"] = dict(
+            short="d", type="bool", default=False, required=False, multi=False, hide=True,
+            discription_ja="デバックモードで起動します。",
+            discription_en="Starts in debug mode.",
+            choise=[True, False])
         self._options["format"] = dict(
             short="f", type="bool", default=None, required=False, multi=False, hide=True,
             discription_ja="処理結果を見やすい形式で出力します。指定しない場合json形式で出力します。",
@@ -513,7 +518,7 @@ class Options:
                     discription_ja="クライアント側でキャプチャー画像を取得します。",
                     discription_en="Get a capture image on the client side.",
                     choise=[
-                        dict(short="d", opt="capture_device", type="str", default="0", required=True, multi=False, hide=True, choise=None,
+                        dict(opt="capture_device", type="str", default="0", required=True, multi=False, hide=True, choise=None,
                              discription_ja="キャプチャーディバイスを指定します。 `cv2.VideoCapture` の第一引数に渡される値。",
                              discription_en="Specify the capture device. The value passed to the first argument of `cv2.VideoCapture`."),
                         dict(opt="image_type", type="str", default="capture", required=True, multi=False, hide=False, choise=['bmp', 'png', 'jpeg', 'capture'],
@@ -1799,8 +1804,8 @@ class Options:
                              discription_ja="キャプチャーする回数。",
                              discription_en="Number of captures."),
                         dict(opt="access_url", type="str", default=None, required=False, multi=False, hide=True, choise=None,
-                             discription_ja="クライアントからアクセスするときのURL。省略した時は `http://localhost:<listen_port>/webcap/pub_img` を使用します。",
-                             discription_en="The URL to access from the client. if omitted, use `http://localhost:<listen_port>/webcap/pub_img`."),
+                             discription_ja="クライアントからアクセスするときのURL。省略した時は `webcap/pub_img` を使用します。例えば `http://localhost:<listen_port>/webcap/pub_img` を指定します。",
+                             discription_en="The URL to access from the client. if omitted, use `webcap/pub_img`. For example, specify `http://localhost:<listen_port>/webcap/pub_img`."),
                         dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False],
                              discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
                              discription_en="Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."),
@@ -1855,6 +1860,7 @@ class Options:
                 ),
             )
         )
+        self._options["debug"]["opt"] = "debug"
         for key, mode in self._options["cmd"].items():
             if type(mode) is not dict:
                 continue
@@ -1863,6 +1869,7 @@ class Options:
                 if type(c) is not dict:
                     continue
                 c["opt"] = k
+                c["choise"].append(self._options["debug"])
                 self._options["cmd"]["choise"] += [c]
             self._options["mode"][key] = mode
             self._options["mode"]["choise"] += [mode]

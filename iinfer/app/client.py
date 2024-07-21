@@ -66,23 +66,23 @@ class Client(object):
             dict: Redisサーバーからの応答
         """
         if name is None or name == "":
-            self.logger.error(f"name is empty.")
+            self.logger.warning(f"name is empty.")
             return {"error": f"name is empty."}
         if " " in name:
-            self.logger.error(f"name contains whitespace.")
+            self.logger.warning(f"name contains whitespace.")
             return {"error": f"name contains whitespace."}
         if model_file is None:
-            self.logger.error(f"model_file or model_file is empty.")
+            self.logger.warning(f"model_file or model_file is empty.")
             return {"error": f"model_file or model_file is empty."}
         if predict_type is None:
-            self.logger.error(f"predict_type is empty.")
+            self.logger.warning(f"predict_type is empty.")
             return {"error": f"predict_type is empty."}
         if predict_type not in common.BASE_MODELS and predict_type != "Custom":
-            self.logger.error(f"Unknown predict_type. {predict_type}")
+            self.logger.warning(f"Unknown predict_type. {predict_type}")
             return {"error": f"Unknown predict_type. {predict_type}"}
         if predict_type == 'Custom':
             if custom_predict_py is None or not custom_predict_py.exists():
-                self.logger.error(f"custom_predict_py path {str(custom_predict_py)} does not exist")
+                self.logger.warning(f"custom_predict_py path {str(custom_predict_py)} does not exist")
                 return {"error": f"custom_predict_py path {str(custom_predict_py)} does not exist"}
             with open(custom_predict_py, "rb") as pf:
                 custom_predict_py_b64 = base64.b64encode(pf.read()).decode('utf-8')
@@ -98,18 +98,18 @@ class Client(object):
         if before_injection_type is not None and len(before_injection_type) > 0:
             for t in before_injection_type:
                 if t not in common.BASE_BREFORE_INJECTIONS:
-                    self.logger.error(f"Unknown before_injection_type. {t}")
+                    self.logger.warning(f"Unknown before_injection_type. {t}")
                     return {"error": f"Unknown before_injection_type. {t}"}
             before_injection_type = ','.join(before_injection_type)
         if after_injection_type is not None and len(after_injection_type) > 0:
             for t in after_injection_type:
                 if t not in common.BASE_AFTER_INJECTIONS:
-                    self.logger.error(f"Unknown after_injection_type. {t}")
+                    self.logger.warning(f"Unknown after_injection_type. {t}")
                     return {"error": f"Unknown after_injection_type. {t}"}
             after_injection_type = ','.join(after_injection_type)
         def _conf_b64(name:str, conf:Path):
             if conf is not None and not conf.exists():
-                self.logger.error(f"{name} {conf} does not exist")
+                self.logger.warning(f"{name} {conf} does not exist")
                 return False, {"error": f"{name} {conf} does not exist"}
             elif conf is not None:
                 with open(conf, "rb") as lf:
@@ -131,7 +131,7 @@ class Client(object):
                 with open(model_file, "rb") as mf:
                     model_bytes_b64 = base64.b64encode(mf.read()).decode('utf-8')
             elif predict_type != 'Custom' and common.BASE_MODELS[predict_type]['required_model_weight']:
-                self.logger.error(f"model_file {model_file} does not exist")
+                self.logger.warning(f"model_file {model_file} does not exist")
                 return {"error": f"model_file {model_file} does not exist"}
             else:
                 model_bytes_b64 = None
@@ -143,7 +143,7 @@ class Client(object):
                 names = []
                 for p in files:
                     if not p.exists():
-                        self.logger.error(f"{aname} {p} does not exist")
+                        self.logger.warning(f"{aname} {p} does not exist")
                         return False, {"error": f"{aname} {p} does not exist"}, None
                     with open(p, "rb") as f:
                         b64s.append(base64.b64encode(f.read()).decode('utf-8'))
@@ -195,7 +195,7 @@ class Client(object):
             dict: Redisサーバーからの応答
         """
         if name is None or name == "":
-            self.logger.error(f"name is empty.")
+            self.logger.warning(f"name is empty.")
             return {"error": f"name is empty."}
         res_json = self.redis_cli.send_cmd('undeploy', [name],
                                            retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
@@ -219,10 +219,10 @@ class Client(object):
             dict: Redisサーバーからの応答
         """
         if name is None or name == "":
-            self.logger.error(f"name is empty.")
+            self.logger.warning(f"name is empty.")
             return {"error": f"name is empty."}
         if model_provider is None or model_provider == "":
-            self.logger.error(f"model_provider is empty.")
+            self.logger.warning(f"model_provider is empty.")
             return {"error": f"model_provider is empty."}
         res_json = self.redis_cli.send_cmd('start', [name, model_provider, str(use_track), str(gpuid)],
                                            retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
@@ -243,7 +243,7 @@ class Client(object):
             dict: Redisサーバーからの応答
         """
         if name is None or name == "":
-            self.logger.error(f"name is empty.")
+            self.logger.warning(f"name is empty.")
             return {"error": f"name is empty."}
         res_json = self.redis_cli.send_cmd('stop', [name],
                                            retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
@@ -289,17 +289,17 @@ class Client(object):
         """
         spredtime = time.perf_counter()
         if name is None or name == "":
-            self.logger.error(f"name is empty.")
+            self.logger.warning(f"name is empty.")
             return {"error": f"name is empty."}
         if image is None and image_file is None:
-            self.logger.error(f"image and image_file is empty.")
+            self.logger.warning(f"image and image_file is empty.")
             return {"error": f"image and image_file is empty."}
         npy_b64 = None
         simgloadtime = time.perf_counter()
         if image_file is not None and image_file_enable:
             if type(image_file) == str:
                 if not Path(image_file).exists():
-                    self.logger.error(f"Not found image_file. {image_file}.")
+                    self.logger.warning(f"Not found image_file. {image_file}.")
                     return {"error": f"Not found image_file. {image_file}."}
             if pred_input_type == 'jpeg' or pred_input_type == 'png' or pred_input_type == 'bmp':
                 f = None
@@ -382,7 +382,7 @@ class Client(object):
                 finally:
                     if f is not None: f.close()
             else:
-                self.logger.error(f"pred_input_type is invalid. {pred_input_type}.")
+                self.logger.warning(f"pred_input_type is invalid. {pred_input_type}.")
                 return {"error": f"pred_input_type is invalid. {pred_input_type}."}
         else:
             if type(image) == np.ndarray:
@@ -391,7 +391,6 @@ class Client(object):
                 image_file_enable = False
             elif pred_input_type == 'capture':
                 capture_data = image.split(',')
-                #self.logger.info(f"capture_data={capture_data[1:]}")
                 t = capture_data[0]
                 img = capture_data[1]
                 h = int(capture_data[2])
@@ -411,7 +410,7 @@ class Client(object):
             elif pred_input_type == 'output_json':
                 res_json = json.loads(image)
                 if not ("output_image" in res_json and "output_image_shape" in res_json and "output_image_name" in res_json):
-                    self.logger.error(f"image_file data is invalid. Not found output_image or output_image_shape or output_image_name key.")
+                    self.logger.warning(f"image_file data is invalid. Not found output_image or output_image_shape or output_image_name key.")
                     return {"error": f"image_file data is invalid. Not found output_image or output_image_shape or output_image_name key."}
                 img_npy = convert.b64str2npy(res_json["output_image"], shape=res_json["output_image_shape"])
                 if image_file is None: image_file = res_json["output_image_name"]
@@ -421,7 +420,7 @@ class Client(object):
                 if image_file is None: image_file = f'{datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")}.{pred_input_type}'
                 image_file_enable = False
             else:
-                self.logger.error(f"pred_input_type is invalid. {pred_input_type}.")
+                self.logger.warning(f"pred_input_type is invalid. {pred_input_type}.")
                 return {"error": f"pred_input_type is invalid. {pred_input_type}."}
 
         eimgloadtime = time.perf_counter()
@@ -559,7 +558,7 @@ class Client(object):
                 if download_file.is_dir():
                     download_file = download_file / res_json["success"]["name"]
                 if download_file.exists():
-                    self.logger.error(f"download_file {download_file} already exists.")
+                    self.logger.warning(f"download_file {download_file} already exists.")
                     return {"error": f"download_file {download_file} already exists."}
                 with open(download_file, "wb") as f:
                     f.write(base64.b64decode(res_json["success"]["data"]))
@@ -584,13 +583,13 @@ class Client(object):
             dict: Redisサーバーからの応答
         """
         if upload_file is None:
-            self.logger.error(f"upload_file is empty.")
+            self.logger.warning(f"upload_file is empty.")
             return {"error": f"upload_file is empty."}
         if not upload_file.exists():
-            self.logger.error(f"input_file {upload_file} does not exist.")
+            self.logger.warning(f"input_file {upload_file} does not exist.")
             return {"error": f"input_file {upload_file} does not exist."}
         if upload_file.is_dir():
-            self.logger.error(f"input_file {upload_file} is directory.")
+            self.logger.warning(f"input_file {upload_file} is directory.")
             return {"error": f"input_file {upload_file} is directory."}
         with open(upload_file, "rb") as f:
             if local_data is not None:
@@ -674,14 +673,14 @@ class Client(object):
                     output_image_name = f"{output_image_name}.{image_type}"
                     yield image_type, img_b64, img_npy.shape[0], img_npy.shape[1], img_npy.shape[2] if len(img_npy.shape) > 2 else -1, output_image_name
                 else:
-                    self.logger.error(f"Capture failed. devide_id={capture_device}", stack_info=True)
+                    self.logger.warning(f"Capture failed. devide_id={capture_device}", stack_info=True)
                     break
                 end = time.perf_counter()
                 if interval - (end - start) > 0:
                     time.sleep(interval - (end - start))
 
         except KeyboardInterrupt:
-            self.logger.info("KeyboardInterrupt", exc_info=True)
+            self.logger.warning("KeyboardInterrupt", exc_info=True)
         finally:
             cap.release()
 
@@ -698,6 +697,6 @@ class Client(object):
                 output_name = f"{output_name}.txt"
                 yield 'prompt', convert.str2b64str(prompt), output_name
         except KeyboardInterrupt:
-            self.logger.info("KeyboardInterrupt", exc_info=True)
+            self.logger.warning("KeyboardInterrupt", exc_info=True)
         finally:
             pass

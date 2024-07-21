@@ -51,7 +51,7 @@
             "type": "python",
             "request": "launch",
             "args": ["-m","web","-c","webcap","--listen_port", "8082",
-                     "--image_type", "capture", "--capture_count", "5", "--capture_frame_width", "1920", "--capture_frame_height", "1080", "--capture_fps", "5"],
+                     "--image_type", "capture", "--capture_count", "1", "--capture_frame_width", "1920", "--capture_frame_height", "1080", "--capture_fps", "5"],
             //"args": ["--version"],
             "module": "iinfer",
             "console": "integratedTerminal",

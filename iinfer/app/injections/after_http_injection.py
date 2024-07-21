@@ -60,9 +60,7 @@ class AfterHttpInjection(injection.AfterInjection):
 
     def post_json(self, url, outputs:Dict[str, Any]):
         tm = time.time()
-        self.logger.info(f'post_json start: {tm}')
         res = self.req_session.post(url, json=outputs, verify=False, timeout=30)
-        self.logger.info(f'post_json end: {time.time()-tm}')
         if res.status_code != 200:
             raise Exception(f"HTTP POST request failed. status_code={res.status_code} res.reason={res.reason} res.text={res.text} url={url}")
         try:
