@@ -43,7 +43,7 @@ webcap.init = () => {
     if (pipeline_elem.find('.dropdown-submenu').length <= 0) {
       const elem = $(`<li class="dropdown-submenu"><a class="dropdown-item" href="#">&lt; Not found webcap to showimg pipeline &gt;</a></li>`);
       pipeline_elem.append(elem);
-      webcap.change_pipeline(null, null, outputs_key_str);
+      webcap.change_pipeline(null, null, "");
     }
     hide_loading();
   });
