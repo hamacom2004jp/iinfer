@@ -7,7 +7,7 @@ const open_capture_func = (target_id) => {
             hide_loading();
         });
     };
-    filer_modal_func(target_id, 'capture', '', view_capture_func);
+    filer_modal_func(target_id, 'capture', '', false, view_capture_func);
 };
 const load_capture = async (current_path) => {
     const formData = new FormData();

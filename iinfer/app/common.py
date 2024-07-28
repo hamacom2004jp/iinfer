@@ -287,6 +287,7 @@ def to_str(o, slise=-1):
 BASE_MODELS = {}
 BASE_BREFORE_INJECTIONS = {}
 BASE_AFTER_INJECTIONS = {}
+BASE_TRAIN_MODELS = {}
 
 def download_file(url:str, save_path:Path) -> Path:
     """

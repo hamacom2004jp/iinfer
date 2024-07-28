@@ -3,6 +3,7 @@ const list_cmd_func = async () => {
     $('#cmd_items').html('');
     const kwd = $('#cmd_kwd').val();
     const py_list_cmd = await list_cmd(kwd?`*${kwd}*`:'*');
+    $('#cmd_items').append($($('#cmd_add').html()));
     py_list_cmd.forEach(row => {
         const elem = $($('#cmd_template').html());
         elem.find('.cmd_title').text(row.title);
@@ -10,7 +11,6 @@ const list_cmd_func = async () => {
         elem.find('.cmd_cmd').text(row.cmd);
         $('#cmd_items').append(elem);
     });
-    $('#cmd_items').append($($('#cmd_add').html()));
 }
 // コマンドファイルの取得が出来た時の処理
 const list_cmd_func_then = () => {
@@ -100,7 +100,20 @@ const list_cmd_func_then = () => {
                         // tid, tnの値を残すためにクロージャーにする
                         return () => {
                             const current_path = $(`[id="${tid}"]`).val();
-                            filer_modal_func(tid, tn, current_path);
+                            filer_modal_func(tid, tn, current_path, false);
+                        }
+                    }
+                    btn.click(mk_func(input_elem.attr('id'), input_elem.attr('name')));
+                }
+                // ディレクトリタイプの場合はファイラーモーダルを開くボタンを追加
+                if(row.type=='dir'){
+                    const btn = $('<button class="btn btn-secondary" type="button">dir</button>');
+                    input_elem.parent().append(btn);
+                    const mk_func = (tid, tn) => {
+                        // tid, tnの値を残すためにクロージャーにする
+                        return () => {
+                            const current_path = $(`[id="${tid}"]`).val();
+                            filer_modal_func(tid, tn, current_path, true);
                         }
                     }
                     btn.click(mk_func(input_elem.attr('id'), input_elem.attr('name')));

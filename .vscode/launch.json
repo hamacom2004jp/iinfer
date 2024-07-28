@@ -8,7 +8,7 @@
             "name": "Python: iinfer server",
             "type": "python",
             "request": "launch",
-            "args": ["-m","server","-c","start","-f","--retry_count","0","--retry_interval","-1"],
+            "args": ["-m","server","-c","start","-f","--retry_count","0","--retry_interval","-1", "--debug"],
             "module": "iinfer",
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
@@ -52,11 +52,21 @@
             "request": "launch",
             "args": ["-m","web","-c","webcap","--listen_port", "8082",
                      "--image_type", "capture", "--capture_count", "1", "--capture_frame_width", "1920", "--capture_frame_height", "1080", "--capture_fps", "5"],
-            //"args": ["--version"],
+            "module": "iinfer",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "justMyCode": false
+        },
+        {
+            "name": "Python: iinfer train_type_list",
+            "type": "python",
+            "request": "launch",
+            "args": ["-m","client","-c","train_type_list","-f"],
             "module": "iinfer",
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
             "justMyCode": false
         }
+        
     ]
 }

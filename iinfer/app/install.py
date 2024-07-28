@@ -170,9 +170,9 @@ class Install(object):
 
     def _torch(self, install_use_gpu:bool=False):
         if install_use_gpu:
-            returncode, _ = common.cmd('pip install \'numpy<2.0\' torch==2.1.0 torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118', logger=self.logger)
+            returncode, _ = common.cmd('pip install numpy==1.26.4 torch==2.1.0 torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118', logger=self.logger)
         else:
-            returncode, _ = common.cmd('pip install \'numpy<2.0\' torch==2.1.0 torchvision torchaudio', logger=self.logger)
+            returncode, _ = common.cmd('pip install numpy==1.26.4 torch==2.1.0 torchvision torchaudio', logger=self.logger)
         if returncode != 0:
             self.logger.warning(f"Failed to install torch torchvision torchaudio.")
             return {"error": f"Failed to install torch torchvision torchaudio."}
@@ -208,8 +208,8 @@ class Install(object):
     def mmdet(self, data_dir:Path, install_use_gpu:bool=False):
         returncode, _ = common.cmd(f'git clone https://github.com/open-mmlab/mmdetection.git', logger=self.logger)
         if returncode != 0:
-            self.logger.warning(f"Failed to git clone mmdetection.")
-            return {"error": f"Failed to git clone mmdetection."}
+            self.logger.warning(f"Failed to git clone mmdetection. Delete mmdetection as it probably already exists.")
+            return {"error": f"Failed to git clone mmdetection. Delete mmdetection as it probably already exists."}
         srcdir = Path('.') / 'mmdetection'
         shutil.copytree(srcdir, data_dir / 'mmdetection', dirs_exist_ok=True, ignore=shutil.ignore_patterns('.git'))
         shutil.rmtree(srcdir, ignore_errors=True)
@@ -233,8 +233,8 @@ class Install(object):
     def mmseg(self, data_dir:Path, install_use_gpu:bool=False):
         returncode, _ = common.cmd(f'git clone -b main https://github.com/open-mmlab/mmsegmentation.git', logger=self.logger)
         if returncode != 0:
-            self.logger.warning(f"Failed to git clone mmsegmentation.")
-            return {"error": f"Failed to git clone mmsegmentation."}
+            self.logger.warning(f"Failed to git clone mmsegmentation. Delete mmsegmentation as it probably already exists.")
+            return {"error": f"Failed to git clone mmsegmentation. Delete mmsegmentation as it probably already exists."}
         srcdir = Path('.') / 'mmsegmentation'
         shutil.copytree(srcdir, data_dir / 'mmsegmentation', dirs_exist_ok=True, ignore=shutil.ignore_patterns('.git'))
         shutil.rmtree(srcdir, ignore_errors=True)
@@ -284,8 +284,8 @@ class Install(object):
     def mmpretrain(self, data_dir:Path, install_use_gpu:bool=False):
         returncode, _ = common.cmd(f'git clone https://github.com/open-mmlab/mmpretrain.git', logger=self.logger)
         if returncode != 0:
-            self.logger.warning(f"Failed to git clone mmpretrain.")
-            return {"error": f"Failed to git clone mmpretrain."}
+            self.logger.warning(f"Failed to git clone mmpretrain. Delete mmpretrain as it probably already exists.")
+            return {"error": f"Failed to git clone mmpretrain. Delete mmpretrain as it probably already exists."}
         srcdir = Path('.') / 'mmpretrain'
         shutil.copytree(srcdir, data_dir / 'mmpretrain', dirs_exist_ok=True, ignore=shutil.ignore_patterns('.git'))
         shutil.rmtree(srcdir, ignore_errors=True)

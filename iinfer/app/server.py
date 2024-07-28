@@ -8,6 +8,7 @@ import base64
 import datetime
 import logging
 import json
+import threading
 import numpy as np
 import redis
 import shutil
@@ -206,6 +207,26 @@ class Server(filer.Filer):
                                      model_bin, model_conf_file, model_conf_bin, custom_predict_py, label_txt, color_txt,
                                      before_injection_conf, before_injection_type, before_injection_py, before_injection_bin,
                                      after_injection_conf, after_injection_type, after_injection_py, after_injection_bin, overwrite)
+
+                elif msg[0] == 'train':
+                    if msg[4] == 'None':
+                        model_conf_file = None
+                    else:
+                        model_conf_file = msg[4].split(',')
+                    if msg[5] == 'None':
+                        model_conf_bin = None
+                    else:
+                        model_conf_bin = [base64.b64decode(m) for m in msg[5].split(',')]
+                    if msg[6] == 'None':
+                        custom_train_py = None
+                    else:
+                        custom_train_py = base64.b64decode(msg[6])
+                    if msg[7] == 'True':
+                        overwrite = True
+                    else:
+                        overwrite = False
+                    st = self.train(msg[1], msg[2], msg[3], model_conf_file, model_conf_bin, custom_train_py, overwrite)
+
                 elif msg[0] == 'deploy_list':
                     st = self.deploy_list(msg[1])
                 elif msg[0] == 'undeploy':
@@ -245,7 +266,9 @@ class Server(filer.Filer):
                     svpath = convert.b64str2str(msg[2])
                     file_name = convert.b64str2str(msg[3])
                     file_data = convert.b64str2bytes(msg[4])
-                    st = self.file_upload(msg[1], svpath, file_name, file_data)
+                    mkdir = msg[5]=='True'
+                    orverwrite = msg[6]=='True'
+                    st = self.file_upload(msg[1], svpath, file_name, file_data, mkdir, orverwrite)
                 elif msg[0] == 'file_remove':
                     svpath = convert.b64str2str(msg[2])
                     st = self.file_remove(msg[1], svpath)
@@ -430,6 +453,23 @@ class Server(filer.Filer):
             json.dump(conf, f, default=common.default_json_enc)
             self.logger.info(f"Save conf.json to {str(deploy_dir)}")
 
+        self._gitpull(reskey, deploy_dir, predict_type)
+
+        try:
+            ret, predict_obj = module.build_predict(conf["predict_type"], conf["custom_predict_py"], self.logger)
+            if not ret:
+                self.redis_cli.rpush(reskey, predict_obj)
+                return self.RESP_WARN
+            predict_obj.post_deploy(deploy_dir, conf)
+        except Exception as e:
+            self.logger.warn(f"Failed to load Predict: {e}", exc_info=True)
+            self.redis_cli.rpush(reskey, {"warn": f"Failed to load Predict: {e}"})
+            return self.RESP_WARN
+
+        self.redis_cli.rpush(reskey, {"success": f"Save conf.json to {str(deploy_dir)}"})
+        return self.RESP_SCCESS
+
+    def _gitpull(self, reskey:str, deploy_dir:Path, predict_type:str):
         if predict_type.startswith('mmpretrain_'):
             if not (self.data_dir / "mmpretrain").exists():
                 returncode, _ = common.cmd(f'cd {self.data_dir} && git clone https://github.com/open-mmlab/mmpretrain.git', logger=self.logger)
@@ -458,18 +498,111 @@ class Server(filer.Filer):
             shutil.copytree(self.data_dir / "mmsegmentation" / "configs", deploy_dir / "configs", dirs_exist_ok=True)
             self.logger.info(f"Copy mmsegmentation configs to {str(deploy_dir / 'configs')}")
 
-        try:
-            ret, predict_obj = module.build_predict(conf["predict_type"], conf["custom_predict_py"], self.logger)
-            if not ret:
-                self.redis_cli.rpush(reskey, predict_obj)
-                return self.RESP_WARN
-            predict_obj.post_deploy(deploy_dir, conf)
-        except Exception as e:
-            self.logger.warn(f"Failed to load Predict: {e}", exc_info=True)
-            self.redis_cli.rpush(reskey, {"warn": f"Failed to load Predict: {e}"})
+    def train(self, reskey:str, name:str, train_type:str,
+              model_conf_file:List[str], model_conf_bin:List[bytes],
+              custom_train_py:bytes, overwrite:bool):
+        """
+        モデルをデプロイする
+
+        Args:
+            reskey (str): レスポンスキー
+            name (dict): モデル名
+            train_type (str): 学習方法のタイプ
+            model_conf_file (List[str]): モデル設定のファイル名
+            model_conf_bin (List[bytes]): モデル設定ファイル
+            custom_train_py (bytes): 学習のPythonスクリプト
+            overwrite (bool): 上書きするかどうか
+        """
+        if name is None or name == "":
+            self.logger.warn(f"Name is empty.")
+            self.redis_cli.rpush(reskey, {"warn": f"Name is empty."})
             return self.RESP_WARN
 
-        self.redis_cli.rpush(reskey, {"success": f"Save conf.json to {str(deploy_dir)}"})
+        deploy_dir = self.data_dir / name
+        if name in self.sessions:
+            self.logger.warn(f"{name} has already started a session.")
+            self.redis_cli.rpush(reskey, {"warn": f"{name} has already started a session."})
+            return self.RESP_WARN
+        if not overwrite and deploy_dir.exists():
+            self.logger.warn(f"Could not be deployed. '{deploy_dir}' already exists")
+            self.redis_cli.rpush(reskey, {"warn": f"Could not be deployed. '{deploy_dir}' already exists"})
+            return self.RESP_WARN
+        if model_conf_file is None or len(model_conf_file) <= 0:
+            self.logger.warning(f"model_conf_file path {str(model_conf_file)} is None")
+            return {"error": f"model_conf_file path {str(model_conf_file)} is None"}
+
+        if train_type != "Custom":
+            if train_type not in common.BASE_TRAIN_MODELS:
+                self.logger.warn(f"Incorrect train_type. '{train_type}'")
+                self.redis_cli.rpush(reskey, {"warn": f"Incorrect train_type. '{train_type}'"})
+                return self.RESP_WARN
+
+        common.mkdirs(deploy_dir)
+        def _save_s(file:str, data:bytes, ret_fn:bool=False):
+            if file is None or data is None:
+                return False, None
+            file = deploy_dir / file
+            with open(file, "wb") as f:
+                f.write(data)
+                self.logger.info(f"Save {file} to {str(deploy_dir)}")
+            return True, file if ret_fn else None
+
+        def _save_m(name:str, files:List[str], datas:List[bytes]):
+            if files is not None and datas is None:
+                self.logger.warn(f"{name}_file is not None but {name}_bin is None.")
+                self.redis_cli.rpush(reskey, {"warn": f"{name}_file is not None but {name}_bin is None."})
+                return False, files
+            if files is None and datas is not None:
+                self.logger.warn(f"{name}_file is None but {name}_bin is not None.")
+                self.redis_cli.rpush(reskey, {"warn": f"{name}_file is None but {name}_bin is not None."})
+                return False, files
+            if files is not None:
+                files = [deploy_dir / cf for cf in files if cf is not None and cf != '']
+                for i, cf in enumerate(files):
+                    with open(cf, "wb") as f:
+                        f.write(datas[i])
+                        self.logger.info(f"Save {cf} to {str(deploy_dir)}")
+            return True, files
+        ret, model_conf_file = _save_m('model_conf', model_conf_file, model_conf_bin)
+        if not ret: return self.RESP_WARN
+
+        custom_train_file = None
+        if custom_train_py is not None:
+            custom_train_file = deploy_dir / "custom_train.py"
+            with open(custom_train_file, "wb") as f:
+                f.write(custom_train_py)
+                self.logger.info(f"Save custom_train.py to {str(deploy_dir)}")
+
+        with open(deploy_dir / "train_conf.json", "w") as f:
+            conf = dict(model_img_width=224, model_img_height=224, train_type=train_type,
+                        model_conf_file=model_conf_file, custom_train_py=(custom_train_file if custom_train_file is not None else None))
+            json.dump(conf, f, default=common.default_json_enc)
+            self.logger.info(f"Save train_conf.json to {str(deploy_dir)}")
+
+        self._gitpull(reskey, deploy_dir, train_type)
+        train_obj = None
+        try:
+            ret, train_obj = module.build_train(conf["train_type"], conf["custom_train_py"], self.logger)
+            if not ret:
+                self.redis_cli.rpush(reskey, train_obj)
+                return self.RESP_WARN
+        except Exception as e:
+            self.logger.warn(f"Failed to load Train: {e}", exc_info=True)
+            self.redis_cli.rpush(reskey, {"warn": f"Failed to load Train: {e}"})
+            return self.RESP_WARN
+
+        def _train(train_obj, deploy_dir, model_conf_file, conf, logger):
+            try:
+                c = model_conf_file[0] if type(model_conf_file) is list and len(model_conf_file)>0 else str(model_conf_file)
+                train_obj.train(deploy_dir, c, train_cfg_options=None)
+                train_obj.post_train(deploy_dir, conf)
+            except Exception as e:
+                logger.warn(f"Failed Train: {e}", exc_info=True)
+
+        process = threading.Thread(target=_train, args=(train_obj, deploy_dir, model_conf_file, conf, self.logger))
+        process.start()
+
+        self.redis_cli.rpush(reskey, {"success": f"Save train_conf.json to {str(deploy_dir)}. Training started. see iinfer_server.log."})
         return self.RESP_SCCESS
 
     def deploy_list(self, reskey:str):
@@ -854,7 +987,7 @@ class Server(filer.Filer):
         self.redis_cli.rpush(reskey, msg)
         return rescode
 
-    def file_upload(self, reskey:str, current_path:str, file_name:str, file_data:bytes) -> int:
+    def file_upload(self, reskey:str, current_path:str, file_name:str, file_data:bytes, mkdir:bool, orverwrite:bool) -> int:
         """
         ファイルをアップロードする
 
@@ -863,11 +996,13 @@ class Server(filer.Filer):
             current_path (str): ファイルパス
             file_name (str): ファイル名
             file_data (bytes): ファイルデータ
+            mkdir (bool): ディレクトリを作成するかどうか
+            orverwrite (bool): 上書きするかどうか
 
         Returns:
             int: レスポンスコード
         """
-        rescode, msg = super().file_upload(current_path, file_name, file_data)
+        rescode, msg = super().file_upload(current_path, file_name, file_data, mkdir, orverwrite)
         self.redis_cli.rpush(reskey, msg)
         return rescode
 

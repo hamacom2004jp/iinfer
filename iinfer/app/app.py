@@ -191,6 +191,18 @@ class IinferApp:
                 if 'success' not in ret:
                     return 1, ret
 
+            elif args.cmd == 'train':
+                if args.model_conf_file is not None:
+                    args.model_conf_file = [Path(f) for f in args.model_conf_file if f is not None and f != '']
+                args.dataset = Path(args.dataset) if args.dataset is not None else None
+                args.custom_train_py = Path(args.custom_train_py) if args.custom_train_py is not None else None
+
+                ret = self.cl.train(args.name, args.dataset, args.dataset_upload, args.model_conf_file, args.train_type,
+                                args.custom_train_py, overwrite=args.overwrite, retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
+                common.print_format(ret, args.format, tm, args.output_json, args.output_json_append)
+                if 'success' not in ret:
+                    return 1, ret
+
             elif args.cmd == 'deploy_list':
                 ret = self.cl.deploy_list(retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
                 common.print_format(ret, args.format, tm, args.output_json, args.output_json_append)
@@ -318,6 +330,7 @@ class IinferApp:
                 local_data = Path(args.local_data.replace('"','')) if args.local_data is not None else None
                 upload_file = Path(args.upload_file.replace('"','')) if args.upload_file is not None else None
                 ret = self.cl.file_upload(args.svpath.replace('"',''), upload_file, local_data=local_data,
+                                          mkdir=args.mkdir, orverwrite=args.orverwrite,
                                           retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
                 common.print_format(ret, args.format, tm, args.output_json, args.output_json_append)
                 if 'success' not in ret:
@@ -337,6 +350,13 @@ class IinferApp:
                                 model_type=f"{val['model_type'].__module__}.{val['model_type'].__name__}") for key,val in common.BASE_MODELS.items()]
                 type_list.append(dict(predict_type='Custom', site='Custom', image_width=None, image_height=None,
                                       required_model_conf=None, required_model_weight=None))
+                ret = dict(success=type_list)
+                common.print_format(ret, args.format, tm, args.output_json, args.output_json_append)
+
+            elif args.cmd == 'train_type_list':
+                type_list = [dict(train_type=key, site=val['site'],
+                                  model_type=f"{val['model_type'].__module__}.{val['model_type'].__name__}") for key,val in common.BASE_TRAIN_MODELS.items()]
+                type_list.append(dict(train_type='Custom', site='Custom'))
                 ret = dict(success=type_list)
                 common.print_format(ret, args.format, tm, args.output_json, args.output_json_append)
 

@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>iinfer.app package &mdash; iinfer 2024/07/21 documentation</title>
+  <title>iinfer.app package &mdash; iinfer 2024/07/28 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -16,7 +16,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=1596ff5c"></script>
+        <script src="../_static/documentation_options.js?v=927d484a"></script>
         <script src="../_static/doctools.js?v=9a2dae69"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -437,13 +437,15 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.client.Client.file_upload">
-<span class="sig-name descname"><span class="pre">file_upload</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">svpath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upload_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retry_count</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retry_interval</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">60</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/client.html#Client.file_upload"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.client.Client.file_upload" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">file_upload</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">svpath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upload_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mkdir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">orverwrite</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retry_count</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retry_interval</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">60</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/client.html#Client.file_upload"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.client.Client.file_upload" title="Link to this definition"></a></dt>
 <dd><p>サーバー上にファイルをアップロードする</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>svpath</strong> (<em>Path</em>) -- サーバー上のファイルパス</p></li>
 <li><p><strong>upload_file</strong> (<em>Path</em>) -- ローカルのファイルパス</p></li>
+<li><p><strong>mkdir</strong> (<em>bool</em><em>, </em><em>optional</em>) -- ディレクトリを作成するかどうか. Defaults to False.</p></li>
+<li><p><strong>orverwrite</strong> (<em>bool</em><em>, </em><em>optional</em>) -- 上書きするかどうか. Defaults to False.</p></li>
 <li><p><strong>local_data</strong> (<em>Path</em><em>, </em><em>optional</em>) -- ローカルを参照させる場合のデータフォルダ. Defaults to None.</p></li>
 <li><p><strong>retry_count</strong> (<em>int</em><em>, </em><em>optional</em>) -- リトライ回数. Defaults to 3.</p></li>
 <li><p><strong>retry_interval</strong> (<em>int</em><em>, </em><em>optional</em>) -- リトライ間隔. Defaults to 5.</p></li>
@@ -550,6 +552,34 @@
 <li><p><strong>retry_count</strong> (<em>int</em><em>, </em><em>optional</em>) -- リトライ回数. Defaults to 3.</p></li>
 <li><p><strong>retry_interval</strong> (<em>int</em><em>, </em><em>optional</em>) -- リトライ間隔. Defaults to 5.</p></li>
 <li><p><strong>timeout</strong> (<em>int</em><em>, </em><em>optional</em>) -- タイムアウト時間. Defaults to 60.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Redisサーバーからの応答</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.client.Client.train">
+<span class="sig-name descname"><span class="pre">train</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_upload</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_conf_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Path</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">train_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_train_py</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retry_count</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retry_interval</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10800</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/client.html#Client.train"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.client.Client.train" title="Link to this definition"></a></dt>
+<dd><p>モデルをRedisサーバーで学習する</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) -- モデル名</p></li>
+<li><p><strong>dataset</strong> (<em>Path</em>) -- データセットディレクトリのパス</p></li>
+<li><p><strong>dataset_upload</strong> (<em>bool</em>) -- データセットをサーバーにアップロードするかどうか</p></li>
+<li><p><strong>model_conf_file</strong> (<em>List</em><em>[</em><em>Path</em><em>]</em>) -- モデル設定ファイルのパス</p></li>
+<li><p><strong>train_type</strong> (<em>str</em>) -- 学習方法のタイプ</p></li>
+<li><p><strong>custom_train_py</strong> (<em>Path</em>) -- 学習スクリプトのパス</p></li>
+<li><p><strong>overwrite</strong> (<em>bool</em>) -- モデルを上書きするかどうか</p></li>
+<li><p><strong>retry_count</strong> (<em>int</em><em>, </em><em>optional</em>) -- リトライ回数. Defaults to 3.</p></li>
+<li><p><strong>retry_interval</strong> (<em>int</em><em>, </em><em>optional</em>) -- リトライ間隔. Defaults to 5.</p></li>
+<li><p><strong>timeout</strong> (<em>int</em><em>, </em><em>optional</em>) -- タイムアウト時間. Defaults to 3*3600.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1579,7 +1609,7 @@ return dict(output_boxes=final_boxes, output_scores=final_scores, output_classes
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.server.Server.file_upload">
-<span class="sig-name descname"><span class="pre">file_upload</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reskey</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="../_modules/iinfer/app/server.html#Server.file_upload"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.server.Server.file_upload" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">file_upload</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reskey</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mkdir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">orverwrite</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="../_modules/iinfer/app/server.html#Server.file_upload"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.server.Server.file_upload" title="Link to this definition"></a></dt>
 <dd><p>ファイルをアップロードする</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1588,6 +1618,8 @@ return dict(output_boxes=final_boxes, output_scores=final_scores, output_classes
 <li><p><strong>current_path</strong> (<em>str</em>) -- ファイルパス</p></li>
 <li><p><strong>file_name</strong> (<em>str</em>) -- ファイル名</p></li>
 <li><p><strong>file_data</strong> (<em>bytes</em>) -- ファイルデータ</p></li>
+<li><p><strong>mkdir</strong> (<em>bool</em>) -- ディレクトリを作成するかどうか</p></li>
+<li><p><strong>orverwrite</strong> (<em>bool</em>) -- 上書きするかどうか</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1671,6 +1703,25 @@ return dict(output_boxes=final_boxes, output_scores=final_scores, output_classes
 <dt class="sig sig-object py" id="iinfer.app.server.Server.terminate_server">
 <span class="sig-name descname"><span class="pre">terminate_server</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/server.html#Server.terminate_server"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.server.Server.terminate_server" title="Link to this definition"></a></dt>
 <dd><p>サーバー処理を終了する</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="iinfer.app.server.Server.train">
+<span class="sig-name descname"><span class="pre">train</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reskey</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">train_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_conf_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_conf_bin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">bytes</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_train_py</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/server.html#Server.train"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.server.Server.train" title="Link to this definition"></a></dt>
+<dd><p>モデルをデプロイする</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reskey</strong> (<em>str</em>) -- レスポンスキー</p></li>
+<li><p><strong>name</strong> (<em>dict</em>) -- モデル名</p></li>
+<li><p><strong>train_type</strong> (<em>str</em>) -- 学習方法のタイプ</p></li>
+<li><p><strong>model_conf_file</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) -- モデル設定のファイル名</p></li>
+<li><p><strong>model_conf_bin</strong> (<em>List</em><em>[</em><em>bytes</em><em>]</em>) -- モデル設定ファイル</p></li>
+<li><p><strong>custom_train_py</strong> (<em>bytes</em>) -- 学習のPythonスクリプト</p></li>
+<li><p><strong>overwrite</strong> (<em>bool</em>) -- 上書きするかどうか</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">

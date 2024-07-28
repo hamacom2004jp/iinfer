@@ -1,4 +1,4 @@
-from iinfer.app import common, predict, injection
+from iinfer.app import common, predict, train, injection
 from pathlib import Path
 from typing import List, Dict, Any, Tuple
 import importlib.util
@@ -11,17 +11,17 @@ import iinfer
 
 def load_custom_predict(custom_predict_py:Path, logger:logging.Logger) -> predict.Predict:
     """
-    カスタム予測オブジェクトを読み込みます。
+    カスタム推論オブジェクトを読み込みます。
 
     Args:
-        custom_predict_py (Path): カスタム予測オブジェクトのパス
+        custom_predict_py (Path): カスタム推論オブジェクトのパス
         logger (logging.Logger): ロガー
 
     Raises:
         BaseException: 指定されたオブジェクトが見つからない場合
 
     Returns:
-        iinfer.app.predict.Predict: 予測オブジェクト
+        iinfer.app.predict.Predict: 推論オブジェクト
     """
     spec = importlib.util.spec_from_file_location("iinfer.user.predict", custom_predict_py)
     module = importlib.util.module_from_spec(spec)
@@ -31,7 +31,40 @@ def load_custom_predict(custom_predict_py:Path, logger:logging.Logger) -> predic
             return obj(logger)
     raise BaseException(f"Predict class not found.({custom_predict_py})")
 
+def load_custom_train(custom_train_py:Path, logger:logging.Logger) -> train.Train:
+    """
+    カスタム学習オブジェクトを読み込みます。
+
+    Args:
+        custom_train_py (Path): カスタム学習オブジェクトのパス
+        logger (logging.Logger): ロガー
+
+    Raises:
+        BaseException: 指定されたオブジェクトが見つからない場合
+
+    Returns:
+        iinfer.app.train.Train: 学習オブジェクト
+    """
+    spec = importlib.util.spec_from_file_location("iinfer.user.train", custom_train_py)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    for name, obj in inspect.getmembers(module):
+        if inspect.isclass(obj) and issubclass(obj, train.Train):
+            return obj(logger)
+    raise BaseException(f"Train class not found.({custom_train_py})")
+
 def build_predict(predict_type:str, custom_predict_py:str, logger:logging.Logger) -> Tuple[bool, predict.Predict]:
+    """
+    推論オブジェクトを構築します。
+
+    Args:
+        predict_type (str): 推論オブジェクトの型
+        custom_predict_py (str): カスタム推論オブジェクトのパス
+        logger (logging.Logger): ロガー
+    
+    Returns:
+        Tuple[bool, predict.Predict]: 成功した場合はTrueと推論オブジェクト、失敗した場合はFalseとエラーメッセージ
+    """
     if predict_type == 'Custom':
         custom_predict_py = Path(custom_predict_py) if custom_predict_py is not None else None
         if custom_predict_py is None:
@@ -45,25 +78,70 @@ def build_predict(predict_type:str, custom_predict_py:str, logger:logging.Logger
         predict_obj = load_predict(predict_type, logger)
     return True, predict_obj
 
-def load_predict(predict_type:str, logger:logging.Logger) -> predict.Predict:
+def build_train(train_type:str, custom_train_py:str, logger:logging.Logger) -> Tuple[bool, train.Train]:
     """
-    指定された予測オブジェクトを読み込みます。
+    学習オブジェクトを構築します。
 
     Args:
-        predict_type (str): 予測オブジェクトのモジュール名
+        train_type (str): 学習オブジェクトの型
+        custom_train_py (str): カスタム学習オブジェクトのパス
+        logger (logging.Logger): ロガー
+    
+    Returns:
+        Tuple[bool, train.Train]: 成功した場合はTrueと学習オブジェクト、失敗した場合はFalseとエラーメッセージ
+    """
+    if train_type == 'Custom':
+        custom_train_py = Path(custom_train_py) if custom_train_py is not None else None
+        if custom_train_py is None:
+            logger.warn(f"train_type is Custom but custom_train_py is None.")
+            return False, {"warn": f"train_type is Custom but custom_train_py is None."}
+        if not custom_train_py.exists():
+            logger.warn(f"custom_train_py path {str(custom_train_py)} does not exist")
+            return False, {"warn": f"custom_train_py path {str(custom_train_py)} does not exist"}
+        train_obj = load_custom_train(custom_train_py, logger)
+    else:
+        train_obj = load_train(train_type, logger)
+    return True, train_obj
+
+def load_predict(predict_type:str, logger:logging.Logger) -> predict.Predict:
+    """
+    指定された推論オブジェクトを読み込みます。
+
+    Args:
+        predict_type (str): 推論オブジェクトのモジュール名
         logger (logging.Logger): ロガー
 
     Raises:
         BaseException: 指定されたオブジェクトが見つからない場合
 
     Returns:
-        predict.Predict: 予測オブジェクト
+        predict.Predict: 推論オブジェクト
     """
     module = importlib.import_module("iinfer.app.predicts." + predict_type)
     for name, obj in inspect.getmembers(module):
         if inspect.isclass(obj) and issubclass(obj, predict.Predict):
             return obj(logger)
     raise BaseException(f"Predict class not found.({predict_type})")
+
+def load_train(train_type:str, logger:logging.Logger) -> train.Train:
+    """
+    指定された学習オブジェクトを読み込みます。
+
+    Args:
+        train_type (str): 学習オブジェクトのモジュール名
+        logger (logging.Logger): ロガー
+
+    Raises:
+        BaseException: 指定されたオブジェクトが見つからない場合
+
+    Returns:
+        train.Train: 学習オブジェクト
+    """
+    module = importlib.import_module("iinfer.app.trains." + train_type)
+    for name, obj in inspect.getmembers(module):
+        if inspect.isclass(obj) and issubclass(obj, train.Train):
+            return obj(logger)
+    raise BaseException(f"Train class not found.({train_type})")
 
 def load_before_injection_type(injection_type:List[str], config:Dict[str,Any], logger:logging.Logger) -> List[injection.BeforeInjection]:
     """
@@ -197,6 +275,21 @@ for mod in get_module_list('iinfer.app.predicts'):
         elif f == 'REQUIREd_MODEL_WEIGHT': required_model_weight = getattr(m, f)
     common.BASE_MODELS[mod] = dict(site=site, image_width=width, image_height=height, model_type=model_type,
                                    required_model_conf=required_model_conf, required_model_weight=required_model_weight)
+
+for mod in get_module_list('iinfer.app.trains'):
+    if mod.startswith('__'):
+        continue
+    m = importlib.import_module("iinfer.app.trains." + mod)
+    site = None
+    model_type = iinfer.app.train.Train
+    for f in dir(m):
+        members = inspect.getmembers(m, inspect.isclass)
+        for name, cls in members:
+            if issubclass(cls, iinfer.app.train.Train):
+                model_type = cls
+                break
+        if f == 'SITE': site = getattr(m, f)
+    common.BASE_TRAIN_MODELS[mod] = dict(site=site, model_type=model_type)
 
 for mod in get_module_list('iinfer.app.injections'):
     if mod.startswith('__'):

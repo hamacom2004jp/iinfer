@@ -1,5 +1,5 @@
 // ファイラーモーダル
-filer_modal_func = async (target_id, modal_title, current_path, call_back_func) => {
+filer_modal_func = async (target_id, modal_title, current_path, select_dir, call_back_func) => {
     const filer_modal = $('#filer_modal');
     filer_modal.find('.modal-title').text(modal_title);
     filer_modal.find('.modal-body').html('<ul class="tree-menu overflow-auto border col-4"></ul><div class="file-list overflow-auto col-8"></div>');
@@ -60,7 +60,15 @@ filer_modal_func = async (target_id, modal_title, current_path, call_back_func) 
             table.append(table_body);
             filer_modal.find('.filer_address').val(node['path']);
             if(node['children']) {
-                const mk_file_func = (target_id, current_node, current_path) => {
+                const mk_dir_func = (target_id, current_node, current_path) => {
+                    if (select_dir) {
+                        // 右側ペインのフォルダを選択した時の処理
+                        return () => {
+                            $(`[id="${target_id}"]`).val(current_path);
+                            filer_modal.modal('hide');
+                            if(call_back_func) call_back_func(current_path);
+                        }
+                    }
                     // 右側ペインのフォルダを選択した時の処理
                     return () => reload_tree(target_id, current_node, current_path);
                 }
@@ -69,31 +77,33 @@ filer_modal_func = async (target_id, modal_title, current_path, call_back_func) 
                     const tr_elem = $('<tr/>');
                     table_body.append(tr_elem);
                     const td = $(`<td><a href="#" class="folder-close">${n['name']}</a></td>`);
-                    td.find('a').click(mk_file_func(target_id, $(`#${k}`), n['path']));
+                    td.find('a').click(mk_dir_func(target_id, $(`#${k}`), n['path']));
                     tr_elem.append($('<td><img src="assets/tree-menu/image/folder-close.png"></td>'));
                     tr_elem.append(td);
                     tr_elem.append($(`<td>${n['size']}</td>`));
                     tr_elem.append($(`<td>${n['last']}</td>`));
                 });
-                const mk_dir_func = (target_id, current_node, current_path) => {
-                    // 右側ペインのファイルを選択した時の処理
-                    return () => {
-                        $(`[id="${target_id}"]`).val(current_path);
-                        filer_modal.modal('hide');
-                        if(call_back_func) call_back_func(current_path);
+                if (!select_dir) {
+                    const mk_file_func = (target_id, current_node, current_path) => {
+                        // 右側ペインのファイルを選択した時の処理
+                        return () => {
+                            $(`[id="${target_id}"]`).val(current_path);
+                            filer_modal.modal('hide');
+                            if(call_back_func) call_back_func(current_path);
+                        }
                     }
+                    Object.entries(node['children']).forEach(([k, n]) => {
+                        if(n['is_dir']) return;
+                        const tr_elem = $('<tr/>');
+                        table_body.append(tr_elem);
+                        const td = $(`<td><a href="#" class="folder-close">${n['name']}</a></td>`);
+                        td.find('a').click(mk_file_func(target_id, $(`#${k}`), n['path']));
+                        tr_elem.append($('<td><img src="assets/tree-menu/image/file.png"></td>'));
+                        tr_elem.append(td);
+                        tr_elem.append($(`<td>${n['size']}</td>`));
+                        tr_elem.append($(`<td>${n['last']}</td>`));
+                    });
                 }
-                Object.entries(node['children']).forEach(([k, n]) => {
-                    if(n['is_dir']) return;
-                    const tr_elem = $('<tr/>');
-                    table_body.append(tr_elem);
-                    const td = $(`<td><a href="#" class="folder-close">${n['name']}</a></td>`);
-                    td.find('a').click(mk_dir_func(target_id, $(`#${k}`), n['path']));
-                    tr_elem.append($('<td><img src="assets/tree-menu/image/file.png"></td>'));
-                    tr_elem.append(td);
-                    tr_elem.append($(`<td>${n['size']}</td>`));
-                    tr_elem.append($(`<td>${n['last']}</td>`));
-                });
             }
         }
     }

@@ -105,9 +105,13 @@ class Filer(object):
         if not chk:
             return self.RESP_WARN, msg
 
-        abspath.mkdir(parents=True)
-        ret_path = str(Path(current_path).parent).replace("\\","/")
-        return self.RESP_SCCESS, {"success": {"path":f"{ret_path}","msg":f"Created {abspath}"}}
+        try:
+            abspath.mkdir(parents=True)
+            ret_path = str(Path(current_path).parent).replace("\\","/")
+            return self.RESP_SCCESS, {"success": {"path":f"{ret_path}","msg":f"Created {abspath}"}}
+        except Exception as e:
+            self.logger.error(f"Failed to create {abspath}. {e}")
+            return self.RESP_WARN, {"warn": f"Failed to create {abspath}. {e}"}
     
     def file_rmdir(self, current_path:str) -> Tuple[int, Dict[str, Any]]:
         """
@@ -127,9 +131,13 @@ class Filer(object):
             self.logger.warn(f"Path {abspath} is root directory.")
             return self.RESP_WARN, {"warn": f"Path {abspath} is root directory."}
 
-        common.rmdirs(abspath)
-        ret_path = str(Path(current_path).parent).replace("\\","/")
-        return self.RESP_SCCESS, {"success": {"path":f"{ret_path}","msg":f"Removed {abspath}"}}
+        try:
+            common.rmdirs(abspath)
+            ret_path = str(Path(current_path).parent).replace("\\","/")
+            return self.RESP_SCCESS, {"success": {"path":f"{ret_path}","msg":f"Removed {abspath}"}}
+        except Exception as e:
+            self.logger.error(f"Failed to remove {abspath}. {e}")
+            return self.RESP_WARN, {"warn": f"Failed to remove {abspath}. {e}"}
 
     def file_download(self, current_path:str) -> Tuple[int, Dict[str, Any]]:
         """
@@ -149,11 +157,15 @@ class Filer(object):
             self.logger.warn(f"Path {abspath} is directory.")
             return self.RESP_WARN, {"warn": f"Path {abspath} is directory."}
 
-        with open(abspath, "rb") as f:
-            data = convert.bytes2b64str(f.read())
-        return self.RESP_SCCESS, {"success":{"name":abspath.name, "data":data}}
+        try:
+            with open(abspath, "rb") as f:
+                data = convert.bytes2b64str(f.read())
+            return self.RESP_SCCESS, {"success":{"name":abspath.name, "data":data}}
+        except Exception as e:
+            self.logger.error(f"Failed to download {abspath}. {e}")
+            return self.RESP_WARN, {"warn": f"Failed to download {abspath}. {e}"}
 
-    def file_upload(self, current_path:str, file_name:str, file_data:bytes) -> Tuple[int, Dict[str, Any]]:
+    def file_upload(self, current_path:str, file_name:str, file_data:bytes, mkdir:bool, orverwrite:bool) -> Tuple[int, Dict[str, Any]]:
         """
         ファイルをアップロードする
 
@@ -161,6 +173,8 @@ class Filer(object):
             current_path (str): ファイルパス
             file_name (str): ファイル名
             file_data (bytes): ファイルデータ
+            mkdir (bool): ディレクトリを作成するかどうか
+            orverwrite (bool): 上書きするかどうか
 
         Returns:
             int: レスポンスコード
@@ -173,7 +187,7 @@ class Filer(object):
         if abspath.exists():
             if abspath.is_dir():
                 abspath = abspath / file_name
-            if abspath.is_file():
+            if abspath.is_file() and not orverwrite:
                 self.logger.warn(f"Path {abspath} already exist. param={current_path}")
                 return self.RESP_WARN, {"warn": f"Path {abspath} already exist. param={current_path}"}
             save_path = abspath
@@ -182,10 +196,15 @@ class Filer(object):
             save_path = abspath / file_name
         else:
             save_path = abspath
-
-        with open(save_path, "wb") as f:
-            f.write(file_data)
-        return self.RESP_SCCESS, {"success": f"Uploaded {save_path}"}
+        try:
+            if mkdir:
+                save_path.parent.mkdir(parents=True, exist_ok=True)
+            with open(save_path, "wb") as f:
+                f.write(file_data)
+            return self.RESP_SCCESS, {"success": f"Uploaded {save_path}"}
+        except Exception as e:
+            self.logger.error(f"Failed to upload {save_path}. {e}")
+            return self.RESP_WARN, {"warn": f"Failed to upload {save_path}. {e}"}
 
     def file_remove(self, current_path:str) -> Tuple[int, Dict[str, Any]]:
         """
@@ -205,6 +224,11 @@ class Filer(object):
             self.logger.warn(f"Path {abspath} is directory.")
             return self.RESP_WARN, {"warn": f"Path {abspath} is directory."}
 
-        abspath.unlink()
-        ret_path = str(Path(current_path).parent).replace("\\","/")
-        return self.RESP_SCCESS, {"success": {"path":f"{ret_path}","msg":f"Removed {abspath}"}}
+        try:
+            abspath.unlink()
+            ret_path = str(Path(current_path).parent).replace("\\","/")
+            return self.RESP_SCCESS, {"success": {"path":f"{ret_path}","msg":f"Removed {abspath}"}}
+        except Exception as e:
+            self.logger.error(f"Failed to remove {abspath}. {e}")
+            return self.RESP_WARN, {"warn": f"Failed to remove {abspath}. {e}"}
+        

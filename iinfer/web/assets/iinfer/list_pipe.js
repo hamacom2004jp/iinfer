@@ -3,13 +3,13 @@ list_pipe_func = async () => {
     $('#pipe_items').html('');
     const kwd = $('#pipe_kwd').val();
     const py_list_pipe = await list_pipe(kwd?`*${kwd}*`:'*');
+    $('#pipe_items').append($($('#pipe_add').html()));
     py_list_pipe.forEach(row => {
         const elem = $($('#pipe_template').html());
         elem.find('.pipe_title').text(row['title']);
         elem.find('.pipe_desc').text(row['description']);
         $('#pipe_items').append(elem);
     });
-    $('#pipe_items').append($($('#pipe_add').html()));
 }
 list_pipe_func_then = () => {
     // パイプラインカードクリック時の処理（モーダルダイアログを開く）
