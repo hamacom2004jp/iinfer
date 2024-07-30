@@ -11,3 +11,17 @@
 .filer-pane-left-top {
   height: 49%;
 }*/
+/** viewer表示時の行番号スタイル */
+pre{
+  counter-reset: rowNumber;
+}
+pre span.row-number{
+  counter-increment: rowNumber;
+}
+pre span.row-number::before { 
+  content:counter(rowNumber);
+  /* 以下少しだけ装飾 */
+  width: 2rem;
+  display: inline-block;
+  color: #aaa;
+}

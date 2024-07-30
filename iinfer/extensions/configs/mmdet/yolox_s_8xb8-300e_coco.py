@@ -70,7 +70,7 @@ model = dict(
     test_cfg=dict(score_thr=0.01, nms=dict(type='nms', iou_threshold=0.65)))
 
 # dataset settings
-data_root = 'data/coco/'
+data_root = 'input/'
 dataset_type = 'CocoDataset'
 
 # Example to use different file client
@@ -124,8 +124,8 @@ train_dataset = dict(
     dataset=dict(
         type=dataset_type,
         data_root=data_root,
-        ann_file='annotations/instances_train2017.json',
-        data_prefix=dict(img='train2017/'),
+        ann_file='train.json',
+        data_prefix=dict(img='train/'),
         pipeline=[
             dict(type='LoadImageFromFile', backend_args=backend_args),
             dict(type='LoadAnnotations', with_bbox=True)
@@ -163,8 +163,8 @@ val_dataloader = dict(
     dataset=dict(
         type=dataset_type,
         data_root=data_root,
-        ann_file='annotations/instances_val2017.json',
-        data_prefix=dict(img='val2017/'),
+        ann_file='val.json',
+        data_prefix=dict(img='val/'),
         test_mode=True,
         pipeline=test_pipeline,
         backend_args=backend_args))
@@ -172,7 +172,7 @@ test_dataloader = val_dataloader
 
 val_evaluator = dict(
     type='CocoMetric',
-    ann_file=data_root + 'annotations/instances_val2017.json',
+    ann_file=data_root + 'val.json',
     metric='bbox',
     backend_args=backend_args)
 test_evaluator = val_evaluator

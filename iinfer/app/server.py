@@ -8,6 +8,7 @@ import base64
 import datetime
 import logging
 import json
+import os
 import threading
 import numpy as np
 import redis
@@ -38,6 +39,7 @@ class Server(filer.Filer):
         self.redis_cli = None
         self.sessions:Dict[str, Dict[str, Any]] = {}
         self.is_running = False
+        self.train_thread = None
 
     def __enter__(self):
         self.start_server()
@@ -592,15 +594,23 @@ class Server(filer.Filer):
             return self.RESP_WARN
 
         def _train(train_obj, deploy_dir, model_conf_file, conf, logger):
+            cwd = os.getcwd()
             try:
                 c = model_conf_file[0] if type(model_conf_file) is list and len(model_conf_file)>0 else str(model_conf_file)
+                os.chdir(deploy_dir)
                 train_obj.train(deploy_dir, c, train_cfg_options=None)
                 train_obj.post_train(deploy_dir, conf)
             except Exception as e:
                 logger.warn(f"Failed Train: {e}", exc_info=True)
+            finally:
+                os.chdir(cwd)
 
-        process = threading.Thread(target=_train, args=(train_obj, deploy_dir, model_conf_file, conf, self.logger))
-        process.start()
+        if self.train_thread is not None and self.train_thread.is_alive():
+            self.logger.warn(f"Training is already running.")
+            self.redis_cli.rpush(reskey, {"warn": f"Training is already running."})
+            return self.RESP_WARN
+        self.train_thread = threading.Thread(target=_train, args=(train_obj, deploy_dir, model_conf_file, conf, self.logger))
+        self.train_thread.start()
 
         self.redis_cli.rpush(reskey, {"success": f"Save train_conf.json to {str(deploy_dir)}. Training started. see iinfer_server.log."})
         return self.RESP_SCCESS

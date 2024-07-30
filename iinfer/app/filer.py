@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import List, Dict, Any, Tuple, Union
 import logging
 import datetime
-
+import mimetypes
 
 class Filer(object):
     RESP_SCCESS:int = 0
@@ -80,7 +80,8 @@ class Filer(object):
                 key = common.safe_fname(path)
                 if key in children:
                     continue
-                children[key] = dict(name=f.name, is_dir=f.is_dir(), path=path, size=f.stat().st_size , last=_ts2str(f.stat().st_mtime))
+                mime_type, encoding = mimetypes.guess_type(str(f))
+                children[key] = dict(name=f.name, is_dir=f.is_dir(), path=path, mime_type=mime_type, size=f.stat().st_size , last=_ts2str(f.stat().st_mtime))
 
             tpath = '/'.join(current_path_parts[:i+1])
             tpath = '/' if tpath=='' else tpath

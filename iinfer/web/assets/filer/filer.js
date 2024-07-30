@@ -417,7 +417,7 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
       if(!node['path']) return;
       target.find('.filer_address').val(node['path']);
       const table = $('<table class="table table-bordered table-hover table-sm">'
-                    + '<thead><tr><th scope="col">-</th><th scope="col">name</th><th scope="col">size</th><th scope="col">last</th></tr></thead>'
+                    + '<thead><tr><th scope="col">-</th><th scope="col">name</th><th scope="col">mime</th><th scope="col">size</th><th scope="col">last</th></tr></thead>'
                     + '</table>');
       const table_body = $('<tbody></tbody>');
       target.find('.file-list').html('');
@@ -498,9 +498,36 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
             });
           }
         }};
+        // ビューアー関数の生成
+        mk_view = (_p, _mime, _size, _l) => {return ()=>{
+          if (_size.indexOf('G') >= 0 || _size.indexOf('T') >= 0) {
+            fsapi.message({warn: `The file size is too large to view. (${_size})`});
+            return;
+          }
+          else if (_size.indexOf('M') >= 0 && parseInt(_size.replace('M','')) > 5) {
+            fsapi.message({warn: `The file size is too large to view. (${_size} > 5M)`});
+            return;
+          }
+          show_loading();
+          const opt = fsapi.get_server_opt();
+          opt['mode'] = 'client';
+          opt['cmd'] = 'file_download';
+          opt['capture_stdout'] = true;
+          opt['svpath'] = _p;
+          const exec_cmd = _l ? fsapi.local_exec_cmd : fsapi.sv_exec_cmd;
+          exec_cmd(opt).then(res => {
+            if(!res[0] || !res[0]['success']) {
+              fsapi.message(res);
+              return;
+            }
+            fsapi.viewer(_p, res[0]['success']['data'], _mime);
+            hide_loading();
+          });
+        }};
         // ファイルリストの生成
         const mk_tr = (_t, _p, _e, _n, _l) => {
           const png = _n["is_dir"] ? 'folder-close.png' : 'file.png';
+          const mime = _n['mime_type'] ? _n['mime_type'] : '-';
           const dt = _n["is_dir"] ? '-' : new Date(_n["last"]).toLocaleDateString('ja-JP', {
             year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit'
           });
@@ -512,7 +539,8 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
                   + '<ul class="dropdown-menu"/>'
                 + '</div>'
               + '</td>'
-              + `<td class="text-end">${fsapi.calc_size(_n['size'])}</td>`
+              + `<td class="mime_type">${mime}</td>`
+              + `<td class="file_size text-end">${fsapi.calc_size(_n['size'])}</td>`
               + `<td class="text-end">${dt}</td>`
             + '</tr>');
           tr.find('.dropdown-toggle').on('dragstart', (event) => {
@@ -526,12 +554,12 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
           } else {
             tr.find('.dropdown-menu').append('<li><a class="dropdown-item mkdir" href="#">Create Folder</a></li>');
             tr.find('.dropdown-menu').append('<li><a class="dropdown-item delete" href="#">Delete</a></li>');
-            //tr.find('.dropdown-menu').append('<li><a class="dropdown-item download" href="#">Download</a></li>');
+            tr.find('.dropdown-menu').append('<li><a class="dropdown-item view" href="#">View</a></li>');
           }
           tr.find('.open').off('click').on('click', mk_tree(_t, _p, _e, _l));
           tr.find('.delete').off('click').on('click', mk_delete(_p, _e, _n["is_dir"], _l));
           tr.find('.mkdir').off('click').on('click', mk_mkdir(_t, _p, _e, _n["is_dir"], _l));
-          tr.find('.download').off('click').on('click', mk_download(_p));
+          tr.find('.view').off('click').on('click', mk_view(_p, tr.find('.mime_type').text(), tr.find('.file_size').text(), _l));
           return tr;
         };
         // ディレクトリを先に表示
@@ -573,7 +601,7 @@ fsapi.file_list = async (target_path, current_path, dh) => {
     fsapi.handles[path] = entry;
     if (entry.kind === 'file') {
       const f = await entry.getFile();
-      children[key] = {'name':entry.name, 'is_dir':false, 'path':path, 'size':f.size, 'last':f.lastModified, 'local':true};
+      children[key] = {'name':entry.name, 'is_dir':false, 'path':path, 'mime_type':f.type, 'size':f.size, 'last':f.lastModified, 'local':true};
     }
     else if (entry.kind === 'directory') {
       children[key] = {'name':entry.name, 'is_dir':true, 'path':path, 'size':0, 'last':'', 'local':true};
@@ -631,6 +659,23 @@ fsapi.local_exec_cmd = async (opt) => {
     fsapi.tree(fsapi.left, "/", fsapi.left.find('.tree-menu'))
     return []
   }
+  else if (opt['mode'] == 'client' && opt['cmd'] == 'file_download') {
+    path = opt['svpath'];
+    const entry = fsapi.handles[path];
+    try {
+      file = await entry.getFile();
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      return new Promise((resolve) => {
+        reader.onload = () => {
+          txt = reader.result.substring(reader.result.indexOf(',')+1);
+          resolve([{"success": {"svpath": path, "data": txt}}]);
+        };
+      });
+    } catch (e) {
+      return {"warn": `Failed to view.${opt['svpath']}`};
+    }
+  }
   return {"warn": "Unknown command."}
 };
 fsapi.sv_exec_cmd = async (opt) => {
@@ -647,6 +692,40 @@ fsapi.message = (res) => {
   alert(msg.replace(/\\n/g, '\n'));
   hide_loading();
 }
+fsapi.viewer = (title, data, mime) => {
+  const viewer = $('#viewer_modal');
+  viewer.find('.modal-title').text(title);
+  const viewer_body = viewer.find('.modal-body');
+  viewer_body.html('');
+  if (mime.indexOf('image') >= 0) {
+    const img = $('<img class="img-fluid" />');
+    img.attr('src', `data:${mime};base64,${data}`);
+    viewer_body.append(img);
+  } else {
+    cls = '';
+    cls = mime == 'application/json' ? 'language-json' : cls;
+    cls = mime == 'text/html' ? 'language-html' : cls;
+    cls = mime == 'text/x-python' ? 'language-python' : cls;
+    const pre = $(`<pre><code class="${cls}"></code></pre>`);
+    viewer_body.append(pre);
+    const txt = atob(data);
+    const istxt = fsapi.is_text(new TextEncoder().encode(txt));
+    if (istxt) {
+      pre.find('code').text(txt.replace(/\r/g, ''));
+    } else {
+      pre.find('code').text('< This file is not text or image data. >');
+    }
+  }
+  hljs.initHighlightingOnLoad();
+  viewer.modal('show');
+}
+fsapi.is_text = (array) => {
+  const textChars = [7, 8, 9, 10, 12, 13, 27, ...fsapi.range(0x20, 0xff, 1)];
+  return array.every(e => textChars.includes(e));
+}
+fsapi.range = (start, stop, step) => {
+  return Array.from({ length: (stop - start) / step + 1 }, (_, i) => start + i * step);
+}
 $(()=>{
   fetch('get_server_opt', {method: 'GET'}).then(res => res.json()).then(opt => {
     fsapi.initargs = opt;
@@ -656,5 +735,10 @@ $(()=>{
     fsapi.right.find('.filer_svname').val(fsapi.initargs['svname']);
     fsapi.right.find('.filer_local_data').val(fsapi.initargs['data']);
     fsapi.filer("/", false);
+  });
+  hljs.addPlugin({
+    'after:highlightElement': ({el, result}) => {
+        el.innerHTML = result.value.replace(/^/gm,'<span class="row-number"></span>');
+    }
   });
 })

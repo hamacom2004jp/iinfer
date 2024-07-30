@@ -538,13 +538,17 @@ class Web(options.Options):
     def versions_used(self):
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"web.versions_used")
+        ret = []
         with open(Path(iinfer.__file__).parent / 'licenses' / 'files.txt', 'r', encoding='utf-8') as f:
-            ret = []
             for i, line in enumerate(f.readlines()):
                 parts = line.strip().split('\t')
                 ret.append(parts)
-            return ret
-    
+        with open(Path(iinfer.__file__).parent / 'web' / 'assets_license_list.txt', 'r', encoding='utf-8') as f:
+            for i, line in enumerate(f.readlines()):
+                parts = line.strip().split('\t')
+                ret.append(parts)
+        return ret
+     
     def filer_upload(self, request:bottle.Request):
         q = request.query
         svpath = q['svpath']
