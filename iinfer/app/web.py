@@ -98,6 +98,7 @@ class Web(options.Options):
             self.logger.debug(f"web.list_cmd: kwd={kwd}")
         paths = glob.glob(str(self.data / f"cmd-{kwd}.json"))
         ret = [common.loadopt(path) for path in paths]
+        ret = sorted(ret, key=lambda cmd: cmd["title"])
         return ret
 
     def save_cmd(self, title, opt):
@@ -370,7 +371,9 @@ class Web(options.Options):
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"web.list_pipe: kwd={kwd}")
         paths = glob.glob(str(self.data / f"pipe-{kwd}.json"))
-        return [common.loadopt(path) for path in paths]
+        ret = [common.loadopt(path) for path in paths]
+        ret = sorted(ret, key=lambda cmd: cmd["title"])
+        return ret
 
     def exec_pipe(self, title, opt, nothread=False, capture_stdin=False):
         self.logger.info(f"exec_pipe: title={title}, opt={opt}")

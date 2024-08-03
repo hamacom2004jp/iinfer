@@ -726,6 +726,85 @@ class Client(object):
                                            retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
         return res_json
 
+    def read_dir(self, glob_str:str, read_input_type:str='jpeg', image_type:str='capture', root_dir:Path=Path('.'), include_hidden=True,
+                 moveto:Path=None, polling:bool=False, polling_count:int=10, polling_interval:int=1):
+        """
+        ディレクトリ内の画像ファイルを取得します
+
+        Args:
+            glob_str (str): 読込むファイルのglobパターン
+            read_input_type (str, optional): 読み込みタイプ. Defaults to 'jpeg'.
+            image_type (str, optional): 画像の形式. Defaults to 'capture'.
+            root_dir (Path, optional): 検索の基準となるルートディレクトリ. Defaults to Path('.').
+            include_hidden (bool, optional): 隠しファイルを含めるかどうか. Defaults to True.
+            moveto (Path, optional): 読み込んだファイルを移動する先のディレクトリ. Defaults to None.
+            polling (bool, optional): 定期的にディレクトリ内の読込みを繰り返すかどうか. Defaults to False.
+            polling_count (int, optional): ポーリング回数. Defaults to 10.
+            polling_interval (int, optional): ポーリング間隔. Defaults to 1.
+
+        Yields:
+            Tuple[str, str, int, int, int, str]: 画像の形式, 画像のBase64文字列, 画像の高さ, 画像の幅, 画像の色数, 画像のファイル名
+        """
+        if root_dir is None or not root_dir.exists():
+            self.logger.warning(f"root_dir {root_dir} does not exist.")
+            return
+        def _read_file(p:Path, image_type:str):
+            img_npy = convert.imgfile2npy(p)
+            if image_type == 'capture':
+                img_b64 = convert.npy2b64str(img_npy)
+            elif image_type != 'capture':
+                img_b64 = convert.bytes2b64str(convert.npy2imgfile(img_npy, image_type=image_type))
+            return image_type, img_b64, img_npy.shape[0], img_npy.shape[1], img_npy.shape[2] if len(img_npy.shape) > 2 else -1, p.name
+
+        def _read_dir(glob_str:str, read_input_type:str, image_type:str, root_dir:Path, include_hidden:bool, moveto:Path):
+            files = glob.glob(glob_str, root_dir=root_dir, include_hidden=include_hidden, recursive=True)
+            for file in files:
+                p = root_dir / file
+                if not p.is_file():
+                    continue
+                if self.logger.level == logging.DEBUG:
+                    self.logger.debug(f"read file: {p}")
+                if read_input_type == 'capture':
+                    with open(p, 'r', encoding='utf-8') as f:
+                        for line in f:
+                            cel = line.split(',')
+                            if cel[0] != image_type:
+                                if cel[0] == 'capture':
+                                    img_npy = convert.b64str2npy(cel[1], shape=(int(cel[2]), int(cel[3]), int(cel[4]) if int(cel[4]) > 0 else 1))
+                                else:
+                                    img_npy = convert.imgbytes2npy(convert.b64str2bytes(cel[1]))
+                                cel[0] = image_type
+                                cel[1] = convert.npy2b64str(img_npy)
+                            yield cel[0], cel[1], cel[2], cel[3], cel[4], cel[5]
+                elif read_input_type == 'filelist':
+                    with open(p, 'r', encoding='utf-8') as f:
+                        for line in f:
+                            p = Path(line)
+                            cel = _read_file(p, image_type)
+                            yield cel[0], cel[1], cel[2], cel[3], cel[4], cel[5]
+                else:
+                    cel = _read_file(p, image_type)
+                    yield cel[0], cel[1], cel[2], cel[3], cel[4], cel[5]
+                if moveto is not None:
+                    mv = moveto / file
+                    if self.logger.level == logging.DEBUG:
+                        self.logger.debug(f"move file: {p} => {mv}")
+                    mv.parent.mkdir(parents=True, exist_ok=True)
+                    p.rename(mv)
+        
+        if polling:
+            count = 0
+            while True:
+                for cel in _read_dir(glob_str, read_input_type, image_type, root_dir, include_hidden, moveto):
+                    yield cel
+                count += 1
+                if count >= polling_count and polling_count > 0:
+                    break
+                time.sleep(polling_interval)
+        else:
+            for cel in _read_dir(glob_str, read_input_type, image_type, root_dir, include_hidden, moveto):
+                yield cel
+
     def capture(self, capture_device='0', image_type:str='capture', capture_frame_width:int=None, capture_frame_height:int=None,
                 capture_fps:int=1000, output_preview:bool=False):
         """

@@ -58,10 +58,11 @@
             "justMyCode": false
         },
         {
-            "name": "Python: iinfer train_type_list",
+            "name": "Python: iinfer read_dir",
             "type": "python",
             "request": "launch",
-            "args": ["-m","client","-c","train_type_list","-f"],
+            "args": ["-m","client","-c","read_dir","-f", "--glob_str", "**/*.jpg", "--read_input_type", "jpeg", "--image_type", "capture",
+                     "--root_dir", "sample/input", "--polling_interval", "1", "--polling"],
             "module": "iinfer",
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",

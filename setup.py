@@ -37,6 +37,7 @@ PACKAGES = [
     'iinfer.app.injections',
     'iinfer.app.postprocesses',
     'iinfer.app.predicts',
+    'iinfer.app.trains',
     'iinfer.docker',
     'iinfer.extensions'
 ]

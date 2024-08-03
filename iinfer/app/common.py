@@ -59,13 +59,27 @@ def load_config(mode:str, debug:bool=False) -> Tuple[logging.Logger, dict]:
     log_config = yaml.safe_load(resource_string(APP_ID, f"logconf_{mode}.yml"))
     logging.config.dictConfig(log_config)
     logger = logging.getLogger(mode)
+    set_debug(logger, debug)
+    config = yaml.safe_load(resource_string(APP_ID, "config.yml"))
+    return logger, config
+
+def set_debug(logger:logging.Logger, debug:bool=False) -> None:
+    """
+    ロガーのデバッグモードを設定します。
+
+    Args:
+        logger (logging.Logger): ロガー
+        debug (bool, optional): デバッグモード. Defaults to False.
+    """
     if debug:
         logger.setLevel(logging.DEBUG)
         for handler in logger.handlers:
             handler.setLevel(logging.DEBUG)
         logger.info("Use debug mode logging.")
-    config = yaml.safe_load(resource_string(APP_ID, "config.yml"))
-    return logger, config
+    else:
+        logger.setLevel(logging.INFO)
+        for handler in logger.handlers:
+            handler.setLevel(logging.INFO)
 
 def default_json_enc(o) -> Any:
     if isinstance(o, Path):
@@ -305,13 +319,14 @@ def download_file(url:str, save_path:Path) -> Path:
         f.write(r.content)
     return save_path
 
-def cmd(cmd:str, logger:logging.Logger, strip:bool=False):
+def cmd(cmd:str, logger:logging.Logger, slise:int=100):
     """
     コマンドを実行します。
 
     Args:
         cmd (str): 実行するコマンド
         logger (logging.Logger): ロガー
+        slise (int, optional): 出力文字列の最大長. Defaults to 100
 
     Returns:
         Tuple[int, str]: コマンドの戻り値と出力
@@ -330,7 +345,7 @@ def cmd(cmd:str, logger:logging.Logger, strip:bool=False):
                 #if platform.system() == 'Windows' or strip:
                 #    output = output.rstrip()
                 if logger.level == logging.DEBUG:
-                    output_str = to_str(output, slise=100)
+                    output_str = to_str(output, slise=slise)
                     logger.debug(f"common.cmd:output={output_str}")
                 break
             except UnicodeDecodeError:

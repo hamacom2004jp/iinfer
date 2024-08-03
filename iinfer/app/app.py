@@ -360,6 +360,20 @@ class IinferApp:
                 ret = dict(success=type_list)
                 common.print_format(ret, args.format, tm, args.output_json, args.output_json_append)
 
+            elif args.cmd == 'read_dir':
+                root_dir = Path(args.root_dir) if args.root_dir is not None else Path('.')
+                moveto = Path(args.moveto) if args.moveto is not None else None
+                for t,b64,h,w,c,fn in self.cl.read_dir(args.glob_str, read_input_type=args.read_input_type, image_type=args.image_type,
+                                                    root_dir=root_dir, include_hidden=args.include_hidden, moveto=moveto,
+                                                    polling=args.polling, polling_count=args.polling_count, polling_interval=args.polling_interval):
+                    ret = f"{t},"+b64+f",{h},{w},{c},{fn}"
+                    if args.output_csv is not None:
+                        with open(args.output_csv, 'a' if append else 'w', encoding="utf-8") as f:
+                            print(ret, file=f)
+                            append = True
+                    else:
+                        common.print_format(ret, False, tm, None, False)
+
             elif args.cmd == 'capture':
                 count = 0
                 append = False
