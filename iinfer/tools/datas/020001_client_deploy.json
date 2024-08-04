@@ -1,0 +1,38 @@
+{
+    "mode": "client",
+    "cmd": "deploy",
+    "title": "020001_client_deploy",
+    "name": "yolox_02",
+    "model_file": "https://download.openmmlab.com/mmdetection/v2.0/yolox/yolox_tiny_8x8_300e_coco/yolox_tiny_8x8_300e_coco_20211124_171234-b4047906.pth",
+    "model_conf_file": [
+        "sample\\configs\\mmdet\\yolox_tiny_8xb8-300e_coco.py",
+        "sample\\configs\\mmdet\\yolox_s_8xb8-300e_coco.py",
+        "sample\\configs\\mmdet\\yolox_tta.py"
+    ],
+    "predict_type": "mmdet_det_YoloX",
+    "label_file": "sample\\label_coco.txt",
+    "color_file": "",
+    "overwrite": true,
+    "timeout": 120,
+    "host": "localhost",
+    "port": 6379,
+    "password": "password",
+    "svname": "server",
+    "model_img_width": "",
+    "model_img_height": "",
+    "custom_predict_py": "",
+    "before_injection_type": [],
+    "before_injection_conf": "",
+    "before_injection_py": [],
+    "after_injection_type": [
+        "after_det_filter_injection",
+        "after_det_jadge_injection"
+    ],
+    "after_injection_conf": "iinfer\\tools\\datas\\injections\\after_yolox_injection.json",
+    "after_injection_py": [],
+    "retry_count": 3,
+    "retry_interval": 5,
+    "output_json": "",
+    "output_json_append": false,
+    "debug": true
+}

@@ -326,14 +326,14 @@
 
 <div class="viewcode-block" id="rmdirs">
 <a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.common.rmdirs">[docs]</a>
-<span class="k">def</span> <span class="nf">rmdirs</span><span class="p">(</span><span class="n">dir_path</span><span class="p">:</span><span class="n">Path</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">rmdirs</span><span class="p">(</span><span class="n">dir_path</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="n">ignore_errors</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    ディレクトリをサブディレクトリ含めて削除します。</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        dir_path (Path): 削除するディレクトリのパス</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">dir_path</span><span class="p">)</span></div>
+    <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">dir_path</span><span class="p">,</span> <span class="n">ignore_errors</span><span class="o">=</span><span class="n">ignore_errors</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="random_string">

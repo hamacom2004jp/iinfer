@@ -1,0 +1,14 @@
+{
+    "mode": "client",
+    "cmd": "capture",
+    "title": "000001_client_capture",
+    "capture_device": "0",
+    "image_type": "capture",
+    "capture_count": 3,
+    "output_preview": false,
+    "capture_frame_width": 640,
+    "capture_frame_height": 480,
+    "capture_fps": 10,
+    "output_csv": "",
+    "debug": true
+}

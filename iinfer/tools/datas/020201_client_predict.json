@@ -1,0 +1,22 @@
+{
+    "mode": "client",
+    "cmd": "predict",
+    "title": "020201_client_predict",
+    "name": "yolox_02",
+    "input_file": "tests\\dog.jpg",
+    "stdin": false,
+    "nodraw": false,
+    "pred_input_type": "jpeg",
+    "output_image": "",
+    "output_preview": false,
+    "host": "localhost",
+    "port": 6379,
+    "password": "password",
+    "svname": "server",
+    "retry_count": 3,
+    "retry_interval": 5,
+    "timeout": 15,
+    "output_json": "",
+    "output_json_append": false,
+    "debug": true
+}

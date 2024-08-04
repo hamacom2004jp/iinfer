@@ -1,0 +1,22 @@
+{
+    "mode": "postprocess",
+    "cmd": "det_filter",
+    "title": "010301_postprocess_det_filter",
+    "input_file": "tests\\output_010201_client_predict.json",
+    "stdin": false,
+    "score_th": 0.1,
+    "width_th": 10,
+    "height_th": 10,
+    "classes": [],
+    "labels": [
+        "car",
+        "bus",
+        "person"
+    ],
+    "nodraw": false,
+    "output_preview": false,
+    "output_image": "",
+    "output_json": "tests\\output_010301_postprocess_det_filter.json",
+    "output_json_append": false,
+    "debug": true
+}

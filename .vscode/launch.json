@@ -67,6 +67,18 @@
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
             "justMyCode": false
+        },
+        {
+            "name": "Python: gentest",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "iinfer/tools/gentest.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH":"${workspaceFolder}", // 追加
+            }
         }
         
     ]

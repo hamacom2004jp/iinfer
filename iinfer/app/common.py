@@ -202,14 +202,14 @@ def mkdirs(dir_path:Path):
         raise BaseException(f"Don't make diredtory.({str(dir_path)})")
     return dir_path
 
-def rmdirs(dir_path:Path):
+def rmdirs(dir_path:Path, ignore_errors:bool=True):
     """
     ディレクトリをサブディレクトリ含めて削除します。
 
     Args:
         dir_path (Path): 削除するディレクトリのパス
     """
-    shutil.rmtree(dir_path)
+    shutil.rmtree(dir_path, ignore_errors=ignore_errors)
 
 def random_string(size:int=16):
     """

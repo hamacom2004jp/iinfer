@@ -120,39 +120,6 @@ class Web(options.Options):
         self.logger.info(f"del_cmd: opt_path={opt_path}")
         opt_path.unlink()
 
-    def mk_opt_list(self, opt:dict):
-        opt_schema = self.get_cmd_choices(opt['mode'], opt['cmd'])
-        opt_list = ['-m', opt['mode'], '-c', opt['cmd']]
-        file_dict = dict()
-        for key, val in opt.items():
-            if key in ['stdout_log', 'capture_stdout']:
-                continue
-            schema = [schema for schema in opt_schema if schema['opt'] == key]
-            if len(schema) == 0 or val == '':
-                continue
-            if schema[0]['type'] == 'bool':
-                if val:
-                    opt_list.append(f"--{key}")
-                continue
-            if type(val) == list:
-                for v in val:
-                    if v is None or v == '':
-                        continue
-                    opt_list.append(f"--{key}")
-                    if str(v).find(' ') >= 0:
-                        opt_list.append(f'"{v}"')
-                    else:
-                        opt_list.append(str(v))
-            elif val is not None and val != '':
-                opt_list.append(f"--{key}")
-                if str(val).find(' ') >= 0:
-                    opt_list.append(f'"{val}"')
-                else:
-                    opt_list.append(str(val))
-            if 'fileio' in schema and schema[0]['fileio'] == 'in' and type(val) != str:
-                file_dict[key] = val
-        return opt_list, file_dict
-
     def bbforce_cmd(self):
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"web.bbforce_cmd")

@@ -1,7 +1,8 @@
 from typing import List, Dict, Any 
+from iinfer import version
 from iinfer.app import common
+import locale
 import os
-
 
 class Options:
     USE_REDIS_FALSE = -1
@@ -11,6 +12,9 @@ class Options:
         self._options = dict()
         self.init_options()
 
+    def get_mode_keys(self) -> List[str]:
+        return [key for key,val in self._options["mode"].items() if type(val) == dict]
+
     def get_modes(self) -> List[Dict[str, str]]:
         """
         起動モードの選択肢を取得します。
@@ -18,6 +22,11 @@ class Options:
             List[Dict[str, str]]: 起動モードの選択肢
         """
         return [''] + [{key:val} for key,val in self._options["mode"].items() if type(val) == dict]
+
+    def get_cmd_keys(self, mode:str) -> List[str]:
+        if mode not in self._options["cmd"]:
+            return []
+        return [key for key,val in self._options["cmd"][mode].items() if type(val) == dict]
 
     def get_cmds(self, mode:str) -> List[Dict[str, str]]:
         """
@@ -95,7 +104,8 @@ class Options:
                     opt['action'] = 'append' if val['multi'] else None
                 o = [f'-{val["short"]}'] if "short" in val else []
                 o += [f'--{key}']
-                opt['help'] = val['discription_en']
+                language, _ = locale.getlocale()
+                opt['help'] = val['discription_en'] if language.find('Japan') < 0 else val['discription_ja']
                 opt['default'] = val['default']
                 opt['opts'] = o
                 if val['choise'] is not None:
@@ -120,6 +130,39 @@ class Options:
                         continue
                     _list(ret, opt['opt'], opt)
         return ret
+
+    def mk_opt_list(self, opt:dict):
+        opt_schema = self.get_cmd_choices(opt['mode'], opt['cmd'])
+        opt_list = ['-m', opt['mode'], '-c', opt['cmd']]
+        file_dict = dict()
+        for key, val in opt.items():
+            if key in ['stdout_log', 'capture_stdout']:
+                continue
+            schema = [schema for schema in opt_schema if schema['opt'] == key]
+            if len(schema) == 0 or val == '':
+                continue
+            if schema[0]['type'] == 'bool':
+                if val:
+                    opt_list.append(f"--{key}")
+                continue
+            if type(val) == list:
+                for v in val:
+                    if v is None or v == '':
+                        continue
+                    opt_list.append(f"--{key}")
+                    if str(v).find(' ') >= 0:
+                        opt_list.append(f'"{v}"')
+                    else:
+                        opt_list.append(str(v))
+            elif val is not None and val != '':
+                opt_list.append(f"--{key}")
+                if str(val).find(' ') >= 0:
+                    opt_list.append(f'"{val}"')
+                else:
+                    opt_list.append(str(val))
+            if 'fileio' in schema[0] and schema[0]['fileio'] == 'in' and type(val) != str:
+                file_dict[key] = val
+        return opt_list, file_dict
 
     def init_options(self):
         default_host = os.environ.get('REDIS_HOST', 'localhost')
@@ -1335,7 +1378,7 @@ class Options:
                              discription_ja="ピクセルごとのクラススコアがこの値以下のものは除去されます。",
                              discription_en="Pixels with class scores less than this value are removed."),
                         dict(opt="classes", type="int", default="", required=False, multi=True, hide=True, choise=None,
-                             discription_ja="このクラス以外のマスクは除去します。複数指定できます。。",
+                             discription_ja="このクラス以外のマスクは除去します。複数指定できます。",
                              discription_en="Remove areas other than this class. Multiple specifications are possible."),
                         dict(opt="labels", type="str", default="", required=False, multi=True, hide=False, choise=None,
                              discription_ja="このラベル以外のマスクは除去します。複数指定できます。",
@@ -1786,8 +1829,8 @@ class Options:
                              discription_ja="省略した時は `$HONE/.iinfer` を使用します。",
                              discription_en="When omitted, `$HONE/.iinfer` is used."),
                         dict(opt="install_iinfer", type="str", default='iinfer', required=False, multi=False, hide=True, choise=None,
-                             discription_ja="省略した時は `iinfer` を使用します。 `iinfer==0.7.2` といった指定も可能です。",
-                             discription_en="When omitted, `iinfer` is used. You can also specify `iinfer==0.7.2`."),
+                             discription_ja=f"省略した時は `iinfer` を使用します。 `iinfer=={version.__version__}` といった指定も可能です。",
+                             discription_en=f"When omitted, `iinfer` is used. You can also specify `iinfer=={version.__version__}`."),
                         dict(opt="install_onnx", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False],
                              discription_ja="dockerイメージ内に `onnxruntime` をインストールします。",
                              discription_en="Install `onnxruntime` in the docker image."),

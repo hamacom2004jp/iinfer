@@ -432,6 +432,9 @@ class Client(object):
                     elif len(res_list) == 1:
                         return res_list[0]
                     return res_list
+                except UnicodeDecodeError as e:
+                    self.logger.error(f"capture file or pred_input_type setting is invalid. pred_input_type={pred_input_type}. {e}", exc_info=True)
+                    return {"error": f"capture file or pred_input_type setting is invalid. pred_input_type={pred_input_type}. {e}"}
                 finally:
                     if f is not None: f.close()
             elif pred_input_type == 'output_json':

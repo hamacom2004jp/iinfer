@@ -1,0 +1,28 @@
+{
+    "mode": "postprocess",
+    "cmd": "det_jadge",
+    "title": "010302_postprocess_det_jadge",
+    "input_file": "tests\\output_010301_postprocess_det_filter.json",
+    "stdin": false,
+    "ok_score_th": 0.5,
+    "ok_classes": [],
+    "ok_labels": [
+        "person"
+    ],
+    "ng_score_th": 0.3,
+    "ng_classes": [],
+    "ng_labels": [
+        "dog"
+    ],
+    "ext_score_th": 0.1,
+    "ext_classes": [],
+    "ext_labels": [
+        "bus"
+    ],
+    "nodraw": false,
+    "output_preview": false,
+    "output_image": "",
+    "output_json": "",
+    "output_json_append": false,
+    "debug": true
+}
