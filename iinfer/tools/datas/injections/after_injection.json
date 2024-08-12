@@ -1,0 +1,31 @@
+{
+    "nodraw": false,
+    "score_th": 0.1,
+    "width_th": 10,
+    "height_th": 10,
+    "classes": [],
+    "labels": ["car","bus","person"],
+
+    "ok_score_th": 0.9,
+    "ok_classes": [1],
+    "ok_labels": [],
+    "ng_score_th": null,
+    "ng_classes": [],
+    "ng_labels": [],
+    "ext_score_th": null,
+    "ext_classes": [],
+    "ext_labels": [],
+    
+    "logits_th": -100.0,
+    "del_logits": true,
+    
+    "nodraw_bbox": false,
+    "nodraw_rbbox": false,
+    "del_segments": false,
+
+    "host": "localhost",
+    "port": "6379",
+    "password": "password",
+    "svname": "server",
+    "maxrecsize": 1000
+}

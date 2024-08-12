@@ -68,6 +68,12 @@ class IinferApp:
             v = version.__logo__ + '\n' + version.__description__
             common.print_format(v, False, tm, None, False)
             return 0, v
+
+        if args.mode is None:
+            msg = {"warn":f"mode is None. Please specify the --help option."}
+            common.print_format(msg, args.format, tm, args.output_json, args.output_json_append)
+            return 1, msg
+
         logger, _ = common.load_config(args.mode, debug=args.debug)
         if logger.level == logging.DEBUG:
             logger.debug(f"app.main: args.mode={args.mode}, args.cmd={args.cmd}")

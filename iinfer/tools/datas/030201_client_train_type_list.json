@@ -1,0 +1,8 @@
+{
+    "mode": "client",
+    "cmd": "train_type_list",
+    "title": "030201_client_train_type_list",
+    "output_json": "",
+    "output_json_append": false,
+    "debug": true
+}

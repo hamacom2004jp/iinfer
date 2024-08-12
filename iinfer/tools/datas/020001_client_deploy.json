@@ -17,7 +17,7 @@
     "host": "localhost",
     "port": 6379,
     "password": "password",
-    "svname": "server",
+    "svname": "server2",
     "model_img_width": "",
     "model_img_height": "",
     "custom_predict_py": "",
@@ -28,7 +28,7 @@
         "after_det_filter_injection",
         "after_det_jadge_injection"
     ],
-    "after_injection_conf": "iinfer\\tools\\datas\\injections\\after_yolox_injection.json",
+    "after_injection_conf": "iinfer/tools/datas/injections/after_yolox_injection.json",
     "after_injection_py": [],
     "retry_count": 3,
     "retry_interval": 5,

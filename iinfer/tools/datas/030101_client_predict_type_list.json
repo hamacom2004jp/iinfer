@@ -1,0 +1,8 @@
+{
+    "mode": "client",
+    "cmd": "predict_type_list",
+    "title": "030101_client_predict_type_list",
+    "output_json": "",
+    "output_json_append": false,
+    "debug": true
+}
