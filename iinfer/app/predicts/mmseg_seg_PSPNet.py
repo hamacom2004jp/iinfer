@@ -62,17 +62,19 @@ class MMSegPSPNet(predict.TorchPredict):
         # RGB画像をBGR画像に変換
         img_npy = convert.img2npy(input_data)
 
-        from mmseg.apis import inference_model
+        from mmseg.apis import inference_model, show_result_pyplot
         from mmseg.structures import SegDataSample
 
         result:SegDataSample = inference_model(model, img_npy)
         if hasattr(model, 'module'):
-            model = model.module
+            _model = model.module
+        else:
+            _model = model
         
         segment = result.pred_sem_seg.numpy()
         logits = result.seg_logits.numpy()
-        output_catalog = model.dataset_meta['classes']
-        output_palette = model.dataset_meta['palette']
+        output_catalog = _model.dataset_meta['classes']
+        output_palette = _model.dataset_meta['palette']
         output_classes = np.unique(segment.data)
         output_labels = [output_catalog[i] for i in output_classes]
         output_sem_seg = convert.npy2b64str(segment.data)
@@ -83,10 +85,16 @@ class MMSegPSPNet(predict.TorchPredict):
         output_seg_logits_dtype = str(logits.data.dtype)
 
         if not nodraw:
-            img = self.draw_mask(img_npy, result,
-                                 labels if labels is not None else output_catalog,
-                                 colors if colors is not None else model.dataset_meta['palette'])
-            output_image = convert.npy2img(img)
+            output_image = show_result_pyplot(
+                model,
+                img_npy,
+                result,
+                title="input",
+                opacity=0.5,
+                with_labels=True,
+                draw_gt=False,
+                show=False,
+                out_file=None)
 
         else:
             output_image = input_data
@@ -101,18 +109,3 @@ class MMSegPSPNet(predict.TorchPredict):
                     output_seg_logits=output_seg_logits,
                     output_seg_logits_shape=output_seg_logits_shape,
                     output_seg_logits_dtype=output_seg_logits_dtype), output_image
-
-    def draw_mask(self, img_npy, result, classes, palette, alpha=0.5, with_labels=True):
-        from mmseg.visualization import SegLocalVisualizer
-        visualizer = SegLocalVisualizer(vis_backends=[dict(type='LocalVisBackend')], save_dir=None, alpha=alpha)
-        visualizer.dataset_meta = dict(classes=classes, palette=palette)
-        visualizer.add_datasample(
-            name='input',
-            image=img_npy,
-            data_sample=result,
-            draw_gt=False,
-            draw_pred=True,
-            show=False,
-            with_labels=with_labels)
-        img = visualizer.get_image()
-        return img

@@ -74,7 +74,7 @@ class Filer(object):
             cpath = '/'.join(current_path_parts[1:i+1])
             file_list:Path = self.data_dir / cpath
             children = dict()
-            for f in file_list.iterdir():
+            for f in sorted(list(file_list.iterdir())):
                 parts = str(f)[data_dir_len:].replace("\\","/").split("/")
                 path = "/".join(parts[:i+2])
                 key = common.safe_fname(path)

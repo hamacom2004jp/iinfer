@@ -36,4 +36,6 @@ class BeforeGrayimgInjection(injection.BeforeInjection):
         Returns:
             Image.Image: 前処理後の画像データ
         """
-        return image.convert('L')
+        image = image.convert('L')
+        image = image.convert('RGB')
+        return image

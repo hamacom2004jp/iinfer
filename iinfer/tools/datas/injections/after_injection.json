@@ -21,7 +21,7 @@
     
     "nodraw_bbox": false,
     "nodraw_rbbox": false,
-    "del_segments": false,
+    "del_segments": true,
 
     "host": "localhost",
     "port": "6379",

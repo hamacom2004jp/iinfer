@@ -84,6 +84,10 @@ class RedisClient(object):
         Returns:
             bool: 接続成功時はTrue、失敗時はFalse
         """
+        if retry_interval <= 0:
+            self.logger.warning(f"retry_interval must be greater than 0. retry_interval={retry_interval}", exc_info=True)
+            return dict(error=f"retry_interval must be greater than 0. retry_interval={retry_interval}")
+
         i = 0
         while i < retry_count or retry_count <= 0:
             try:
@@ -122,6 +126,8 @@ class RedisClient(object):
             dict: Redisサーバーからの応答
         """
         try:
+            if timeout <= 0:
+                raise ValueError(f"timeout must be greater than 0. timeout={timeout}")
             sreqtime = time.perf_counter()
             if not self.check_server(find_svname=True, retry_count=retry_count, retry_interval=retry_interval, outstatus=outstatus):
                 return dict(error=f"Connected server failed or server not found. svname={self.svname.split('-')[1]}")

@@ -750,7 +750,10 @@ class Client(object):
         """
         if root_dir is None or not root_dir.exists():
             self.logger.warning(f"root_dir {root_dir} does not exist.")
-            return
+            raise FileNotFoundError(f"root_dir {root_dir} does not exist.")
+        if polling_interval <= 0:
+            self.logger.warning(f"polling_interval {polling_interval} is invalid.")
+            raise ValueError(f"polling_interval {polling_interval} is invalid.")
         def _read_file(p:Path, image_type:str):
             img_npy = convert.imgfile2npy(p)
             if image_type == 'capture':

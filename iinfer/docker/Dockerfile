@@ -6,7 +6,10 @@ ARG MKUSER
 #{COPY_IINFER_START}
 
 RUN groupadd ${MKUSER} && \
-    useradd -m -g ${MKUSER} -s /usr/bin/bash ${MKUSER}
+    useradd -m -g ${MKUSER} -s /usr/bin/bash ${MKUSER} && \
+    cp /etc/skel/.bash_logout /home/${MKUSER}/ && \
+    cp /etc/skel/.bashrc /home/${MKUSER}/ && \
+    cp /etc/skel/.profile /home/${MKUSER}/
 RUN chown -R ${MKUSER}:${MKUSER} /home/${MKUSER}
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Asia/Tokyo

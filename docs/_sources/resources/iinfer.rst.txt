@@ -9,6 +9,7 @@ Subpackages
 
    iinfer.app
    iinfer.docker
+   iinfer.tools
 
 Submodules
 ----------

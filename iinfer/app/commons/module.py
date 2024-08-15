@@ -27,8 +27,13 @@ def load_custom_predict(custom_predict_py:Path, logger:logging.Logger) -> predic
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     for name, obj in inspect.getmembers(module):
-        if inspect.isclass(obj) and issubclass(obj, predict.Predict):
-            return obj(logger)
+        if hasattr(obj, "__module__") and obj.__module__ == module.__name__ and inspect.isclass(obj) and issubclass(obj, predict.Predict):
+            width = getattr(module, 'IMAGE_WIDTH')
+            height = getattr(module, 'IMAGE_HEIGHT')
+            pred = obj(logger)
+            pred.IMAGE_WIDTH = width
+            pred.IMAGE_HEIGHT = height
+            return pred
     raise BaseException(f"Predict class not found.({custom_predict_py})")
 
 def load_custom_train(custom_train_py:Path, logger:logging.Logger) -> train.Train:
@@ -49,7 +54,7 @@ def load_custom_train(custom_train_py:Path, logger:logging.Logger) -> train.Trai
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     for name, obj in inspect.getmembers(module):
-        if inspect.isclass(obj) and issubclass(obj, train.Train):
+        if hasattr(obj, "__module__") and obj.__module__ == module.__name__ and inspect.isclass(obj) and issubclass(obj, train.Train):
             return obj(logger)
     raise BaseException(f"Train class not found.({custom_train_py})")
 
@@ -119,7 +124,7 @@ def load_predict(predict_type:str, logger:logging.Logger) -> predict.Predict:
     """
     module = importlib.import_module("iinfer.app.predicts." + predict_type)
     for name, obj in inspect.getmembers(module):
-        if inspect.isclass(obj) and issubclass(obj, predict.Predict):
+        if hasattr(obj, "__module__") and obj.__module__ == module.__name__ and inspect.isclass(obj) and issubclass(obj, predict.Predict):
             return obj(logger)
     raise BaseException(f"Predict class not found.({predict_type})")
 
@@ -139,7 +144,7 @@ def load_train(train_type:str, logger:logging.Logger) -> train.Train:
     """
     module = importlib.import_module("iinfer.app.trains." + train_type)
     for name, obj in inspect.getmembers(module):
-        if inspect.isclass(obj) and issubclass(obj, train.Train):
+        if hasattr(obj, "__module__") and obj.__module__ == module.__name__ and inspect.isclass(obj) and issubclass(obj, train.Train):
             return obj(logger)
     raise BaseException(f"Train class not found.({train_type})")
 
@@ -162,7 +167,7 @@ def load_before_injection_type(injection_type:List[str], config:Dict[str,Any], l
     for t in injection_type:
         module = importlib.import_module("iinfer.app.injections." + t)
         for name, obj in inspect.getmembers(module):
-            if inspect.isclass(obj) and issubclass(obj, injection.BeforeInjection):
+            if hasattr(obj, "__module__") and obj.__module__ == module.__name__ and inspect.isclass(obj) and issubclass(obj, injection.BeforeInjection):
                 injections.append(obj(config, logger))
     if len(injections) > 0:
         return injections
@@ -187,7 +192,7 @@ def load_after_injection_type(injection_type:List[str], config:Dict[str,Any], lo
     for t in injection_type:
         module = importlib.import_module("iinfer.app.injections." + t)
         for name, obj in inspect.getmembers(module):
-            if inspect.isclass(obj) and issubclass(obj, injection.AfterInjection):
+            if hasattr(obj, "__module__") and obj.__module__ == module.__name__ and inspect.isclass(obj) and issubclass(obj, injection.AfterInjection):
                 injections.append(obj(config, logger))
     if len(injections) > 0:
         return injections
@@ -211,7 +216,7 @@ def load_before_injections(before_injection_py:List[Path], config:Dict[str,Any],
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
         for name, obj in inspect.getmembers(module):
-            if inspect.isclass(obj) and issubclass(obj, injection.BeforeInjection):
+            if hasattr(obj, "__module__") and obj.__module__ == module.__name__ and inspect.isclass(obj) and issubclass(obj, injection.BeforeInjection):
                 injections.append(obj(config, logger))
     return injections
 
@@ -234,7 +239,7 @@ def load_after_injections(after_injection_py:List[Path], config:Dict[str,Any], l
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
         for name, obj in inspect.getmembers(module):
-            if inspect.isclass(obj) and issubclass(obj, injection.AfterInjection):
+            if hasattr(obj, "__module__") and obj.__module__ == module.__name__ and inspect.isclass(obj) and issubclass(obj, injection.AfterInjection):
                 injections.append(obj(config, logger))
     return injections
 

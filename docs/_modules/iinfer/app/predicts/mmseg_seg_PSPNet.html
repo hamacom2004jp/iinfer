@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>iinfer.app.predicts.mmseg_seg_PSPNet &mdash; iinfer 2024/06/12 documentation</title>
+  <title>iinfer.app.predicts.mmseg_seg_PSPNet &mdash; iinfer 2024/08/15 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=3fafac33" />
@@ -15,7 +15,7 @@
   
         <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../../_static/documentation_options.js?v=9df839e0"></script>
+        <script src="../../../../_static/documentation_options.js?v=aed4c1a1"></script>
         <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
         <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/js/theme.js"></script>
@@ -158,17 +158,19 @@
         <span class="c1"># RGB画像をBGR画像に変換</span>
         <span class="n">img_npy</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">img2npy</span><span class="p">(</span><span class="n">input_data</span><span class="p">)</span>
 
-        <span class="kn">from</span> <span class="nn">mmseg.apis</span> <span class="kn">import</span> <span class="n">inference_model</span>
+        <span class="kn">from</span> <span class="nn">mmseg.apis</span> <span class="kn">import</span> <span class="n">inference_model</span><span class="p">,</span> <span class="n">show_result_pyplot</span>
         <span class="kn">from</span> <span class="nn">mmseg.structures</span> <span class="kn">import</span> <span class="n">SegDataSample</span>
 
         <span class="n">result</span><span class="p">:</span><span class="n">SegDataSample</span> <span class="o">=</span> <span class="n">inference_model</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">img_npy</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s1">&#39;module&#39;</span><span class="p">):</span>
-            <span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">module</span>
+            <span class="n">_model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">module</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">_model</span> <span class="o">=</span> <span class="n">model</span>
         
         <span class="n">segment</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">pred_sem_seg</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
         <span class="n">logits</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">seg_logits</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
-        <span class="n">output_catalog</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">dataset_meta</span><span class="p">[</span><span class="s1">&#39;classes&#39;</span><span class="p">]</span>
-        <span class="n">output_palette</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">dataset_meta</span><span class="p">[</span><span class="s1">&#39;palette&#39;</span><span class="p">]</span>
+        <span class="n">output_catalog</span> <span class="o">=</span> <span class="n">_model</span><span class="o">.</span><span class="n">dataset_meta</span><span class="p">[</span><span class="s1">&#39;classes&#39;</span><span class="p">]</span>
+        <span class="n">output_palette</span> <span class="o">=</span> <span class="n">_model</span><span class="o">.</span><span class="n">dataset_meta</span><span class="p">[</span><span class="s1">&#39;palette&#39;</span><span class="p">]</span>
         <span class="n">output_classes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">segment</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
         <span class="n">output_labels</span> <span class="o">=</span> <span class="p">[</span><span class="n">output_catalog</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">output_classes</span><span class="p">]</span>
         <span class="n">output_sem_seg</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">npy2b64str</span><span class="p">(</span><span class="n">segment</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
@@ -179,10 +181,16 @@
         <span class="n">output_seg_logits_dtype</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">logits</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">nodraw</span><span class="p">:</span>
-            <span class="n">img</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">draw_mask</span><span class="p">(</span><span class="n">img_npy</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span>
-                                 <span class="n">labels</span> <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">output_catalog</span><span class="p">,</span>
-                                 <span class="n">colors</span> <span class="k">if</span> <span class="n">colors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">model</span><span class="o">.</span><span class="n">dataset_meta</span><span class="p">[</span><span class="s1">&#39;palette&#39;</span><span class="p">])</span>
-            <span class="n">output_image</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span class="n">npy2img</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+            <span class="n">output_image</span> <span class="o">=</span> <span class="n">show_result_pyplot</span><span class="p">(</span>
+                <span class="n">model</span><span class="p">,</span>
+                <span class="n">img_npy</span><span class="p">,</span>
+                <span class="n">result</span><span class="p">,</span>
+                <span class="n">title</span><span class="o">=</span><span class="s2">&quot;input&quot;</span><span class="p">,</span>
+                <span class="n">opacity</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+                <span class="n">with_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">draw_gt</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">out_file</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>
             <span class="n">output_image</span> <span class="o">=</span> <span class="n">input_data</span>
@@ -197,24 +205,6 @@
                     <span class="n">output_seg_logits</span><span class="o">=</span><span class="n">output_seg_logits</span><span class="p">,</span>
                     <span class="n">output_seg_logits_shape</span><span class="o">=</span><span class="n">output_seg_logits_shape</span><span class="p">,</span>
                     <span class="n">output_seg_logits_dtype</span><span class="o">=</span><span class="n">output_seg_logits_dtype</span><span class="p">),</span> <span class="n">output_image</span></div>
-
-
-<div class="viewcode-block" id="MMSegPSPNet.draw_mask">
-<a class="viewcode-back" href="../../../../resources/iinfer.app.predicts.html#iinfer.app.predicts.mmseg_seg_PSPNet.MMSegPSPNet.draw_mask">[docs]</a>
-    <span class="k">def</span> <span class="nf">draw_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">img_npy</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="n">classes</span><span class="p">,</span> <span class="n">palette</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">with_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">mmseg.visualization</span> <span class="kn">import</span> <span class="n">SegLocalVisualizer</span>
-        <span class="n">visualizer</span> <span class="o">=</span> <span class="n">SegLocalVisualizer</span><span class="p">(</span><span class="n">vis_backends</span><span class="o">=</span><span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;LocalVisBackend&#39;</span><span class="p">)],</span> <span class="n">save_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">)</span>
-        <span class="n">visualizer</span><span class="o">.</span><span class="n">dataset_meta</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">classes</span><span class="o">=</span><span class="n">classes</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="n">palette</span><span class="p">)</span>
-        <span class="n">visualizer</span><span class="o">.</span><span class="n">add_datasample</span><span class="p">(</span>
-            <span class="n">name</span><span class="o">=</span><span class="s1">&#39;input&#39;</span><span class="p">,</span>
-            <span class="n">image</span><span class="o">=</span><span class="n">img_npy</span><span class="p">,</span>
-            <span class="n">data_sample</span><span class="o">=</span><span class="n">result</span><span class="p">,</span>
-            <span class="n">draw_gt</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-            <span class="n">draw_pred</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-            <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-            <span class="n">with_labels</span><span class="o">=</span><span class="n">with_labels</span><span class="p">)</span>
-        <span class="n">img</span> <span class="o">=</span> <span class="n">visualizer</span><span class="o">.</span><span class="n">get_image</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">img</span></div>
 </div>
 
 </pre></div>
