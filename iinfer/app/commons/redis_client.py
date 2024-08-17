@@ -67,7 +67,7 @@ class RedisClient(object):
     
     def hget(self, name:str, key:str):
         return self.redis_cli.hget(name, key)
-    
+
     def keys(self, pattern:str):
         return self.redis_cli.keys(pattern)
 
@@ -86,7 +86,7 @@ class RedisClient(object):
         """
         if retry_interval <= 0:
             self.logger.warning(f"retry_interval must be greater than 0. retry_interval={retry_interval}", exc_info=True)
-            return dict(error=f"retry_interval must be greater than 0. retry_interval={retry_interval}")
+            return False
 
         i = 0
         while i < retry_count or retry_count <= 0:
@@ -95,7 +95,8 @@ class RedisClient(object):
                     self.logger.info(f"({i+1}/{retry_count if retry_count>0 else '-'}) connecting to the redis server. {self.host}:{self.port}")
                 self.redis_cli.ping()
                 if find_svname:
-                    found = self.redis_cli.keys(self.hbname)
+                    _hbname = f"{self.hbname}-*" if len(self.hbname.split('-')) < 3 else self.hbname
+                    found = self.redis_cli.keys(_hbname)
                     if len(found) <= 0:
                         self.logger.warning(f"Server not found. svname={self.svname.split('-')[1]}")
                         return False
@@ -132,6 +133,7 @@ class RedisClient(object):
             if not self.check_server(find_svname=True, retry_count=retry_count, retry_interval=retry_interval, outstatus=outstatus):
                 return dict(error=f"Connected server failed or server not found. svname={self.svname.split('-')[1]}")
             reskey = common.random_string()
+            reskey = f"cl-{reskey}-{int(time.time())}"
             self.redis_cli.rpush(self.svname, f"{cmd} {reskey} {' '.join([str(p) for p in params])}")
             self.is_running = True
             stime = time.time()
@@ -187,7 +189,7 @@ class RedisClient(object):
             performance.append(dict(key="cl_reskbyte", val=f"{reskbyte:.3f}KB"))
         return res_json
 
-    def recive_showimg(self):
+    def receive_showimg(self):
         if not self.check_server(find_svname=False):
             return None, None
         result = self.lpop(self.siname)
@@ -196,7 +198,7 @@ class RedisClient(object):
         msg = result.decode().split(' ')
         if self.logger.level == logging.DEBUG:
             msg_str = common.to_str(msg, slise=100)
-            self.logger.debug(f"redis_client.recive_showimg: self.siname={self.siname}, msg={msg_str}")
+            self.logger.debug(f"redis_client.receive_showimg: self.siname={self.siname}, msg={msg_str}")
         if len(msg) <= 0:
             return None, None
         cmd = msg[0]
@@ -266,6 +268,34 @@ class RedisClient(object):
             self.logger.warning(f"Failed to publish to Redis server. cmd='{cmd}' llen={llen}. {e}", exc_info=True)
             return dict(warn=f"Failed to publish to Redis server. cmd='{cmd}' llen={llen}. {e}")
         return dict(success=f"Success execution of showimg. cmd='{cmd}' llen={llen+1}.")
-    
 
-    
+    def list_server(self) -> List[Dict[str, Any]]:
+        """
+        起動しているサーバーリストを取得する
+
+        Returns:
+            List[Dict[str, Any]]: サーバーのリスト
+        """
+        hblist = self.keys("hb-*")
+        svlist = []
+        for hb in hblist:
+            hb = hb.decode()
+            svname = hb.replace("hb-", "")
+            try:
+                val = self.hget(hb, 'receive_cnt')
+                receive_cnt = int(val.decode()) if val is not None else 0
+                val = self.hget(hb, 'sccess_cnt')
+                sccess_cnt = int(val.decode()) if val is not None else 0
+                val = self.hget(hb, 'warn_cnt')
+                warn_cnt = int(val.decode()) if val is not None else 0
+                val = self.hget(hb, 'error_cnt')
+                error_cnt = int(val.decode()) if val is not None else 0
+                val = self.hget(hb, 'status')
+                status = val.decode() if val is not None else "unknown"
+                val = self.hget(hb, 'ctime')
+                ctime = time.strftime('%Y/%m/%d %H:%M:%S', time.localtime(float(val.decode()))) if val is not None else "-"
+            except redis.exceptions.ResponseError:
+                self.logger.warn(f"ResponseError. {hb}", exc_info=True)
+            svlist.append(dict(svname=svname, status=status, ctime=ctime,
+                               receive_cnt=receive_cnt, sccess_cnt=sccess_cnt, warn_cnt=warn_cnt, error_cnt=error_cnt))
+        return svlist

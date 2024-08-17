@@ -167,7 +167,7 @@ webcap.change_pipeline = (title, url, outputs_key_str, capture_fps, capture_fram
   $('#rec_error').hide();
   $('#navi_title').text(`WebCap ( ${title} )`);
   const pipeline_elem = $('#pipeline');
-  pipeline_elem.find('.dropdown-submenu span').text("&nbsp;");
+  pipeline_elem.find('.dropdown-submenu span').html("&nbsp;");
   pipeline_elem.find(`.${title}`).text("*");
   fetch(webcap.pipeline.url, {method: "GET", mode:'cors'});
 };

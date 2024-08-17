@@ -8,7 +8,7 @@
             "name": "Python: iinfer server",
             "type": "python",
             "request": "launch",
-            "args": ["-m","server","-c","start","-f","--retry_count","0","--retry_interval","-1", "--debug"],
+            "args": ["-m","server","-c","start","-f","--retry_count","3","--debug"],
             "module": "iinfer",
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",

@@ -1,9 +1,8 @@
-from geventwebsocket.exceptions import WebSocketError
 from iinfer import version
 from iinfer.app import app, common, options
 from iinfer.app.commons import convert, redis_client
 from pathlib import Path
-from typing import List
+from typing import Any, Dict, List
 import ctypes
 import bottle
 import bottle_websocket
@@ -12,7 +11,6 @@ import datetime
 import glob
 import gevent
 import html
-#import httpx
 import iinfer
 import io
 import json
@@ -78,7 +76,16 @@ class Web(options.Options):
         #self.webcap_client = httpx.Client()
         self.webcap_client = requests.Session()
 
-    def mk_curl_fileup(self, cmd_opt):
+    def mk_curl_fileup(self, cmd_opt:Dict[str, Any]) -> str:
+        """
+        curlコマンド文字列を作成する
+
+        Args:
+            cmd_opt (dict): コマンドのオプション
+        
+        Returns:
+            str: curlコマンド文字列
+        """
         if 'mode' not in cmd_opt or 'cmd' not in cmd_opt:
             return ""
         curl_fileup = set()
@@ -91,7 +98,16 @@ class Web(options.Options):
             curl_fileup.add(f'-F "input_file=@&lt;input_file&gt;"')
         return " ".join(curl_fileup)
 
-    def list_cmd(self, kwd):
+    def list_cmd(self, kwd:str) -> List[Dict[str, Any]]:
+        """
+        コマンドファイルのタイトル一覧を取得する
+
+        Args:
+            kwd (str): キーワード
+
+        Returns:
+            list: コマンドファイルのタイトル一覧
+        """
         if kwd is None or kwd == '':
             kwd = '*'
         if self.logger.level == logging.DEBUG:
@@ -101,7 +117,17 @@ class Web(options.Options):
         ret = sorted(ret, key=lambda cmd: cmd["title"])
         return ret
 
-    def save_cmd(self, title, opt):
+    def save_cmd(self, title:str, opt:Dict[str, Any]) -> Dict[str, str]:
+        """
+        コマンドファイルを保存する
+
+        Args:
+            title (str): タイトル
+            opt (dict): オプション
+        
+        Returns:
+            dict: 結果
+        """
         if common.check_fname(title):
             return dict(warn=f'The title contains invalid characters."{title}"')
         opt_path = self.data / f"cmd-{title}.json"
@@ -109,18 +135,36 @@ class Web(options.Options):
         common.saveopt(opt, opt_path)
         return dict(success=f'Command "{title}" saved in "{opt_path}".')
 
-    def load_cmd(self, title):
+    def load_cmd(self, title:str) -> Dict[str, Any]:
+        """
+        コマンドファイルを読み込む
+        
+        Args:
+            title (str): タイトル
+            
+        Returns:
+            dict: コマンドファイルの内容
+        """
         opt_path = self.data / f"cmd-{title}.json"
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"web.load_cmd: title={title}, opt_path={opt_path}")
         return common.loadopt(opt_path)
 
-    def del_cmd(self, title):
+    def del_cmd(self, title:str):
+        """
+        コマンドファイルを削除する
+
+        Args:
+            title (str): タイトル
+        """
         opt_path = self.data / f"cmd-{title}.json"
         self.logger.info(f"del_cmd: opt_path={opt_path}")
         opt_path.unlink()
 
     def bbforce_cmd(self):
+        """
+        コマンドの強制終了
+        """
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"web.bbforce_cmd")
         try:
@@ -142,6 +186,15 @@ class Web(options.Options):
             pass
 
     def chk_client_only(self, opt):
+        """
+        クライアントのみのサービスかどうかをチェックする
+
+        Args:
+            opt (dict): オプション
+
+        Returns:
+            tuple: (クライアントのみ場合はTrue, メッセージ)
+        """
         if not self.client_only:
             return False, None
         use_redis = self.get_cmd_attr(opt['mode'], opt['cmd'], "use_redis")
@@ -157,7 +210,18 @@ class Web(options.Options):
                 return True, output
         return False, None
 
-    def exec_cmd(self, title, opt, nothread=False):
+    def exec_cmd(self, title:str, opt:Dict[str, Any], nothread:bool=False) -> List[Dict[str, Any]]:
+        """
+        コマンドを実行する
+
+        Args:
+            title (str): タイトル
+            opt (dict): オプション
+            nothread (bool, optional): スレッドを使わないかどうか. Defaults to False.
+        
+        Returns:
+            list: コマンド実行結果
+        """
         self.container['iinfer_app'] = app.IinferApp()
         def _exec_cmd(iinfer_app:app.IinferApp, title, opt, nothread=False):
             self.logger.info(f"exec_cmd: title={title}, opt={opt}")
@@ -232,7 +296,17 @@ class Web(options.Options):
         th.start()
         return [dict(warn='start_cmd')]
 
-    def raw_cmd(self, title:str, opt:dict):
+    def raw_cmd(self, title:str, opt:dict) -> List[Dict[str, Any]]:
+        """
+        コマンドライン文字列、オプション文字列、curlコマンド文字列を作成する
+
+        Args:
+            title (str): タイトル
+            opt (dict): オプション
+        
+        Returns:
+            list[Dict[str, Any]]: コマンドライン文字列、オプション文字列、curlコマンド文字列
+        """
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"web.raw_cmd: title={title}, opt={opt}")
         opt_list, _ = self.mk_opt_list(opt)
@@ -243,7 +317,16 @@ class Web(options.Options):
                 dict(type='optjson',raw=json.dumps(opt, default=common.default_json_enc)),
                 dict(type='curlcmd',raw=f'curl {curl_cmd_file} http://localhost:8081/exec_cmd/{title}')]
 
-    def list_tree(self, current_path):
+    def list_tree(self, current_path:str) -> Dict[str, Any]:
+        """
+        ディレクトリのツリーを取得する
+
+        Args:
+            current_path (str): カレントパス
+        
+        Returns:
+            dict: ディレクトリのツリー
+        """
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"web.list_tree: current_path={current_path}")
         current_path = Path.cwd() if current_path is None or current_path=='' else Path(current_path)
@@ -267,7 +350,17 @@ class Web(options.Options):
             path_tree[path_key] = dict(name=part, is_dir=path.is_dir(), path=str(path), children=children, size=path.stat().st_size, last=ts2str(path.stat().st_mtime))
         return path_tree
     
-    def list_downloads(self, current_path, root_path=None):
+    def list_downloads(self, current_path:str, root_path:Path=None):
+        """
+        ダウンロードファイルのリストを取得する
+
+        Args:
+            current_path (str): カレントパス
+            root_path (Path, optional): ルートパス. Defaults to None.
+        
+        Returns:
+            list: ダウンロードファイルのリスト
+        """
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"web.list_downloads: current_path={current_path}, root_path={root_path}")
         if type(current_path) == str:
@@ -286,7 +379,16 @@ class Web(options.Options):
                 download_files = download_files + self.list_downloads(f, root_path)
         return download_files
 
-    def load_result(self, current_path):
+    def load_result(self, current_path:str) -> List[Dict[str, Any]]:
+        """
+        結果ファイルを読み込む
+
+        Args:
+            current_path (str): カレントパス
+        
+        Returns:
+            list[Dict[str, Any]]: 結果ファイルの内容
+        """
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"web.load_result: current_path={current_path}")
         current_path = Path(current_path)
@@ -306,7 +408,16 @@ class Web(options.Options):
         except:
             return {'warn': f'An error occurred while reading the file.: {current_path}'}
 
-    def load_capture(self, current_path):
+    def load_capture(self, current_path:str) -> List[Dict[str, Any]]:
+        """
+        キャプチャファイルを読み込む
+
+        Args:
+            current_path (str): カレントパス
+
+        Returns:
+            list[Dict[str, Any]]: キャプチャファイルの内容
+        """
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"web.load_capture: current_path={current_path}")
         current_path = Path(current_path)
@@ -332,7 +443,16 @@ class Web(options.Options):
         except:
             return {'warn': f'An error occurred while reading the file.: {current_path}'}
     
-    def list_pipe(self, kwd):
+    def list_pipe(self, kwd:str) -> List[Dict[str, Any]]:
+        """
+        パイプラインファイルのリストを取得する
+
+        Args:
+            kwd (str): キーワード
+        
+        Returns:
+            list: パイプラインファイルのリスト
+        """
         if kwd is None or kwd == '':
             kwd = '*'
         if self.logger.level == logging.DEBUG:
@@ -342,7 +462,19 @@ class Web(options.Options):
         ret = sorted(ret, key=lambda cmd: cmd["title"])
         return ret
 
-    def exec_pipe(self, title, opt, nothread=False, capture_stdin=False):
+    def exec_pipe(self, title:str, opt:Dict[str, Any], nothread:bool=False, capture_stdin:bool=False) -> List[Dict[str, Any]]:
+        """
+        パイプラインを実行する
+
+        Args:
+            title (str): タイトル
+            opt (dict): オプション
+            nothread (bool, optional): スレッドを使わないかどうか. Defaults to False.
+            capture_stdin (bool, optional): 標準入力をキャプチャするかどうか. Defaults to False.
+        
+        Returns:
+            list: パイプライン実行結果
+        """
         self.logger.info(f"exec_pipe: title={title}, opt={opt}")
         def to_json(o):
             res_json = json.loads(o)
@@ -435,7 +567,17 @@ class Web(options.Options):
         #gevent.spawn(_exec_pipe, title, opt, self.container, False, capture_stdin)
         return dict(success='start_pipe')
 
-    def raw_pipe(self, title, opt):
+    def raw_pipe(self, title:str, opt:Dict[str, Any]) -> List[Dict[str, Any]]:
+        """
+        パイプラインのコマンドライン文字列、curlコマンド文字列を作成する
+
+        Args:
+            title (str): タイトル
+            opt (dict): オプション
+        
+        Returns:
+            list[Dict[str, Any]]: コマンドライン文字列、curlコマンド文字列
+        """
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"web.raw_pipe: title={title}, opt={opt}")
         cmdlines = []
@@ -475,7 +617,17 @@ class Web(options.Options):
         ret += [dict(type='warn', raw=em) for em in errormsg]
         return ret
 
-    def save_pipe(self, title, opt):
+    def save_pipe(self, title:str, opt:Dict[str, Any]) -> Dict[str, str]:
+        """
+        パイプラインを保存する
+
+        Args:
+            title (str): タイトル
+            opt (dict): オプション
+
+        Returns:
+            dict: 結果
+        """
         if common.check_fname(title):
             return dict(warn=f'The title contains invalid characters."{title}"')
         opt_path = self.data / f"pipe-{title}.json"
@@ -483,29 +635,62 @@ class Web(options.Options):
         common.saveopt(opt, opt_path)
         return dict(success=f'Pipeline "{title}" saved in "{opt_path}".')
 
-    def del_pipe(self, title):
+    def del_pipe(self, title:str):
+        """
+        パイプラインを削除する
+
+        Args:
+            title (str): タイトル
+        """
         opt_path = self.data / f"pipe-{title}.json"
         self.logger.info(f"del_pipe: opt_path={opt_path}")
         opt_path.unlink()
 
-    def load_pipe(self, title):
+    def load_pipe(self, title:str) -> Dict[str, Any]:
+        """
+        パイプラインを読み込む
+
+        Args:
+            title (str): タイトル
+
+        Returns:
+            dict: パイプラインの内容
+        """
         opt_path = self.data / f"pipe-{title}.json"
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"web.load_pipe: title={title}")
         return common.loadopt(opt_path)
 
-    def copyright(self):
+    def copyright(self) -> str:
+        """
+        コピーライトを取得する
+        
+        Returns:
+            str: コピーライト
+        """
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"web.copyright")
         return version.__copyright__
 
-    def versions_iinfer(self):
+    def versions_iinfer(self) -> List[str]:
+        """
+        iinferのバージョン情報を取得する
+
+        Returns:
+            list: バージョン情報
+        """
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"web.versions_iinfer")
         logo = [version.__logo__]
         return logo + version.__description__.split('\n')
 
-    def versions_used(self):
+    def versions_used(self) -> List[List[str]]:
+        """
+        使用しているミドルウエアのバージョン情報を取得する
+
+        Returns:
+            list: バージョン情報
+        """
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"web.versions_used")
         ret = []
@@ -519,7 +704,16 @@ class Web(options.Options):
                 ret.append(parts)
         return ret
      
-    def filer_upload(self, request:bottle.Request):
+    def filer_upload(self, request:bottle.Request) -> str:
+        """
+        ファイルをアップロードする
+
+        Args:
+            request (bottle.Request): リクエスト
+        
+        Returns:
+            str: 結果
+        """
         q = request.query
         svpath = q['svpath']
         self.logger.info(f"filer_upload: svpath={svpath}")
@@ -543,31 +737,60 @@ class Web(options.Options):
         return 'upload success'
         #return f'upload {upload.filename}'
 
-    def callback_console_modal_log_func(self, output:dict):
+    def callback_console_modal_log_func(self, output:Dict[str, Any]):
+        """
+        コンソールモーダルにログを出力する
+
+        Args:
+            output (Dict[str, Any]): 出力
+        """
         if self.logger.level == logging.DEBUG:
             output_str = common.to_str(output, slise=100)
             self.logger.debug(f"web.callback_console_modal_log_func: output={output_str}")
         self.cb_queue.put(('js_console_modal_log_func', None, output))
     
-    def callback_return_cmd_exec_func(self, title, output:dict):
+    def callback_return_cmd_exec_func(self, title:str, output:Dict[str, Any]):
+        """
+        コマンド実行結果を返す
+
+        Args:
+            title (str): タイトル
+            output (Dict[str, Any]): 出力
+        """
         if self.logger.level == logging.DEBUG:
             output_str = common.to_str(output, slise=100)
             self.logger.debug(f"web.callback_return_cmd_exec_func: output={output_str}")
         self.cb_queue.put(('js_return_cmd_exec_func', title, output))
 
-    def callback_return_pipe_exec_func(self, title, output):
+    def callback_return_pipe_exec_func(self, title:str, output:Dict[str, Any]):
+        """
+        パイプライン実行結果を返す
+
+        Args:
+            title (str): タイトル
+            output (Dict[str, Any]): 出力
+        """
         if self.logger.level == logging.DEBUG:
             output_str = common.to_str(output, slise=100)
             self.logger.debug(f"web.callback_return_pipe_exec_func: title={title}, output={output_str}")
         self.cb_queue.put(('js_return_pipe_exec_func', title, output))
 
-    def callback_return_stream_log_func(self, output):
+    def callback_return_stream_log_func(self, output:Dict[str, Any]):
+        """
+        ストリームログを返す
+
+        Args:
+            output (Dict[str, Any]): 出力
+        """
         if self.logger.level == logging.DEBUG:
             output_str = common.to_str(output, slise=100)
             self.logger.debug(f"web.callback_return_stream_log_func: output={output_str}")
         self.cb_queue.put(('js_return_stream_log_func', None, output))
 
     def gui_callback(self):
+        """
+        コマンドの実行結果をキューから取り出してブラウザに送信する
+        """
         wsock = bottle.request.environ.get('wsgi.websocket') # type: ignore
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"web.gui_callback: connected")
@@ -591,6 +814,14 @@ class Web(options.Options):
                 return
 
     def start(self, allow_host:str="0.0.0.0", listen_port:int=8081, outputs_key:List[str]=[]):
+        """
+        Webサーバを起動する
+
+        Args:
+            allow_host (str, optional): 許可ホスト. Defaults to "
+            listen_port (int, optional): リスンポート. Defaults to 8081.
+            outputs_key (list, optional): 出力キー. Defaults to [].
+        """
         self.allow_host = allow_host
         self.listen_port = listen_port
         self.outputs_key = outputs_key
@@ -634,6 +865,9 @@ class Web(options.Options):
 
         @app.hook('after_request')
         def enable_cors():
+            """
+            CORSを有効にする
+            """
             if not 'Origin' in bottle.request.headers.keys():
                 return
             bottle.response.headers['Access-Control-Allow-Origin'] = bottle.request.headers['Origin']
@@ -888,7 +1122,7 @@ class Web(options.Options):
                         outputs = self.img_queue.get(block=True, timeout=0.001)
                     except queue.Empty:
                         if redis_cli is not None:
-                            cmd, outputs = redis_cli.recive_showimg()
+                            cmd, outputs = redis_cli.receive_showimg()
                     if outputs is None:
                         gevent.sleep(0.1)
                         continue
@@ -1016,6 +1250,9 @@ class Web(options.Options):
             pass
 
     def stop(self):
+        """
+        Webサーバを停止する
+        """
         with open("iinfer_web.pid", mode="r", encoding="utf-8") as f:
             pid = f.read()
             os.kill(int(pid), signal.CTRL_C_EVENT)
@@ -1025,6 +1262,19 @@ class Web(options.Options):
     def webcap(self, allow_host:str="0.0.0.0", listen_port:int=8082,
                image_type:str='capture', outputs_key:List[str]=None, capture_frame_width:int=None, capture_frame_height:int=None,
                capture_count:int=5, capture_fps:int=5):
+        """
+        Webキャプチャを起動する
+
+        Args:
+            allow_host (str, optional): 許可ホスト. Defaults to "
+            listen_port (int, optional): リスンポート. Defaults to 8082.
+            image_type (str, optional): 画像タイプ. Defaults to 'capture'.
+            outputs_key (list, optional): 出力キー. Defaults to None.
+            capture_frame_width (int, optional): キャプチャフレーム幅. Defaults to None.
+            capture_frame_height (int, optional): キャプチャフレーム高さ. Defaults to None.
+            capture_count (int, optional): キャプチャ回数. Defaults to 5.
+            capture_fps (int, optional): キャプチャFPS. Defaults to 5.
+        """
         self.allow_host = allow_host
         self.listen_port = listen_port
         self.image_type = image_type

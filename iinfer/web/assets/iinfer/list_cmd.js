@@ -219,6 +219,7 @@ const list_cmd_func_then = () => {
         }
         cmd_modal.find('.modal-title').text(`Command : ${modal_title}`);
         cmd_modal.find('.row_content_hide').hide();
+        cmd_modal.find('.btn_window_stack').click();
         cmd_modal.modal('show');
         hide_loading();
     }

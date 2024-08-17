@@ -9,6 +9,7 @@ import logging
 import sys
 import time
 import traceback
+import threading
 
 
 def main(args_list:list=None):
@@ -262,7 +263,7 @@ class IinferApp:
                                 self.cl.logger.debug(f"app.main: args.mode={args.mode}, args.cmd={args.cmd}, msg={msg_str}")
                             return 1, msg
                         if args.pred_input_type in ['capture', 'prompt']:
-                            for line in sys.stdin:
+                            def _pred(args, line, tm):
                                 if self.cl.logger.level == logging.DEBUG:
                                     line_str = common.to_str(line, slise=100)
                                     self.cl.logger.debug(f"app.main: args.mode={args.mode}, args.cmd={args.cmd}, args.name={args.name}, image={line_str}")
@@ -273,6 +274,11 @@ class IinferApp:
                                 if self.cl.logger.level == logging.DEBUG:
                                     ret_str = common.to_str(ret, slise=100)
                                     self.cl.logger.debug(f"app.main: args.mode={args.mode}, args.cmd={args.cmd}, ret={ret_str}")
+                            for line in sys.stdin:
+                                # 標準入力による推論処理は非同期で行う(同名複数serverの場合にスループットを向上させるため)
+                                #thread = threading.Thread(target=_pred, args=(args, line, tm))
+                                #thread.start()
+                                _pred(args, line, tm)
                                 tm = time.perf_counter()
                                 args.output_json_append = True
                         else:

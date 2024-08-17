@@ -312,12 +312,16 @@ fsapi.load_server_list = () => {
         hide_loading();
         return;
       }
+      const svnames = {};
       res[0]['success'].forEach(elem => {
-        const a_elem = $(`<a class="dropdown-item" href="#" data-local_data="">${elem['svname']} ( ${opt['host']}:${opt['port']} )</a>`);
+        svname = elem['svname'].split('-')[0];
+        if (svnames[svname]) return;
+        svnames[svname] = true;
+        const a_elem = $(`<a class="dropdown-item" href="#" data-local_data="">${svname} ( ${opt['host']}:${opt['port']} )</a>`);
         a_elem.attr('data-host', opt['host']);
         a_elem.attr('data-port', opt['port']);
         a_elem.attr('data-password', opt['password']);
-        a_elem.attr('data-svname', elem['svname']);
+        a_elem.attr('data-svname', svname);
         a_elem.off("click").on("click", mk_func(a_elem));
         const li_elem = $('<li class="filer_svnames"></li>').append(a_elem);
         fsapi.right.find('.filer_server').append(li_elem);

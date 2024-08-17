@@ -105,6 +105,7 @@ class Install(object):
                     REDIS_PASSWORD='${REDIS_PASSWORD:-password}',
                     SVNAME='${SVNAME:-server'+install_tag+'}',
                     LISTEN_PORT='${LISTEN_PORT:-8081}',
+                    SVCOUNT='${SVCOUNT:-2}',
                 ),
                 user=user,
                 ports=['${LISTEN_PORT:-8081}:${LISTEN_PORT:-8081}'],

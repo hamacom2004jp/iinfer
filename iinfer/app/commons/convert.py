@@ -95,6 +95,7 @@ def npy2imgfile(npy, output_image_file:Path=None, image_type:str='jpeg') -> byte
         bytes: 画像のバイト列
     """
     image = Image.fromarray(npy)
+    image_type = 'jpeg' if image_type == 'jpg' else image_type
     img_byte = img2byte(image, format=image_type)
     if output_image_file is not None:
         with open(output_image_file, 'wb') as f:

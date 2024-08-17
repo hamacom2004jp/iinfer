@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="jp" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>iinfer.tools.gentest &mdash; iinfer 2024/08/15 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=aed4c1a1"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            iinfer
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/overview.html">iinferの概要</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/install.html">インストール</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/gui.html">GUIモード</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/web.html">Webモード</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/command.html">コマンドリファレンス</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/models.html">動作確認済みモデル</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/detection.html">物体検知</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/segmentation.html">領域検知</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/face.html">顔認識</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/pipeline.html">パイプライン</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/injections.html">インジェクション</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/customize.html">カスタマイズ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/developer.html">開発者向け情報</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/errors.html">よくあるエラー</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/license.html">ライセンス</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">iinfer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">iinfer.tools.gentest</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for iinfer.tools.gentest</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">iinfer.app</span> <span class="kn">import</span> <span class="n">common</span><span class="p">,</span> <span class="n">options</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">io</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">def main():</span>
+<span class="sd">    option = options.Options()</span>
+<span class="sd">    outdir = Path(&quot;tests&quot;) / &quot;genapp&quot;</span>
+<span class="sd">    common.rmdirs(outdir)</span>
+<span class="sd">    common.mkdirs(outdir)</span>
+
+<span class="sd">    opt_files = glob.glob(f&quot;iinfer/tools/datas/*.json&quot;, recursive=False)</span>
+<span class="sd">    buffer =  io.StringIO()</span>
+<span class="sd">    buffer.write(BASE_TEST)</span>
+<span class="sd">    index = 0</span>
+<span class="sd">    for opt_file in opt_files:</span>
+<span class="sd">        opt = common.loadopt(opt_file)</span>
+<span class="sd">        opt_list = option.mk_opt_list(opt)</span>
+<span class="sd">        cmd_line = TEMP_TEST.format(index=index, mode_key=opt[&quot;mode&quot;], cmd_key=opt[&quot;cmd&quot;], opt_list=&#39; &quot; \\\n\t\t  &quot;&#39;.join(opt_list[0]))</span>
+<span class="sd">        buffer.write(cmd_line)</span>
+<span class="sd">        index += 1</span>
+
+<span class="sd">    testfile = outdir / f&quot;test_gentest.py&quot;</span>
+<span class="sd">    with open(testfile, &quot;w&quot;, encoding=&quot;utf-8&quot;) as f:</span>
+<span class="sd">        f.write(buffer.getvalue())</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="main">
+<a class="viewcode-back" href="../../../resources/iinfer.tools.html#iinfer.tools.gentest.main">[docs]</a>
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">option</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">Options</span><span class="p">()</span>
+    <span class="n">outdir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;tests&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;genapp&quot;</span>
+    <span class="n">common</span><span class="o">.</span><span class="n">rmdirs</span><span class="p">(</span><span class="n">outdir</span><span class="p">)</span>
+    <span class="n">common</span><span class="o">.</span><span class="n">mkdirs</span><span class="p">(</span><span class="n">outdir</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_set</span><span class="p">(</span><span class="n">tv</span><span class="p">,</span> <span class="n">opt_name</span><span class="p">,</span> <span class="n">opt_map</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">tv</span><span class="p">)</span> <span class="o">==</span> <span class="nb">list</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tv</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">t</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">type</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">==</span> <span class="nb">bool</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">t</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">opt_map</span><span class="p">[</span><span class="s2">&quot;opt_list&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;--</span><span class="si">{</span><span class="n">opt_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">==</span> <span class="nb">bool</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">Path</span><span class="p">):</span>
+                    <span class="n">opt_map</span><span class="p">[</span><span class="s2">&quot;opt_list&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;/&quot;</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">opt_map</span><span class="p">[</span><span class="s2">&quot;opt_list&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">t</span><span class="p">))</span>
+            <span class="k">return</span>
+        <span class="k">elif</span> <span class="n">tv</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">tv</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">opt_map</span><span class="p">[</span><span class="s2">&quot;opt_list&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;--</span><span class="si">{</span><span class="n">opt_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">tv</span><span class="p">)</span> <span class="o">==</span> <span class="nb">bool</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tv</span><span class="p">,</span> <span class="n">Path</span><span class="p">):</span>
+            <span class="n">opt_map</span><span class="p">[</span><span class="s2">&quot;opt_list&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">tv</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;/&quot;</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">opt_map</span><span class="p">[</span><span class="s2">&quot;opt_list&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">tv</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">mode_key</span> <span class="ow">in</span> <span class="n">option</span><span class="o">.</span><span class="n">get_mode_keys</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">mode_key</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">buffer</span> <span class="o">=</span>  <span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()</span>
+        <span class="n">buffer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">BASE_TEST</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">cmd_key</span> <span class="ow">in</span> <span class="n">option</span><span class="o">.</span><span class="n">get_cmd_keys</span><span class="p">(</span><span class="n">mode_key</span><span class="p">):</span>
+            <span class="n">choices</span> <span class="o">=</span> <span class="n">option</span><span class="o">.</span><span class="n">get_cmd_choices</span><span class="p">(</span><span class="n">mode_key</span><span class="p">,</span> <span class="n">cmd_key</span><span class="p">)</span>
+            <span class="n">names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">choice</span> <span class="ow">in</span> <span class="n">choices</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s2">&quot;test_true&quot;</span> <span class="ow">in</span> <span class="n">choice</span><span class="p">:</span>
+                    <span class="n">names</span> <span class="o">|=</span> <span class="nb">set</span><span class="p">(</span><span class="n">choice</span><span class="p">[</span><span class="s2">&quot;test_true&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+                <span class="k">if</span> <span class="s2">&quot;test_false&quot;</span> <span class="ow">in</span> <span class="n">choice</span><span class="p">:</span>
+                    <span class="n">names</span> <span class="o">|=</span> <span class="nb">set</span><span class="p">(</span><span class="n">choice</span><span class="p">[</span><span class="s2">&quot;test_false&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+            <span class="n">names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">names</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">names</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">opt_list_true</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+            <span class="n">opt_list_chk</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+            <span class="n">opt_list_false</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+            <span class="n">opt_list_stdin</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+                <span class="n">opt_list_true</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">opt_list</span><span class="o">=</span><span class="p">[],</span> <span class="n">jadge</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">opt_list_chk</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">opt_list</span><span class="o">=</span><span class="p">[],</span> <span class="n">jadge</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                <span class="n">opt_list_false</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">opt_list</span><span class="o">=</span><span class="p">[],</span> <span class="n">jadge</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">choice</span> <span class="ow">in</span> <span class="n">choices</span><span class="p">:</span>
+                    <span class="n">set_false</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">if</span> <span class="s2">&quot;test_false&quot;</span> <span class="ow">in</span> <span class="n">choice</span> <span class="ow">and</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">choice</span><span class="p">[</span><span class="s2">&quot;test_false&quot;</span><span class="p">]:</span>
+                        <span class="n">testval</span> <span class="o">=</span> <span class="n">choice</span><span class="p">[</span><span class="s2">&quot;test_false&quot;</span><span class="p">][</span><span class="n">name</span><span class="p">]</span>
+                        <span class="n">_set</span><span class="p">(</span><span class="n">testval</span><span class="p">,</span> <span class="n">choice</span><span class="p">[</span><span class="s2">&quot;opt&quot;</span><span class="p">],</span> <span class="n">opt_list_chk</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
+                        <span class="n">_set</span><span class="p">(</span><span class="n">testval</span><span class="p">,</span> <span class="n">choice</span><span class="p">[</span><span class="s2">&quot;opt&quot;</span><span class="p">],</span> <span class="n">opt_list_false</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
+                        <span class="n">set_false</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="k">if</span> <span class="s2">&quot;test_true&quot;</span> <span class="ow">in</span> <span class="n">choice</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">choice</span><span class="p">[</span><span class="s2">&quot;test_true&quot;</span><span class="p">]:</span>
+                            <span class="n">testval</span> <span class="o">=</span> <span class="n">choice</span><span class="p">[</span><span class="s2">&quot;test_true&quot;</span><span class="p">][</span><span class="n">name</span><span class="p">]</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">testval</span> <span class="o">=</span> <span class="n">choice</span><span class="p">[</span><span class="s2">&quot;test_true&quot;</span><span class="p">][</span><span class="nb">list</span><span class="p">(</span><span class="n">choice</span><span class="p">[</span><span class="s2">&quot;test_true&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]]</span>
+                        <span class="n">_set</span><span class="p">(</span><span class="n">testval</span><span class="p">,</span> <span class="n">choice</span><span class="p">[</span><span class="s2">&quot;opt&quot;</span><span class="p">],</span> <span class="n">opt_list_true</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
+                        <span class="k">if</span> <span class="n">set_false</span><span class="p">:</span> <span class="n">_set</span><span class="p">(</span><span class="n">testval</span><span class="p">,</span> <span class="n">choice</span><span class="p">[</span><span class="s2">&quot;opt&quot;</span><span class="p">],</span> <span class="n">opt_list_false</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="s2">&quot;test_stdin&quot;</span> <span class="ow">in</span> <span class="n">choice</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">choice</span><span class="p">[</span><span class="s2">&quot;test_stdin&quot;</span><span class="p">]:</span>
+                            <span class="n">testval</span> <span class="o">=</span> <span class="n">choice</span><span class="p">[</span><span class="s2">&quot;test_stdin&quot;</span><span class="p">][</span><span class="n">name</span><span class="p">]</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">testval</span> <span class="o">=</span> <span class="n">choice</span><span class="p">[</span><span class="s2">&quot;test_stdin&quot;</span><span class="p">][</span><span class="nb">list</span><span class="p">(</span><span class="n">choice</span><span class="p">[</span><span class="s2">&quot;test_stdin&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]]</span>
+                        <span class="n">opt_list_stdin</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">testval</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">opt_list_true</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s2">&quot;opt_list&quot;</span><span class="p">])</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">del</span> <span class="n">opt_list_true</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">opt_list_chk</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s2">&quot;opt_list&quot;</span><span class="p">])</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">del</span> <span class="n">opt_list_chk</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+                    <span class="k">del</span> <span class="n">opt_list_false</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+
+            <span class="n">test_assert</span> <span class="o">=</span> <span class="n">option</span><span class="o">.</span><span class="n">get_cmd_attr</span><span class="p">(</span><span class="n">mode_key</span><span class="p">,</span> <span class="n">cmd_key</span><span class="p">,</span> <span class="s2">&quot;test_assert&quot;</span><span class="p">)</span>
+            <span class="n">test_assert</span> <span class="o">=</span> <span class="n">test_assert</span> <span class="k">if</span> <span class="n">test_assert</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;assert &#39;success&#39; </span><span class="si">{jadge}</span><span class="s2"> result.keys()&quot;</span>
+            <span class="n">jointxt</span> <span class="o">=</span> <span class="s1">&#39;&quot;,</span><span class="se">\n</span><span class="s1">           &quot;&#39;</span>
+            <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+                <span class="n">temp</span> <span class="o">=</span> <span class="n">TEMP_TEST</span>
+                <span class="n">stdin_file</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">opt_list_stdin</span> <span class="ow">and</span> <span class="n">opt_list_stdin</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">temp</span> <span class="o">=</span> <span class="n">TEMP_TEST_STDIN</span>
+                    <span class="n">stdin_file</span> <span class="o">=</span> <span class="n">opt_list_stdin</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+                <span class="n">temp</span> <span class="o">=</span> <span class="n">temp</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{test_assert}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">test_assert</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">opt_list_true</span><span class="p">:</span>
+                    <span class="n">opt_list</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;-m&quot;</span><span class="p">,</span> <span class="n">mode_key</span><span class="p">,</span> <span class="s2">&quot;-c&quot;</span><span class="p">,</span> <span class="n">cmd_key</span><span class="p">]</span> <span class="o">+</span> <span class="n">opt_list_true</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s2">&quot;opt_list&quot;</span><span class="p">]</span>
+                    <span class="n">opt_list</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">opt_list</span> <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">!=</span> <span class="s2">&quot;--debug&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;--debug&quot;</span><span class="p">]</span>
+                    <span class="n">cmd_line</span> <span class="o">=</span> <span class="n">temp</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span> <span class="n">mode_key</span><span class="o">=</span><span class="n">mode_key</span><span class="p">,</span> <span class="n">cmd_key</span><span class="o">=</span><span class="n">cmd_key</span><span class="p">,</span>
+                                                <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">jadge</span><span class="o">=</span><span class="s2">&quot;in&quot;</span><span class="p">,</span> <span class="n">opt_list</span><span class="o">=</span><span class="n">jointxt</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">opt_list</span><span class="p">),</span>
+                                                <span class="n">stdin_file</span><span class="o">=</span><span class="n">stdin_file</span><span class="p">)</span>
+                    <span class="n">buffer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">cmd_line</span><span class="p">)</span>
+                    <span class="n">index</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">opt_list_false</span><span class="p">:</span>
+                    <span class="n">opt_list</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;-m&quot;</span><span class="p">,</span> <span class="n">mode_key</span><span class="p">,</span> <span class="s2">&quot;-c&quot;</span><span class="p">,</span> <span class="n">cmd_key</span><span class="p">]</span> <span class="o">+</span> <span class="n">opt_list_false</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s2">&quot;opt_list&quot;</span><span class="p">]</span>
+                    <span class="n">opt_list</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">opt_list</span> <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">!=</span> <span class="s2">&quot;--debug&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;--debug&quot;</span><span class="p">]</span>
+                    <span class="n">cmd_line</span> <span class="o">=</span> <span class="n">temp</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span> <span class="n">mode_key</span><span class="o">=</span><span class="n">mode_key</span><span class="p">,</span> <span class="n">cmd_key</span><span class="o">=</span><span class="n">cmd_key</span><span class="p">,</span>
+                                                <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">jadge</span><span class="o">=</span><span class="s2">&quot;not in&quot;</span><span class="p">,</span> <span class="n">opt_list</span><span class="o">=</span><span class="n">jointxt</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">opt_list</span><span class="p">),</span>
+                                                <span class="n">stdin_file</span><span class="o">=</span><span class="n">stdin_file</span><span class="p">)</span>
+                    <span class="n">buffer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">cmd_line</span><span class="p">)</span>
+                    <span class="n">index</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="n">testfile</span> <span class="o">=</span> <span class="n">outdir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;test_</span><span class="si">{</span><span class="n">mode_key</span><span class="si">}</span><span class="s2">.py&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">testfile</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">buffer</span><span class="o">.</span><span class="n">getvalue</span><span class="p">())</span></div>
+
+
+
+<span class="n">TEMP_TEST</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">@pytest.mark.run(order=</span><span class="si">{index}</span><span class="s2">)</span>
+<span class="s2">def test_</span><span class="si">{index}</span><span class="s2">_</span><span class="si">{mode_key}</span><span class="s2">_</span><span class="si">{cmd_key}</span><span class="s2">_</span><span class="si">{name}</span><span class="s2">(capfd):</span>
+<span class="s2">    cmd = [&quot;</span><span class="si">{opt_list}</span><span class="s2">&quot;]</span>
+
+<span class="s2">    _, result = app.IinferApp().main(args_list=cmd)</span>
+<span class="s2">    out, err = capfd.readouterr()</span>
+<span class="s2">    print(out)</span>
+<span class="s2">    </span><span class="si">{test_assert}</span>
+
+<span class="s2">&quot;&quot;&quot;</span>
+
+<span class="n">TEMP_TEST_STDIN</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">@pytest.mark.run(order=</span><span class="si">{index}</span><span class="s2">)</span>
+<span class="s2">def test_</span><span class="si">{index}</span><span class="s2">_</span><span class="si">{mode_key}</span><span class="s2">_</span><span class="si">{cmd_key}</span><span class="s2">_</span><span class="si">{name}</span><span class="s2">(capfd, monkeypatch):</span>
+<span class="s2">    cmd = [&quot;</span><span class="si">{opt_list}</span><span class="s2">&quot;]</span>
+
+<span class="s2">    with open(&#39;</span><span class="si">{stdin_file}</span><span class="s2">&#39;, &#39;br&#39;) as f:</span>
+<span class="s2">        sys.stdin = f.buffer = f</span>
+<span class="s2">        _, result = app.IinferApp().main(args_list=cmd)</span>
+<span class="s2">        out, err = capfd.readouterr()</span>
+<span class="s2">        print(out)</span>
+<span class="s2">        </span><span class="si">{test_assert}</span>
+
+<span class="s2">&quot;&quot;&quot;</span>
+
+<span class="n">BASE_TEST</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">from iinfer.app import app</span>
+<span class="s2">from pathlib import Path</span>
+<span class="s2">from unittest.mock import patch</span>
+<span class="s2">import iinfer</span>
+<span class="s2">import os</span>
+<span class="s2">import pytest</span>
+<span class="s2">import time</span>
+<span class="s2">import shutil</span>
+<span class="s2">import subprocess</span>
+<span class="s2">import sys</span>
+
+
+<span class="s2">@pytest.fixture(scope=&#39;module&#39;, autouse=True)</span>
+<span class="s2">def fixture_server():</span>
+<span class="s2">    python = Path(iinfer.__file__).parent.parent / &#39;.venv&#39; / &#39;Scripts&#39; / &#39;python.exe&#39;</span>
+<span class="s2">    cmd = f&quot;</span><span class="si">{python}</span><span class="s2"> -m iinfer -m server -c start --svname server&quot;.split(&#39; &#39;)</span>
+<span class="s2">    proc1 = subprocess.Popen(cmd)</span>
+<span class="s2">    #cmd = f&quot;</span><span class="si">{python}</span><span class="s2"> -m iinfer -m server -c start --svname server1&quot;.split(&#39; &#39;)</span>
+<span class="s2">    #proc2 = subprocess.Popen(cmd)</span>
+<span class="s2">    #cmd = f&quot;</span><span class="si">{python}</span><span class="s2"> -m iinfer -m server -c start --svname server2&quot;.split(&#39; &#39;)</span>
+<span class="s2">    #proc3 = subprocess.Popen(cmd)</span>
+<span class="s2">    shutil.rmtree(&quot;mmdetection&quot;, ignore_errors=True)</span>
+<span class="s2">    shutil.rmtree(&quot;mmpretrain&quot;, ignore_errors=True)</span>
+<span class="s2">    shutil.rmtree(&quot;mmsegmentation&quot;, ignore_errors=True)</span>
+<span class="s2">    time.sleep(15)</span>
+<span class="s2">    yield</span>
+<span class="s2">    #cmd = f&quot;</span><span class="si">{python}</span><span class="s2"> -m iinfer -m server -c stop --svname server2 --timeout 15&quot;.split(&#39; &#39;)</span>
+<span class="s2">    #subprocess.run(cmd)</span>
+<span class="s2">    #cmd = f&quot;</span><span class="si">{python}</span><span class="s2"> -m iinfer -m server -c stop --svname server1 --timeout 15&quot;.split(&#39; &#39;)</span>
+<span class="s2">    #subprocess.run(cmd)</span>
+<span class="s2">    cmd = f&quot;</span><span class="si">{python}</span><span class="s2"> -m iinfer -m server -c stop --svname server --timeout 15&quot;.split(&#39; &#39;)</span>
+<span class="s2">    subprocess.run(cmd)</span>
+
+<span class="s2">&quot;&quot;&quot;</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Copyright (c) 2023-2024 hamacom2004jp All Rights Reserved..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

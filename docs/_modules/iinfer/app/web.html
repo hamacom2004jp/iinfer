@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>iinfer.app.web &mdash; iinfer 2024/08/04 documentation</title>
+  <title>iinfer.app.web &mdash; iinfer 2024/08/17 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -15,7 +15,7 @@
   
         <script src="../../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=6e6395fc"></script>
+        <script src="../../../_static/documentation_options.js?v=3d54cfd2"></script>
         <script src="../../../_static/doctools.js?v=9a2dae69"></script>
         <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -87,12 +87,11 @@
            <div itemprop="articleBody">
              
   <h1>Source code for iinfer.app.web</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">geventwebsocket.exceptions</span> <span class="kn">import</span> <span class="n">WebSocketError</span>
-<span class="kn">from</span> <span class="nn">iinfer</span> <span class="kn">import</span> <span class="n">version</span>
+<span></span><span class="kn">from</span> <span class="nn">iinfer</span> <span class="kn">import</span> <span class="n">version</span>
 <span class="kn">from</span> <span class="nn">iinfer.app</span> <span class="kn">import</span> <span class="n">app</span><span class="p">,</span> <span class="n">common</span><span class="p">,</span> <span class="n">options</span>
 <span class="kn">from</span> <span class="nn">iinfer.app.commons</span> <span class="kn">import</span> <span class="n">convert</span><span class="p">,</span> <span class="n">redis_client</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
 <span class="kn">import</span> <span class="nn">ctypes</span>
 <span class="kn">import</span> <span class="nn">bottle</span>
 <span class="kn">import</span> <span class="nn">bottle_websocket</span>
@@ -101,7 +100,6 @@
 <span class="kn">import</span> <span class="nn">glob</span>
 <span class="kn">import</span> <span class="nn">gevent</span>
 <span class="kn">import</span> <span class="nn">html</span>
-<span class="c1">#import httpx</span>
 <span class="kn">import</span> <span class="nn">iinfer</span>
 <span class="kn">import</span> <span class="nn">io</span>
 <span class="kn">import</span> <span class="nn">json</span>
@@ -171,7 +169,16 @@
 
 <div class="viewcode-block" id="Web.mk_curl_fileup">
 <a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.mk_curl_fileup">[docs]</a>
-    <span class="k">def</span> <span class="nf">mk_curl_fileup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd_opt</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">mk_curl_fileup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd_opt</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        curlコマンド文字列を作成する</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            cmd_opt (dict): コマンドのオプション</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            str: curlコマンド文字列</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="s1">&#39;mode&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cmd_opt</span> <span class="ow">or</span> <span class="s1">&#39;cmd&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cmd_opt</span><span class="p">:</span>
             <span class="k">return</span> <span class="s2">&quot;&quot;</span>
         <span class="n">curl_fileup</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
@@ -187,7 +194,16 @@
 
 <div class="viewcode-block" id="Web.list_cmd">
 <a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.list_cmd">[docs]</a>
-    <span class="k">def</span> <span class="nf">list_cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kwd</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">list_cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kwd</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        コマンドファイルのタイトル一覧を取得する</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            kwd (str): キーワード</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: コマンドファイルのタイトル一覧</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">kwd</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">kwd</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
             <span class="n">kwd</span> <span class="o">=</span> <span class="s1">&#39;*&#39;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
@@ -200,7 +216,17 @@
 
 <div class="viewcode-block" id="Web.save_cmd">
 <a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.save_cmd">[docs]</a>
-    <span class="k">def</span> <span class="nf">save_cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">opt</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">save_cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">opt</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        コマンドファイルを保存する</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            title (str): タイトル</span>
+<span class="sd">            opt (dict): オプション</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: 結果</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">common</span><span class="o">.</span><span class="n">check_fname</span><span class="p">(</span><span class="n">title</span><span class="p">):</span>
             <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;The title contains invalid characters.&quot;</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
         <span class="n">opt_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;cmd-</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2">.json&quot;</span>
@@ -211,7 +237,16 @@
 
 <div class="viewcode-block" id="Web.load_cmd">
 <a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.load_cmd">[docs]</a>
-    <span class="k">def</span> <span class="nf">load_cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">load_cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        コマンドファイルを読み込む</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            title (str): タイトル</span>
+<span class="sd">            </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: コマンドファイルの内容</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">opt_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;cmd-</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2">.json&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;web.load_cmd: title=</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2">, opt_path=</span><span class="si">{</span><span class="n">opt_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -220,7 +255,13 @@
 
 <div class="viewcode-block" id="Web.del_cmd">
 <a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.del_cmd">[docs]</a>
-    <span class="k">def</span> <span class="nf">del_cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">del_cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        コマンドファイルを削除する</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            title (str): タイトル</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">opt_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;cmd-</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2">.json&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;del_cmd: opt_path=</span><span class="si">{</span><span class="n">opt_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">opt_path</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span></div>
@@ -229,6 +270,9 @@
 <div class="viewcode-block" id="Web.bbforce_cmd">
 <a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.bbforce_cmd">[docs]</a>
     <span class="k">def</span> <span class="nf">bbforce_cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        コマンドの強制終了</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;web.bbforce_cmd&quot;</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
@@ -253,6 +297,15 @@
 <div class="viewcode-block" id="Web.chk_client_only">
 <a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.chk_client_only">[docs]</a>
     <span class="k">def</span> <span class="nf">chk_client_only</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">opt</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        クライアントのみのサービスかどうかをチェックする</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            opt (dict): オプション</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple: (クライアントのみ場合はTrue, メッセージ)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">client_only</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">None</span>
         <span class="n">use_redis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cmd_attr</span><span class="p">(</span><span class="n">opt</span><span class="p">[</span><span class="s1">&#39;mode&#39;</span><span class="p">],</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;cmd&#39;</span><span class="p">],</span> <span class="s2">&quot;use_redis&quot;</span><span class="p">)</span>
@@ -271,7 +324,18 @@
 
 <div class="viewcode-block" id="Web.exec_cmd">
 <a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.exec_cmd">[docs]</a>
-    <span class="k">def</span> <span class="nf">exec_cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">nothread</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">exec_cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">opt</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">nothread</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        コマンドを実行する</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            title (str): タイトル</span>
+<span class="sd">            opt (dict): オプション</span>
+<span class="sd">            nothread (bool, optional): スレッドを使わないかどうか. Defaults to False.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            list: コマンド実行結果</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="p">[</span><span class="s1">&#39;iinfer_app&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">IinferApp</span><span class="p">()</span>
         <span class="k">def</span> <span class="nf">_exec_cmd</span><span class="p">(</span><span class="n">iinfer_app</span><span class="p">:</span><span class="n">app</span><span class="o">.</span><span class="n">IinferApp</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">nothread</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;exec_cmd: title=</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2">, opt=</span><span class="si">{</span><span class="n">opt</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -349,7 +413,17 @@
 
 <div class="viewcode-block" id="Web.raw_cmd">
 <a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.raw_cmd">[docs]</a>
-    <span class="k">def</span> <span class="nf">raw_cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">opt</span><span class="p">:</span><span class="nb">dict</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">raw_cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">opt</span><span class="p">:</span><span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        コマンドライン文字列、オプション文字列、curlコマンド文字列を作成する</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            title (str): タイトル</span>
+<span class="sd">            opt (dict): オプション</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            list[Dict[str, Any]]: コマンドライン文字列、オプション文字列、curlコマンド文字列</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;web.raw_cmd: title=</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2">, opt=</span><span class="si">{</span><span class="n">opt</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">opt_list</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mk_opt_list</span><span class="p">(</span><span class="n">opt</span><span class="p">)</span>
@@ -363,7 +437,16 @@
 
 <div class="viewcode-block" id="Web.list_tree">
 <a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.list_tree">[docs]</a>
-    <span class="k">def</span> <span class="nf">list_tree</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_path</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">list_tree</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_path</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        ディレクトリのツリーを取得する</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            current_path (str): カレントパス</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: ディレクトリのツリー</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;web.list_tree: current_path=</span><span class="si">{</span><span class="n">current_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">current_path</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span> <span class="k">if</span> <span class="n">current_path</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">current_path</span><span class="o">==</span><span class="s1">&#39;&#39;</span> <span class="k">else</span> <span class="n">Path</span><span class="p">(</span><span class="n">current_path</span><span class="p">)</span>
@@ -390,7 +473,17 @@
     
 <div class="viewcode-block" id="Web.list_downloads">
 <a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.list_downloads">[docs]</a>
-    <span class="k">def</span> <span class="nf">list_downloads</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_path</span><span class="p">,</span> <span class="n">root_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">list_downloads</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_path</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">root_path</span><span class="p">:</span><span class="n">Path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        ダウンロードファイルのリストを取得する</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            current_path (str): カレントパス</span>
+<span class="sd">            root_path (Path, optional): ルートパス. Defaults to None.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            list: ダウンロードファイルのリスト</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;web.list_downloads: current_path=</span><span class="si">{</span><span class="n">current_path</span><span class="si">}</span><span class="s2">, root_path=</span><span class="si">{</span><span class="n">root_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">current_path</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
@@ -412,7 +505,16 @@
 
 <div class="viewcode-block" id="Web.load_result">
 <a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.load_result">[docs]</a>
-    <span class="k">def</span> <span class="nf">load_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_path</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">load_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_path</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        結果ファイルを読み込む</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            current_path (str): カレントパス</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            list[Dict[str, Any]]: 結果ファイルの内容</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;web.load_result: current_path=</span><span class="si">{</span><span class="n">current_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">current_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">current_path</span><span class="p">)</span>
@@ -435,7 +537,16 @@
 
 <div class="viewcode-block" id="Web.load_capture">
 <a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.load_capture">[docs]</a>
-    <span class="k">def</span> <span class="nf">load_capture</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_path</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">load_capture</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_path</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        キャプチャファイルを読み込む</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            current_path (str): カレントパス</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list[Dict[str, Any]]: キャプチャファイルの内容</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;web.load_capture: current_path=</span><span class="si">{</span><span class="n">current_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">current_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">current_path</span><span class="p">)</span>
@@ -464,7 +575,16 @@
     
 <div class="viewcode-block" id="Web.list_pipe">
 <a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.list_pipe">[docs]</a>
-    <span class="k">def</span> <span class="nf">list_pipe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kwd</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">list_pipe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kwd</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        パイプラインファイルのリストを取得する</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            kwd (str): キーワード</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            list: パイプラインファイルのリスト</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">kwd</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">kwd</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
             <span class="n">kwd</span> <span class="o">=</span> <span class="s1">&#39;*&#39;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
@@ -477,7 +597,19 @@
 
 <div class="viewcode-block" id="Web.exec_pipe">
 <a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.exec_pipe">[docs]</a>
-    <span class="k">def</span> <span class="nf">exec_pipe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">nothread</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">capture_stdin</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">exec_pipe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">opt</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">nothread</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">capture_stdin</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        パイプラインを実行する</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            title (str): タイトル</span>
+<span class="sd">            opt (dict): オプション</span>
+<span class="sd">            nothread (bool, optional): スレッドを使わないかどうか. Defaults to False.</span>
+<span class="sd">            capture_stdin (bool, optional): 標準入力をキャプチャするかどうか. Defaults to False.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            list: パイプライン実行結果</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;exec_pipe: title=</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2">, opt=</span><span class="si">{</span><span class="n">opt</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">def</span> <span class="nf">to_json</span><span class="p">(</span><span class="n">o</span><span class="p">):</span>
             <span class="n">res_json</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
@@ -573,7 +705,17 @@
 
 <div class="viewcode-block" id="Web.raw_pipe">
 <a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.raw_pipe">[docs]</a>
-    <span class="k">def</span> <span class="nf">raw_pipe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">opt</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">raw_pipe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">opt</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        パイプラインのコマンドライン文字列、curlコマンド文字列を作成する</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            title (str): タイトル</span>
+<span class="sd">            opt (dict): オプション</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            list[Dict[str, Any]]: コマンドライン文字列、curlコマンド文字列</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;web.raw_pipe: title=</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2">, opt=</span><span class="si">{</span><span class="n">opt</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">cmdlines</span> <span class="o">=</span> <span class="p">[]</span>
@@ -616,7 +758,17 @@
 
 <div class="viewcode-block" id="Web.save_pipe">
 <a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.save_pipe">[docs]</a>
-    <span class="k">def</span> <span class="nf">save_pipe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">opt</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">save_pipe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">opt</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        パイプラインを保存する</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            title (str): タイトル</span>
+<span class="sd">            opt (dict): オプション</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: 結果</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">common</span><span class="o">.</span><span class="n">check_fname</span><span class="p">(</span><span class="n">title</span><span class="p">):</span>
             <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;The title contains invalid characters.&quot;</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
         <span class="n">opt_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;pipe-</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2">.json&quot;</span>
@@ -627,7 +779,13 @@
 
 <div class="viewcode-block" id="Web.del_pipe">
 <a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.del_pipe">[docs]</a>
-    <span class="k">def</span> <span class="nf">del_pipe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">del_pipe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        パイプラインを削除する</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            title (str): タイトル</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">opt_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;pipe-</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2">.json&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;del_pipe: opt_path=</span><span class="si">{</span><span class="n">opt_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">opt_path</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span></div>
@@ -635,7 +793,16 @@
 
 <div class="viewcode-block" id="Web.load_pipe">
 <a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.load_pipe">[docs]</a>
-    <span class="k">def</span> <span class="nf">load_pipe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">load_pipe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        パイプラインを読み込む</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            title (str): タイトル</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: パイプラインの内容</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">opt_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;pipe-</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2">.json&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;web.load_pipe: title=</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -644,7 +811,13 @@
 
 <div class="viewcode-block" id="Web.copyright">
 <a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.copyright">[docs]</a>
-    <span class="k">def</span> <span class="nf">copyright</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">copyright</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        コピーライトを取得する</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            str: コピーライト</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;web.copyright&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">version</span><span class="o">.</span><span class="n">__copyright__</span></div>
@@ -652,7 +825,13 @@
 
 <div class="viewcode-block" id="Web.versions_iinfer">
 <a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.versions_iinfer">[docs]</a>
-    <span class="k">def</span> <span class="nf">versions_iinfer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">versions_iinfer</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        iinferのバージョン情報を取得する</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: バージョン情報</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;web.versions_iinfer&quot;</span><span class="p">)</span>
         <span class="n">logo</span> <span class="o">=</span> <span class="p">[</span><span class="n">version</span><span class="o">.</span><span class="n">__logo__</span><span class="p">]</span>
@@ -661,7 +840,13 @@
 
 <div class="viewcode-block" id="Web.versions_used">
 <a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.versions_used">[docs]</a>
-    <span class="k">def</span> <span class="nf">versions_used</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">versions_used</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        使用しているミドルウエアのバージョン情報を取得する</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: バージョン情報</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;web.versions_used&quot;</span><span class="p">)</span>
         <span class="n">ret</span> <span class="o">=</span> <span class="p">[]</span>
@@ -678,7 +863,16 @@
      
 <div class="viewcode-block" id="Web.filer_upload">
 <a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.filer_upload">[docs]</a>
-    <span class="k">def</span> <span class="nf">filer_upload</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span><span class="n">bottle</span><span class="o">.</span><span class="n">Request</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">filer_upload</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span><span class="n">bottle</span><span class="o">.</span><span class="n">Request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        ファイルをアップロードする</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            request (bottle.Request): リクエスト</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            str: 結果</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">q</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">query</span>
         <span class="n">svpath</span> <span class="o">=</span> <span class="n">q</span><span class="p">[</span><span class="s1">&#39;svpath&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;filer_upload: svpath=</span><span class="si">{</span><span class="n">svpath</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -705,7 +899,13 @@
 
 <div class="viewcode-block" id="Web.callback_console_modal_log_func">
 <a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.callback_console_modal_log_func">[docs]</a>
-    <span class="k">def</span> <span class="nf">callback_console_modal_log_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output</span><span class="p">:</span><span class="nb">dict</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">callback_console_modal_log_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        コンソールモーダルにログを出力する</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            output (Dict[str, Any]): 出力</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
             <span class="n">output_str</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">to_str</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">slise</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;web.callback_console_modal_log_func: output=</span><span class="si">{</span><span class="n">output_str</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -714,7 +914,14 @@
     
 <div class="viewcode-block" id="Web.callback_return_cmd_exec_func">
 <a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.callback_return_cmd_exec_func">[docs]</a>
-    <span class="k">def</span> <span class="nf">callback_return_cmd_exec_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">output</span><span class="p">:</span><span class="nb">dict</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">callback_return_cmd_exec_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">output</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        コマンド実行結果を返す</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            title (str): タイトル</span>
+<span class="sd">            output (Dict[str, Any]): 出力</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
             <span class="n">output_str</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">to_str</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">slise</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;web.callback_return_cmd_exec_func: output=</span><span class="si">{</span><span class="n">output_str</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -723,7 +930,14 @@
 
 <div class="viewcode-block" id="Web.callback_return_pipe_exec_func">
 <a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.callback_return_pipe_exec_func">[docs]</a>
-    <span class="k">def</span> <span class="nf">callback_return_pipe_exec_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">output</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">callback_return_pipe_exec_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">output</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        パイプライン実行結果を返す</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            title (str): タイトル</span>
+<span class="sd">            output (Dict[str, Any]): 出力</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
             <span class="n">output_str</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">to_str</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">slise</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;web.callback_return_pipe_exec_func: title=</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2">, output=</span><span class="si">{</span><span class="n">output_str</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -732,7 +946,13 @@
 
 <div class="viewcode-block" id="Web.callback_return_stream_log_func">
 <a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.callback_return_stream_log_func">[docs]</a>
-    <span class="k">def</span> <span class="nf">callback_return_stream_log_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">callback_return_stream_log_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        ストリームログを返す</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            output (Dict[str, Any]): 出力</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
             <span class="n">output_str</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">to_str</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">slise</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;web.callback_return_stream_log_func: output=</span><span class="si">{</span><span class="n">output_str</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -742,6 +962,9 @@
 <div class="viewcode-block" id="Web.gui_callback">
 <a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.gui_callback">[docs]</a>
     <span class="k">def</span> <span class="nf">gui_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        コマンドの実行結果をキューから取り出してブラウザに送信する</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">wsock</span> <span class="o">=</span> <span class="n">bottle</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;wsgi.websocket&#39;</span><span class="p">)</span> <span class="c1"># type: ignore</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;web.gui_callback: connected&quot;</span><span class="p">)</span>
@@ -768,6 +991,14 @@
 <div class="viewcode-block" id="Web.start">
 <a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.start">[docs]</a>
     <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">allow_host</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s2">&quot;0.0.0.0&quot;</span><span class="p">,</span> <span class="n">listen_port</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">8081</span><span class="p">,</span> <span class="n">outputs_key</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="p">[]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Webサーバを起動する</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            allow_host (str, optional): 許可ホスト. Defaults to &quot;</span>
+<span class="sd">            listen_port (int, optional): リスンポート. Defaults to 8081.</span>
+<span class="sd">            outputs_key (list, optional): 出力キー. Defaults to [].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">allow_host</span> <span class="o">=</span> <span class="n">allow_host</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">listen_port</span> <span class="o">=</span> <span class="n">listen_port</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">outputs_key</span> <span class="o">=</span> <span class="n">outputs_key</span>
@@ -811,6 +1042,9 @@
 
         <span class="nd">@app</span><span class="o">.</span><span class="n">hook</span><span class="p">(</span><span class="s1">&#39;after_request&#39;</span><span class="p">)</span>
         <span class="k">def</span> <span class="nf">enable_cors</span><span class="p">():</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            CORSを有効にする</span>
+<span class="sd">            &quot;&quot;&quot;</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="s1">&#39;Origin&#39;</span> <span class="ow">in</span> <span class="n">bottle</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
                 <span class="k">return</span>
             <span class="n">bottle</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s1">&#39;Access-Control-Allow-Origin&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bottle</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s1">&#39;Origin&#39;</span><span class="p">]</span>
@@ -1065,7 +1299,7 @@
                         <span class="n">outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">img_queue</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">block</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mf">0.001</span><span class="p">)</span>
                     <span class="k">except</span> <span class="n">queue</span><span class="o">.</span><span class="n">Empty</span><span class="p">:</span>
                         <span class="k">if</span> <span class="n">redis_cli</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                            <span class="n">cmd</span><span class="p">,</span> <span class="n">outputs</span> <span class="o">=</span> <span class="n">redis_cli</span><span class="o">.</span><span class="n">recive_showimg</span><span class="p">()</span>
+                            <span class="n">cmd</span><span class="p">,</span> <span class="n">outputs</span> <span class="o">=</span> <span class="n">redis_cli</span><span class="o">.</span><span class="n">receive_showimg</span><span class="p">()</span>
                     <span class="k">if</span> <span class="n">outputs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                         <span class="n">gevent</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
                         <span class="k">continue</span>
@@ -1196,6 +1430,9 @@
 <div class="viewcode-block" id="Web.stop">
 <a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.web.Web.stop">[docs]</a>
     <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Webサーバを停止する</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;iinfer_web.pid&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">pid</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
             <span class="n">os</span><span class="o">.</span><span class="n">kill</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">pid</span><span class="p">),</span> <span class="n">signal</span><span class="o">.</span><span class="n">CTRL_C_EVENT</span><span class="p">)</span>
@@ -1208,6 +1445,19 @@
     <span class="k">def</span> <span class="nf">webcap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">allow_host</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s2">&quot;0.0.0.0&quot;</span><span class="p">,</span> <span class="n">listen_port</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">8082</span><span class="p">,</span>
                <span class="n">image_type</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s1">&#39;capture&#39;</span><span class="p">,</span> <span class="n">outputs_key</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">capture_frame_width</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">capture_frame_height</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                <span class="n">capture_count</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">capture_fps</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Webキャプチャを起動する</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            allow_host (str, optional): 許可ホスト. Defaults to &quot;</span>
+<span class="sd">            listen_port (int, optional): リスンポート. Defaults to 8082.</span>
+<span class="sd">            image_type (str, optional): 画像タイプ. Defaults to &#39;capture&#39;.</span>
+<span class="sd">            outputs_key (list, optional): 出力キー. Defaults to None.</span>
+<span class="sd">            capture_frame_width (int, optional): キャプチャフレーム幅. Defaults to None.</span>
+<span class="sd">            capture_frame_height (int, optional): キャプチャフレーム高さ. Defaults to None.</span>
+<span class="sd">            capture_count (int, optional): キャプチャ回数. Defaults to 5.</span>
+<span class="sd">            capture_fps (int, optional): キャプチャFPS. Defaults to 5.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">allow_host</span> <span class="o">=</span> <span class="n">allow_host</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">listen_port</span> <span class="o">=</span> <span class="n">listen_port</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">image_type</span> <span class="o">=</span> <span class="n">image_type</span>

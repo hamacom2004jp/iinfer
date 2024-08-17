@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>iinfer.app package &mdash; iinfer 2024/08/15 documentation</title>
+  <title>iinfer.app package &mdash; iinfer 2024/08/17 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -16,7 +16,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=aed4c1a1"></script>
+        <script src="../_static/documentation_options.js?v=3d54cfd2"></script>
         <script src="../_static/doctools.js?v=9a2dae69"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -1686,14 +1686,14 @@ return dict(output_boxes=final_boxes, output_scores=final_scores, output_classes
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.server.Server.list_server">
-<span class="sig-name descname"><span class="pre">list_server</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/server.html#Server.list_server"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.server.Server.list_server" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">list_server</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/iinfer/app/server.html#Server.list_server"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.server.Server.list_server" title="Link to this definition"></a></dt>
 <dd><p>起動しているサーバーリストを取得する</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>サーバーのリスト</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>List[str]</p>
+<dd class="field-even"><p>Dict[str, List[Dict[str, Any]]]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1824,157 +1824,482 @@ return dict(output_boxes=final_boxes, output_scores=final_scores, output_classes
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.web.Web.bbforce_cmd">
 <span class="sig-name descname"><span class="pre">bbforce_cmd</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.bbforce_cmd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.bbforce_cmd" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>コマンドの強制終了</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.web.Web.callback_console_modal_log_func">
-<span class="sig-name descname"><span class="pre">callback_console_modal_log_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.callback_console_modal_log_func"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.callback_console_modal_log_func" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">callback_console_modal_log_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.callback_console_modal_log_func"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.callback_console_modal_log_func" title="Link to this definition"></a></dt>
+<dd><p>コンソールモーダルにログを出力する</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>output</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>) -- 出力</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.web.Web.callback_return_cmd_exec_func">
-<span class="sig-name descname"><span class="pre">callback_return_cmd_exec_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.callback_return_cmd_exec_func"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.callback_return_cmd_exec_func" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">callback_return_cmd_exec_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.callback_return_cmd_exec_func"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.callback_return_cmd_exec_func" title="Link to this definition"></a></dt>
+<dd><p>コマンド実行結果を返す</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>title</strong> (<em>str</em>) -- タイトル</p></li>
+<li><p><strong>output</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>) -- 出力</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.web.Web.callback_return_pipe_exec_func">
-<span class="sig-name descname"><span class="pre">callback_return_pipe_exec_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.callback_return_pipe_exec_func"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.callback_return_pipe_exec_func" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">callback_return_pipe_exec_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.callback_return_pipe_exec_func"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.callback_return_pipe_exec_func" title="Link to this definition"></a></dt>
+<dd><p>パイプライン実行結果を返す</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>title</strong> (<em>str</em>) -- タイトル</p></li>
+<li><p><strong>output</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>) -- 出力</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.web.Web.callback_return_stream_log_func">
-<span class="sig-name descname"><span class="pre">callback_return_stream_log_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.callback_return_stream_log_func"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.callback_return_stream_log_func" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">callback_return_stream_log_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.callback_return_stream_log_func"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.callback_return_stream_log_func" title="Link to this definition"></a></dt>
+<dd><p>ストリームログを返す</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>output</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>) -- 出力</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.web.Web.chk_client_only">
 <span class="sig-name descname"><span class="pre">chk_client_only</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">opt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.chk_client_only"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.chk_client_only" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>クライアントのみのサービスかどうかをチェックする</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>opt</strong> (<em>dict</em>) -- オプション</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>(クライアントのみ場合はTrue, メッセージ)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.web.Web.copyright">
-<span class="sig-name descname"><span class="pre">copyright</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.copyright"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.copyright" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">copyright</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.copyright"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.copyright" title="Link to this definition"></a></dt>
+<dd><p>コピーライトを取得する</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>コピーライト</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.web.Web.del_cmd">
-<span class="sig-name descname"><span class="pre">del_cmd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.del_cmd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.del_cmd" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">del_cmd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.del_cmd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.del_cmd" title="Link to this definition"></a></dt>
+<dd><p>コマンドファイルを削除する</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>title</strong> (<em>str</em>) -- タイトル</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.web.Web.del_pipe">
-<span class="sig-name descname"><span class="pre">del_pipe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.del_pipe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.del_pipe" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">del_pipe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.del_pipe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.del_pipe" title="Link to this definition"></a></dt>
+<dd><p>パイプラインを削除する</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>title</strong> (<em>str</em>) -- タイトル</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.web.Web.exec_cmd">
-<span class="sig-name descname"><span class="pre">exec_cmd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nothread</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.exec_cmd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.exec_cmd" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">exec_cmd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nothread</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.exec_cmd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.exec_cmd" title="Link to this definition"></a></dt>
+<dd><p>コマンドを実行する</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>title</strong> (<em>str</em>) -- タイトル</p></li>
+<li><p><strong>opt</strong> (<em>dict</em>) -- オプション</p></li>
+<li><p><strong>nothread</strong> (<em>bool</em><em>, </em><em>optional</em>) -- スレッドを使わないかどうか. Defaults to False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>コマンド実行結果</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.web.Web.exec_pipe">
-<span class="sig-name descname"><span class="pre">exec_pipe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nothread</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capture_stdin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.exec_pipe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.exec_pipe" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">exec_pipe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nothread</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capture_stdin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.exec_pipe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.exec_pipe" title="Link to this definition"></a></dt>
+<dd><p>パイプラインを実行する</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>title</strong> (<em>str</em>) -- タイトル</p></li>
+<li><p><strong>opt</strong> (<em>dict</em>) -- オプション</p></li>
+<li><p><strong>nothread</strong> (<em>bool</em><em>, </em><em>optional</em>) -- スレッドを使わないかどうか. Defaults to False.</p></li>
+<li><p><strong>capture_stdin</strong> (<em>bool</em><em>, </em><em>optional</em>) -- 標準入力をキャプチャするかどうか. Defaults to False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>パイプライン実行結果</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.web.Web.filer_upload">
-<span class="sig-name descname"><span class="pre">filer_upload</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">BaseRequest</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.filer_upload"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.filer_upload" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">filer_upload</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">BaseRequest</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.filer_upload"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.filer_upload" title="Link to this definition"></a></dt>
+<dd><p>ファイルをアップロードする</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<em>bottle.Request</em>) -- リクエスト</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>結果</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.web.Web.gui_callback">
 <span class="sig-name descname"><span class="pre">gui_callback</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.gui_callback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.gui_callback" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>コマンドの実行結果をキューから取り出してブラウザに送信する</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.web.Web.list_cmd">
-<span class="sig-name descname"><span class="pre">list_cmd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kwd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.list_cmd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.list_cmd" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">list_cmd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kwd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.list_cmd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.list_cmd" title="Link to this definition"></a></dt>
+<dd><p>コマンドファイルのタイトル一覧を取得する</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kwd</strong> (<em>str</em>) -- キーワード</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>コマンドファイルのタイトル一覧</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.web.Web.list_downloads">
-<span class="sig-name descname"><span class="pre">list_downloads</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.list_downloads"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.list_downloads" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">list_downloads</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.list_downloads"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.list_downloads" title="Link to this definition"></a></dt>
+<dd><p>ダウンロードファイルのリストを取得する</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>current_path</strong> (<em>str</em>) -- カレントパス</p></li>
+<li><p><strong>root_path</strong> (<em>Path</em><em>, </em><em>optional</em>) -- ルートパス. Defaults to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>ダウンロードファイルのリスト</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.web.Web.list_pipe">
-<span class="sig-name descname"><span class="pre">list_pipe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kwd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.list_pipe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.list_pipe" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">list_pipe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kwd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.list_pipe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.list_pipe" title="Link to this definition"></a></dt>
+<dd><p>パイプラインファイルのリストを取得する</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kwd</strong> (<em>str</em>) -- キーワード</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>パイプラインファイルのリスト</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.web.Web.list_tree">
-<span class="sig-name descname"><span class="pre">list_tree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.list_tree"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.list_tree" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">list_tree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.list_tree"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.list_tree" title="Link to this definition"></a></dt>
+<dd><p>ディレクトリのツリーを取得する</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>current_path</strong> (<em>str</em>) -- カレントパス</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>ディレクトリのツリー</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.web.Web.load_capture">
-<span class="sig-name descname"><span class="pre">load_capture</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.load_capture"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.load_capture" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">load_capture</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.load_capture"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.load_capture" title="Link to this definition"></a></dt>
+<dd><p>キャプチャファイルを読み込む</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>current_path</strong> (<em>str</em>) -- カレントパス</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>キャプチャファイルの内容</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[Dict[str, Any]]</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.web.Web.load_cmd">
-<span class="sig-name descname"><span class="pre">load_cmd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.load_cmd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.load_cmd" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">load_cmd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.load_cmd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.load_cmd" title="Link to this definition"></a></dt>
+<dd><p>コマンドファイルを読み込む</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>title</strong> (<em>str</em>) -- タイトル</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>コマンドファイルの内容</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.web.Web.load_pipe">
-<span class="sig-name descname"><span class="pre">load_pipe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.load_pipe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.load_pipe" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">load_pipe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.load_pipe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.load_pipe" title="Link to this definition"></a></dt>
+<dd><p>パイプラインを読み込む</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>title</strong> (<em>str</em>) -- タイトル</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>パイプラインの内容</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.web.Web.load_result">
-<span class="sig-name descname"><span class="pre">load_result</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.load_result"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.load_result" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">load_result</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.load_result"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.load_result" title="Link to this definition"></a></dt>
+<dd><p>結果ファイルを読み込む</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>current_path</strong> (<em>str</em>) -- カレントパス</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>結果ファイルの内容</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[Dict[str, Any]]</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.web.Web.mk_curl_fileup">
-<span class="sig-name descname"><span class="pre">mk_curl_fileup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd_opt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.mk_curl_fileup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.mk_curl_fileup" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">mk_curl_fileup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd_opt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.mk_curl_fileup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.mk_curl_fileup" title="Link to this definition"></a></dt>
+<dd><p>curlコマンド文字列を作成する</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>cmd_opt</strong> (<em>dict</em>) -- コマンドのオプション</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>curlコマンド文字列</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.web.Web.raw_cmd">
-<span class="sig-name descname"><span class="pre">raw_cmd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.raw_cmd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.raw_cmd" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">raw_cmd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.raw_cmd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.raw_cmd" title="Link to this definition"></a></dt>
+<dd><p>コマンドライン文字列、オプション文字列、curlコマンド文字列を作成する</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>title</strong> (<em>str</em>) -- タイトル</p></li>
+<li><p><strong>opt</strong> (<em>dict</em>) -- オプション</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>コマンドライン文字列、オプション文字列、curlコマンド文字列</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[Dict[str, Any]]</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.web.Web.raw_pipe">
-<span class="sig-name descname"><span class="pre">raw_pipe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.raw_pipe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.raw_pipe" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">raw_pipe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.raw_pipe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.raw_pipe" title="Link to this definition"></a></dt>
+<dd><p>パイプラインのコマンドライン文字列、curlコマンド文字列を作成する</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>title</strong> (<em>str</em>) -- タイトル</p></li>
+<li><p><strong>opt</strong> (<em>dict</em>) -- オプション</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>コマンドライン文字列、curlコマンド文字列</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[Dict[str, Any]]</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.web.Web.save_cmd">
-<span class="sig-name descname"><span class="pre">save_cmd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.save_cmd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.save_cmd" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">save_cmd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.save_cmd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.save_cmd" title="Link to this definition"></a></dt>
+<dd><p>コマンドファイルを保存する</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>title</strong> (<em>str</em>) -- タイトル</p></li>
+<li><p><strong>opt</strong> (<em>dict</em>) -- オプション</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>結果</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.web.Web.save_pipe">
-<span class="sig-name descname"><span class="pre">save_pipe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.save_pipe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.save_pipe" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">save_pipe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.save_pipe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.save_pipe" title="Link to this definition"></a></dt>
+<dd><p>パイプラインを保存する</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>title</strong> (<em>str</em>) -- タイトル</p></li>
+<li><p><strong>opt</strong> (<em>dict</em>) -- オプション</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>結果</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.web.Web.start">
 <span class="sig-name descname"><span class="pre">start</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">allow_host</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'0.0.0.0'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">listen_port</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">8081</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outputs_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.start"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.start" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Webサーバを起動する</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>allow_host</strong> (<em>str</em><em>, </em><em>optional</em>) -- 許可ホスト. Defaults to &quot;</p></li>
+<li><p><strong>listen_port</strong> (<em>int</em><em>, </em><em>optional</em>) -- リスンポート. Defaults to 8081.</p></li>
+<li><p><strong>outputs_key</strong> (<em>list</em><em>, </em><em>optional</em>) -- 出力キー. Defaults to [].</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.web.Web.stop">
 <span class="sig-name descname"><span class="pre">stop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.stop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.stop" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Webサーバを停止する</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.web.Web.versions_iinfer">
-<span class="sig-name descname"><span class="pre">versions_iinfer</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.versions_iinfer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.versions_iinfer" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">versions_iinfer</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.versions_iinfer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.versions_iinfer" title="Link to this definition"></a></dt>
+<dd><p>iinferのバージョン情報を取得する</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>バージョン情報</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.web.Web.versions_used">
-<span class="sig-name descname"><span class="pre">versions_used</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.versions_used"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.versions_used" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">versions_used</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.versions_used"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.versions_used" title="Link to this definition"></a></dt>
+<dd><p>使用しているミドルウエアのバージョン情報を取得する</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>バージョン情報</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="iinfer.app.web.Web.webcap">
 <span class="sig-name descname"><span class="pre">webcap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">allow_host</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'0.0.0.0'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">listen_port</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">8082</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'capture'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outputs_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capture_frame_width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capture_frame_height</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capture_count</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">capture_fps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/iinfer/app/web.html#Web.webcap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#iinfer.app.web.Web.webcap" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Webキャプチャを起動する</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>allow_host</strong> (<em>str</em><em>, </em><em>optional</em>) -- 許可ホスト. Defaults to &quot;</p></li>
+<li><p><strong>listen_port</strong> (<em>int</em><em>, </em><em>optional</em>) -- リスンポート. Defaults to 8082.</p></li>
+<li><p><strong>image_type</strong> (<em>str</em><em>, </em><em>optional</em>) -- 画像タイプ. Defaults to 'capture'.</p></li>
+<li><p><strong>outputs_key</strong> (<em>list</em><em>, </em><em>optional</em>) -- 出力キー. Defaults to None.</p></li>
+<li><p><strong>capture_frame_width</strong> (<em>int</em><em>, </em><em>optional</em>) -- キャプチャフレーム幅. Defaults to None.</p></li>
+<li><p><strong>capture_frame_height</strong> (<em>int</em><em>, </em><em>optional</em>) -- キャプチャフレーム高さ. Defaults to None.</p></li>
+<li><p><strong>capture_count</strong> (<em>int</em><em>, </em><em>optional</em>) -- キャプチャ回数. Defaults to 5.</p></li>
+<li><p><strong>capture_fps</strong> (<em>int</em><em>, </em><em>optional</em>) -- キャプチャFPS. Defaults to 5.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 

@@ -83,6 +83,7 @@ list_pipe_func_then = () => {
         }
         pipe_modal.find('.modal-title').text(`Pipeline : ${modal_title}`);
         pipe_modal.modal('show');
+        pipe_modal.find('.btn_window_stack').click();
         hide_loading();
     }
     $('.pipe_card').off('click').on('click', pipe_card_func);

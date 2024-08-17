@@ -19,7 +19,7 @@ import urllib
 
 class Server(filer.Filer):
 
-    def __init__(self, data_dir: Path, logger: logging.Logger, redis_host: str = "localhost", redis_port: int = 6379, redis_password: str = None, svname: str = 'server'):
+    def __init__(self, data_dir:Path, logger:logging.Logger, redis_host:str="localhost", redis_port:int=6379, redis_password:str=None, svname:str='server'):
         """
         Redisサーバーに接続し、クライアントからのコマンドを受信し実行する
 
@@ -32,14 +32,18 @@ class Server(filer.Filer):
             svname (str, optional): 推論サーバーのサービス名. by default 'server'
         """
         super().__init__(data_dir, logger)
+        if svname.find('-') >= 0:
+            raise ValueError(f"Server name is invalid. '-' is not allowed. svname={svname}")
         self.redis_host = redis_host
         self.redis_port = redis_port
         self.redis_password = redis_password
-        self.svname = svname
+        self.org_svname = svname
+        self.svname = f"{svname}-{common.random_string(size=6)}"
         self.redis_cli = None
         self.sessions:Dict[str, Dict[str, Any]] = {}
         self.is_running = False
         self.train_thread = None
+        self.cleaning_interval = 10
 
     def __enter__(self):
         self.start_server()
@@ -58,38 +62,16 @@ class Server(filer.Filer):
             self.is_running = True
             self._run_server()
 
-    def list_server(self):
+    def list_server(self) -> Dict[str, List[Dict[str, Any]]]:
         """
         起動しているサーバーリストを取得する
 
         Returns:
-            List[str]: サーバーのリスト
+            Dict[str, List[Dict[str, Any]]]: サーバーのリスト
         """
-        self.redis_cli = redis_client.RedisClient(self.logger, host=self.redis_host, port=self.redis_port, password=self.redis_password, svname=self.svname)
-        hblist = self.redis_cli.keys("hb-*")
-        svlist = []
-        for hb in hblist:
-            svname = hb.decode().replace("hb-", "")
-            recive_cnt = -1
-            sccess_cnt = -1
-            warn_cnt = -1
-            error_cnt = -1
-            try:
-                if self.redis_cli.hexists(hb, 'recive_cnt'):
-                    val = self.redis_cli.hget(hb, 'recive_cnt')
-                    recive_cnt = int(val.decode()) if val is not None else -1
-                if self.redis_cli.hexists(hb, 'sccess_cnt'):
-                    val = self.redis_cli.hget(hb, 'sccess_cnt')
-                    sccess_cnt = int(val.decode()) if val is not None else -1
-                if self.redis_cli.hexists(hb, 'sccess_cnt'):
-                    val = self.redis_cli.hget(hb, 'warn_cnt')
-                    warn_cnt = int(val.decode()) if val is not None else -1
-                if self.redis_cli.hexists(hb, 'sccess_cnt'):
-                    val = self.redis_cli.hget(hb, 'error_cnt')
-                    error_cnt = int(val.decode()) if val is not None else -1
-            except redis.exceptions.ResponseError:
-                self.logger.warn(f"Failed to get ctime. {hb}", exc_info=True)
-            svlist.append(dict(svname=svname, recive_cnt=recive_cnt, sccess_cnt=sccess_cnt, warn_cnt=warn_cnt, error_cnt=error_cnt))
+        if self.redis_cli is None:
+            self.redis_cli = redis_client.RedisClient(self.logger, host=self.redis_host, port=self.redis_port, password=self.redis_password, svname=self.svname)
+        svlist = self.redis_cli.list_server()
         if len(svlist) <= 0:
             return {"warn": "No server is running."}
         return {"success": svlist}
@@ -100,6 +82,7 @@ class Server(filer.Filer):
         """
         hblist = self.redis_cli.keys("hb-*")
         for hb in hblist:
+            hb = hb.decode()
             try:
                 v = self.redis_cli.hget(hb, 'ctime')
                 if v is None:
@@ -107,43 +90,78 @@ class Server(filer.Filer):
             except redis.exceptions.ResponseError:
                 self.logger.warn(f"Failed to get ctime. {hb}", exc_info=True)
                 continue
-            tm = float(v)
-            if time.time() - tm > 10:
+            tm = time.time() - float(v)
+            if tm > self.cleaning_interval:
                 self.redis_cli.delete(hb)
-                self.redis_cli.delete(hb.decode().replace("hb-", "sv-"))
+                self.redis_cli.delete(hb.replace("hb-", "sv-"))
+
+    def _clean_reskey(self):
+        """
+        Redisサーバーに残っている停止済みのクライアントキーを削除する
+        """
+        rlist = self.redis_cli.keys("cl-*")
+        for reskey in rlist:
+            try:
+                tm = int(reskey.decode().split("-")[2])
+                if time.time() - tm > self.cleaning_interval:
+                    self.redis_cli.delete(reskey)
+            except Exception as e:
+                self.redis_cli.delete(reskey)
 
     def _run_server(self):
         self.logger.info(f"start server. svname={self.svname}")
         ltime = time.time()
-        recive_cnt = 0
+        receive_cnt = 0
         sccess_cnt = 0
         warn_cnt = 0
         error_cnt = 0
-        self.redis_cli.hset(self.redis_cli.hbname, 'recive_cnt', recive_cnt)
+        self.redis_cli.hset(self.redis_cli.hbname, 'receive_cnt', receive_cnt)
         self.redis_cli.hset(self.redis_cli.hbname, 'sccess_cnt', sccess_cnt)
         self.redis_cli.hset(self.redis_cli.hbname, 'warn_cnt', warn_cnt)
         self.redis_cli.hset(self.redis_cli.hbname, 'error_cnt', error_cnt)
+
+        def _publish(msg_str):
+            # 各サーバーにメッセージを配布する
+            hblist = self.redis_cli.keys(f"hb-{self.org_svname}-*")
+            for hb in hblist:
+                hb = hb.decode()
+                sv = hb.replace("hb-", "sv-")
+                self.redis_cli.rpush(sv, msg_str)
+
         while self.is_running:
             try:
                 # ブロッキングリストから要素を取り出す
                 ctime = time.time()
                 self.redis_cli.hset(self.redis_cli.hbname, 'ctime', ctime)
+                self.redis_cli.hset(self.redis_cli.hbname, 'status', 'ready')
                 result = self.redis_cli.blpop(self.redis_cli.svname)
-                if ctime - ltime > 10:
+                if ctime - ltime > self.cleaning_interval:
                     self._clean_server()
+                    self._clean_reskey()
                     ltime = ctime
+                to_cluster = False
                 if result is None or len(result) <= 0:
-                    time.sleep(1)
-                    continue
-                msg = result[1].decode().split(' ')
+                    # クラスター宛メッセージがあるか確認する
+                    result = self.redis_cli.blpop(f"sv-{self.org_svname}")
+                    if result is None or len(result) <= 0:
+                        time.sleep(1)
+                        continue
+                    to_cluster = True
+                msg_str = result[1].decode()
+                msg = msg_str.split(' ')
                 if len(msg) <= 0:
                     time.sleep(1)
                     continue
+
                 st = None
-                recive_cnt += 1
-                self.redis_cli.hset(self.redis_cli.hbname, 'recive_cnt', recive_cnt)
+                receive_cnt += 1
+                self.redis_cli.hset(self.redis_cli.hbname, 'receive_cnt', receive_cnt)
+                self.redis_cli.hset(self.redis_cli.hbname, 'status', 'processing')
 
                 if msg[0] == 'deploy':
+                    if to_cluster:
+                        _publish(msg_str)
+                        continue
                     if msg[7] == 'None':
                         model_bin = None
                     else:
@@ -232,10 +250,19 @@ class Server(filer.Filer):
                 elif msg[0] == 'deploy_list':
                     st = self.deploy_list(msg[1])
                 elif msg[0] == 'undeploy':
+                    if to_cluster:
+                        _publish(msg_str)
+                        continue
                     st = self.undeploy(msg[1], msg[2])
                 elif msg[0] == 'start':
+                    if to_cluster:
+                        _publish(msg_str)
+                        continue
                     st = self.start(msg[1], msg[2], msg[3], (True if msg[4]=='True' else False), (None if msg[5]=='None' else msg[5]))
                 elif msg[0] == 'stop':
+                    if to_cluster:
+                        _publish(msg_str)
+                        continue
                     st = self.stop(msg[1], msg[2])
                 elif msg[0] == 'predict':
                     nodraw = True if msg[4] == 'True' else False
@@ -249,6 +276,9 @@ class Server(filer.Filer):
                     else:
                         st = self.predict(msg[1], msg[2], convert.b64str2str(msg[3]), output_image_name, nodraw)
                 elif msg[0] == 'stop_server':
+                    if to_cluster:
+                        _publish(msg_str)
+                        continue
                     self.is_running = False
                     self.redis_cli.rpush(msg[1], {"success": f"Successful stop server. svname={self.redis_cli.svname}"})
                     break
@@ -256,15 +286,24 @@ class Server(filer.Filer):
                     svpath = convert.b64str2str(msg[2])
                     st = self.file_list(msg[1], svpath)
                 elif msg[0] == 'file_mkdir':
+                    if to_cluster:
+                        _publish(msg_str)
+                        continue
                     svpath = convert.b64str2str(msg[2])
                     st = self.file_mkdir(msg[1], svpath)
                 elif msg[0] == 'file_rmdir':
+                    if to_cluster:
+                        _publish(msg_str)
+                        continue
                     svpath = convert.b64str2str(msg[2])
                     st = self.file_rmdir(msg[1], svpath)
                 elif msg[0] == 'file_download':
                     svpath = convert.b64str2str(msg[2])
                     st = self.file_download(msg[1], svpath)
                 elif msg[0] == 'file_upload':
+                    if to_cluster:
+                        _publish(msg_str)
+                        continue
                     svpath = convert.b64str2str(msg[2])
                     file_name = convert.b64str2str(msg[3])
                     file_data = convert.b64str2bytes(msg[4])
@@ -272,6 +311,9 @@ class Server(filer.Filer):
                     orverwrite = msg[6]=='True'
                     st = self.file_upload(msg[1], svpath, file_name, file_data, mkdir, orverwrite)
                 elif msg[0] == 'file_remove':
+                    if to_cluster:
+                        _publish(msg_str)
+                        continue
                     svpath = convert.b64str2str(msg[2])
                     st = self.file_remove(msg[1], svpath)
                 else:
@@ -287,6 +329,7 @@ class Server(filer.Filer):
                 elif st==self.RESP_ERROR:
                     error_cnt += 1
                     self.redis_cli.hset(self.redis_cli.hbname, 'error_cnt', error_cnt)
+                self.redis_cli.hset(self.redis_cli.hbname, 'ctime', time.time())
             except redis.exceptions.TimeoutError:
                 pass
             except redis.exceptions.ConnectionError as e:
