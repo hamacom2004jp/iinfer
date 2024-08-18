@@ -319,7 +319,7 @@ class Web(options.Options):
 
     def list_tree(self, current_path:str) -> Dict[str, Any]:
         """
-        ディレクトリのツリーを取得する
+        クライアント側のディレクトリのツリーを取得する
 
         Args:
             current_path (str): カレントパス
@@ -329,25 +329,38 @@ class Web(options.Options):
         """
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"web.list_tree: current_path={current_path}")
-        current_path = Path.cwd() if current_path is None or current_path=='' else Path(current_path)
-        current_path = current_path if current_path.is_dir() else current_path.parent
+        cwd = Path.cwd()
+        current_path:Path = Path('.') if current_path is None or current_path=='' else Path(current_path)
+        current_path:Path = current_path if current_path.is_dir() else current_path.parent
+        if str(cwd) not in str(current_path.absolute()):
+            current_path = Path('.')
         path_tree = {}
-        def mk_key(path):
-            return re.sub(r'[\s:\\\\/,\.#$%^&!@*\(\)\{\}\[\]\'\"\`]', '_',str(path))
         def ts2str(ts):
             return datetime.datetime.fromtimestamp(ts)
-        for i, part in enumerate(current_path.parts):
-            path = Path('/'.join(current_path.parts[:i+1]).replace('//', '/'))
-            if not os.access(path, os.R_OK):
+        path_parts = current_path.parts
+        if len(path_parts) == 0:
+            path_parts = ['.']
+        for i, part in enumerate(path_parts):
+            path = Path('/'.join(path_parts[:i+1]).replace('//', '/'))
+            full_path = cwd / path
+            if not os.access(full_path, os.R_OK):
                 continue
-            path_key = mk_key(path)
+            path = '.' + str(full_path).replace(str(cwd),'')
+            path_key = common.safe_fname(path)
             children = None
-            if path.is_dir():
+            if full_path.is_dir():
                 try:
-                    children = {mk_key(p):dict(name=p.name, is_dir=p.is_dir(), path=str(p), size=p.stat().st_size, last=ts2str(p.stat().st_mtime)) for p in path.iterdir()}
+                    children = {}
+                    for fp in full_path.iterdir():
+                        p = '.' + str(fp).replace(str(cwd),'')
+                        children[common.safe_fname(p)] = dict(name=fp.name,
+                                                              is_dir=fp.is_dir(),
+                                                              path=p,
+                                                              size=fp.stat().st_size,
+                                                              last=ts2str(fp.stat().st_mtime))
                 except:
                     children = {}
-            path_tree[path_key] = dict(name=part, is_dir=path.is_dir(), path=str(path), children=children, size=path.stat().st_size, last=ts2str(path.stat().st_mtime))
+            path_tree[path_key] = dict(name=part, is_dir=full_path.is_dir(), path=str(path), children=children, size=full_path.stat().st_size, last=ts2str(full_path.stat().st_mtime))
         return path_tree
     
     def list_downloads(self, current_path:str, root_path:Path=None):

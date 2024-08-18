@@ -609,7 +609,7 @@ fsapi.file_list = async (target_path, current_path, dh) => {
     }
     else if (entry.kind === 'directory') {
       children[key] = {'name':entry.name, 'is_dir':true, 'path':path, 'size':0, 'last':'', 'local':true};
-      if (target_path.indexOf(path)<0) {
+      if (!target_path.startsWith(path)) {
         continue;
       }
       const res = await fsapi.file_list(target_path, path, entry);

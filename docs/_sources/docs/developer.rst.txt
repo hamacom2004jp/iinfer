@@ -200,6 +200,37 @@ iinferの開発環境を構築するための手順を説明します。
 
         wsl --import Ubuntu_docker-22.04 <任意のパス> <任意のパス>/Ubuntu_docker-20.04.tar --version 2
 
+【参考】WSL環境でUSBディバイスを使用する方法
+=============================================
+
+- WSL2のUbuntuでUSBデバイスを使用するためには、以下の手順を実行します。 `元記事 <https://learn.microsoft.com/ja-jp/windows/wsl/connect-usb>`__
+
+    1. WSL に USBIPD をインストールする。 `ダウンロードサイト <https://github.com/dorssel/usbipd-win/releases>`__
+    2. 管理者モードでコマンドプロンプトを開き以下のコマンドを実行する。
+
+        .. code-block:: bat
+
+            usbipd list
+
+    3. アタッチしたいデバイスの BUSID をメモする。
+    4. 以下のコマンドでディバイスを共有状態にする。 ( BUSIDが '3-1' の場合 )
+
+        .. code-block:: bat
+
+            usbipd bind --busid 3-1
+
+    5. 以下のコマンドでWSLにアタッチする。 ( BUSIDが '3-1' の場合 )
+
+        .. code-block:: bat
+
+            usbipd attach --wsl --busid 3-1
+
+    6. WSL内のUbuntuでUSBディバイスが使用可能であることを確認する。
+
+        .. code-block:: sh
+
+            lsusb
+
 【参考】RedisをWindows環境を構築する手順
 =====================================================
 
@@ -232,3 +263,4 @@ iinferの開発環境を構築するための手順を説明します。
         sphinx-build -b html docs_src docs
         python setup.py sdist
         python setup.py bdist_wheel
+

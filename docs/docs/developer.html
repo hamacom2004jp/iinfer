@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>開発者向け情報 &mdash; iinfer 2024/08/17 documentation</title>
+  <title>開発者向け情報 &mdash; iinfer 2024/08/18 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -16,7 +16,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=3d54cfd2"></script>
+        <script src="../_static/documentation_options.js?v=d54e6c10"></script>
         <script src="../_static/doctools.js?v=9a2dae69"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -65,6 +65,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#id3">モジュールのコミット方法</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#pypl">【参考】pyplにアップするための手順</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#wsl2-ubuntu20-04-docker">【参考】WSL2-Ubuntu20.04-docker環境を構築する手順</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#wslusb">【参考】WSL環境でUSBディバイスを使用する方法</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#rediswindows">【参考】RedisをWindows環境を構築する手順</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#sitemap-xml">【参考】sitemap.xmlの作成手順</a></li>
 </ul>
@@ -304,6 +305,47 @@ wsl --unregister Ubuntu-22.04
 </div></blockquote>
 </li>
 </ol>
+</section>
+<section id="wslusb">
+<h2>【参考】WSL環境でUSBディバイスを使用する方法<a class="headerlink" href="#wslusb" title="Link to this heading"></a></h2>
+<ul>
+<li><p>WSL2のUbuntuでUSBデバイスを使用するためには、以下の手順を実行します。 <a class="reference external" href="https://learn.microsoft.com/ja-jp/windows/wsl/connect-usb">元記事</a></p>
+<blockquote>
+<div><ol class="arabic">
+<li><p>WSL に USBIPD をインストールする。 <a class="reference external" href="https://github.com/dorssel/usbipd-win/releases">ダウンロードサイト</a></p></li>
+<li><p>管理者モードでコマンドプロンプトを開き以下のコマンドを実行する。</p>
+<blockquote>
+<div><div class="highlight-bat notranslate"><div class="highlight"><pre><span></span>usbipd list
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>アタッチしたいデバイスの BUSID をメモする。</p></li>
+<li><p>以下のコマンドでディバイスを共有状態にする。 ( BUSIDが '3-1' の場合 )</p>
+<blockquote>
+<div><div class="highlight-bat notranslate"><div class="highlight"><pre><span></span>usbipd bind --busid 3-1
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>以下のコマンドでWSLにアタッチする。 ( BUSIDが '3-1' の場合 )</p>
+<blockquote>
+<div><div class="highlight-bat notranslate"><div class="highlight"><pre><span></span>usbipd attach --wsl --busid 3-1
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>WSL内のUbuntuでUSBディバイスが使用可能であることを確認する。</p>
+<blockquote>
+<div><div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>lsusb
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+</ol>
+</div></blockquote>
+</li>
+</ul>
 </section>
 <section id="rediswindows">
 <h2>【参考】RedisをWindows環境を構築する手順<a class="headerlink" href="#rediswindows" title="Link to this heading"></a></h2>

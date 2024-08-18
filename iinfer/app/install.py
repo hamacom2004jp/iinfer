@@ -115,6 +115,7 @@ class Install(object):
                 volumes=[
                     f'{data}:/home/{user}/.iinfer',
                     f'/home/{user}/scripts:/home/{user}/scripts',
+                    f'/home/{user}:/home/{user}',
                     '/dev/bus/usb/:/dev/bus/usb/:rw'
                 ]
             )
