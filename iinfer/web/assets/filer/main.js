@@ -96,4 +96,6 @@ $(() => {
       return false;
     }
   });
+
+  fsapi.onload();
 });

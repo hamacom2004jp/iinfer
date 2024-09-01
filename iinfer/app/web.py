@@ -1224,6 +1224,12 @@ class Web(options.Options):
                 bottle.abort(502, 'Could not connect to webcap process.')
                 return
 
+        @app.route('/annotation')
+        def filer():
+            #if self.filer_html_data is not None:
+            #    return self.filer_html_data
+            return bottle.static_file('annotation.html', root=static_root)
+
         @app.route('/copyright')
         def copyright():
             return self.copyright()

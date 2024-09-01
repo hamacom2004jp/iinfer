@@ -730,7 +730,7 @@ fsapi.is_text = (array) => {
 fsapi.range = (start, stop, step) => {
   return Array.from({ length: (stop - start) / step + 1 }, (_, i) => start + i * step);
 }
-$(()=>{
+fsapi.onload = () => {
   fetch('get_server_opt', {method: 'GET'}).then(res => res.json()).then(opt => {
     fsapi.initargs = opt;
     fsapi.right.find('.filer_host').val(fsapi.initargs['host']);
@@ -745,4 +745,4 @@ $(()=>{
         el.innerHTML = result.value.replace(/^/gm,'<span class="row-number"></span>');
     }
   });
-})
+}

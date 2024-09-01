@@ -189,10 +189,15 @@ class IinferApp:
                 args.color_file = Path(args.color_file) if args.color_file is not None else None
                 args.before_injection_conf = Path(args.before_injection_conf) if args.before_injection_conf is not None else None
                 args.after_injection_conf = Path(args.after_injection_conf) if args.after_injection_conf is not None else None
+
+                args.train_dataset = Path(args.train_dataset) if args.train_dataset is not None else None
+                args.custom_train_py = Path(args.custom_train_py) if args.custom_train_py is not None else None
+
                 ret = self.cl.deploy(args.name, args.model_img_width, args.model_img_height, args.model_file, args.model_conf_file, args.predict_type,
                                 args.custom_predict_py, label_file=args.label_file, color_file=args.color_file,
                                 before_injection_conf=args.before_injection_conf, before_injection_type=args.before_injection_type, before_injection_py=args.before_injection_py,
                                 after_injection_conf=args.after_injection_conf, after_injection_type=args.after_injection_type, after_injection_py=args.after_injection_py,
+                                train_dataset=args.train_dataset, train_dataset_upload=args.train_dataset_upload, train_type=args.train_type, custom_train_py=args.custom_train_py,
                                 overwrite=args.overwrite, retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
                 common.print_format(ret, args.format, tm, args.output_json, args.output_json_append)
                 if 'success' not in ret:

@@ -100,7 +100,7 @@ const list_cmd_func_then = () => {
                         // tid, tnの値を残すためにクロージャーにする
                         return () => {
                             const current_path = $(`[id="${tid}"]`).val();
-                            filer_modal_func(tid, tn, current_path, false);
+                            fmodal.filer_modal_func(tid, tn, current_path, false, true);
                         }
                     }
                     btn.click(mk_func(input_elem.attr('id'), input_elem.attr('name')));
@@ -113,7 +113,7 @@ const list_cmd_func_then = () => {
                         // tid, tnの値を残すためにクロージャーにする
                         return () => {
                             const current_path = $(`[id="${tid}"]`).val();
-                            filer_modal_func(tid, tn, current_path, true);
+                            fmodal.filer_modal_func(tid, tn, current_path, true, true);
                         }
                     }
                     btn.click(mk_func(input_elem.attr('id'), input_elem.attr('name')));

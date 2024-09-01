@@ -112,11 +112,11 @@ class Install(object):
                 privileged=True,
                 restart='always',
                 working_dir=f'/home/{user}',
+                devices=['/dev/bus/usb:/dev/bus/usb'],
                 volumes=[
                     f'{data}:/home/{user}/.iinfer',
                     f'/home/{user}/scripts:/home/{user}/scripts',
-                    f'/home/{user}:/home/{user}',
-                    '/dev/bus/usb/:/dev/bus/usb/:rw'
+                    f'/home/{user}:/home/{user}'
                 ]
             )
             if install_use_gpu:

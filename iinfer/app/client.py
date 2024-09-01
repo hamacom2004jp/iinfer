@@ -38,8 +38,9 @@ class Client(object):
     def deploy(self, name:str, model_img_width:int, model_img_height:int, model_file:str, model_conf_file:List[Path], predict_type:str,
                custom_predict_py:Path, label_file:Path, color_file:Path,
                before_injection_conf:Path, before_injection_type:List[str], before_injection_py:List[Path],
-               after_injection_conf:Path, after_injection_type:List[str], after_injection_py:List[Path], overwrite:bool,
-               retry_count:int=3, retry_interval:int=5, timeout:int = 60):
+               after_injection_conf:Path, after_injection_type:List[str], after_injection_py:List[Path],
+               train_dataset:Path, train_dataset_upload:bool, train_type:str, custom_train_py:Path,
+               overwrite:bool, retry_count:int=3, retry_interval:int=5, timeout:int = 60):
         """
         モデルをRedisサーバーにデプロイする
 
@@ -59,6 +60,10 @@ class Client(object):
             after_injection_type (List[str]): 推論後処理タイプ
             after_injection_conf (Path): 推論後処理設定ファイルのパス
             after_injection_py (List[Path]): 推論後処理スクリプトのパス
+            train_dataset (Path): 学習データセットディレクトリのパス
+            train_dataset_upload (bool): 学習データセットをサーバーにアップロードするかどうか
+            train_type (str): 学習方法のタイプ
+            custom_train_py (Path): 学習スクリプトのパス
             overwrite (bool): モデルを上書きするかどうか
             retry_count (int, optional): リトライ回数. Defaults to 3.
             retry_interval (int, optional): リトライ間隔. Defaults to 5.
@@ -158,13 +163,56 @@ class Client(object):
         if not ret: return before_injection_py_name
         ret, after_injection_py_name, after_injection_py_b64 = _name_b64("after_injection_py", after_injection_py)
         if not ret: return after_injection_py_name
+
+        if train_dataset is not None:
+            if train_type is None:
+                self.logger.warning(f"train_type is empty.Required if train_dataset is specified.")
+                return {"error": f"train_type is empty.Required if train_dataset is specified."}
+            if not train_dataset.exists():
+                self.logger.warning(f"train_dataset path {str(train_dataset)} does not exist")
+                return {"error": f"train_dataset path {str(train_dataset)} does not exist"}
+            if not train_dataset.is_dir():
+                self.logger.warning(f"train_dataset path {str(train_dataset)} does not directory")
+                return {"error": f"train_dataset path {str(train_dataset)} does not directory"}
+        if train_type is not None and train_dataset is None:
+            self.logger.warning(f"train_dataset is empty.Required if train_type is specified.")
+            return {"error": f"train_dataset is empty.Required if train_type is specified."}
+        if train_type is not None and train_type not in common.BASE_TRAIN_MODELS and train_type != "Custom":
+            self.logger.warning(f"Unknown train_type. {train_type}")
+            return {"error": f"Unknown train_type. {train_type}"}
+        if train_type == 'Custom':
+            if custom_train_py is None or not custom_train_py.exists():
+                self.logger.warning(f"custom_train_py path {str(custom_train_py)} does not exist")
+                return {"error": f"custom_train_py path {str(custom_train_py)} does not exist"}
+            with open(custom_train_py, "rb") as pf:
+                custom_train_py_b64 = base64.b64encode(pf.read()).decode('utf-8')
+        else:
+            custom_train_py_b64 = None
+
         res_json = self.redis_cli.send_cmd('deploy', [name, str(model_img_width), str(model_img_height), predict_type,
                                            model_file.name if isinstance(model_file, Path) else model_file, model_bytes_b64,
                                            model_conf_file_name, model_conf_bytes_b64,
                                            custom_predict_py_b64, label_file_b64, color_file_b64,
                                            before_injection_conf_b64, before_injection_type, before_injection_py_name, before_injection_py_b64,
-                                           after_injection_conf_b64, after_injection_type, after_injection_py_name, after_injection_py_b64, overwrite],
+                                           after_injection_conf_b64, after_injection_type, after_injection_py_name, after_injection_py_b64,
+                                           'input' if train_dataset is not None and train_dataset_upload else None,
+                                           train_type, custom_train_py_b64, overwrite],
                                            retry_count=retry_count, retry_interval=retry_interval, outstatus=False, timeout=timeout)
+
+        if train_dataset is not None and train_dataset_upload:
+            data_files = glob.glob(str(train_dataset / "**" / "*"), recursive=True)
+            svpath = Path(f"/{name}")
+            for f in data_files:
+                file_path = Path(f)
+                if file_path.is_dir():
+                    continue
+                p = f.replace(str(train_dataset), '', 1).replace('\\', '/')
+                up_path = svpath / 'input' / p[1:] if p.startswith('/') else svpath / p
+                rj = self.file_upload(up_path, file_path, mkdir=True, orverwrite=True,
+                                            retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
+                if 'success' not in rj:
+                    return rj
+
         return res_json
 
     def train(self, name:str, dataset:Path, dataset_upload:bool, model_conf_file:List[Path], train_type:str, custom_train_py:Path,

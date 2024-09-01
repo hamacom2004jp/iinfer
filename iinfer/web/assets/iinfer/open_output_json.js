@@ -7,7 +7,7 @@ const open_output_json_func = (target_id) => {
             hide_loading();
         });
     };
-    filer_modal_func(target_id, 'output_json', '', false, view_output_json_func);
+    fmodal.filer_modal_func(target_id, 'output_json', '', false, true, view_output_json_func);
 };
 const load_result = async (current_path) => {
     const formData = new FormData();

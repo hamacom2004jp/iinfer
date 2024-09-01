@@ -218,7 +218,19 @@ class Server(filer.Filer):
                         after_injection_bin = None
                     else:
                         after_injection_bin = [base64.b64decode(m) for m in msg[20].split(',')]
-                    if msg[21] == 'True':
+                    if msg[21] == 'None':
+                        train_dataset = None
+                    else:
+                        train_dataset = msg[21]
+                    if msg[22] == 'None':
+                        train_type = None
+                    else:
+                        train_type = msg[22]
+                    if msg[23] == 'None':
+                        custom_train_py = None
+                    else:
+                        custom_train_py = base64.b64decode(msg[23])
+                    if msg[24] == 'True':
                         overwrite = True
                     else:
                         overwrite = False
@@ -226,7 +238,8 @@ class Server(filer.Filer):
                     st = self.deploy(msg[1], msg[2], int(msg[3]), int(msg[4]), msg[5], msg[6],
                                      model_bin, model_conf_file, model_conf_bin, custom_predict_py, label_txt, color_txt,
                                      before_injection_conf, before_injection_type, before_injection_py, before_injection_bin,
-                                     after_injection_conf, after_injection_type, after_injection_py, after_injection_bin, overwrite)
+                                     after_injection_conf, after_injection_type, after_injection_py, after_injection_bin,
+                                     train_dataset, train_type, custom_train_py, overwrite)
 
                 elif msg[0] == 'train':
                     if msg[4] == 'None':
@@ -358,7 +371,8 @@ class Server(filer.Filer):
                model_file:str, model_bin:bytes, model_conf_file:List[str], model_conf_bin:List[bytes],
                custom_predict_py:bytes, label_txt:bytes, color_txt:bytes,
                before_injection_conf:bytes, before_injection_type:List[str], before_injection_py:List[str], before_injection_bin:List[bytes],
-               after_injection_conf:bytes, after_injection_type:List[str], after_injection_py:List[str], after_injection_bin:List[bytes], overwrite:bool):
+               after_injection_conf:bytes, after_injection_type:List[str], after_injection_py:List[str], after_injection_bin:List[bytes],
+               train_dataset:str, train_type:str, custom_train_py:bytes, overwrite:bool):
         """
         モデルをデプロイする
 
@@ -383,6 +397,9 @@ class Server(filer.Filer):
             after_injection_type (List[str]): 推論後処理のタイプ
             after_injection_py (List[str]): 推論後処理のPythonスクリプトファイル名
             after_injection_bin (List[bytes]): 推論後処理のPythonスクリプト
+            train_dataset (str): 学習データセットのパス
+            train_type (str): 学習方法のタイプ
+            custom_train_py (bytes): 学習のPythonスクリプト
             overwrite (bool): 上書きするかどうか
         """
         if name is None or name == "":
@@ -469,33 +486,24 @@ class Server(filer.Filer):
         if not ret: return self.RESP_WARN
         ret, after_injection_py = _save_m('after_injection', after_injection_py, after_injection_bin)
         if not ret: return self.RESP_WARN
-        custom_predict_file = None
-        if custom_predict_py is not None:
-            custom_predict_file = deploy_dir / "custom_predict.py"
-            with open(custom_predict_file, "wb") as f:
-                f.write(custom_predict_py)
-                self.logger.info(f"Save custom_predict.py to {str(deploy_dir)}")
-        if label_txt is not None:
-            label_file = deploy_dir / 'label.txt'
-            with open(label_file, "wb") as f:
-                f.write(label_txt)
-                self.logger.info(f"Save {label_file} to {str(deploy_dir)}")
+        ret, custom_predict_file = _save_s('custom_predict.py', custom_predict_py, ret_fn=True)
+        ret, label_file = _save_s('label.txt', label_txt, ret_fn=True)
+        ret, color_file = _save_s('color.txt', color_txt, ret_fn=True)
+
+        if train_dataset is not None:
+            train_dataset = deploy_dir / train_dataset
         else:
-            label_file = None
-        if color_txt is not None:
-            color_file = deploy_dir / 'color.txt'
-            with open(color_file, "wb") as f:
-                f.write(color_txt)
-                self.logger.info(f"Save {color_file} to {str(deploy_dir)}")
-        else:
-            color_file = None
+            train_dataset = None
+        ret, custom_train_file = _save_s("custom_train.py", custom_train_py, ret_fn=True)
+
         with open(deploy_dir / "conf.json", "w") as f:
             conf = dict(model_img_width=model_img_width, model_img_height=model_img_height, predict_type=predict_type,
                         model_file=model_file, model_conf_file=model_conf_file, custom_predict_py=(custom_predict_file if custom_predict_file is not None else None),
                         label_file=label_file, color_file=color_file, before_injection_conf=before_injection_conf, after_injection_conf=after_injection_conf,
                         before_injection_type=before_injection_type, after_injection_type=after_injection_type,
-                        before_injection_py=before_injection_py, after_injection_py=after_injection_py)
-            json.dump(conf, f, default=common.default_json_enc)
+                        before_injection_py=before_injection_py, after_injection_py=after_injection_py,
+                        train_dataset=train_dataset, train_type=train_type, custom_train_py=(custom_train_file if custom_train_file is not None else None))
+            json.dump(conf, f, default=common.default_json_enc, indent=4)
             self.logger.info(f"Save conf.json to {str(deploy_dir)}")
 
         self._gitpull(reskey, deploy_dir, predict_type)
@@ -679,7 +687,7 @@ class Server(filer.Filer):
                 continue
             with open(conf_path, "r") as cf:
                 conf = json.load(cf)
-                model_file = Path(conf["model_file"])
+                model_file = 'exists' if "model_file" in conf and conf["model_file"] is not None and Path(conf["model_file"]).exists() else None
                 model_conf_file = None
                 if "model_conf_file" in conf and conf["model_conf_file"] is not None and len(conf["model_conf_file"]) > 0 and Path(conf["model_conf_file"][0]).exists():
                     model_conf_file = 'exists'
@@ -698,14 +706,18 @@ class Server(filer.Filer):
                 custom_predict_py = 'exists' if "custom_predict_py" in conf and conf["custom_predict_py"] is not None and Path(conf["custom_predict_py"]).exists() else None
                 label_file = 'exists' if "label_file" in conf and conf["label_file"] is not None and Path(conf["label_file"]).exists() else None
                 color_file = 'exists' if "color_file" in conf and conf["color_file"] is not None and Path(conf["color_file"]).exists() else None
+                train_dataset = 'exists' if "train_dataset" in conf and conf["train_dataset"] is not None and Path(conf["train_dataset"]).exists() else None
+                train_type = conf["train_type"] if "train_type" in conf else None
+                custom_train_py = 'exists' if "custom_train_py" in conf and conf["custom_train_py"] is not None and Path(conf["custom_train_py"]).exists() else None
                 row = dict(name=dir.name,
-                           input=(conf["model_img_width"], conf["model_img_height"]), model_file=model_file.name, model_conf_file=model_conf_file,
+                           input=(conf["model_img_width"], conf["model_img_height"]), model_file=model_file, model_conf_file=model_conf_file,
                            predict_type=conf["predict_type"], custom_predict=custom_predict_py,
                            label_file=label_file, color_file=color_file,
                            session=dir.name in self.sessions,
                            mot=dir.name in self.sessions and self.sessions[dir.name]['tracker'] is not None,
                            before_injection_py=before_injection,
-                           after_injection_py=after_injection)
+                           after_injection_py=after_injection,
+                           train_dataset=train_dataset, train_type=train_type, custom_train=custom_train_py)
                 deploy_list.append(row)
         self.redis_cli.rpush(reskey, {"success": deploy_list})
         return self.RESP_SCCESS
