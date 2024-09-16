@@ -1,6 +1,7 @@
 from io import BytesIO
 from pathlib import Path
 from PIL import Image
+from PIL.Image import Resampling
 from typing import Tuple
 import base64
 import numpy as np
@@ -126,6 +127,21 @@ def bgr2rgb(npy:np.ndarray) -> np.ndarray:
     """
     return npy[..., ::-1].copy()
 
+def imgbytes2thumbnail(img:bytes, size:Tuple[float, float]) -> Image.Image:
+    """
+    画像のバイト列をサムネイルに変換します。
+
+    Args:
+        img (bytes): 画像のバイト列
+        size (Tuple[float, float]): サムネイルのサイズ(width, height)
+
+    Returns:
+        Image.Image: サムネイル
+    """
+    i = Image.open(BytesIO(img))
+    i.thumbnail(size, Resampling.LANCZOS)
+
+    return i
 
 def imgbytes2npy(img:bytes, dtype:str='uint8') -> np.ndarray:
     """
@@ -174,6 +190,7 @@ def img2byte(image:Image.Image, format:str='jpeg') -> bytes:
 
     Args:
         image (Image.Image): PILのImageオブジェクト
+        format (str, optional): 画像のフォーマット. Defaults to 'jpeg'.
 
     Returns:
         bytes: 画像のバイト列

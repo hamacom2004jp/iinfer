@@ -337,7 +337,7 @@ class IinferApp:
             elif args.cmd == 'file_download':
                 local_data = Path(args.local_data.replace('"','')) if args.local_data is not None else None
                 download_file = Path(args.download_file.replace('"','')) if args.download_file is not None else None
-                ret = self.cl.file_download(args.svpath.replace('"',''), download_file, local_data=local_data, rpath=args.rpath,
+                ret = self.cl.file_download(args.svpath.replace('"',''), download_file, local_data=local_data, rpath=args.rpath, img_thumbnail=args.img_thumbnail,
                                             retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
                 common.print_format(ret, args.format, tm, args.output_json, args.output_json_append)
                 if 'success' not in ret:

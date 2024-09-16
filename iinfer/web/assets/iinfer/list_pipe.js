@@ -14,7 +14,7 @@ list_pipe_func = async () => {
 list_pipe_func_then = () => {
     // パイプラインカードクリック時の処理（モーダルダイアログを開く）
     const pipe_card_func = async (e) => {
-        show_loading();
+        iinfer.show_loading();
         const pipe_modal = $('#pipe_modal');
         pipe_modal.find('.is-invalid, .is-valid').removeClass('is-invalid').removeClass('is-valid');
         let row_content = pipe_modal.find('.row_content');
@@ -84,7 +84,7 @@ list_pipe_func_then = () => {
         pipe_modal.find('.modal-title').text(`Pipeline : ${modal_title}`);
         pipe_modal.modal('show');
         pipe_modal.find('.btn_window_stack').click();
-        hide_loading();
+        iinfer.hide_loading();
     }
     $('.pipe_card').off('click').on('click', pipe_card_func);
     // パイプラインファイルの保存
@@ -94,26 +94,26 @@ list_pipe_func_then = () => {
         if (pipe_modal.find('.row_content, .row_content_common').find('.is-invalid').length > 0) {
             return;
         }
-        show_loading();
+        iinfer.show_loading();
         const result = await save_pipe(title, opt);
         await list_pipe_func();
         $('.pipe_card').off('click').on('click', pipe_card_func);
         if (result['success']) alert(result['success']);
         else if (result['warn']) alert(result['warn']);
-        hide_loading();
+        iinfer.hide_loading();
     });
     // パイプラインファイルの削除
     $('#pipe_del').off('click').on('click', async () => {
         const pipe_modal = $('#pipe_modal');
         const title = pipe_modal.find('[name="title"]').val();
-        show_loading();
+        iinfer.show_loading();
         if (window.confirm(`delete "${title}"?`)) {
             await del_pipe(title);
             pipe_modal.modal('hide');
             await list_pipe_func();
             $('.pipe_card').off('click').on('click', pipe_card_func);
         }
-        hide_loading();
+        iinfer.hide_loading();
     });
     // パイプラインファイルの実行
     $('#pipe_exec').off('click').on('click', async () => {
@@ -122,11 +122,11 @@ list_pipe_func_then = () => {
         if (pipe_modal.find('.row_content').find('.is-invalid').length > 0) {
             return;
         }
-        show_loading();
+        iinfer.show_loading();
         // コマンドの実行
         exec_pipe(title, opt).then((result) => {
             pipe_modal.modal('hide');
-            //hide_loading();
+            //iinfer.hide_loading();
         });
     });
     // RAW表示の実行
@@ -136,11 +136,11 @@ list_pipe_func_then = () => {
         if (pipe_modal.find('.row_content').find('.is-invalid').length > 0) {
             return;
         }
-        show_loading();
+        iinfer.show_loading();
         // コマンドの実行
         raw_pipe(title, opt).then((result) => {
             view_raw_func(title, result);
-            hide_loading();
+            iinfer.hide_loading();
         });
     });
 };

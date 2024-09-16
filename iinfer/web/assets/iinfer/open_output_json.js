@@ -4,7 +4,7 @@ const open_output_json_func = (target_id) => {
     const view_output_json_func = (current_path) => {
         load_result(current_path).then((result) => {
             view_result_func(current_path, result);
-            hide_loading();
+            iinfer.hide_loading();
         });
     };
     fmodal.filer_modal_func(target_id, 'output_json', '', false, true, view_output_json_func);

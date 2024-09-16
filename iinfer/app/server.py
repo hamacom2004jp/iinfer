@@ -312,7 +312,11 @@ class Server(filer.Filer):
                     st = self.file_rmdir(msg[1], svpath)
                 elif msg[0] == 'file_download':
                     svpath = convert.b64str2str(msg[2])
-                    st = self.file_download(msg[1], svpath)
+                    if msg[3] == 'None':
+                        img_thumbnail = 0.0
+                    else:
+                        img_thumbnail = float(msg[3])
+                    st = self.file_download(msg[1], svpath, img_thumbnail)
                 elif msg[0] == 'file_upload':
                     if to_cluster:
                         _publish(msg_str)
@@ -502,7 +506,8 @@ class Server(filer.Filer):
                         label_file=label_file, color_file=color_file, before_injection_conf=before_injection_conf, after_injection_conf=after_injection_conf,
                         before_injection_type=before_injection_type, after_injection_type=after_injection_type,
                         before_injection_py=before_injection_py, after_injection_py=after_injection_py,
-                        train_dataset=train_dataset, train_type=train_type, custom_train_py=(custom_train_file if custom_train_file is not None else None))
+                        train_dataset=train_dataset, train_type=train_type, custom_train_py=(custom_train_file if custom_train_file is not None else None),
+                        deploy_dir=deploy_dir)
             json.dump(conf, f, default=common.default_json_enc, indent=4)
             self.logger.info(f"Save conf.json to {str(deploy_dir)}")
 
@@ -1037,7 +1042,7 @@ class Server(filer.Filer):
         self.redis_cli.rpush(reskey, msg)
         return rescode
 
-    def file_download(self, reskey:str, current_path:str) -> int:
+    def file_download(self, reskey:str, current_path:str, img_thumbnail:float=0.0) -> int:
         """
         ファイルをダウンロードする
 
@@ -1048,7 +1053,7 @@ class Server(filer.Filer):
         Returns:
             int: レスポンスコード
         """
-        rescode, msg = super().file_download(current_path)
+        rescode, msg = super().file_download(current_path, img_thumbnail)
         self.redis_cli.rpush(reskey, msg)
         return rescode
 

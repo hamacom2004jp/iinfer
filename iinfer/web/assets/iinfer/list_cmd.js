@@ -29,7 +29,7 @@ const list_cmd_func_then = () => {
     }
     // コマンドカードクリック時の処理（モーダルダイアログを開く）
     const cmd_card_func = async (e) => {
-        show_loading();
+        iinfer.show_loading();
         const py_get_modes = await get_modes();
         const cmd_modal = $('#cmd_modal');
         cmd_modal.find('[name="mode"]').html(mkopt(py_get_modes));
@@ -221,7 +221,7 @@ const list_cmd_func_then = () => {
         cmd_modal.find('.row_content_hide').hide();
         cmd_modal.find('.btn_window_stack').click();
         cmd_modal.modal('show');
-        hide_loading();
+        iinfer.hide_loading();
     }
     $('.cmd_card').off('click').on('click', cmd_card_func);
     // コマンドファイルの保存
@@ -231,26 +231,26 @@ const list_cmd_func_then = () => {
         if (cmd_modal.find('.row_content, .row_content_common').find('.is-invalid').length > 0) {
             return;
         }
-        show_loading();
+        iinfer.show_loading();
         const result = await save_cmd(title, opt);
         await list_cmd_func();
         $('.cmd_card').off('click').on('click', cmd_card_func);
         if (result.success) alert(result.success);
         else if (result.warn) alert(result.warn);
-        hide_loading();
+        iinfer.hide_loading();
     });
     // コマンドファイルの削除
     $('#cmd_del').off('click').on('click', async () => {
         const cmd_modal = $('#cmd_modal');
         const title = cmd_modal.find('[name="title"]').val();
-        show_loading();
+        iinfer.show_loading();
         if (window.confirm(`delete "${title}"?`)) {
             await del_cmd(title);
             cmd_modal.modal('hide');
             await list_cmd_func();
             $('.cmd_card').off('click').on('click', cmd_card_func);
         }
-        hide_loading();
+        iinfer.hide_loading();
     });
     // コマンドファイルの実行
     $('#cmd_exec').off('click').on('click', async () => {
@@ -259,12 +259,12 @@ const list_cmd_func_then = () => {
         if (cmd_modal.find('.row_content, .row_content_common').find('.is-invalid').length > 0) {
             return;
         }
-        show_loading();
+        iinfer.show_loading();
         // コマンドの実行
         exec_cmd(title, opt).then((result) => {
             cmd_modal.modal('hide');
             view_result_func(title, result);
-            hide_loading();
+            iinfer.hide_loading();
         });
     });
     // RAW表示の実行
@@ -274,11 +274,11 @@ const list_cmd_func_then = () => {
         if (cmd_modal.find('.row_content, .row_content_common').find('.is-invalid').length > 0) {
             return;
         }
-        show_loading();
+        iinfer.show_loading();
         // コマンドの実行
         raw_cmd(title, opt).then((result) => {
             view_raw_func(title, result);
-            hide_loading();
+            iinfer.hide_loading();
         });
     });
 };

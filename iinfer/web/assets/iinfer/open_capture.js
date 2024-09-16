@@ -4,7 +4,7 @@ const open_capture_func = (target_id) => {
     const view_capture_func = (current_path) => {
         load_capture(current_path).then((result) =>{
             view_result_func(current_path, result);
-            hide_loading();
+            iinfer.hide_loading();
         });
     };
     fmodal.filer_modal_func(target_id, 'capture', '', false, true, view_capture_func);

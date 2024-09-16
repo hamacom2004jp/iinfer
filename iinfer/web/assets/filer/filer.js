@@ -34,7 +34,7 @@ fsapi.progress = (_min, _max, _now, _text, _show, _cycle) => {
 fsapi.filer = (svpath, is_local) => {
   // ファイルアップロード ========================================================
   const upload = async (event) => {
-    show_loading();
+    iinfer.show_loading();
     // https://qiita.com/KokiSakano/items/a122bc0a1a368c697643
     const files = [];
     const searchFile = async (entry) => {
@@ -113,42 +113,21 @@ fsapi.filer = (svpath, is_local) => {
     }
     svpath = fsapi.right.find('.filer_address').val();
     // https://developer.mozilla.org/ja/docs/Web/API/fetch
-    param = {method: 'POST', body: formData};
-    opt = fsapi.get_server_opt();
-    $.ajax({ // fetchだとxhr.upload.onprogressが使えないため、$.ajaxを使用
-      url: `filer/upload?host=${encodeURI(opt['host'])}&port=${encodeURI(opt['port'])}&password=${encodeURI(opt['password'])}&svname=${encodeURI(opt['svname'])}&svpath=${encodeURI(svpath)}&local_data=${encodeURI(opt['local_data'])}`,
-      type: 'POST',
-      processData: false,
-      contentType: false,
-      async: true,
-      data: formData,
-      xhr: function() {
-        const xhr = $.ajaxSettings.xhr();
-        xhr.upload.onprogress = function(e) {
-          if (e.lengthComputable) {
-            fsapi.progress(0, e.total, e.loaded, '', true, e.total==e.loaded);
-          }
-        };
-        return xhr;
-      },
-      success: function(data) {
-        //fsapi.message(data);
-        fsapi.tree(fsapi.right, svpath, fsapi.right.find('.tree-menu'), false);
-      },
-      error: function(data) {
-        console.log(data);
-        fsapi.message(data);
-        fsapi.tree(fsapi.right, svpath, fsapi.right.find('.tree-menu'), false);
-      }
+    iinfer.file_upload(fsapi.right, svpath, formData, orverwrite=false, progress_func=(e) => {
+      fsapi.progress(0, e.total, e.loaded, '', true, e.total==e.loaded);
+    }, success_func=(target, svpath, data) => {
+      fsapi.tree(target, svpath, target.find('.tree-menu'), false);
+    }, error_func=(target, svpath, data) => {
+      fsapi.tree(target, svpath, target.find('.tree-menu'), false);
     });
   }
   // ファイルダウンロード ==============================================================
   const download = (event) => {
     if (!fsapi.left.find('.filer_address').val()) {
-      fsapi.message({warn: 'Please select a local directory before downloading.'});
+      iinfer.message({warn: 'Please select a local directory before downloading.'});
       return;
     }
-    show_loading();
+    iinfer.show_loading();
     const formData = new FormData();
     formData.append('current_path', event.originalEvent.dataTransfer.getData('path'));
     fetch('gui/list_downloads', {method: 'POST', body: formData}).then(async res => {
@@ -163,11 +142,11 @@ fsapi.filer = (svpath, is_local) => {
         opt['svpath'] = path['svpath'];
         opt['rpath'] = path['rpath'];
         //opt['svpath'] = event.originalEvent.dataTransfer.getData('path');
-        jobs.push(fsapi.sv_exec_cmd(opt).then(async res => {
+        jobs.push(iinfer.sv_exec_cmd(opt).then(async res => {
           if(!res[0] || !res[0]['success']) {
             fsapi.download_now ++;
             fsapi.progress(0, list_downloads.length, fsapi.download_now, '', true, false)
-            fsapi.message(res);
+            iinfer.message(res);
             return;
           }
           const mk_blob = (base64) => {
@@ -213,7 +192,7 @@ fsapi.filer = (svpath, is_local) => {
         }));
       });
       Promise.all(jobs).then(() => {
-        hide_loading();
+        iinfer.hide_loading();
         fsapi.progress(0, list_downloads.length, fsapi.download_now, '', false, false)
         fsapi.download_now = 0;
         fsapi.tree(fsapi.left, fsapi.left.find('.filer_address').val(), fsapi.left.find('.tree-menu'), true);
@@ -268,127 +247,33 @@ fsapi.filer = (svpath, is_local) => {
   if (is_local) {
     fsapi.tree(fsapi.left, "/", fsapi.left.find('.tree-menu'), true);
   } else {
-    fsapi.load_server_list();
+    iinfer.load_server_list(fsapi.right, (opt) => {
+      fsapi.tree(fsapi.right, "/", fsapi.right.find('.tree-menu'), false);
+    });
+    //fsapi.load_server_list();
   }
   fsapi.left.find('.filer_local_bot').off('click').on('click', (event) => {
     fsapi.opendir();
   });
 }
-// 接続情報一覧を取得 ========================================================
-fsapi.get_server_opt = () => {
-  const filer_host = fsapi.right.find('.filer_host').val();
-  const filer_port = fsapi.right.find('.filer_port').val();
-  const filer_password = fsapi.right.find('.filer_password').val();
-  const filer_svname = fsapi.right.find('.filer_svname').val();
-  const filer_local_data = fsapi.right.find('.filer_local_data').val();
-
-  return {"host":filer_host, "port":filer_port, "password":filer_password, "svname":filer_svname, "local_data": filer_local_data};
-}
-// サーバーリスト取得 ================================================================
-fsapi.load_server_list = () => {
-  show_loading();
-  fsapi.right.find('.filer_svnames').remove();
-  const mk_func = (elem) => {return ()=>{
-    fsapi.right.find('.filer_server_bot').text(elem.attr('data-svname'));
-    fsapi.right.find('.filer_host').val(elem.attr('data-host'));
-    fsapi.right.find('.filer_port').val(elem.attr('data-port'));
-    fsapi.right.find('.filer_password').val(elem.attr('data-password'));
-    fsapi.right.find('.filer_svname').val(elem.attr('data-svname'));
-    fsapi.right.find('.filer_local_data').val(elem.attr('data-local_data'));
-    fsapi.tree(fsapi.right, "/", fsapi.right.find('.tree-menu'), false);
-  }};
-  if (!fsapi.initargs['client_only']) {
-    const opt = fsapi.get_server_opt();
-    opt['mode'] = 'server';
-    opt['cmd'] = 'list';
-    opt["capture_stdout"] = true;
-    delete opt['svname'];
-    fsapi.sv_exec_cmd(opt).then(res => {
-      if(!res[0] || !res[0]['success']) {
-        fsapi.message(res);
-        return;
-      }
-      if(res.length<=0 || !res[0]['success']) {
-        hide_loading();
-        return;
-      }
-      const svnames = {};
-      res[0]['success'].forEach(elem => {
-        svname = elem['svname'].split('-')[0];
-        if (svnames[svname]) return;
-        svnames[svname] = true;
-        const a_elem = $(`<a class="dropdown-item" href="#" data-local_data="">${svname} ( ${opt['host']}:${opt['port']} )</a>`);
-        a_elem.attr('data-host', opt['host']);
-        a_elem.attr('data-port', opt['port']);
-        a_elem.attr('data-password', opt['password']);
-        a_elem.attr('data-svname', svname);
-        a_elem.off("click").on("click", mk_func(a_elem));
-        const li_elem = $('<li class="filer_svnames"></li>').append(a_elem);
-        fsapi.right.find('.filer_server').append(li_elem);
-      });
-      fsapi.right.find('.filer_server').find('.dropdown-item:first').click();
-    }).catch((e) => {
-      console.log(e);
-    }).finally(() => {
-      hide_loading();
-    });
-  }
-  const cl = () => {
-    const a_elem = $(`<a class="dropdown-item" href="#">client</a>`);
-    a_elem.attr('data-host', fsapi.initargs['host']);
-    a_elem.attr('data-port', fsapi.initargs['port']);
-    a_elem.attr('data-password', fsapi.initargs['password']);
-    a_elem.attr('data-svname', 'client');
-    a_elem.attr('data-local_data', fsapi.initargs['data']);
-    a_elem.off("click").on("click", mk_func(a_elem));
-    const li_elem = $('<li class="filer_svnames"></li>').append(a_elem);
-    fsapi.right.find('.filer_server').append(li_elem);
-    fsapi.right.find('.filer_server').find('.dropdown-item:first').click();
-  }
-  cl();
-}
-// ファイルサイズ表記 ================================================================
-fsapi.calc_size = (size) => {
-  const kb = 1024
-  const mb = Math.pow(kb, 2)
-  const gb = Math.pow(kb, 3)
-  const tb = Math.pow(kb, 4)
-  let target = null
-  let unit = 'B'
-  if (size >= tb) {
-    target = tb
-    unit = 'TB'
-  } else if (size >= gb) {
-    target = gb
-    unit = 'GB'
-  } else if (size >= mb) {
-    target = mb
-    unit = 'MB'
-  } else if (size >= kb) {
-    target = kb
-    unit = 'KB'
-  }
-  const res = target !== null ? Math.floor((size / target) * 100) / 100 : size
-  return `${res} ${unit}`
-};
 // ツリー表示 ================================================================
 fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
-  show_loading();
-  opt = fsapi.get_server_opt();
+  iinfer.show_loading();
+  opt = iinfer.get_server_opt(false, fsapi.right);
   opt['mode'] = 'client';
   opt['cmd'] = 'file_list';
   opt['capture_stdout'] = true;
   opt['svpath'] = svpath;
-  const exec_cmd = is_local ? fsapi.local_exec_cmd : fsapi.sv_exec_cmd;
+  const exec_cmd = is_local ? fsapi.local_exec_cmd : iinfer.sv_exec_cmd;
   exec_cmd(opt).then(res => {
     current_ul_elem.html('');
     if(!res[0] || !res[0]['success']) {
-      fsapi.message(res);
+      iinfer.message(res);
       target.find('.file-list').html('');
       return;
     }
     const list_tree = Object.entries(res[0]['success']).sort();
-    hide_loading();
+    iinfer.hide_loading();
     // 上側ペイン
     list_tree.forEach(([key, node]) => {
       if(!node['is_dir']) return;
@@ -435,19 +320,19 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
         const mk_delete = (_p, _e, is_dir, _l) => {return ()=>{
           if(confirm(`Do you want to delete "${_p}"？${is_dir?"\nNote: In the case of directories, the contents will also be deleted.":""}`)) {
             const remote = is_dir ? 'file_rmdir' : 'file_remove';
-            show_loading();
-            const opt = fsapi.get_server_opt();
+            iinfer.show_loading();
+            const opt = iinfer.get_server_opt(false, fsapi.right);
             opt['mode'] = 'client';
             opt['cmd'] = remote;
             opt['capture_stdout'] = true;
             opt['svpath'] = _p;
-            const exec_cmd = _l ? fsapi.local_exec_cmd : fsapi.sv_exec_cmd;
+            const exec_cmd = _l ? fsapi.local_exec_cmd : iinfer.sv_exec_cmd;
             exec_cmd(opt).then(res => {
               if(!res[0] || !res[0]['success']) {
-                fsapi.message(res);
+                iinfer.message(res);
                 return;
               }
-              hide_loading();
+              iinfer.hide_loading();
               fsapi.tree(target, res[0]['success']['path'], _e, _l);
             });
           }
@@ -461,15 +346,15 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
         }
         // ダウンロード関数の生成
         mk_download = (_p) => {return ()=>{
-          show_loading();
-          const opt = fsapi.get_server_opt();
+          iinfer.show_loading();
+          const opt = iinfer.get_server_opt(false, fsapi.right);
           opt['mode'] = 'client';
           opt['cmd'] = 'file_download';
           opt['capture_stdout'] = true;
           opt['svpath'] = _p;
-          fsapi.sv_exec_cmd(opt).then(res => {
+          iinfer.sv_exec_cmd(opt).then(res => {
             if(!res[0] || !res[0]['success']) {
-              fsapi.message(res);
+              iinfer.message(res);
               return;
             }
             const blob = mk_blob(res[0]['success']['data']);
@@ -485,19 +370,19 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
           _p = _p.substring(0, _p.lastIndexOf('/')+1);
           const prompt_text = prompt('Enter a new folder name.');
           if(prompt_text) {
-            show_loading();
-            const opt = fsapi.get_server_opt();
+            iinfer.show_loading();
+            const opt = iinfer.get_server_opt(false, fsapi.right);
             opt['mode'] = 'client';
             opt['cmd'] = 'file_mkdir';
             opt['capture_stdout'] = true;
             opt['svpath'] = `${_p=="/"?"":_p}/${prompt_text}`.replace("//","/");
-            const exec_cmd = _l ? fsapi.local_exec_cmd : fsapi.sv_exec_cmd;
+            const exec_cmd = _l ? fsapi.local_exec_cmd : iinfer.sv_exec_cmd;
             exec_cmd(opt).then(res => {
               if(!res[0] || !res[0]['success']) {
-                fsapi.message(res);
+                iinfer.message(res);
                 return;
               }
-              hide_loading();
+              iinfer.hide_loading();
               fsapi.tree(_t, res[0]['success']['path'], _e, _l);
             });
           }
@@ -505,27 +390,27 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
         // ビューアー関数の生成
         mk_view = (_p, _mime, _size, _l) => {return ()=>{
           if (_size.indexOf('G') >= 0 || _size.indexOf('T') >= 0) {
-            fsapi.message({warn: `The file size is too large to view. (${_size})`});
+            iinfer.message({warn: `The file size is too large to view. (${_size})`});
             return;
           }
           else if (_size.indexOf('M') >= 0 && parseInt(_size.replace('M','')) > 5) {
-            fsapi.message({warn: `The file size is too large to view. (${_size} > 5M)`});
+            iinfer.message({warn: `The file size is too large to view. (${_size} > 5M)`});
             return;
           }
-          show_loading();
-          const opt = fsapi.get_server_opt();
+          iinfer.show_loading();
+          const opt = iinfer.get_server_opt(false, fsapi.right);
           opt['mode'] = 'client';
           opt['cmd'] = 'file_download';
           opt['capture_stdout'] = true;
           opt['svpath'] = _p;
-          const exec_cmd = _l ? fsapi.local_exec_cmd : fsapi.sv_exec_cmd;
+          const exec_cmd = _l ? fsapi.local_exec_cmd : iinfer.sv_exec_cmd;
           exec_cmd(opt).then(res => {
             if(!res[0] || !res[0]['success']) {
-              fsapi.message(res);
+              iinfer.message(res);
               return;
             }
             fsapi.viewer(_p, res[0]['success']['data'], _mime);
-            hide_loading();
+            iinfer.hide_loading();
           });
         }};
         // ファイルリストの生成
@@ -544,7 +429,7 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
                 + '</div>'
               + '</td>'
               + `<td class="mime_type">${mime}</td>`
-              + `<td class="file_size text-end">${fsapi.calc_size(_n['size'])}</td>`
+              + `<td class="file_size text-end">${iinfer.calc_size(_n['size'])}</td>`
               + `<td class="text-end">${dt}</td>`
             + '</tr>');
           tr.find('.dropdown-toggle').on('dragstart', (event) => {
@@ -583,7 +468,7 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
   }).catch((e) => {
     console.log(e);
   }).finally(() => {
-    hide_loading();
+    iinfer.hide_loading();
   });
 }
 // ローカル操作 ==============================================================
@@ -682,20 +567,6 @@ fsapi.local_exec_cmd = async (opt) => {
   }
   return {"warn": "Unknown command."}
 };
-fsapi.sv_exec_cmd = async (opt) => {
-  return fetch('exec_cmd', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(opt)
-  }).then(response => response.json());
-};
-fsapi.message = (res) => {
-  msg = JSON.stringify(res)
-  alert(msg.replace(/\\n/g, '\n'));
-  hide_loading();
-}
 fsapi.viewer = (title, data, mime) => {
   const viewer = $('#viewer_modal');
   viewer.find('.modal-title').text(title);
@@ -713,9 +584,20 @@ fsapi.viewer = (title, data, mime) => {
     const pre = $(`<pre><code class="${cls}"></code></pre>`);
     viewer_body.append(pre);
     const txt = atob(data);
-    const istxt = fsapi.is_text(new TextEncoder().encode(txt));
+    const istxt = iinfer.is_text(new TextEncoder().encode(txt));
     if (istxt) {
-      pre.find('code').text(txt.replace(/\r/g, ''));
+      // 文字コード判定
+      const codes = Encoding.stringToCode(txt);
+      let detectedEncoding = Encoding.detect(codes);
+      detectedEncoding = detectedEncoding?detectedEncoding:'SJIS'
+      // 文字コード変換
+      const unicodeString = Encoding.convert(codes, {
+        to: 'UNICODE',
+        from: detectedEncoding,
+        type: 'string'
+      });
+      pre.find('code').text(unicodeString.replace(/\r/g, ''));
+      viewer.find('.modal-title').text(`${title} ( ${detectedEncoding} -> UNICODE )`);
     } else {
       pre.find('code').text('< This file is not text or image data. >');
     }
@@ -723,21 +605,8 @@ fsapi.viewer = (title, data, mime) => {
   hljs.initHighlightingOnLoad();
   viewer.modal('show');
 }
-fsapi.is_text = (array) => {
-  const textChars = [7, 8, 9, 10, 12, 13, 27, ...fsapi.range(0x20, 0xff, 1)];
-  return array.every(e => textChars.includes(e));
-}
-fsapi.range = (start, stop, step) => {
-  return Array.from({ length: (stop - start) / step + 1 }, (_, i) => start + i * step);
-}
 fsapi.onload = () => {
-  fetch('get_server_opt', {method: 'GET'}).then(res => res.json()).then(opt => {
-    fsapi.initargs = opt;
-    fsapi.right.find('.filer_host').val(fsapi.initargs['host']);
-    fsapi.right.find('.filer_port').val(fsapi.initargs['port']);
-    fsapi.right.find('.filer_password').val(fsapi.initargs['password']);
-    fsapi.right.find('.filer_svname').val(fsapi.initargs['svname']);
-    fsapi.right.find('.filer_local_data').val(fsapi.initargs['data']);
+  iinfer.get_server_opt(true, fsapi.right).then((opt) => {
     fsapi.filer("/", false);
   });
   hljs.addPlugin({

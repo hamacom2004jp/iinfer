@@ -81,13 +81,25 @@ class Filer(object):
                 if key in children:
                     continue
                 mime_type, encoding = mimetypes.guess_type(str(f))
-                children[key] = dict(name=f.name, is_dir=f.is_dir(), path=path, mime_type=mime_type, size=f.stat().st_size , last=_ts2str(f.stat().st_mtime))
+                children[key] = dict(name=f.name,
+                                     is_dir=f.is_dir(),
+                                     path=path,
+                                     mime_type=mime_type,
+                                     size=f.stat().st_size,
+                                     last=_ts2str(f.stat().st_mtime),
+                                     depth=len(parts))
 
             tpath = '/'.join(current_path_parts[:i+1])
             tpath = '/' if tpath=='' else tpath
             tpath_key = common.safe_fname(tpath)
             cpart = '/' if cpart=='' else cpart
-            path_tree[tpath_key] = dict(name=cpart, is_dir=True, path=tpath, children=children, size=0, last="")
+            path_tree[tpath_key] = dict(name=cpart,
+                                        is_dir=True,
+                                        path=tpath,
+                                        children=children,
+                                        size=0,
+                                        last="",
+                                        depth=len(current_path_parts[:i+1]))
 
         return self.RESP_SCCESS, {"success": path_tree}
     
@@ -140,17 +152,19 @@ class Filer(object):
             self.logger.error(f"Failed to remove {abspath}. {e}")
             return self.RESP_WARN, {"warn": f"Failed to remove {abspath}. {e}"}
 
-    def file_download(self, current_path:str) -> Tuple[int, Dict[str, Any]]:
+    def file_download(self, current_path:str, img_thumbnail:float=0.0) -> Tuple[int, Dict[str, Any]]:
         """
         ファイルをダウンロードする
 
         Args:
             current_path (str): ファイルパス
+            img_thumbnail (float, optional): サムネイルのサイズ, by default 0.0
 
         Returns:
             int: レスポンスコード
             dict: メッセージ
         """
+        img_thumbnail = 0.0 if img_thumbnail is None else img_thumbnail
         chk, abspath, msg = self._file_exists(current_path)
         if not chk:
             return self.RESP_WARN, msg
@@ -159,9 +173,16 @@ class Filer(object):
             return self.RESP_WARN, {"warn": f"Path {abspath} is directory."}
 
         try:
+            mime_type, encoding = mimetypes.guess_type(str(abspath))
+            fname = abspath.name
             with open(abspath, "rb") as f:
-                data = convert.bytes2b64str(f.read())
-            return self.RESP_SCCESS, {"success":{"name":abspath.name, "data":data}}
+                fd = f.read()
+                if mime_type != 'image/svg+xml' and mime_type.startswith('image') and img_thumbnail > 0:
+                    img = convert.imgbytes2thumbnail(fd, (img_thumbnail, img_thumbnail))
+                    fd = convert.img2byte(img, "jpeg")
+                    fname = f"{fname}.thumbnail.jpg"
+                data = convert.bytes2b64str(fd)
+            return self.RESP_SCCESS, {"success":{"name":fname, "data":data, "mime_type":mime_type}}
         except Exception as e:
             self.logger.error(f"Failed to download {abspath}. {e}")
             return self.RESP_WARN, {"warn": f"Failed to download {abspath}. {e}"}

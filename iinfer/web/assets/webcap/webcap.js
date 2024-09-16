@@ -1,25 +1,4 @@
-const change_dark_mode = (dark_mode) => {
-  const html = $('html');
-  if(dark_mode) html.attr('data-bs-theme','dark');
-  else if(html.attr('data-bs-theme')=='dark') html.removeAttr('data-bs-theme');
-  else html.attr('data-bs-theme','dark');
-}
-const show_loading = () => {
-  const loading = $('#loading');
-  loading.removeClass('d-none');
-}
-const hide_loading = () => {
-  const loading = $('#loading');
-  loading.addClass('d-none');
-  const progress = $('#progress');
-  progress.addClass('d-none');
-}
 const webcap = {}
-webcap.message = (res) => {
-  msg = JSON.stringify(res)
-  alert(msg.replace(/\\n/g, '\n'));
-  hide_loading();
-}
 /** 初期化処理 */
 webcap.init = () => {
   /** webcapが可能なpipelineの読込み */
@@ -49,22 +28,22 @@ webcap.init = () => {
       pipeline_elem.append(elem);
       webcap.change_pipeline(null, null, "", 10, 640, 480);
     }
-    hide_loading();
+    iinfer.hide_loading();
   });
   $('#rec_error').off('click').on('click', () => {
-    webcap.message('Please select pipeline and Camera.');
+    iinfer.message('Please select pipeline and Camera.');
   });
   /** 使用可能なカメラ一覧の読込み */
   const camera_selection = async () => {
     if (!('mediaDevices' in navigator && 'getUserMedia' in navigator.mediaDevices)) {
-      webcap.message('No camera found.');
+      iinfer.message('No camera found.');
       return;
     }
     try {
       await navigator.mediaDevices.getUserMedia({video: true});
     }
     catch (e) {
-      webcap.message('No camera found.');
+      iinfer.message('No camera found.');
       return;
     }
     const devices = await navigator.mediaDevices.enumerateDevices();
@@ -112,7 +91,7 @@ webcap.get_camera_const = async () => {
   try {
     await navigator.mediaDevices.getUserMedia(constraints);
   } catch (e) {
-    webcap.message(`Error: ${e}\nCould not connect to camera.`);
+    iinfer.message(`Error: ${e}\nCould not connect to camera.`);
   }
   return constraints;
 };
@@ -174,20 +153,20 @@ webcap.change_pipeline = (title, url, outputs_key_str, capture_fps, capture_fram
 /** カメラ映像をwebcapに送信開始 */
 webcap.rec_start = () => {
   if (!webcap.pipeline || webcap.pipeline.length <= 0) {
-    webcap.message('Please select pipeline.');
+    iinfer.message('Please select pipeline.');
     return;
   }
   if (webcap.pipeline.is_rec) return;
   $('#rec').hide();
   $('#pause').show();
   webcap.pipeline.is_rec = true;
-  show_loading();
+  iinfer.show_loading();
 };
 /** カメラ映像をwebcapに送信停止 */
 webcap.rec_stop = () => {
   $('#rec').show();
   $('#pause').hide();
-  hide_loading();
+  iinfer.hide_loading();
   webcap.pipeline.is_rec = false;
 };
 /** アスペクト比計算 */
@@ -233,13 +212,13 @@ webcap.rec = () => {
   const blob = new Blob([capimg], {type:"application/octet-stream"});
   formData.append('files', blob);
   fetch(webcap.pipeline.url, {method: "POST", mode:'cors', body: formData}).then((res) => {
-    hide_loading();
+    iinfer.hide_loading();
     if (!res.ok) {
-      webcap.message(`Error: ${res.status} ${res.statusText}\nCould not connect to webcap process.`);
+      iinfer.message(`Error: ${res.status} ${res.statusText}\nCould not connect to webcap process.`);
       webcap.rec_stop();
     }
   }).catch((e) => {
-    webcap.message(`Error: ${e} ${webcap.pipeline.url}`);
+    iinfer.message(`Error: ${e} ${webcap.pipeline.url}`);
     webcap.rec_stop();
   }).finally(() => {
     window.setTimeout(webcap.rec, 1000 / webcap.pipeline.capture_fps);
@@ -299,16 +278,15 @@ webcap.callback = () => {
   }
 }
 $(() => {
-  show_loading();
+  iinfer.show_loading();
   // ダークモード対応
-  change_dark_mode(window.matchMedia('(prefers-color-scheme: dark)').matches);
-  // copyright情報取得
-  const copyright_func = async () => {
-    const response = await fetch('copyright');
-    const copyright = await response.text();
-    $('.copyright').text(copyright);
-  };
-  copyright_func();
+  iinfer.change_dark_mode(window.matchMedia('(prefers-color-scheme: dark)').matches);
+  // copyright表示
+  iinfer.copyright();
+  // バージョン情報モーダル初期化
+  iinfer.init_version_modal();
+  // モーダルボタン初期化
+  iinfer.init_modal_button();
   // webcapモード初期化
   webcap.init();
   // 推論結果受信

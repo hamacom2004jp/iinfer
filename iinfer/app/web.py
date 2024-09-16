@@ -362,7 +362,7 @@ class Web(options.Options):
                     children = {}
             path_tree[path_key] = dict(name=part, is_dir=full_path.is_dir(), path=str(path), children=children, size=full_path.stat().st_size, last=ts2str(full_path.stat().st_mtime))
         return path_tree
-    
+
     def list_downloads(self, current_path:str, root_path:Path=None):
         """
         ダウンロードファイルのリストを取得する
@@ -732,7 +732,7 @@ class Web(options.Options):
         self.logger.info(f"filer_upload: svpath={svpath}")
         opt = dict(mode='client', cmd='file_upload',
                    host=q['host'], port=q['port'], password=q['password'], svname=q['svname'],
-                   local_data=q['local_data'])
+                   local_data=q['local_data'], orverwrite=('orverwrite' in q))
         for file in request.files.getall('files'):
             with tempfile.TemporaryDirectory() as tmpdir:
                 raw_filename = file.raw_filename.replace('\\','/').replace('//','/')
@@ -1225,10 +1225,29 @@ class Web(options.Options):
                 return
 
         @app.route('/annotation')
-        def filer():
-            #if self.filer_html_data is not None:
-            #    return self.filer_html_data
+        def annotation():
+            #if self.annotation_html_data is not None:
+            #    return self.annotation_html_data
             return bottle.static_file('annotation.html', root=static_root)
+
+        @app.route('/annotation/get_img/<constr>')
+        def anno_get_img(constr:str):
+            try:
+                host, port, svname, password, path, img_thumbnail = convert.b64str2str(constr).split('\t')
+                opt = dict(host=host, port=port, svname=svname, password=password, svpath=path,
+                           img_thumbnail=img_thumbnail, mode='client', cmd='file_download')
+                opt['capture_stdout'] = nothread = True
+                opt['stdout_log'] = False
+                ret = self.exec_cmd('file_download', opt, nothread)
+                if len(ret) == 0 or 'success' not in ret[0] or 'data' not in ret[0]['success']:
+                    return common.to_str(ret)
+                bottle.response.content_type = ret[0]['success']['mime_type']
+                bottle.response.headers['Cache-Control'] = f'no-cache'
+                return convert.b64str2bytes(ret[0]['success']['data'])
+            except Exception as e:
+                self.logger.warning(f'Missing specified file or not an image {e}')
+                bottle.abort(404, 'Missing specified file or not an image.')
+                return
 
         @app.route('/copyright')
         def copyright():

@@ -677,7 +677,7 @@ class Client(object):
                                            retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
         return res_json
     
-    def file_download(self, svpath:str, download_file:Path, local_data:Path = None, rpath:str="",
+    def file_download(self, svpath:str, download_file:Path, local_data:Path = None, rpath:str="", img_thumbnail:float=0.0,
                       retry_count:int=3, retry_interval:int=5, timeout:int = 60):
         """
         サーバー上のファイルをダウンロードする
@@ -687,6 +687,7 @@ class Client(object):
             download_file (Path): ローカルのファイルパス
             local_data (Path, optional): ローカルを参照させる場合のデータフォルダ. Defaults to None.
             rpath (str, optional): リクエストパス. Defaults to "".
+            img_thumbnail (float, optional): サムネイル画像のサイズ. Defaults to 0.0.
             retry_count (int, optional): リトライ回数. Defaults to 3.
             retry_interval (int, optional): リトライ間隔. Defaults to 5.
             timeout (int, optional): タイムアウト時間. Defaults to 60.
@@ -696,9 +697,9 @@ class Client(object):
         """
         if local_data is not None:
             f = filer.Filer(local_data, self.logger)
-            _, res_json = f.file_download(svpath)
+            _, res_json = f.file_download(svpath, img_thumbnail)
         else:
-            res_json = self.redis_cli.send_cmd('file_download', [convert.str2b64str(str(svpath))],
+            res_json = self.redis_cli.send_cmd('file_download', [convert.str2b64str(str(svpath)), str(img_thumbnail)],
                                                retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
         if "success" in res_json:
             res_json["success"]["rpath"] = rpath

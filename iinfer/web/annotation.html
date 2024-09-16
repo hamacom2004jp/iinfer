@@ -38,7 +38,7 @@
                             View
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#" onclick="change_dark_mode();">Change Dark Mode</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="iinfer.change_dark_mode();">Change Dark Mode</a></li>
                         </ul>
                     </li>
                     
@@ -56,84 +56,110 @@
     </nav>
     <div id="main_container" class="container-fluid overflow-auto split-pane fixed-left" style="margin-top:46px;height:calc(100vh - 105px);">
         <!-- 左側ペイン -->
-        <div id="right_container" class="split-pane-component filer-pane-left" style="width:20%;">
-            <div>
-                <!-- アドレスバー -->
-                <div class="input-group p-1" style="top:0%;">
-                    <button class="btn btn-outline-secondary filer_server_bot" type="button" aria-expanded="false" disabled>Server</button>'
-                    <input name="filer_host" type="hidden" class="filer_host">
-                    <input name="filer_port" type="hidden" class="filer_port">
-                    <input name="filer_password" type="hidden" class="filer_password">
-                    <input name="filer_svname" type="hidden" class="filer_svname">
-                    <input name="filer_local_data" type="hidden" class="filer_local_data">
-                    <input type="text" class="form-control filer_address" aria-describedby="button-addon2" disabled>
-                    <button class="btn btn-outline-secondary" type="button" aria-expanded="false" onclick="open_datasetfolder_func('data_folder')">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-folder-symlink" viewBox="0 0 16 16">
-                            <path d="m11.798 8.271-3.182 1.97c-.27.166-.616-.036-.616-.372V9.1s-2.571-.3-4 2.4c.571-4.8 3.143-4.8 4-4.8v-.769c0-.336.346-.538.616-.371l3.182 1.969c.27.166.27.576 0 .742z"/>
-                            <path d="m.5 3 .04.87a1.99 1.99 0 0 0-.342 1.311l.637 7A2 2 0 0 0 2.826 14h10.348a2 2 0 0 0 1.991-1.819l.637-7A2 2 0 0 0 13.81 3H9.828a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 6.172 1H2.5a2 2 0 0 0-2 2zm.694 2.09A1 1 0 0 1 2.19 4h11.62a1 1 0 0 1 .996 1.09l-.636 7a1 1 0 0 1-.996.91H2.826a1 1 0 0 1-.995-.91l-.637-7zM6.172 2a1 1 0 0 1 .707.293L7.586 3H2.19c-.24 0-.47.042-.683.12L1.5 2.98a1 1 0 0 1 1-.98h3.672z"/>
-                        </svg>
-                    </button>'
-                </div>
-                <ul class="nav nav-tabs" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="ds-tab-1" data-bs-toggle="tab" data-bs-target="#ds-tab-1-pane" type="button" role="tab" aria-controls="ds-tab-1-pane" aria-selected="true">ds-tab-1</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="ds-tab-2" data-bs-toggle="tab" data-bs-target="#ds-tab-2-pane" type="button" role="tab" aria-controls="ds-tab-2-pane" aria-selected="true">ds-tab-2</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="ds-tab-add" data-bs-toggle="tab" data-bs-target="#ds-tab-add-pane" type="button" role="tab" aria-controls="ds-tab-add-pane" aria-selected="false">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
-                                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
-                            </svg>
-                        </button>
-                    </li>
-                </ul>
-                <div class="tab-content" id="myTabContent">
-                    <div class="tab-pane fade show" id="ds-tab-1-pane" role="tabpanel" aria-labelledby="ds-tab-1" tabindex="0">..1.</div>
-                    <div class="tab-pane fade show" id="ds-tab-2-pane" role="tabpane2" aria-labelledby="ds-tab-2" tabindex="0">..2.</div>
-                </div>
+        <div id="left_container" class="split-pane-component" style="width:20%;">
+            <div class="input-group p-1" style="top:0%;">
+                <button class="btn btn-outline-secondary dropdown-toggle filer_server_bot" type="button" data-bs-toggle="dropdown" aria-expanded="false">Server</button>
+                <input name="filer_host" type="hidden" class="filer_host">
+                <input name="filer_port" type="hidden" class="filer_port">
+                <input name="filer_password" type="hidden" class="filer_password">
+                <input name="filer_svname" type="hidden" class="filer_svname">
+                <input name="filer_local_data" type="hidden" class="filer_local_data">
+                <!-- デプロイ一覧（データセット登録があるもののみ） -->
+                <ul class="dropdown-menu filer_server"></ul>
+                <select class="form-select deploy_names"></select>
+            </div>
+            <div class="split-pane fixed-top" style="height:calc(100% - 50px)">
+                <!-- ディレクトリツリー -->
+                <ul class="split-pane-component tree-menu tree_ul overflow-auto border w-100" style="height:20%;min-height:100px;"></ul>
+                <!-- 上下のスプリッター -->
+                <div class="split-pane-divider filer-pane-divider" style="top:20%;"></div>
+                <!-- ファイルリスト -->
+                <div class="split-pane-component file-list drop-area overflow-auto p-1" style="top:20%;"></div>
             </div>
         </div>
         <!-- 左右のスプリッター -->
         <div class="split-pane-divider filer-pane-divider" style="left:20%;"></div>
         <!-- 右側ペイン -->
         <div id="canvas_container" class="split-pane-component filer-pane-right" style="left:20%;">
-            <div class="split-pane fixed-left">
-                <div class="split-pane-component d-flex filer-pane-right-top" style="width:75%;">
+            <div class="btn-toolbar mb-1" role="toolbar" aria-label="Toolbar with button groups">
+                <div class="input-group p-1">
+                    <span class="input-group-text">annotation</span>
+                    <button class="btn btn-outline-secondary tool_bot_annoreload" type="button" title="reload">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/>
+                            <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/>
+                        </svg>
+                    </button>
+                    <button class="btn btn-outline-secondary tool_bot_annosave" type="button" title="save">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                            <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                            <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="input-group p-1">
+                    <span class="input-group-text">label color</span>
+                    <button class="btn btn-outline-secondary tool_bot_reload" type="button" title="reload">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/>
+                            <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/>
+                        </svg>
+                    </button>
+                    <button class="btn btn-outline-secondary tool_bot_save" type="button" title="save">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                            <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                            <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="input-group p-1" style="width:calc(100% - 400px);">
+                    <span class="input-group-text">Image</span>
+                    <input type="text" class="form-control image_address" aria-describedby="button-addon3" disabled>
+                </div>
+            </div>
+            <div class="split-pane fixed-left" style="height:calc(100% - 50px)">
+                <div class="split-pane-component d-flex" style="width:75%;">
                     <!-- ツールボックス -->
                     <div class="d-flex flex-column flex-shrink-0 bg-body-tertiary" style="width:4.5rem;">
                         <ul class="nav nav-pills nav-flush flex-column mb-auto text-center">
+                            <li>
+                                <a href="#" class="nav-link py-3 border-bottom rounded-0 tool_bot tool_bot_tag" title="tags" data-bs-toggle="dropdown">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-tags" viewBox="0 0 16 16">
+                                        <path d="M3 2v4.586l7 7L14.586 9l-7-7H3zM2 2a1 1 0 0 1 1-1h4.586a1 1 0 0 1 .707.293l7 7a1 1 0 0 1 0 1.414l-4.586 4.586a1 1 0 0 1-1.414 0l-7-7A1 1 0 0 1 2 6.586V2z"/>
+                                        <path d="M5.5 5a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1zm0 1a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM1 7.086a1 1 0 0 0 .293.707L8.75 15.25l-.043.043a1 1 0 0 1-1.414 0l-7-7A1 1 0 0 1 0 7.586V3a1 1 0 0 1 1-1v5.086z"/>
+                                    </svg>
+                                </a>
+                                <ul id="tags_labels" class="dropdown-menu" style="width:300px;">
+                                    <li>
+                                        <div class="input-group p-1">
+                                            <span class="input-group-text">new label</span>
+                                            <input type="color" class="form-control form-control-color new_label_color" value="#563d7c" title="Choose your color" style="max-width:35px;">
+                                            <input type="text" class="form-control new_label" aria-describedby="button-addon3">
+                                            <button class="btn btn-outline-secondary" type="button">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                                                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </li>
                             <li class="nav-item">
-                                <a href="#" class="nav-link active py-3 border-bottom rounded-0" aria-current="page" title="cursor" data-bs-toggle="tooltip" data-bs-placement="right">
+                                <a href="#" class="nav-link active py-3 border-bottom rounded-0 tool_bot tool_bot_cursor" title="cursor">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cursor" viewBox="0 0 16 16">
                                         <path d="M14.082 2.182a.5.5 0 0 1 .103.557L8.528 15.467a.5.5 0 0 1-.917-.007L5.57 10.694.803 8.652a.5.5 0 0 1-.006-.916l12.728-5.657a.5.5 0 0 1 .556.103zM2.25 8.184l3.897 1.67a.5.5 0 0 1 .262.263l1.67 3.897L12.743 3.52 2.25 8.184z"/>
                                     </svg>
                                 </a>
                             </li>
                             <li>
-                                <a href="#" class="nav-link py-3 border-bottom rounded-0" title="arrow" data-bs-toggle="tooltip" data-bs-placement="right">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrows-move" viewBox="0 0 16 16">
-                                        <path fill-rule="evenodd" d="M7.646.146a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 1.707V5.5a.5.5 0 0 1-1 0V1.707L6.354 2.854a.5.5 0 1 1-.708-.708l2-2zM8 10a.5.5 0 0 1 .5.5v3.793l1.146-1.147a.5.5 0 0 1 .708.708l-2 2a.5.5 0 0 1-.708 0l-2-2a.5.5 0 0 1 .708-.708L7.5 14.293V10.5A.5.5 0 0 1 8 10zM.146 8.354a.5.5 0 0 1 0-.708l2-2a.5.5 0 1 1 .708.708L1.707 7.5H5.5a.5.5 0 0 1 0 1H1.707l1.147 1.146a.5.5 0 0 1-.708.708l-2-2zM10 8a.5.5 0 0 1 .5-.5h3.793l-1.147-1.146a.5.5 0 0 1 .708-.708l2 2a.5.5 0 0 1 0 .708l-2 2a.5.5 0 0 1-.708-.708L14.293 8.5H10.5A.5.5 0 0 1 10 8z"/>
-                                    </svg>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" class="nav-link py-3 border-bottom rounded-0" title="magic" data-bs-toggle="tooltip" data-bs-placement="right">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-magic" viewBox="0 0 16 16">
-                                        <path d="M9.5 2.672a.5.5 0 1 0 1 0V.843a.5.5 0 0 0-1 0v1.829Zm4.5.035A.5.5 0 0 0 13.293 2L12 3.293a.5.5 0 1 0 .707.707L14 2.707ZM7.293 4A.5.5 0 1 0 8 3.293L6.707 2A.5.5 0 0 0 6 2.707L7.293 4Zm-.621 2.5a.5.5 0 1 0 0-1H4.843a.5.5 0 1 0 0 1h1.829Zm8.485 0a.5.5 0 1 0 0-1h-1.829a.5.5 0 0 0 0 1h1.829ZM13.293 10A.5.5 0 1 0 14 9.293L12.707 8a.5.5 0 1 0-.707.707L13.293 10ZM9.5 11.157a.5.5 0 0 0 1 0V9.328a.5.5 0 0 0-1 0v1.829Zm1.854-5.097a.5.5 0 0 0 0-.706l-.708-.708a.5.5 0 0 0-.707 0L8.646 5.94a.5.5 0 0 0 0 .707l.708.708a.5.5 0 0 0 .707 0l1.293-1.293Zm-3 3a.5.5 0 0 0 0-.706l-.708-.708a.5.5 0 0 0-.707 0L.646 13.94a.5.5 0 0 0 0 .707l.708.708a.5.5 0 0 0 .707 0L8.354 9.06Z"/>
-                                    </svg>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" class="nav-link py-3 border-bottom rounded-0" title="bounding-box" data-bs-toggle="tooltip" data-bs-placement="right">
+                                <a href="#" class="nav-link py-3 border-bottom rounded-0 tool_bot tool_bot_bbox" title="bounding-box">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bounding-box" viewBox="0 0 16 16">
                                         <path d="M5 2V0H0v5h2v6H0v5h5v-2h6v2h5v-5h-2V5h2V0h-5v2H5zm6 1v2h2v6h-2v2H5v-2H3V5h2V3h6zm1-2h3v3h-3V1zm3 11v3h-3v-3h3zM4 15H1v-3h3v3zM1 4V1h3v3H1z"/>
                                     </svg>
                                 </a>
                             </li>
                             <li>
-                                <a href="#" class="nav-link py-3 border-bottom rounded-0" title="pentagon" data-bs-toggle="tooltip" data-bs-placement="right">
+                                <a href="#" class="nav-link py-3 border-bottom rounded-0 tool_bot tool_bot_polygon" title="polygon">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pentagon" viewBox="0 0 16 16">
                                         <path d="M7.685 1.545a.5.5 0 0 1 .63 0l6.263 5.088a.5.5 0 0 1 .161.539l-2.362 7.479a.5.5 0 0 1-.476.349H4.099a.5.5 0 0 1-.476-.35L1.26 7.173a.5.5 0 0 1 .161-.54l6.263-5.087Zm8.213 5.28a.5.5 0 0 0-.162-.54L8.316.257a.5.5 0 0 0-.631 0L.264 6.286a.5.5 0 0 0-.162.538l2.788 8.827a.5.5 0 0 0 .476.349h9.268a.5.5 0 0 0 .476-.35l2.788-8.826Z"/>
                                     </svg>
@@ -142,9 +168,7 @@
                         </ul>
                     </div>
                     <!-- キャンバス -->
-                    <div style="width:calc(100% - 5rem)">
-                        <canvas id="canvas" class="h-100 w-100"></canvas>
-                    </div>
+                    <div id="canvas" class="h-100 p-1" style="width:calc(100% - 5rem)"></div>
                 </div>
                 <!-- 左右のスプリッター -->
                 <div class="split-pane-divider filer-pane-divider" style="left:75%;"></div>
@@ -317,7 +341,7 @@
 <link rel="stylesheet" href="assets/tree-menu/css/tree-menu.css">
 <link rel="stylesheet" href="assets/split-pane/split-pane.css">
 <link rel="stylesheet" href="assets/highlight/styles/tokyo-night-dark.min.css">
-<link rel="stylesheet" href="assets/filer/main.css">
+<link rel="stylesheet" href="assets/annotation/main.css">
 <script type="text/javascript" src="assets/bootstrap/bootstrap.bundle.min.5.3.0.js"></script>
 <script type="text/javascript" src="assets/jquery/jquery.min.3.2.0.js"></script>
 <script type="text/javascript" src="assets/jquery-ui/jquery-ui.min.js"></script>
@@ -326,9 +350,9 @@
 <script type="text/javascript" src="assets/lightbox2/js/lightbox.min.js"></script>
 <script type="text/javascript" src="assets/split-pane/split-pane.js"></script>
 <script type="text/javascript" src="assets/highlight/highlight.min.js"></script>
+<script type="text/javascript" src="assets/iinfer/common.js"></script>
 <script type="text/javascript" src="assets/iinfer/filer_modal.js"></script>
 <script type="text/javascript" src="assets/filer/filer.js"></script>
-<script type="text/javascript" src="assets/annotation/main.js"></script>
-<script type="text/javascript" src="assets/filer/main.js"></script>
 <script type="text/javascript" src="assets/annotation/annotation.js"></script>
+<script type="text/javascript" src="assets/annotation/main.js"></script>
 </html>

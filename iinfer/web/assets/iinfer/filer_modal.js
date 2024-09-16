@@ -1,5 +1,6 @@
 // ファイラーモーダル
 const fmodal = {};
+fmodal.left = $('#filer_modal');
 fmodal.filer_modal_func = async (target_id, modal_title, current_path, select_dir, is_client, call_back_func) => {
     const filer_modal = $('#filer_modal');
     filer_modal.find('.modal-title').text(modal_title);
@@ -70,7 +71,7 @@ fmodal.filer_modal_func = async (target_id, modal_title, current_path, select_di
                         return () => {
                             $(`[id="${target_id}"]`).val(current_path);
                             filer_modal.modal('hide');
-                            if(call_back_func) call_back_func(current_path, fmodal.get_server_opt());
+                            if(call_back_func) call_back_func(current_path, iinfer.get_server_opt(false, fsapi.right));
                         }
                     }
                     // 右側ペインのフォルダを選択した時の処理
@@ -93,7 +94,7 @@ fmodal.filer_modal_func = async (target_id, modal_title, current_path, select_di
                         return () => {
                             $(`[id="${target_id}"]`).val(current_path);
                             filer_modal.modal('hide');
-                            if(call_back_func) call_back_func(current_path, fmodal.get_server_opt());
+                            if(call_back_func) call_back_func(current_path, iinfer.get_server_opt(false, fsapi.right));
                         }
                     }
                     Object.entries(node['children']).forEach(([k, n]) => {
@@ -119,20 +120,29 @@ fmodal.filer_modal_func = async (target_id, modal_title, current_path, select_di
     await reload_tree(target_id, filer_modal.find('.tree-menu'), current_path, filer_modal.find('.file-list'), is_client);
     filer_modal.modal('show');
 };
-fmodal.get_server_opt = () => {
-    try {
-        const filer_host = fsapi.right.find('.filer_host').val();
-        const filer_port = fsapi.right.find('.filer_port').val();
-        const filer_password = fsapi.right.find('.filer_password').val();
-        const filer_svname = fsapi.right.find('.filer_svname').val();
-        const filer_local_data = fsapi.right.find('.filer_local_data').val();
-    
-        return {"host":filer_host, "port":filer_port, "password":filer_password, "svname":filer_svname, "local_data": filer_local_data};
+fmodal.list_tree_client = async (current_path) => {
+    /*try {
+        const opt = iinfer.get_server_opt(false, fmodal.left);
+        opt['mode'] = 'client';
+        opt['cmd'] = 'file_list';
+        opt['capture_stdout'] = true;
+        opt['svpath'] = current_path;
+        const res = await iinfer.sv_exec_cmd(opt);
+        if(!res[0] || !res[0]['success']) {
+            iinfer.message(res);
+            return;
+        }
+        const data = Object.entries(res[0]['success']).sort();
+        const ret = {};
+        for (let i = 0; i < data.length; i++) {
+            const [key, value] = data[i];
+            if (!value['name']) continue;
+            ret[key] = value;
+        }
+        return ret;
     } catch (e) {
         return {};
-    }
-}
-fmodal.list_tree_client = async (current_path) => {
+    }*/
     const formData = new FormData();
     formData.append('current_path', current_path);
     const res = await fetch('gui/list_tree', {method: 'POST', body: formData});
@@ -140,14 +150,14 @@ fmodal.list_tree_client = async (current_path) => {
 }
 fmodal.list_tree_server = async (current_path) => {
     try {
-        const opt = fsapi.get_server_opt();
+        const opt = iinfer.get_server_opt(false, fmodal.left);
         opt['mode'] = 'client';
         opt['cmd'] = 'file_list';
         opt['capture_stdout'] = true;
         opt['svpath'] = current_path;
-        const res = await fsapi.sv_exec_cmd(opt);
+        const res = await iinfer.sv_exec_cmd(opt);
         if(!res[0] || !res[0]['success']) {
-            fsapi.message(res);
+            iinfer.message(res);
             return;
         }
         const data = Object.entries(res[0]['success']).sort();
