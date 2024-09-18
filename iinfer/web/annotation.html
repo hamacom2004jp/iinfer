@@ -82,6 +82,45 @@
         <!-- 右側ペイン -->
         <div id="canvas_container" class="split-pane-component filer-pane-right" style="left:20%;">
             <div class="btn-toolbar mb-1" role="toolbar" aria-label="Toolbar with button groups">
+                <!-- ラベルツールボックス -->
+                <div class="input-group p-1">
+                    <span class="input-group-text">label</span>
+                    <input type="color" class="form-control form-control-color tag_label_color" value="#000000" style="width:35px;">
+                    <span class="input-group-text tag_label" style="max-width:150px;width:150px;"></span>
+                    <button class="btn btn-outline-secondary tool_bot_tag" type="button" title="labels" data-bs-toggle="dropdown">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-tags" viewBox="0 0 16 16">
+                            <path d="M3 2v4.586l7 7L14.586 9l-7-7H3zM2 2a1 1 0 0 1 1-1h4.586a1 1 0 0 1 .707.293l7 7a1 1 0 0 1 0 1.414l-4.586 4.586a1 1 0 0 1-1.414 0l-7-7A1 1 0 0 1 2 6.586V2z"/>
+                            <path d="M5.5 5a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1zm0 1a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM1 7.086a1 1 0 0 0 .293.707L8.75 15.25l-.043.043a1 1 0 0 1-1.414 0l-7-7A1 1 0 0 1 0 7.586V3a1 1 0 0 1 1-1v5.086z"/>
+                        </svg>
+                    </button>
+                    <ul id="tags_labels" class="dropdown-menu" style="width:300px;">
+                        <li>
+                            <div class="input-group p-1">
+                                <span class="input-group-text">new label</span>
+                                <input type="color" class="form-control form-control-color new_label_color" value="#563d7c" title="Choose your color" style="max-width:35px;">
+                                <input type="text" class="form-control new_label" aria-describedby="button-addon3">
+                                <button class="btn btn-outline-secondary tool_bot_add_tag" type="button">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                                        <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </li>
+                    </ul>
+                    <button class="btn btn-outline-secondary tool_bot_reload" type="button" title="reload">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/>
+                            <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/>
+                        </svg>
+                    </button>
+                    <button class="btn btn-outline-secondary tool_bot_save" type="button" title="save">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                            <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                            <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+                        </svg>
+                    </button>
+                </div>
+                <!-- アノテーションツールボックス -->
                 <div class="input-group p-1">
                     <span class="input-group-text">annotation</span>
                     <button class="btn btn-outline-secondary tool_bot_annoreload" type="button" title="reload">
@@ -97,53 +136,17 @@
                         </svg>
                     </button>
                 </div>
-                <div class="input-group p-1">
-                    <span class="input-group-text">label color</span>
-                    <button class="btn btn-outline-secondary tool_bot_reload" type="button" title="reload">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16">
-                            <path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/>
-                            <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/>
-                        </svg>
-                    </button>
-                    <button class="btn btn-outline-secondary tool_bot_save" type="button" title="save">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
-                            <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
-                            <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
-                        </svg>
-                    </button>
-                </div>
-                <div class="input-group p-1" style="width:calc(100% - 400px);">
+                <!-- 画像アドレス -->
+                <div class="input-group p-1" style="width:calc(100% - 600px);">
                     <span class="input-group-text">Image</span>
                     <input type="text" class="form-control image_address" aria-describedby="button-addon3" disabled>
                 </div>
             </div>
             <div class="split-pane fixed-left" style="height:calc(100% - 50px)">
-                <div class="split-pane-component d-flex" style="width:75%;">
+                <div class="split-pane-component d-flex" style="width:85%;">
                     <!-- ツールボックス -->
                     <div class="d-flex flex-column flex-shrink-0 bg-body-tertiary" style="width:4.5rem;">
                         <ul class="nav nav-pills nav-flush flex-column mb-auto text-center">
-                            <li>
-                                <a href="#" class="nav-link py-3 border-bottom rounded-0 tool_bot tool_bot_tag" title="tags" data-bs-toggle="dropdown">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-tags" viewBox="0 0 16 16">
-                                        <path d="M3 2v4.586l7 7L14.586 9l-7-7H3zM2 2a1 1 0 0 1 1-1h4.586a1 1 0 0 1 .707.293l7 7a1 1 0 0 1 0 1.414l-4.586 4.586a1 1 0 0 1-1.414 0l-7-7A1 1 0 0 1 2 6.586V2z"/>
-                                        <path d="M5.5 5a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1zm0 1a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM1 7.086a1 1 0 0 0 .293.707L8.75 15.25l-.043.043a1 1 0 0 1-1.414 0l-7-7A1 1 0 0 1 0 7.586V3a1 1 0 0 1 1-1v5.086z"/>
-                                    </svg>
-                                </a>
-                                <ul id="tags_labels" class="dropdown-menu" style="width:300px;">
-                                    <li>
-                                        <div class="input-group p-1">
-                                            <span class="input-group-text">new label</span>
-                                            <input type="color" class="form-control form-control-color new_label_color" value="#563d7c" title="Choose your color" style="max-width:35px;">
-                                            <input type="text" class="form-control new_label" aria-describedby="button-addon3">
-                                            <button class="btn btn-outline-secondary" type="button">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
-                                                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
-                                                </svg>
-                                            </button>
-                                        </div>
-                                    </li>
-                                </ul>
-                            </li>
                             <li class="nav-item">
                                 <a href="#" class="nav-link active py-3 border-bottom rounded-0 tool_bot tool_bot_cursor" title="cursor">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cursor" viewBox="0 0 16 16">
@@ -171,32 +174,21 @@
                     <div id="canvas" class="h-100 p-1" style="width:calc(100% - 5rem)"></div>
                 </div>
                 <!-- 左右のスプリッター -->
-                <div class="split-pane-divider filer-pane-divider" style="left:75%;"></div>
+                <div class="split-pane-divider filer-pane-divider" style="left:85%;"></div>
                 <!-- アノテーションリスト -->
-                <div class="split-pane-component filer-pane-right-bottom file-list overflow-auto p-1" style="left:75%;">
-                    <div class="list-group list-group-flush border-bottom scrollarea">
-                        <a href="#" class="list-group-item list-group-item-action py-3 lh-sm" aria-current="true">
-                            <div class="d-flex w-100 align-items-center justify-content-between">
-                                <strong class="mb-1">List group item heading</strong>
-                                <small>Wed</small>
-                            </div>
-                            <div class="col-10 mb-1 small">Some placeholder content in a paragraph below the heading and date.</div>
-                        </a>
-                        <a href="#" class="list-group-item list-group-item-action py-3 lh-sm" aria-current="true">
-                            <div class="d-flex w-100 align-items-center justify-content-between">
-                                <strong class="mb-1">List group item heading</strong>
-                                <small>Wed</small>
-                            </div>
-                            <div class="col-10 mb-1 small">Some placeholder content in a paragraph below the heading and date.</div>
-                        </a>
-                        <a href="#" class="list-group-item list-group-item-action py-3 lh-sm" aria-current="true">
-                            <div class="d-flex w-100 align-items-center justify-content-between">
-                                <strong class="mb-1">List group item heading</strong>
-                                <small>Wed</small>
-                            </div>
-                            <div class="col-10 mb-1 small">Some placeholder content in a paragraph below the heading and date.</div>
-                        </a>
-                    </div>
+                <div class="split-pane-component overflow-auto p-1" style="left:85%;">
+                    <div class="list-group list-group-flush border-bottom scrollarea anno-list"></div>
+                    <a id="anno_item_temp" href="#" class="list-group-item list-group-item-action py-2 lh-sm d-none" aria-current="true">
+                        <div class="d-flex w-100 align-items-center">
+                            <input type="color" value="#000000" style="width: 20px; height: 20px;" disabled/>
+                            <strong class="ms-2 mb-1">no annotation</strong>
+                            <button type="button" class="btn ms-auto">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3" viewBox="0 0 16 16">
+                                    <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5ZM11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0H11Zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5h9.916Zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5Z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </a>
                 </div>
             </div>
         </div>

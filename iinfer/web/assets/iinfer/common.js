@@ -189,6 +189,15 @@ iinfer.randam_color = (color=undefined) => {
   return code;
 }
 /**
+ * ランダムな文字列を生成する
+ * @param {number} length - 文字列の長さ
+ * @returns {string} - ランダムな文字列
+ **/
+iinfer.randam_string = (length) => {
+  const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  return Array.from({length: length}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+}
+/**
  * サーバーAPI実行
  * @param {object} opt - オプション
  * @returns {Promise} - レスポンス

@@ -70,6 +70,17 @@ anno.load_conf = (svpath) => {
       const current_ul_elem = anno.left_container.find('.tree-menu');
       anno.load_filelist(`${svpath}${train_dataset}`, `${svpath}${train_dataset}`, current_ul_elem);
     }
+    // ラベルとカラーの追加ボタン
+    const tags_labels_elem = anno.canvas_container.find('#tags_labels');
+    tags_labels_elem.find('.tool_bot_add_tag').off('click').on('click', (event) => {
+      const label = tags_labels_elem.find('.new_label').val();
+      const color = tags_labels_elem.find('.new_label_color').val().slice(1);
+      if (!label || !color) return;
+      anno.add_label(label, color, tags_labels_elem);
+      tags_labels_elem.find('.new_label').val('');
+      tags_labels_elem.find('.new_label_color').attr('value', `#${iinfer.randam_color()}`);
+      event.stopPropagation();
+    });
   }).catch((e) => {
     iinfer.hide_loading();
     console.log(e);
@@ -88,47 +99,72 @@ anno.load_label = (svpath) => {
   iinfer.show_loading();
   iinfer.sv_exec_cmd(opt).then(res => {
     if(!res[0] || !res[0]['success']) {
-      iinfer.hide_loading();
       iinfer.message(res);
       return;
     }
     if (!res[0]['success']['data']) return;
     const labels = atob(res[0]['success']['data']).split(/\r?\n/);
-    const set_labels = (labels) => {
-      labels.forEach((label, i) => {
-        const color = iinfer.randam_color();
-        const li_elem = $(`<li class="dropdown-labels"></li>`);
-        const a_elem = $(`<a class="dropdown-item" href="#" data-label="${label}" data-color="${color}"></a>`);
-        const input_elem = $(`<input type="color" value="#${color}" style="width: 20px; height: 20px;"/>`);
-        input_elem.change((event) => {
-          const input_elem = $(event.currentTarget);
-          const a_elem = input_elem.parent();
-          input_elem.attr('value', event.currentTarget.value);
-          a_elem.attr('data-color', event.currentTarget.value.slice(1));
-          anno.tool.label = a_elem.attr('data-label');
-          anno.tool.color = a_elem.attr('data-color');
-          anno.reflesh_svg();
-        });
-        a_elem.append(input_elem);
-        a_elem.append(`<span class="m-2">${label}</span>`);
-        li_elem.append(a_elem);
-        a_elem.off('click').on('click', (event) => {
-          const a_elem = $(event.currentTarget);
-          anno.tool.label = a_elem.attr('data-label');
-          anno.tool.color = a_elem.attr('data-color');
-        });
-        anno.canvas_container.find('#tags_labels').append(li_elem);
-      });
-    }
-    anno.canvas_container.find('#tags_labels').children('.dropdown-labels').remove();
-    set_labels(labels);
-    anno.canvas_container.find('#tags_labels').find('.input-group').off('click').on('click', (event) => {
-      event.stopPropagation();
+    const tags_labels_elem = anno.canvas_container.find('#tags_labels');
+    tags_labels_elem.children('.dropdown-labels').remove();
+    labels.forEach((label, i) => {
+      const color = iinfer.randam_color();
+      anno.add_label(label, color, tags_labels_elem);
     });
   }).catch((e) => {
-    iinfer.hide_loading();
     console.log(e);
+  }).finally(() => {
+    iinfer.hide_loading();
+    anno.canvas_container.find('#tags_labels .dropdown-item:first').click();
   });
+};
+/**
+ * ラベルの追加
+ * @param {string} label ラベル
+ * @param {string} color カラーコード
+ * @param {$} tags_labels_elem ラベルリストの親要素
+ **/
+anno.add_label = (label, color, tags_labels_elem) => {
+  const li_elem = $(`<li class="dropdown-labels"></li>`);
+  const a_elem = $(`<a class="dropdown-item d-flex pt-0 pb-0" href="#" data-label="${label}" data-color="${color}"></a>`);
+  const input_elem = $(`<input type="color" value="#${color}" style="width: 20px; height: 20px;"/>`);
+  input_elem.change((event) => {
+    const input_elem = $(event.currentTarget);
+    const a_elem = input_elem.parent();
+    input_elem.attr('value', event.currentTarget.value);
+    a_elem.attr('data-color', event.currentTarget.value.slice(1));
+    anno.tool.label = a_elem.attr('data-label');
+    anno.tool.color = a_elem.attr('data-color');
+    anno.reflesh_svg();
+  });
+  const del_elem = $(`<button class="btn ms-auto p-0"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3" viewBox="0 0 16 16">`
+    + `<path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5ZM11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0H11Zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5h9.916Zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5Z"></path></svg>`);
+  del_elem.off('click').on('click', (event) => {
+    if (!window.confirm(`Delete label '${label}'?`)) return;
+    const li_elem = $(event.currentTarget).parent().parent();
+    li_elem.remove();
+    const f_a_elem = anno.canvas_container.find(`#tags_labels .dropdown-item:first`);
+    anno.tool.label = f_a_elem.attr('data-label');
+    anno.tool.color = f_a_elem.attr('data-color');
+    anno.tool.label = anno.tool.label ? anno.tool.label : '';
+    anno.tool.color = anno.tool.color ? anno.tool.color : iinfer.randam_color();
+    anno.canvas_container.find('.tag_label').text(anno.tool.label);
+    anno.canvas_container.find('.tag_label_color').attr('value', `#${anno.tool.color}`);
+    anno.reflesh_svg();
+    event.stopPropagation();
+  });
+  a_elem.append(input_elem);
+  a_elem.append(`<span class="ms-2 mb-1">${label}</span>`);
+  a_elem.append(del_elem);
+  li_elem.append(a_elem);
+  a_elem.off('click').on('click', (event) => {
+    const a_elem = $(event.currentTarget);
+    anno.tool.label = a_elem.attr('data-label');
+    anno.tool.color = a_elem.attr('data-color');
+    anno.canvas_container.find('.tag_label').text(anno.tool.label);
+    anno.canvas_container.find('.tag_label_color').attr('value', `#${anno.tool.color}`);
+  });
+  tags_labels_elem.append(li_elem);
+  a_elem.click();
 };
 /**
  * ツールに設定されているラベルを取得
@@ -154,7 +190,6 @@ anno.load_color = (svpath) => {
   iinfer.show_loading();
   iinfer.sv_exec_cmd(opt).then(res => {
     if(!res[0] || !res[0]['success']) {
-      iinfer.hide_loading();
       iinfer.message(res);
       return;
     }
@@ -177,13 +212,15 @@ anno.load_color = (svpath) => {
         }
         $(ak).attr('data-color', color).find('input').attr('value', `#${color}`);
       });
+      ref_elem.find('.dropdown-item:first').click();
     }
     set_colors(colors);
-    anno.canvas_container.find('#tags_labels .dropdown-item:first').click();
     anno.reflesh_svg();
   }).catch((e) => {
-    iinfer.hide_loading();
     console.log(e);
+  }).finally(() => {
+    iinfer.hide_loading();
+    anno.canvas_container.find('#tags_labels .dropdown-item:first').click();
   });
 };
 /**
@@ -208,6 +245,7 @@ anno.save_label_color = (svpath) => {
     return;
   }
   iinfer.show_loading();
+  anno.blur_comp();
   const conf_file = `${conf['deploy_dir']}/conf.json`;
   const opt = iinfer.get_server_opt(false, anno.left_container);
   let label_file = null;
@@ -273,11 +311,24 @@ anno.load_anno = (image_path, exists_func, notfound_func) => {
  * @return {void}
  **/
 anno.save_anno = (svpath, image_path, svg_elem) => {
+  iinfer.show_loading();
+  anno.blur_comp();
   const svg_str = svg_elem.prop('outerHTML');
   const formData = new FormData();
   image_path = image_path.replace(svpath, '');
   formData.append('files', new Blob([svg_str], {type:"image/svg+xml"}), `${image_path}.svg`);
   iinfer.file_upload(anno.left_container, svpath, formData, orverwrite=true, progress_func=(e) => {}, success_func=(target, svpath, data) => {
+    const fl_svg_elem = anno.left_container.find(`.file-list [data-path='${svpath}${image_path}.svg']`);
+    const src = fl_svg_elem.attr('src');
+    if (src) {
+      // アノテーション画像がすでに存在している場合はリロード
+      fl_svg_elem.attr('src', `${src.split('?')[0]}?r=${iinfer.randam_string(8)}`);
+    } else if (anno.tool.conf['train_dataset'] && anno.tool.conf['deploy_dir']){
+      // アノテーション画像が存在しない場合はファイルリストからリロード
+      const train_dataset = anno.tool.conf['train_dataset'].replace(anno.tool.conf['deploy_dir'], '').replace(/\\/, '/');
+      const image_dir = image_path.split('/').slice(0, -1).join('/');
+      anno.load_filelist(`${svpath}${train_dataset}`, `${svpath}${image_dir}`, anno.left_container.find('.tree-menu'));
+    }
     iinfer.hide_loading();
     iinfer.message(`Saved in. image_path=${svpath}${image_path}.svg`);
   }, error_func=(target, svpath, data) => {
@@ -370,9 +421,18 @@ anno.load_filelist = (basepath, svpath, current_ul_elem) => {
         if(n['is_dir']) return;
         // サムネイル画像の表示
         const thum_size = 100;
-        const card_elem = $('<div class="card card-hover d-inline-block p-1"><div class="card-body p-0"></div></div>');
         const constr = btoa(`${opt['host']}\t${opt['port']}\t${opt['svname']}\t${opt['password']}\t${n['path']}\t${thum_size}`);
-        const img_elem = $(`<img src="annotation/get_img/${constr}"/>`);
+        const img_elem = $(`<img src="annotation/get_img/${constr}?r=${iinfer.randam_string(8)}" data-path="${n['path']}"/>`);
+        let card_elem = undefined;
+        // SVGファイルの場合は元画像があるかどうかを確認
+        if(n['path'].endsWith('.svg')) {
+          const simg_elem = file_list_elem.find(`[data-path='${n['path'].replace(/\.svg$/, '')}']`);
+          img_elem.css('position', 'absolute').css('left', '0').css('top', '0');
+          card_elem = simg_elem.parents('.card');
+        } else {
+          card_elem = $('<div class="card card-hover d-inline-block p-1"><div class="card-body p-0" style="position:relative;"></div></div>');
+          card_elem.off('click').on('click', () => anno.load_image(n, opt));
+        }
         img_elem.off('load').on('load', (event) => {
           const img = event.currentTarget;
           if (img.width > img.height) {
@@ -384,7 +444,6 @@ anno.load_filelist = (basepath, svpath, current_ul_elem) => {
           }
         });
         card_elem.find('.card-body').append(img_elem);
-        card_elem.off('click').on('click', () => anno.load_image(n, opt));
         file_list_elem.append(card_elem);
       });
     });
@@ -395,7 +454,7 @@ anno.load_filelist = (basepath, svpath, current_ul_elem) => {
   });
 };
 /**
- * 画像の表示
+ * キャンバスに画像とアノテーションを表示
  * @param {object} node ノード
  * @param {object} opt オプション
  * @return {void}
@@ -406,28 +465,39 @@ anno.load_image = (node, opt) => {
   const constr = btoa(`${opt['host']}\t${opt['port']}\t${opt['svname']}\t${opt['password']}\t${node['path']}\t0`);
   const card_elem = $('<div class="card d-inline-block p-1"><div class="card-body p-0"></div></div>');
   anno.dragscroll(card_elem, card_elem.get(0)); // ドラッグスクロールの設定
-  const img_elem = $(`<img src="annotation/get_img/${constr}"/>`);
+  const img_elem = $(`<img class="canvas_image" src="annotation/get_img/${constr}" data-path="${node['path']}"/>`);
+  img_elem.data('node', node);
+  img_elem.data('opt', opt);
   const img = img_elem.off('wheel').get(0);
-  let svg_elem, svg;
+  // 画像が読み込まれたとき
   img_elem.off('load').on('load', () => {
     const image_path = anno.canvas_container.find('.image_address').val();
+    // アノテーションの読込
     anno.load_anno(image_path, (svg_str) => {
-      svg_elem = $(svg_str);
-      svg_elem.css('position','absolute').css('left',`4px`).css('top',`4px`);
+      // アノテーションが見つかった場合
+      const svg_elem = $(svg_str);
+      svg_elem.css('position','absolute').css('left',`4px`).css('top',`4px`).css('width','').css('height','');
+      svg_elem.children().each((i, comp) => {
+        $(comp).attr('id', iinfer.randam_string(16));
+      });
       anno.disable_contextmenu(svg_elem); // 右クリックメニューを無効化
       svg_elem.children().each((i, comp) => {
         anno.comp_mouse_action(comp); // アノテーションのマウスアクション
       });
       card_elem.find('.card-body').append(svg_elem);
-      svg = svg_elem.get(0);
+      const svg = svg_elem.get(0);
       anno.svg_mouse_action(svg_elem, svg); // アノテーション画面のマウスアクション
+      anno.reflesh_svg();
+      anno.load_annolist(svg_elem);
     }, () => {
-      svg_elem = $(`<svg id="svg" xmlns="http://www.w3.org/2000/svg" width="${img.naturalWidth}" height="${img.naturalHeight}" viewBox="0 0 ${img.naturalWidth} ${img.naturalHeight}"/>`);
+      // アノテーションが見つからなかった場合
+      const svg_elem = $(`<svg id="svg" xmlns="http://www.w3.org/2000/svg" width="${img.naturalWidth}" height="${img.naturalHeight}" viewBox="0 0 ${img.naturalWidth} ${img.naturalHeight}"/>`);
       svg_elem.css('position','absolute').css('left',`4px`).css('top',`4px`);
       anno.disable_contextmenu(svg_elem); // 右クリックメニューを無効化
       card_elem.find('.card-body').append(svg_elem);
-      svg = svg_elem.get(0);
+      const svg = svg_elem.get(0);
       anno.svg_mouse_action(svg_elem, svg); // アノテーション画面のマウスアクション
+      anno.load_annolist(svg_elem);
     });
   });
   const canvas_elem = anno.canvas_container.find('#canvas');
@@ -439,11 +509,61 @@ anno.load_image = (node, opt) => {
     anno.canvas_scale += event.deltaY * -0.001;
     anno.canvas_scale = Math.min(Math.max(0.125, anno.canvas_scale), 4);
     img.width = img.naturalWidth * anno.canvas_scale;
+    const svg_elem = canvas_elem.find('svg');
     svg_elem.css('width', `${img.width}px`).css('height', `${img.height}px`);
   }  
   card_elem.find('.card-body').append(img_elem);
   canvas_elem.html('');
   canvas_elem.append(card_elem);
+};
+/**
+ * アノテーションリストを再読み込み
+ * @param {$} svg_elem SVG要素
+ **/
+anno.load_annolist = (svg_elem) => {
+  const anno_list_elem = anno.canvas_container.find('.anno-list');
+  anno_list_elem.html('');
+  anno.blur_comp();
+  svg_elem.children().each((i, comp) => {
+    const comp_elem = $(comp);
+    const color = comp_elem.attr('stroke');
+    const label = comp_elem.attr('data-anno-label');
+    const type = comp_elem.attr('data-anno-type');
+    const a_elem = $(anno.canvas_container.find('#anno_item_temp').prop('outerHTML'));
+    a_elem.find('input').attr('value', color);
+    a_elem.attr('data-anno-id', comp_elem.attr('id'));
+    // アノテーションリストをクリックしたときにアノテーションを選択
+    a_elem.off('click').on('click', (event) => {
+      const a_elem = $(event.currentTarget);
+      const svg_elem = anno.canvas_container.find('#canvas svg');
+      const comp_elem = svg_elem.find(`#${a_elem.attr('data-anno-id')}`);
+      if (comp_elem.length <= 0) return;
+      anno.blur_comp();
+      svg_elem.data('selectcomp', comp_elem.get(0));
+      svg_elem.append(comp_elem); // 最前面に移動
+      comp_elem.attr('stroke-width', `5.0`);
+      a_elem.css('background-color', 'var(--bs-list-group-action-active-bg)');
+    });
+    const del_elem = a_elem.find('button');
+    // アノテーションリストの削除ボタンをクリックしたときにアノテーションを削除
+    del_elem.off('click').on('click', (event) => {
+      const a_elem = $(event.currentTarget).parent().parent();
+      const comp_elem = svg_elem.find(`#${a_elem.attr('data-anno-id')}`);
+      comp_elem.remove();
+      a_elem.remove();
+    });
+    const strong_elem = a_elem.find('strong');
+    strong_elem.text(label);
+    a_elem.removeClass('d-none');
+    anno_list_elem.append(a_elem);
+  });
+  if (svg_elem.children().length<=0) {
+    const a_elem = $(anno.canvas_container.find('#anno_item_temp').prop('outerHTML'));
+    a_elem.find('input').remove();
+    a_elem.find('button').remove();
+    a_elem.removeClass('d-none');
+    anno_list_elem.append(a_elem);
+  }
 };
 /**
  * アノテーション画面のマウスアクション
@@ -458,7 +578,7 @@ anno.svg_mouse_action = (svg_elem, svg) => {
     event.stopPropagation();
     // カーソルツールの場合
     if (anno.tool.cursor) {
-      svg_elem.children().attr('stroke-width', `2.0`);
+      anno.blur_comp();
       return false;
     }
     // 矩形ツールの場合
@@ -503,10 +623,6 @@ anno.svg_mouse_action = (svg_elem, svg) => {
     if (event.which != 1) return false;
     if (anno.tool.cursor) return false; // カーソルツールの場合は何もしない
     event.stopPropagation();
-    //const comp = svg_elem.data("comp");
-    //if (comp) {
-    //  anno.dragscroll($(comp), comp); // ドラッグスクロールの設定
-    //}
     svg_elem.data("down", false);
     svg_elem.data("lastcomp", null);
     return false;
@@ -524,16 +640,33 @@ anno.comp_mouse_action = (comp) => {
     const comp_elem = $(event.currentTarget);
     // カーソルツールの場合
     if (anno.tool.cursor) {
+      const x = parseInt(comp_elem.attr('x'));
+      const y = parseInt(comp_elem.attr('y'));
+      const w = parseInt(comp_elem.attr('width'));
+      const h = parseInt(comp_elem.attr('height'));
+      const x1 = ~~(event.offsetX / anno.canvas_scale);
+      const y1 = ~~(event.offsetY / anno.canvas_scale);
+        let edge = undefined;
+      if (comp_elem.attr('data-anno-type')=='rect') {
+        edge = 'center';
+        edge = Math.abs(x-x1) < 20 && Math.abs(y-y1) < 20 ? 'left-top' : edge;
+        edge = Math.abs(x+w-x1) < 20 && Math.abs(y-y1) < 20 ? 'right-top' : edge;
+        edge = Math.abs(x-x1) < 20 && Math.abs(y+h-y1) < 20 ? 'left-bottom' : edge;
+        edge = Math.abs(x+w-x1) < 20 && Math.abs(y+h-y1) < 20 ? 'right-bottom' : edge;
+      }
       comp_elem.data({
-        "x1": ~~(event.offsetX / anno.canvas_scale),
-        "y1": ~~(event.offsetY / anno.canvas_scale),
+        "edge": edge,
+        "x1": x1,
+        "y1": y1,
       });
-      comp_elem.attr('fill-opacity', `1.0`);
       const svg_elem = anno.canvas_container.find('#canvas svg');
       svg_elem.children().attr('stroke-width', `2.0`);
       svg_elem.data('selectcomp', event.currentTarget);
       svg_elem.append(comp_elem); // 最前面に移動
+      anno.blur_comp();
       comp_elem.attr('stroke-width', `5.0`);
+      const id = comp_elem.attr('id');
+      anno.canvas_container.find('.anno-list').find(`[data-anno-id='${id}']`).css('background-color', 'var(--bs-list-group-action-active-bg)');
       return false;
     }
   };
@@ -553,12 +686,31 @@ anno.comp_mouse_action = (comp) => {
       const h = parseInt(comp_elem.attr('height'));
       const mw = parseInt(comp_elem.parent().attr('width'));
       const mh = parseInt(comp_elem.parent().attr('height'));
-      comp_elem.attr('x', Math.min(Math.max(x+x2-x1, 0), mw-w));
-      comp_elem.attr('y', Math.min(Math.max(y+y2-y1, 0), mh-h));
-      comp_elem.data({
-        "x1": x2,
-        "y1": y2,
-      });
+      const edge = comp_elem.data('edge');
+      if (comp_elem.attr('data-anno-type')=='rect') {
+        if (edge == 'center') {
+          comp_elem.attr('x', Math.min(Math.max(x+(x2-x1), 0), mw-w));
+          comp_elem.attr('y', Math.min(Math.max(y+(y2-y1), 0), mh-h));
+        } else if (edge == 'left-top') {
+          comp_elem.attr('x', Math.min(Math.max(x+(x2-x1), 0), mw-w));
+          comp_elem.attr('y', Math.min(Math.max(y+(y2-y1), 0), mh-h));
+          comp_elem.attr('width', Math.max(w-(x2-x1), 20));
+          comp_elem.attr('height', Math.max(h-(y2-y1), 20));
+        } else if (edge == 'right-top') {
+          comp_elem.attr('y', Math.min(Math.max(y+(y2-y1), 0), mh-h));
+          comp_elem.attr('width', Math.min(Math.max(w+(x2-x1), 20), mw-x));
+          comp_elem.attr('height', Math.max(h-(y2-y1), 20));
+        } else if (edge == 'left-bottom') {
+          comp_elem.attr('x', Math.min(Math.max(x+(x2-x1), 0), mw-w));
+          comp_elem.attr('width', Math.max(w-(x2-x1), 20));
+          comp_elem.attr('height', Math.min(Math.max(h+(y2-y1), 20), mh-y));
+        } else if (edge == 'right-bottom') {
+          comp_elem.attr('width', Math.min(Math.max(w+(x2-x1), 20), mw-x));
+          comp_elem.attr('height', Math.min(Math.max(h+(y2-y1), 20), mh-y));
+        }
+        comp_elem.data('x1', x2);
+        comp_elem.data('y1', y2);
+    }
       return false;
     }
   };
@@ -568,8 +720,11 @@ anno.comp_mouse_action = (comp) => {
     const comp_elem = $(event.currentTarget);
     // カーソルツールの場合
     if (anno.tool.cursor) {
-      comp_elem.attr('fill-opacity', `0.5`);
       return false;
+    }
+    // 矩形ツールの場合
+    if (anno.tool.bbox) {
+      anno.load_annolist(comp_elem.parent());
     }
   };
 };
@@ -590,6 +745,7 @@ anno.make_rect_dom = (x1, y1, x2, y2, stroke, fill, stroke_width, label) => {
   const h = Math.abs(y2-y1);
   if (w <= 0 || h <= 0) return null;
   const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+  rect.setAttribute('id', iinfer.randam_string(16));
   rect.setAttribute('x', Math.min(x1, x2));
   rect.setAttribute('y', Math.min(y1, y2));
   rect.setAttribute('width', w);
@@ -599,8 +755,15 @@ anno.make_rect_dom = (x1, y1, x2, y2, stroke, fill, stroke_width, label) => {
   rect.setAttribute('stroke-width', `${stroke_width}`);
   rect.setAttribute('fill-opacity', `0.5`);
   rect.setAttribute('data-anno-label', `${label}`);
-  rect.setAttribute('data_anno-type', `rect`);
+  rect.setAttribute('data-anno-type', `rect`);
   return rect;
+};
+/**
+ * コンポーネントの選択状態を解除
+ **/
+anno.blur_comp = () => {
+  anno.canvas_container.find('.anno-list').find(`a`).css('background-color', '');
+  anno.canvas_container.find('#svg').children().attr('stroke-width', `2.0`);
 };
 /**
  * 右クリックメニューを無効化
@@ -660,6 +823,7 @@ anno.tool = {};
 anno.init_tool_button = () => {
   const toggle_func = (elem) => {
     anno.canvas_container.find('.tool_bot').removeClass('active');
+    anno.blur_comp();
     $(elem).addClass('active');
   }
   anno.canvas_container.find('.tool_bot_cursor').off('click').on('click', () => {
@@ -670,24 +834,42 @@ anno.init_tool_button = () => {
   });
   anno.canvas_container.find('.tool_bot_cursor').click();
   anno.canvas_container.find('.tool_bot_bbox').off('click').on('click', () => {
+    if (anno.canvas_container.find('.tag_label').text() == '') return;
     anno.tool.cursor = false;
     anno.tool.bbox = true;
     anno.tool.polygon = false;
     toggle_func('.tool_bot_bbox');
   });
   anno.canvas_container.find('.tool_bot_polygon').off('click').on('click', () => {
+    if (anno.canvas_container.find('.tag_label').text() == '') return;
     anno.tool.cursor = false;
     anno.tool.bbox = false;
     anno.tool.polygon = true;
     toggle_func('.tool_bot_polygon');
   });
   anno.canvas_container.find('.tool_bot_reload').off('click').on('click', () => {
-    anno.left_container.find('.deploy_names').change();
+    const svpath = anno.left_container.find('.deploy_names').val();
+    const conf = anno.tool.conf;
+    if (conf['label_file'] && conf['deploy_dir']){
+      const label_file = conf['label_file'].replace(conf['deploy_dir'], '').replace(/\\/, '/');
+      anno.load_label(`${svpath}${label_file}`);
+    }
+    if (conf['color_file'] && conf['deploy_dir']){
+      const color_file = conf['color_file'].replace(conf['deploy_dir'], '').replace(/\\/, '/');
+      anno.load_color(`${svpath}${color_file}`);
+    }
   });
   anno.canvas_container.find('.tool_bot_save').off('click').on('click', () => {
     const svpath = anno.left_container.find('.deploy_names').val();
     if (!svpath) return;
     anno.save_label_color(svpath);
+  });
+  anno.canvas_container.find('.tool_bot_annoreload').off('click').on('click', () => {
+    const img_elem = anno.canvas_container.find('#canvas .canvas_image');
+    const node = img_elem.data('node');
+    const opt = img_elem.data('opt');
+    if (!node || !opt) return;
+    anno.load_image(node, opt);
   });
   anno.canvas_container.find('.tool_bot_annosave').off('click').on('click', () => {
     const svpath = anno.left_container.find('.deploy_names').val();
@@ -700,6 +882,7 @@ anno.init_tool_button = () => {
       const svg_elem = anno.canvas_container.find('#canvas svg');
       const comp = svg_elem.data('selectcomp');
       if(comp) comp.remove();
+      anno.load_annolist(svg_elem);
     }
   };
 };
