@@ -417,9 +417,7 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
         const mk_tr = (_t, _p, _e, _n, _l) => {
           const png = _n["is_dir"] ? 'folder-close.png' : 'file.png';
           const mime = _n['mime_type'] ? _n['mime_type'] : '-';
-          const dt = _n["is_dir"] ? '-' : new Date(_n["last"]).toLocaleDateString('ja-JP', {
-            year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit'
-          });
+          const dt = _n["is_dir"] ? '-' : iinfer.toDateStr(new Date(_n["last"]));
           const tr = $('<tr>'
               + `<td><img src="assets/tree-menu/image/${png}"></td>`
               + '<td>'

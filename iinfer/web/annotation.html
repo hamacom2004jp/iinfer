@@ -22,18 +22,6 @@
             <div class="collapse navbar-collapse" id="navbarNavDropdown">
                 <ul class="navbar-nav">
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="fileMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            File
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li>
-                                <a class="dropdown-item" href="#" onclick="open_datasetfolder_func('data_folder')">Open Dataset Folder</a>
-                                <input type="hidden" id="data_folder" value="/"/>
-                            </li>
-                        </ul>
-                    </li>
-
-                    <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="viewMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             View
                         </a>
@@ -82,10 +70,39 @@
         <!-- 右側ペイン -->
         <div id="canvas_container" class="split-pane-component filer-pane-right" style="left:20%;">
             <div class="btn-toolbar mb-1" role="toolbar" aria-label="Toolbar with button groups">
+                <!-- アノテーションツールボックス -->
+                <div class="input-group p-1">
+                    <span class="input-group-text">annotation</span>
+                    <button class="btn btn-outline-secondary" type="button" title="saveall" data-bs-toggle="dropdown">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-up" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M3.5 6a.5.5 0 0 0-.5.5v8a.5.5 0 0 0 .5.5h9a.5.5 0 0 0 .5-.5v-8a.5.5 0 0 0-.5-.5h-2a.5.5 0 0 1 0-1h2A1.5 1.5 0 0 1 14 6.5v8a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 14.5v-8A1.5 1.5 0 0 1 3.5 5h2a.5.5 0 0 1 0 1h-2z"/>
+                            <path fill-rule="evenodd" d="M7.646.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 1.707V10.5a.5.5 0 0 1-1 0V1.707L5.354 3.854a.5.5 0 1 1-.708-.708l3-3z"/>
+                        </svg>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item d-flex pt-0 pb-0 tool_bot_annosave_all_coco" href="#">
+                                <span class="ms-2 mb-1">Save MS COCO format</span>
+                            </a>
+                        </li>
+                    </ul>
+                    <button class="btn btn-outline-secondary tool_bot_annoreload" type="button" title="reload">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/>
+                            <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/>
+                        </svg>
+                    </button>
+                    <button class="btn btn-outline-secondary tool_bot_annosave" type="button" title="save">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                            <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                            <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+                        </svg>
+                    </button>
+                </div>
                 <!-- ラベルツールボックス -->
                 <div class="input-group p-1">
                     <span class="input-group-text">label</span>
-                    <input type="color" class="form-control form-control-color tag_label_color" value="#000000" style="width:35px;">
+                    <input type="color" class="form-control form-control-color tag_label_color" value="#000000" style="width:35px;" disabled>
                     <span class="input-group-text tag_label" style="max-width:150px;width:150px;"></span>
                     <button class="btn btn-outline-secondary tool_bot_tag" type="button" title="labels" data-bs-toggle="dropdown">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-tags" viewBox="0 0 16 16">
@@ -120,24 +137,8 @@
                         </svg>
                     </button>
                 </div>
-                <!-- アノテーションツールボックス -->
-                <div class="input-group p-1">
-                    <span class="input-group-text">annotation</span>
-                    <button class="btn btn-outline-secondary tool_bot_annoreload" type="button" title="reload">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16">
-                            <path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/>
-                            <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/>
-                        </svg>
-                    </button>
-                    <button class="btn btn-outline-secondary tool_bot_annosave" type="button" title="save">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
-                            <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
-                            <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
-                        </svg>
-                    </button>
-                </div>
                 <!-- 画像アドレス -->
-                <div class="input-group p-1" style="width:calc(100% - 600px);">
+                <div class="input-group p-1" style="width:calc(100% - 650px);">
                     <span class="input-group-text">Image</span>
                     <input type="text" class="form-control image_address" aria-describedby="button-addon3" disabled>
                 </div>

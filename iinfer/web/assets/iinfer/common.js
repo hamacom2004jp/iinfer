@@ -35,6 +35,16 @@ iinfer.is_text = (array) => {
   return array.every(e => textChars.includes(e));
 }
 /**
+ * Dateオブジェクトを日付文字列に変換
+ * @param {Date} date - Dateオブジェクト
+ * @returns {string} - 日付文字列
+ */
+iinfer.toDateStr = (date) => {
+  return date.toLocaleDateString('ja-JP', {
+    year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit'
+  });
+}
+/**
  * 指定された範囲の数値の配列を生成する
  * @param {number} start - 開始値
  * @param {number} stop - 終了値

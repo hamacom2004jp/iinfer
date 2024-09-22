@@ -595,7 +595,8 @@ class Client(object):
                 try:
                     cv2.imshow('preview', convert.bgr2rgb(img_npy))
                     cv2.waitKey(1)
-                except KeyboardInterrupt:
+                except Exception as e:
+                    self.logger.error(f"cv2.imshow error. {e}", exc_info=True)
                     pass
         eoutputtime = time.perf_counter()
         epredtime = time.perf_counter()

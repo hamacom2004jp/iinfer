@@ -368,6 +368,22 @@ anno.reflesh_svg = () => {
  * @param {$} current_ul_elem ツリーメニューの要素
  */
 anno.load_filelist = (basepath, svpath, current_ul_elem) => {
+  const path_parts = svpath.split('/');
+  // MS COCO Object Detection formatの保存先を設定
+  if (path_parts.length > 3) {
+    const deploy_name = path_parts[1];
+    const input_name = path_parts[2];
+    const subset = path_parts.slice(-1)[0];
+    const save_path = `/${deploy_name}/${input_name}/annotations/det_${subset}.json`;
+    const menu_elem = anno.canvas_container.find('.tool_bot_annosave_all_coco');
+    menu_elem.find('span').html(`Save MS COCO format to "${save_path}"`);
+    menu_elem.attr('data-save-type', 'coco');
+    menu_elem.attr('data-save-path', save_path);
+    menu_elem.attr('data-save-src', svpath);
+    menu_elem.off('click').on('click', () => {
+      anno.save_annoall(menu_elem);
+    });
+  }
   const opt = iinfer.get_server_opt(false, anno.left_container);
   opt['mode'] = 'client';
   opt['cmd'] = 'file_list';
@@ -410,6 +426,7 @@ anno.load_filelist = (basepath, svpath, current_ul_elem) => {
         anno.left_container.find(`#${k}`).off('click').on('click', mk_func(basepath, n['path'], current_ul_elem));
       });
     });
+    // 下側ペイン
     const file_list_elem = anno.left_container.find('.file-list');
     file_list_elem.html('');
     file_list.forEach(([key, node]) => {
@@ -481,9 +498,6 @@ anno.load_image = (node, opt) => {
         $(comp).attr('id', iinfer.randam_string(16));
       });
       anno.disable_contextmenu(svg_elem); // 右クリックメニューを無効化
-      svg_elem.children().each((i, comp) => {
-        anno.comp_mouse_action(comp); // アノテーションのマウスアクション
-      });
       card_elem.find('.card-body').append(svg_elem);
       const svg = svg_elem.get(0);
       anno.svg_mouse_action(svg_elem, svg); // アノテーション画面のマウスアクション
@@ -528,10 +542,10 @@ anno.load_annolist = (svg_elem) => {
     const comp_elem = $(comp);
     const color = comp_elem.attr('stroke');
     const label = comp_elem.attr('data-anno-label');
-    const type = comp_elem.attr('data-anno-type');
     const a_elem = $(anno.canvas_container.find('#anno_item_temp').prop('outerHTML'));
     a_elem.find('input').attr('value', color);
     a_elem.attr('data-anno-id', comp_elem.attr('id'));
+    a_elem.attr('id', null);
     // アノテーションリストをクリックしたときにアノテーションを選択
     a_elem.off('click').on('click', (event) => {
       const a_elem = $(event.currentTarget);
@@ -551,6 +565,7 @@ anno.load_annolist = (svg_elem) => {
       const comp_elem = svg_elem.find(`#${a_elem.attr('data-anno-id')}`);
       comp_elem.remove();
       a_elem.remove();
+      anno.clear_svg_data(svg_elem);
     });
     const strong_elem = a_elem.find('strong');
     strong_elem.text(label);
@@ -572,96 +587,70 @@ anno.load_annolist = (svg_elem) => {
  * @return {void}
  */
 anno.svg_mouse_action = (svg_elem, svg) => {
-  // キャンバス上でマウスを押したとき、開始座標を記録
-  svg.onmousedown = (event) => {
-    if (event.which != 1) return false;
-    event.stopPropagation();
-    // カーソルツールの場合
-    if (anno.tool.cursor) {
-      anno.blur_comp();
-      return false;
-    }
-    // 矩形ツールの場合
-    if (anno.tool.bbox) {
-      svg_elem.data({
-        "down": true,
-        "move": false,
-        "lastcomp": null,
-        "x1": event.offsetX / anno.canvas_scale,
-        "y1": event.offsetY / anno.canvas_scale,
-      });
-      return false;
-    }
-  };
-  // キャンバス上でマウスを動かしたとき、矩形を描画
-  svg.onmousemove = (event) => {
-    if (!svg_elem.data("down")) return;
-    if (event.which != 1) return false;
-    if (anno.tool.cursor) return false; // カーソルツールの場合は何もしない
-    event.stopPropagation();
+  // 多角形の作成
+  const mk_poly = (svg, svg_elem, event, add_mode) => {
     let comp = svg_elem.data("lastcomp");
-    const x1 = svg_elem.data("x1");
-    const y1 = svg_elem.data("y1");
-    const x2 = ~~(event.offsetX / anno.canvas_scale);
-    const y2 = ~~(event.offsetY / anno.canvas_scale);
-    svg_elem.data("x2", x2);
-    svg_elem.data("y2", y2);
-    try {
-      comp.remove();
-      svg.removeChild(comp);
-    } catch(e) {}
-    comp = anno.make_rect_dom(x1, y1, x2, y2, `#${anno.tool.color}`, '#ffffff', 2, anno.tool.label);
-    if (comp) {
-      svg.appendChild(comp);
-      svg_elem.data("lastcomp", comp);
-      anno.comp_mouse_action(comp);
+    const point = [~~(event.offsetX / anno.canvas_scale), ~~(event.offsetY / anno.canvas_scale)];
+    let points_ary = svg_elem.data("points");
+    if (!points_ary) {
+      points_ary = [];
+      points_ary.push(point);
     }
-    return false;
-  };
-  // キャンバス上でマウスを離したとき、矩形を確定
-  svg.onmouseup = (event) => {
-    if (event.which != 1) return false;
-    if (anno.tool.cursor) return false; // カーソルツールの場合は何もしない
+    points_ary = add_mode ? points_ary : points_ary.slice(0, -1);
+    points_ary.push(point);
+    const points_str = anno.join_points(points_ary);
+    comp = anno.make_polygon_dom(points_str, `#${anno.tool.color}`, '#ffffff', 2, anno.tool.label, comp);
+    svg.appendChild(comp);
+    svg_elem.data("lastcomp", comp);
+    svg_elem.data("points", points_ary);
+    if (add_mode && points_ary.length > 2) {
+      anno.load_annolist(svg_elem);
+    }
+  }
+  // キャンバス上でマウスを押したとき
+  svg.onmousedown = (event) => {
     event.stopPropagation();
-    svg_elem.data("down", false);
-    svg_elem.data("lastcomp", null);
-    return false;
-  };
-};
-/**
- * アノテーションのマウスアクション
- * @param {Element} comp アノテーションのDOM
- **/
-anno.comp_mouse_action = (comp) => {
-  if (!comp) return;
-  comp.onmousedown = (event) => {
+    // 左クリック以外の場合
     if (event.which != 1) return false;
-    event.stopPropagation();
-    const comp_elem = $(event.currentTarget);
+    const comp = event.target;
+    const comp_elem = $(event.target);
     // カーソルツールの場合
     if (anno.tool.cursor) {
-      const x = parseInt(comp_elem.attr('x'));
-      const y = parseInt(comp_elem.attr('y'));
-      const w = parseInt(comp_elem.attr('width'));
-      const h = parseInt(comp_elem.attr('height'));
       const x1 = ~~(event.offsetX / anno.canvas_scale);
       const y1 = ~~(event.offsetY / anno.canvas_scale);
-        let edge = undefined;
+      // 矩形の場合
       if (comp_elem.attr('data-anno-type')=='rect') {
+        const x = parseInt(comp_elem.attr('x'));
+        const y = parseInt(comp_elem.attr('y'));
+        const w = parseInt(comp_elem.attr('width'));
+        const h = parseInt(comp_elem.attr('height'));
+        let edge = undefined;
         edge = 'center';
         edge = Math.abs(x-x1) < 20 && Math.abs(y-y1) < 20 ? 'left-top' : edge;
         edge = Math.abs(x+w-x1) < 20 && Math.abs(y-y1) < 20 ? 'right-top' : edge;
         edge = Math.abs(x-x1) < 20 && Math.abs(y+h-y1) < 20 ? 'left-bottom' : edge;
         edge = Math.abs(x+w-x1) < 20 && Math.abs(y+h-y1) < 20 ? 'right-bottom' : edge;
+        comp_elem.data({
+          "edge": edge,
+          "x1": x1,
+          "y1": y1,
+        });
       }
-      comp_elem.data({
-        "edge": edge,
-        "x1": x1,
-        "y1": y1,
-      });
-      const svg_elem = anno.canvas_container.find('#canvas svg');
-      svg_elem.children().attr('stroke-width', `2.0`);
-      svg_elem.data('selectcomp', event.currentTarget);
+      // 多角形の場合
+      else if (comp_elem.attr('data-anno-type')=='polygon') {
+        const points_ary = anno.parse_points(comp_elem.attr('points'));
+        let edge = -1;
+        points_ary.forEach((point, i) => {
+          edge = Math.abs(point[0]-x1) < 20 && Math.abs(point[1]-y1) < 20 ? i : edge;
+        });
+        comp_elem.data({
+          "edge": edge,
+          "x1": x1,
+          "y1": y1,
+          "points": points_ary,
+        });
+      }
+      svg_elem.data('selectcomp', comp);
       svg_elem.append(comp_elem); // 最前面に移動
       anno.blur_comp();
       comp_elem.attr('stroke-width', `5.0`);
@@ -669,25 +658,51 @@ anno.comp_mouse_action = (comp) => {
       anno.canvas_container.find('.anno-list').find(`[data-anno-id='${id}']`).css('background-color', 'var(--bs-list-group-action-active-bg)');
       return false;
     }
+    // 矩形ツールの場合
+    if (anno.tool.bbox) {
+      svg_elem.data({
+        "down": true,
+        "lastcomp": null,
+        "x1": ~~(event.offsetX / anno.canvas_scale),
+        "y1": ~~(event.offsetY / anno.canvas_scale),
+      });
+      return false;
+    }
+    // 多角形ツールの場合
+    if (anno.tool.polygon) {
+      // マウスダウンしていない場合
+      if (!svg_elem.data("down")) {
+        svg_elem.data({
+          "down": true,
+          "lastcomp": null,
+        });
+      }
+      mk_poly(svg, svg_elem, event, true);
+      return false;
+    }
   };
-  comp.onmousemove = (event) => {
-    if (event.which != 1) return false;
-    //event.stopPropagation();
-    const comp_elem = $(event.currentTarget);
-    const x1 = comp_elem.data("x1");
-    const y1 = comp_elem.data("y1");
-    const x2 = ~~(event.offsetX / anno.canvas_scale);
-    const y2 = ~~(event.offsetY / anno.canvas_scale);
+  // キャンバス上でマウスを動かしたとき
+  svg.onmousemove = (event) => {
+    event.stopPropagation();
+    // 左クリック以外の場合
+    if (event.which != 1 && !anno.tool.polygon) return false;
     // カーソルツールの場合
     if (anno.tool.cursor) {
-      const x = parseInt(comp_elem.attr('x'));
-      const y = parseInt(comp_elem.attr('y'));
-      const w = parseInt(comp_elem.attr('width'));
-      const h = parseInt(comp_elem.attr('height'));
-      const mw = parseInt(comp_elem.parent().attr('width'));
-      const mh = parseInt(comp_elem.parent().attr('height'));
+      const comp = svg_elem.data('selectcomp');
+      const comp_elem = $(comp ? comp : event.target);
+      const x1 = comp_elem.data("x1");
+      const y1 = comp_elem.data("y1");
+      const x2 = ~~(event.offsetX / anno.canvas_scale);
+      const y2 = ~~(event.offsetY / anno.canvas_scale);
       const edge = comp_elem.data('edge');
+      // 矩形の場合
       if (comp_elem.attr('data-anno-type')=='rect') {
+        const x = parseInt(comp_elem.attr('x'));
+        const y = parseInt(comp_elem.attr('y'));
+        const w = parseInt(comp_elem.attr('width'));
+        const h = parseInt(comp_elem.attr('height'));
+        const mw = parseInt(svg_elem.attr('width'));
+        const mh = parseInt(svg_elem.attr('height'));
         if (edge == 'center') {
           comp_elem.attr('x', Math.min(Math.max(x+(x2-x1), 0), mw-w));
           comp_elem.attr('y', Math.min(Math.max(y+(y2-y1), 0), mh-h));
@@ -708,25 +723,109 @@ anno.comp_mouse_action = (comp) => {
           comp_elem.attr('width', Math.min(Math.max(w+(x2-x1), 20), mw-x));
           comp_elem.attr('height', Math.min(Math.max(h+(y2-y1), 20), mh-y));
         }
-        comp_elem.data('x1', x2);
-        comp_elem.data('y1', y2);
-    }
+      }
+      // 多角形の場合
+      if (comp_elem.attr('data-anno-type')=='polygon') {
+        const points_ary = [...comp_elem.data('points')];
+        const mx = x2 - x1;
+        const my = y2 - y1;
+        if (points_ary) {
+          if (edge < 0) {
+            const mw = parseInt(svg_elem.attr('width'));
+            const mh = parseInt(svg_elem.attr('height'));
+            let over = false;
+            points_ary.forEach((point, i) => {
+              if (point[0]+mx < 0 || point[0]+mx > mw || point[1]+my < 0 || point[1]+my > mh) {
+                over = true;
+              }
+              points_ary[i] = [point[0]+mx, point[1]+my];
+            });
+            if (over) return;
+            comp_elem.data('points', points_ary);
+          } else {
+            points_ary[edge] = [x2, y2];
+          }
+          comp_elem.attr('points', anno.join_points(points_ary));
+        }
+      }
+      comp_elem.data('x1', x2);
+      comp_elem.data('y1', y2);
       return false;
     }
-  };
-  comp.onmouseup = (event) => {
-    if (event.which != 1) return false;
-    //event.stopPropagation();
-    const comp_elem = $(event.currentTarget);
-    // カーソルツールの場合
-    if (anno.tool.cursor) {
-      return false;
-    }
+    // マウスダウンしていない場合
+    if (!svg_elem.data("down")) return;
     // 矩形ツールの場合
     if (anno.tool.bbox) {
-      anno.load_annolist(comp_elem.parent());
+      let comp = svg_elem.data("lastcomp");
+      const x1 = svg_elem.data("x1");
+      const y1 = svg_elem.data("y1");
+      const x2 = ~~(event.offsetX / anno.canvas_scale);
+      const y2 = ~~(event.offsetY / anno.canvas_scale);
+      svg_elem.data("x2", x2);
+      svg_elem.data("y2", y2);
+      if (comp) comp.remove();
+      comp = anno.make_rect_dom(x1, y1, x2, y2, `#${anno.tool.color}`, '#ffffff', 2, anno.tool.label);
+      if (comp) {
+        svg.appendChild(comp);
+        svg_elem.data("lastcomp", comp);
+      }
     }
+    // 多角形ツールの場合
+    if (anno.tool.polygon) {
+      mk_poly(svg, svg_elem, event, false);
+    }
+    return false;
   };
+  // キャンバス上でマウスを離したとき、矩形を確定
+  svg.onmouseup = (event) => {
+    event.stopPropagation();
+    // 左クリック以外の場合
+    if (event.which != 1) return false;
+    // カーソルツールの場合
+    if (anno.tool.cursor) return false;
+    // 矩形ツールの場合
+    if (anno.tool.bbox) {
+      anno.clear_svg_data(svg_elem);
+      anno.load_annolist(svg_elem);
+    }
+    // 矩形ツールの場合
+    if (anno.tool.polygon) {
+      anno.load_annolist(svg_elem);
+    }
+    return false;
+  };
+};
+/**
+ * アノテーション作業中のデータをクリアする
+ * @param {$} svg_elem SVG要素
+ **/
+anno.clear_svg_data = (svg_elem) => {
+  // 多角形ツールの場合
+  if (anno.tool.polygon) {
+    const comp = svg_elem.data("lastcomp");
+    if (comp) {
+      // 最後の点を削除
+      let points_ary = svg_elem.data("points");
+      const comp_elem = $(comp);
+      if (points_ary && points_ary.length > 3) {
+        points_ary = points_ary.slice(0, -1);
+        comp_elem.attr('points', anno.join_points(points_ary));
+      } else {
+        // 3点以下の場合は要素を削除
+        comp_elem.remove();
+      }
+    };
+    anno.load_annolist(svg_elem);
+  }
+  svg_elem.data({
+    "down": false,
+    "lastcomp": null,
+    "x1": null,
+    "y1": null,
+    "x2": null,
+    "y2": null,
+    "points": null
+  });
 };
 /**
  * 矩形のDOMを作成
@@ -759,6 +858,89 @@ anno.make_rect_dom = (x1, y1, x2, y2, stroke, fill, stroke_width, label) => {
   return rect;
 };
 /**
+ * 複数の線を結ぶ直線のDOMを作成
+ * @param {string} points_str 点の文字列
+ * @param {string} stroke 線の色
+ * @param {string} fill 塗りつぶしの色
+ * @param {number} stroke_width 線の太さ
+ * @param {string} label ラベル
+ * @return {Element} 直線のDOM
+ **/
+anno.make_polylines_dom = (points_str, stroke, fill, stroke_width, label) => {
+  const polyline = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+  polyline.setAttribute('id', iinfer.randam_string(16));
+  polyline.setAttribute('points', points_str);
+  polyline.setAttribute('fill', `${fill}`);
+  polyline.setAttribute('stroke', `${stroke}`);
+  polyline.setAttribute('stroke-width', `${stroke_width}`);
+  polyline.setAttribute('fill-opacity', `0.5`);
+  polyline.setAttribute('data-anno-label', `${label}`);
+  polyline.setAttribute('data-anno-type', `polyline`);
+  return polyline;
+}
+/**
+ * 多角形のDOMを作成
+ * @param {string} points_str 点の文字列
+ * @param {string} stroke 線の色
+ * @param {string} fill 塗りつぶしの色
+ * @param {number} stroke_width 線の太さ
+ * @param {string} label ラベル
+ * @param {Element} lastcomp 直前のアノテーション
+ * @return {Element} 多角形のDOM
+ **/
+anno.make_polygon_dom = (points_str, stroke, fill, stroke_width, label, lastcomp=undefined) => {
+  const polygon = !lastcomp ? document.createElementNS("http://www.w3.org/2000/svg", "polygon") : lastcomp;
+  if (!lastcomp) polygon.setAttribute('id', iinfer.randam_string(16));
+  polygon.setAttribute('points', points_str);
+  polygon.setAttribute('fill', `${fill}`);
+  polygon.setAttribute('stroke', `${stroke}`);
+  polygon.setAttribute('stroke-width', `${stroke_width}`);
+  polygon.setAttribute('fill-opacity', `0.5`);
+  polygon.setAttribute('data-anno-label', `${label}`);
+  polygon.setAttribute('data-anno-type', `polygon`);
+  return polygon;
+};
+/**
+ * 点の文字列を配列に変換
+ * @param {string} points_str 点の文字列
+ * @return {Array} 点の配列
+ * @example
+ * anno.parse_points('0,0 100,0 100,100 0,100');
+ * // => [[0,0],[100,0],[100,100],[0,100]]
+ **/
+anno.parse_points = (points_str) => {
+  try {
+    const points = points_str.split(' ');
+    const points_ary = [];
+    points.forEach((point) => {
+      const xy = point.split(',');
+      points_ary.push([parseInt(xy[0].trim()), parseInt(xy[1].trim())]);
+    });
+    return points_ary;
+  } catch(e) {
+    return [];
+  }
+};
+/**
+ * 点の配列を文字列に変換
+ * @param {Array} points_ary 点の配列
+ * @return {string} 点の文字列
+ * @example
+ * anno.join_points([[0,0],[100,0],[100,100],[0,100]]);
+ * // => '0,0 100,0 100,100 0,100'
+ **/
+anno.join_points = (points_ary) => {
+  try {
+    let points_str = '';
+    points_ary.forEach((point) => {
+      points_str += `${point[0]},${point[1]} `;
+    });
+    return points_str.trim();
+  } catch(e) {
+    return '';
+  }
+};
+/**
  * コンポーネントの選択状態を解除
  **/
 anno.blur_comp = () => {
@@ -787,7 +969,6 @@ anno.dragscroll = (target_elem, target) => {
     if (!target_elem.data("st")) target_elem.data("st", 0);
     target_elem.data({
       "down": true,
-      "move": false,
       "x": event.clientX,
       "y": event.clientY,
       "scrollleft": target_elem.data("sl"),
@@ -816,6 +997,154 @@ anno.dragscroll = (target_elem, target) => {
     return false;
   };
 };
+/**
+ * 選択中のフォルダ内のSVGファイルを元にアノテーションファイルを生成して保存
+ * @param {$} menu_elem メニュー要素
+ **/
+anno.save_annoall = (menu_elem) => {
+  const save_type = menu_elem.attr('data-save-type');
+  const save_src = menu_elem.attr('data-save-src');
+  const deploy_dir = anno.left_container.find('.deploy_names').val();
+  const conf = anno.tool.conf;
+  if (!save_type || !save_src || !conf) {
+    iinfer.message('Annotation save error.');
+    return;
+  }
+  const save_path = menu_elem.attr('data-save-path').replace(deploy_dir, '');
+  const labels = anno.get_tool_labels();
+  if (labels.length <= 0) {
+    iinfer.message('The label is not set.');
+    return;
+  }
+  if (!window.confirm('Caution:\n'
+                    +'1.Save the label before performing this operation.\n'
+                    +'2.Save the annotation before performing this operation.\n'
+                    +'3.If an annotation file has already been saved, it will be overwritten.\n'
+                    +'\nShall we continue?')) return;
+  const opt = iinfer.get_server_opt(false, anno.left_container);
+  opt['mode'] = 'client';
+  opt['cmd'] = 'file_list';
+  opt['capture_stdout'] = true;
+  opt['svpath'] = save_src;
+  iinfer.show_loading();
+  iinfer.sv_exec_cmd(opt).then(res => {
+    if(!res[0] || !res[0]['success']) {
+      iinfer.hide_loading();
+      iinfer.message(res);
+      return;
+    }
+    const file_list = Object.entries(res[0]['success']).sort();
+    file_list.forEach(async ([key, node]) => {
+      if(!node['path']) return;
+      if(!node['path'].startsWith(save_src)) return;
+      if(!node['children']) return;
+      const coco = {};
+      coco['info'] = {
+        "description": `Dataset from "${node['path']}"`,
+        "url": window.location.href,
+        "version": "1.0",
+        "year": new Date().getFullYear(),
+        "contributor": `${$('.copyright').text()}`,
+        "date_created": iinfer.toDateStr(new Date()),
+      };
+      coco['licenses'] = [{
+        "id": 0,
+        "name": "Unknown",
+        "url": ""
+      }];
+      coco['categories'] = labels.map((label, i) => {
+        return {
+          "id": i,
+          "name": label,
+          "supercategory": ""
+        };
+      });
+      coco['images'] = [];
+      coco['annotations'] = [];
+      // 選択中のディレクトリ内のファイル一覧からSVGファイルを取得
+      const children = Object.entries(node['children']);
+      if (children.length <= 0) {
+        iinfer.hide_loading();
+        iinfer.message('Not found SVG files.');
+      }
+      for (const [k, n] of children) {
+        if(n['is_dir']) return;
+        if(!n['path'].endsWith('.svg')) continue;
+        // SVGファイルの読込
+        const constr = btoa(`${opt['host']}\t${opt['port']}\t${opt['svname']}\t${opt['password']}\t${n['path']}\t0.0`);
+        const svg_str = await fetch(`annotation/get_img/${constr}?r=${iinfer.randam_string(8)}`);
+        const svg_elem = $(await svg_str.text());
+        // 画像情報を取得
+        const img_id = coco['images'].length;
+        coco['images'].push({
+          "id": img_id,
+          "file_name": n['name'].replace(/\.svg$/, ''),
+          "height": parseInt(svg_elem.attr('height')),
+          "width": parseInt(svg_elem.attr('width')),
+          "license": 0,
+          "flickr_url": "",
+          "coco_url": "",
+          "date_captured": n['last']
+        });
+        // svgからcoco形式のアノテーションを取得
+        svg_elem.children().each((i, comp) => {
+          const comp_elem = $(comp);
+          const cate_id = labels.indexOf(comp_elem.attr('data-anno-label'));
+          if (save_type=="coco") {
+            // 矩形の場合
+            if (comp_elem.attr('data-anno-type')=='rect') {
+              const x = parseInt(comp_elem.attr('x'));
+              const y = parseInt(comp_elem.attr('y'));
+              const w = parseInt(comp_elem.attr('width'));
+              const h = parseInt(comp_elem.attr('height'));
+              coco['annotations'].push({
+                "id": coco['annotations'].length,
+                "image_id": img_id,
+                "category_id": cate_id,
+                "segmentation": [],
+                "bbox": [x, y, w, h],
+                "area": w * h,
+                "iscrowd": 0
+              });
+            }
+            // 多角形の場合
+            if (comp_elem.attr('data-anno-type')=='polygon') {
+              const points_ary = anno.parse_points(comp_elem.attr('points'));
+              const x_ary = points_ary.map((point) => point[0]);
+              const y_ary = points_ary.map((point) => point[1]);
+              const x = Math.min(...x_ary);
+              const y = Math.min(...y_ary);
+              const w = Math.max(...x_ary) - x;
+              const h = Math.max(...y_ary) - y;
+              coco['annotations'].push({
+                "id": coco['annotations'].length,
+                "image_id": img_id,
+                "category_id": cate_id,
+                "segmentation": [points_ary.flat()],
+                "bbox": [x, y, w, h],
+                "area": w * h,
+                "iscrowd": 0
+              });
+            }
+          }
+        });
+        svg_elem.remove();
+      }
+      if (save_type=="coco" && coco['annotations'].length > 0) {
+        // cocoファイルの保存
+        const formData = new FormData();
+        formData.append('files', new Blob([JSON.stringify(coco)], {type:"application/json"}), save_path);
+        iinfer.file_upload(anno.left_container, deploy_dir, formData, orverwrite=true, progress_func=(e) => {}, success_func=(target, svpath, data) => {
+          iinfer.hide_loading();
+          iinfer.message(`Saved in. save_path=${deploy_dir}${save_path}`);
+        }, error_func=(target, svpath, data) => {
+          iinfer.hide_loading();
+        });
+      }
+    });
+  });
+
+};
 anno.tool = {};
 /**
  * ツールの初期化
@@ -826,6 +1155,7 @@ anno.init_tool_button = () => {
     anno.blur_comp();
     $(elem).addClass('active');
   }
+  // 選択ツール
   anno.canvas_container.find('.tool_bot_cursor').off('click').on('click', () => {
     anno.tool.cursor = true;
     anno.tool.bbox = false;
@@ -833,6 +1163,7 @@ anno.init_tool_button = () => {
     toggle_func('.tool_bot_cursor');
   });
   anno.canvas_container.find('.tool_bot_cursor').click();
+  // 矩形ツール
   anno.canvas_container.find('.tool_bot_bbox').off('click').on('click', () => {
     if (anno.canvas_container.find('.tag_label').text() == '') return;
     anno.tool.cursor = false;
@@ -840,6 +1171,7 @@ anno.init_tool_button = () => {
     anno.tool.polygon = false;
     toggle_func('.tool_bot_bbox');
   });
+  // 多角形ツール
   anno.canvas_container.find('.tool_bot_polygon').off('click').on('click', () => {
     if (anno.canvas_container.find('.tag_label').text() == '') return;
     anno.tool.cursor = false;
@@ -847,6 +1179,7 @@ anno.init_tool_button = () => {
     anno.tool.polygon = true;
     toggle_func('.tool_bot_polygon');
   });
+  // ラベル再読み込みツール
   anno.canvas_container.find('.tool_bot_reload').off('click').on('click', () => {
     const svpath = anno.left_container.find('.deploy_names').val();
     const conf = anno.tool.conf;
@@ -859,11 +1192,13 @@ anno.init_tool_button = () => {
       anno.load_color(`${svpath}${color_file}`);
     }
   });
+  // ラベル保存ツール
   anno.canvas_container.find('.tool_bot_save').off('click').on('click', () => {
     const svpath = anno.left_container.find('.deploy_names').val();
     if (!svpath) return;
     anno.save_label_color(svpath);
   });
+  // アノテーション再読み込みツール
   anno.canvas_container.find('.tool_bot_annoreload').off('click').on('click', () => {
     const img_elem = anno.canvas_container.find('#canvas .canvas_image');
     const node = img_elem.data('node');
@@ -871,18 +1206,23 @@ anno.init_tool_button = () => {
     if (!node || !opt) return;
     anno.load_image(node, opt);
   });
+  // アノテーション保存ツール
   anno.canvas_container.find('.tool_bot_annosave').off('click').on('click', () => {
     const svpath = anno.left_container.find('.deploy_names').val();
     const image_path = anno.canvas_container.find('.image_address').val();
     if (!svpath || !image_path) return;
     anno.save_anno(svpath, image_path, anno.canvas_container.find('#canvas svg'));
   });
+  // キーボード操作
   document.onkeydown = (event) => {
+    const svg_elem = anno.canvas_container.find('#canvas svg');
     if (event.key == 'Delete') {
-      const svg_elem = anno.canvas_container.find('#canvas svg');
       const comp = svg_elem.data('selectcomp');
       if(comp) comp.remove();
       anno.load_annolist(svg_elem);
+    }
+    if (event.key == 'Escape') {
+      anno.clear_svg_data(svg_elem);
     }
   };
 };
