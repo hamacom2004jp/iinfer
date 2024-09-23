@@ -579,7 +579,7 @@ fsapi.viewer = (title, data, mime) => {
     cls = mime == 'application/json' ? 'language-json' : cls;
     cls = mime == 'text/html' ? 'language-html' : cls;
     cls = mime == 'text/x-python' ? 'language-python' : cls;
-    const pre = $(`<pre><code class="${cls}"></code></pre>`);
+    const pre = $(`<pre style="white-space:break-spaces;"><code class="${cls}" style="word-break:break-all;"></code></pre>`);
     viewer_body.append(pre);
     const txt = atob(data);
     const istxt = iinfer.is_text(new TextEncoder().encode(txt));

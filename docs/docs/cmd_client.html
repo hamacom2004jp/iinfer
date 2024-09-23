@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>コマンドリファレンス（clientモード） &mdash; iinfer 2024/09/22 documentation</title>
+  <title>コマンドリファレンス（clientモード） &mdash; iinfer 2024/09/23 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -16,7 +16,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=dacb1dba"></script>
+        <script src="../_static/documentation_options.js?v=7eb399a3"></script>
         <script src="../_static/doctools.js?v=9a2dae69"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -1088,39 +1088,19 @@
 <td><p>〇</p></td>
 <td><p>AIモデルの登録名を指定します</p></td>
 </tr>
-<tr class="row-odd"><td><p>--dataset &lt;データセットディレクトリ&gt;</p></td>
-<td><p>〇</p></td>
-<td><p>データセットディレクトリを指定します</p></td>
-</tr>
-<tr class="row-even"><td><p>--dataset_upload</p></td>
-<td></td>
-<td><p>データセットをサーバーにアップロードします</p></td>
-</tr>
-<tr class="row-odd"><td><p>--model_conf_file &lt;モデル設定ファイル&gt;</p></td>
-<td><p>〇</p></td>
-<td><p>モデル設定ファイルを指定します。複数指定可能ですが、最初に指定したファイルが <cite>train</cite> 時に使用されます</p></td>
-</tr>
-<tr class="row-even"><td><p>--train_type &lt;学習タイプ&gt;</p></td>
-<td><p>〇</p></td>
-<td><p>AIモデルの学習タイプを指定します。 <a class="reference internal" href="#train-type-list"><span class="std std-ref">参照</span></a></p></td>
-</tr>
-<tr class="row-odd"><td><p>--custom_train_py &lt;カスタム学習pyファイル&gt;</p></td>
-<td></td>
-<td><p>独自の学習タイプを作成するときに指定。この時は <cite>--train_type Custom</cite> を指定。</p></td>
-</tr>
-<tr class="row-even"><td><p>--overwrite</p></td>
+<tr class="row-odd"><td><p>--overwrite</p></td>
 <td></td>
 <td><p>学習済みであっても上書きする指定</p></td>
 </tr>
-<tr class="row-odd"><td><p>--retry_count &lt;リトライ回数&gt;</p></td>
+<tr class="row-even"><td><p>--retry_count &lt;リトライ回数&gt;</p></td>
 <td></td>
 <td><p>Redisサーバーへの再接続回数を指定。0以下を指定すると永遠に再接続を行う。</p></td>
 </tr>
-<tr class="row-even"><td><p>--retry_interval &lt;リトライ間隔&gt;</p></td>
+<tr class="row-odd"><td><p>--retry_interval &lt;リトライ間隔&gt;</p></td>
 <td></td>
 <td><p>Redisサーバーに再接続までの秒数を指定</p></td>
 </tr>
-<tr class="row-odd"><td><p>--timeout &lt;タイムアウト&gt;</p></td>
+<tr class="row-even"><td><p>--timeout &lt;タイムアウト&gt;</p></td>
 <td></td>
 <td><p>サーバーの応答が返ってくるまでの最大待ち時間を指定</p></td>
 </tr>

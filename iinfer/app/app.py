@@ -204,13 +204,8 @@ class IinferApp:
                     return 1, ret
 
             elif args.cmd == 'train':
-                if args.model_conf_file is not None:
-                    args.model_conf_file = [Path(f) for f in args.model_conf_file if f is not None and f != '']
-                args.dataset = Path(args.dataset) if args.dataset is not None else None
-                args.custom_train_py = Path(args.custom_train_py) if args.custom_train_py is not None else None
-
-                ret = self.cl.train(args.name, args.dataset, args.dataset_upload, args.model_conf_file, args.train_type,
-                                args.custom_train_py, overwrite=args.overwrite, retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
+                ret = self.cl.train(args.name, overwrite=args.overwrite,
+                                    retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
                 common.print_format(ret, args.format, tm, args.output_json, args.output_json_append)
                 if 'success' not in ret:
                     return 1, ret

@@ -1,0 +1,18 @@
+# 含めるファイル
+include iinfer/*.yml
+include iinfer/extensions/**
+include iinfer/docker/**
+include iinfer/licenses/**
+include iinfer/tools/**
+include iinfer/web/**
+
+# 除外するファイル
+global-exclude *.pyc
+global-exclude *.swp
+global-exclude .DS_Store
+global-exclude iinfer/extensions/data/*.json
+global-exclude iinfer/extensions/data/*/*.jpg
+global-exclude iinfer/extensions/data/*/*.svg
+
+# 特定のディレクトリを除外する
+recursive-exclude * build

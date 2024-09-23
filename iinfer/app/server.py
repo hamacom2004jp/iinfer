@@ -242,23 +242,11 @@ class Server(filer.Filer):
                                      train_dataset, train_type, custom_train_py, overwrite)
 
                 elif msg[0] == 'train':
-                    if msg[4] == 'None':
-                        model_conf_file = None
-                    else:
-                        model_conf_file = msg[4].split(',')
-                    if msg[5] == 'None':
-                        model_conf_bin = None
-                    else:
-                        model_conf_bin = [base64.b64decode(m) for m in msg[5].split(',')]
-                    if msg[6] == 'None':
-                        custom_train_py = None
-                    else:
-                        custom_train_py = base64.b64decode(msg[6])
-                    if msg[7] == 'True':
+                    if msg[3] == 'True':
                         overwrite = True
                     else:
                         overwrite = False
-                    st = self.train(msg[1], msg[2], msg[3], model_conf_file, model_conf_bin, custom_train_py, overwrite)
+                    st = self.train(msg[1], msg[2], overwrite)
 
                 elif msg[0] == 'deploy_list':
                     st = self.deploy_list(msg[1])
@@ -556,19 +544,13 @@ class Server(filer.Filer):
             shutil.copytree(self.data_dir / "mmsegmentation" / "configs", deploy_dir / "configs", dirs_exist_ok=True)
             self.logger.info(f"Copy mmsegmentation configs to {str(deploy_dir / 'configs')}")
 
-    def train(self, reskey:str, name:str, train_type:str,
-              model_conf_file:List[str], model_conf_bin:List[bytes],
-              custom_train_py:bytes, overwrite:bool):
+    def train(self, reskey:str, name:str, overwrite:bool):
         """
-        モデルをデプロイする
+        モデルを学習する
 
         Args:
             reskey (str): レスポンスキー
             name (dict): モデル名
-            train_type (str): 学習方法のタイプ
-            model_conf_file (List[str]): モデル設定のファイル名
-            model_conf_bin (List[bytes]): モデル設定ファイル
-            custom_train_py (bytes): 学習のPythonスクリプト
             overwrite (bool): 上書きするかどうか
         """
         if name is None or name == "":
@@ -581,94 +563,44 @@ class Server(filer.Filer):
             self.logger.warn(f"{name} has already started a session.")
             self.redis_cli.rpush(reskey, {"warn": f"{name} has already started a session."})
             return self.RESP_WARN
-        if not overwrite and deploy_dir.exists():
-            self.logger.warn(f"Could not be deployed. '{deploy_dir}' already exists")
-            self.redis_cli.rpush(reskey, {"warn": f"Could not be deployed. '{deploy_dir}' already exists"})
+        conf_path = deploy_dir / "conf.json"
+        if not conf_path.exists():
+            self.logger.warn(f"Conf path {str(conf_path)} does not exist")
+            self.redis_cli.rpush(reskey, {"warn": f"Conf path {str(conf_path)} does not exist"})
             return self.RESP_WARN
-        if model_conf_file is None or len(model_conf_file) <= 0:
-            self.logger.warning(f"model_conf_file path {str(model_conf_file)} is None")
-            return {"error": f"model_conf_file path {str(model_conf_file)} is None"}
-
-        if train_type != "Custom":
-            if train_type not in common.BASE_TRAIN_MODELS:
-                self.logger.warn(f"Incorrect train_type. '{train_type}'")
-                self.redis_cli.rpush(reskey, {"warn": f"Incorrect train_type. '{train_type}'"})
+        with open(conf_path, "r") as cf:
+            conf = json.load(cf)
+            if "model_conf_file" not in conf:
+                self.logger.warn(f"model_conf_file is not in conf.json")
+                self.redis_cli.rpush(reskey, {"warn": f"model_conf_file is not in conf.json"})
                 return self.RESP_WARN
-
-        common.mkdirs(deploy_dir)
-        def _save_s(file:str, data:bytes, ret_fn:bool=False):
-            if file is None or data is None:
-                return False, None
-            file = deploy_dir / file
-            with open(file, "wb") as f:
-                f.write(data)
-                self.logger.info(f"Save {file} to {str(deploy_dir)}")
-            return True, file if ret_fn else None
-
-        def _save_m(name:str, files:List[str], datas:List[bytes]):
-            if files is not None and datas is None:
-                self.logger.warn(f"{name}_file is not None but {name}_bin is None.")
-                self.redis_cli.rpush(reskey, {"warn": f"{name}_file is not None but {name}_bin is None."})
-                return False, files
-            if files is None and datas is not None:
-                self.logger.warn(f"{name}_file is None but {name}_bin is not None.")
-                self.redis_cli.rpush(reskey, {"warn": f"{name}_file is None but {name}_bin is not None."})
-                return False, files
-            if files is not None:
-                files = [deploy_dir / cf for cf in files if cf is not None and cf != '']
-                for i, cf in enumerate(files):
-                    with open(cf, "wb") as f:
-                        f.write(datas[i])
-                        self.logger.info(f"Save {cf} to {str(deploy_dir)}")
-            return True, files
-        ret, model_conf_file = _save_m('model_conf', model_conf_file, model_conf_bin)
-        if not ret: return self.RESP_WARN
-
-        custom_train_file = None
-        if custom_train_py is not None:
-            custom_train_file = deploy_dir / "custom_train.py"
-            with open(custom_train_file, "wb") as f:
-                f.write(custom_train_py)
-                self.logger.info(f"Save custom_train.py to {str(deploy_dir)}")
-
-        with open(deploy_dir / "train_conf.json", "w") as f:
-            conf = dict(model_img_width=224, model_img_height=224, train_type=train_type,
-                        model_conf_file=model_conf_file, custom_train_py=(custom_train_file if custom_train_file is not None else None))
-            json.dump(conf, f, default=common.default_json_enc)
-            self.logger.info(f"Save train_conf.json to {str(deploy_dir)}")
-
-        self._gitpull(reskey, deploy_dir, train_type)
-        train_obj = None
-        try:
-            ret, train_obj = module.build_train(conf["train_type"], conf["custom_train_py"], self.logger)
-            if not ret:
-                self.redis_cli.rpush(reskey, train_obj)
+            if "train_type" not in conf:
+                self.logger.warn(f"train_type is not in conf.json")
+                self.redis_cli.rpush(reskey, {"warn": f"train_type is not in conf.json"})
                 return self.RESP_WARN
-        except Exception as e:
-            self.logger.warn(f"Failed to load Train: {e}", exc_info=True)
-            self.redis_cli.rpush(reskey, {"warn": f"Failed to load Train: {e}"})
-            return self.RESP_WARN
+            custom_train_py = conf["custom_train_py"] if "custom_train_py" in conf else None
+            ret, train_obj = module.build_train(conf["train_type"], custom_train_py, self.logger)
 
-        def _train(train_obj, deploy_dir, model_conf_file, conf, logger):
-            cwd = os.getcwd()
-            try:
-                c = model_conf_file[0] if type(model_conf_file) is list and len(model_conf_file)>0 else str(model_conf_file)
-                os.chdir(deploy_dir)
-                train_obj.train(deploy_dir, c, train_cfg_options=None)
-                train_obj.post_train(deploy_dir, conf)
-            except Exception as e:
-                logger.warn(f"Failed Train: {e}", exc_info=True)
-            finally:
-                os.chdir(cwd)
+            def _train(train_obj, deploy_dir, model_conf_file, conf, logger):
+                cwd = os.getcwd()
+                try:
+                    c = model_conf_file[0] if type(model_conf_file) is list and len(model_conf_file)>0 else str(model_conf_file)
+                    os.chdir(deploy_dir)
+                    train_obj.train(deploy_dir, c, train_cfg_options=None)
+                    train_obj.post_train(deploy_dir, conf)
+                except Exception as e:
+                    logger.warn(f"Failed Train: {e}", exc_info=True)
+                finally:
+                    os.chdir(cwd)
 
-        if self.train_thread is not None and self.train_thread.is_alive():
-            self.logger.warn(f"Training is already running.")
-            self.redis_cli.rpush(reskey, {"warn": f"Training is already running."})
-            return self.RESP_WARN
-        self.train_thread = threading.Thread(target=_train, args=(train_obj, deploy_dir, model_conf_file, conf, self.logger))
-        self.train_thread.start()
+            if self.train_thread is not None and self.train_thread.is_alive():
+                self.logger.warn(f"Training is already running.")
+                self.redis_cli.rpush(reskey, {"warn": f"Training is already running."})
+                return self.RESP_WARN
+            self.train_thread = threading.Thread(target=_train, args=(train_obj, deploy_dir, conf["model_conf_file"], conf, self.logger))
+            self.train_thread.start()
 
-        self.redis_cli.rpush(reskey, {"success": f"Save train_conf.json to {str(deploy_dir)}. Training started. see iinfer_server.log."})
+        self.redis_cli.rpush(reskey, {"success": f"Training started. see {str(deploy_dir)}."})
         return self.RESP_SCCESS
 
     def deploy_list(self, reskey:str):

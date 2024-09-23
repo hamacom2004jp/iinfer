@@ -319,16 +319,25 @@ anno.save_anno = (svpath, image_path, svg_elem) => {
   formData.append('files', new Blob([svg_str], {type:"image/svg+xml"}), `${image_path}.svg`);
   iinfer.file_upload(anno.left_container, svpath, formData, orverwrite=true, progress_func=(e) => {}, success_func=(target, svpath, data) => {
     const fl_svg_elem = anno.left_container.find(`.file-list [data-path='${svpath}${image_path}.svg']`);
-    const src = fl_svg_elem.attr('src');
-    if (src) {
+    const fl_img_elem = anno.left_container.find(`.file-list [data-path='${svpath}${image_path}']`);
+    const svg_src = fl_svg_elem.attr('src');
+    const img_src = fl_img_elem.attr('src');
+    if (svg_src) {
       // アノテーション画像がすでに存在している場合はリロード
-      fl_svg_elem.attr('src', `${src.split('?')[0]}?r=${iinfer.randam_string(8)}`);
-    } else if (anno.tool.conf['train_dataset'] && anno.tool.conf['deploy_dir']){
+      fl_svg_elem.attr('src', `${svg_src.split('?')[0]}?r=${iinfer.randam_string(8)}`);
+    } else if (img_src) {
+      // アノテーション画像が無く元画像が存在している場合はSVGを追加
+      const conary = atob(img_src.split('?')[0].split('/').slice(-1)[0]).split('\t');
+      const constr = "annotation/get_img/" + btoa(`${conary.slice(0, 4).join('\t')}\t${svpath}${image_path}.svg\t${conary.slice(5)}`);
+      const svg_elem = $(`<img src="${constr}?r=${iinfer.randam_string(8)}" data-path="${svpath}${image_path}.svg" style="position: absolute; left: 0px; top: 0px;"/>`);
+      svg_elem.attr('width', fl_img_elem.attr('width')).attr('height', fl_img_elem.attr('height'));
+      fl_img_elem.parent().append(svg_elem);
+    /*} else if (anno.tool.conf['train_dataset'] && anno.tool.conf['deploy_dir']){
       // アノテーション画像が存在しない場合はファイルリストからリロード
       const train_dataset = anno.tool.conf['train_dataset'].replace(anno.tool.conf['deploy_dir'], '').replace(/\\/, '/');
       const image_dir = image_path.split('/').slice(0, -1).join('/');
       anno.load_filelist(`${svpath}${train_dataset}`, `${svpath}${image_dir}`, anno.left_container.find('.tree-menu'));
-    }
+    */}
     iinfer.hide_loading();
     iinfer.message(`Saved in. image_path=${svpath}${image_path}.svg`);
   }, error_func=(target, svpath, data) => {
@@ -374,7 +383,7 @@ anno.load_filelist = (basepath, svpath, current_ul_elem) => {
     const deploy_name = path_parts[1];
     const input_name = path_parts[2];
     const subset = path_parts.slice(-1)[0];
-    const save_path = `/${deploy_name}/${input_name}/annotations/det_${subset}.json`;
+    const save_path = `/${deploy_name}/${input_name}/${subset}.json`;
     const menu_elem = anno.canvas_container.find('.tool_bot_annosave_all_coco');
     menu_elem.find('span').html(`Save MS COCO format to "${save_path}"`);
     menu_elem.attr('data-save-type', 'coco');
@@ -436,10 +445,12 @@ anno.load_filelist = (basepath, svpath, current_ul_elem) => {
       const children = node['children'];
       Object.entries(children).forEach(([k, n]) => {
         if(n['is_dir']) return;
+        if(!n['mime_type'].startsWith('image')) return;
         // サムネイル画像の表示
         const thum_size = 100;
+        const img_name = n['path'].split('/').slice(-1)[0];
         const constr = btoa(`${opt['host']}\t${opt['port']}\t${opt['svname']}\t${opt['password']}\t${n['path']}\t${thum_size}`);
-        const img_elem = $(`<img src="annotation/get_img/${constr}?r=${iinfer.randam_string(8)}" data-path="${n['path']}"/>`);
+        const img_elem = $(`<img src="annotation/get_img/${constr}?r=${iinfer.randam_string(8)}" data-path="${n['path']}" alt="${img_name}"/>`);
         let card_elem = undefined;
         // SVGファイルの場合は元画像があるかどうかを確認
         if(n['path'].endsWith('.svg')) {
@@ -609,7 +620,7 @@ anno.svg_mouse_action = (svg_elem, svg) => {
   }
   // キャンバス上でマウスを押したとき
   svg.onmousedown = (event) => {
-    event.stopPropagation();
+    //event.stopPropagation();
     // 左クリック以外の場合
     if (event.which != 1) return false;
     const comp = event.target;
@@ -683,7 +694,7 @@ anno.svg_mouse_action = (svg_elem, svg) => {
   };
   // キャンバス上でマウスを動かしたとき
   svg.onmousemove = (event) => {
-    event.stopPropagation();
+    //event.stopPropagation();
     // 左クリック以外の場合
     if (event.which != 1 && !anno.tool.polygon) return false;
     // カーソルツールの場合
@@ -778,7 +789,7 @@ anno.svg_mouse_action = (svg_elem, svg) => {
   };
   // キャンバス上でマウスを離したとき、矩形を確定
   svg.onmouseup = (event) => {
-    event.stopPropagation();
+    //event.stopPropagation();
     // 左クリック以外の場合
     if (event.which != 1) return false;
     // カーソルツールの場合

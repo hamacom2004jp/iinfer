@@ -215,18 +215,12 @@ class Client(object):
 
         return res_json
 
-    def train(self, name:str, dataset:Path, dataset_upload:bool, model_conf_file:List[Path], train_type:str, custom_train_py:Path,
-              overwrite:bool, retry_count:int=3, retry_interval:int=5, timeout:int = 3*3600):
+    def train(self, name:str, overwrite:bool, retry_count:int=3, retry_interval:int=5, timeout:int = 3*3600):
         """
         モデルをRedisサーバーで学習する
 
         Args:
             name (str): モデル名
-            dataset (Path): データセットディレクトリのパス
-            dataset_upload (bool): データセットをサーバーにアップロードするかどうか
-            model_conf_file (List[Path]): モデル設定ファイルのパス
-            train_type (str): 学習方法のタイプ
-            custom_train_py (Path): 学習スクリプトのパス
             overwrite (bool): モデルを上書きするかどうか
             retry_count (int, optional): リトライ回数. Defaults to 3.
             retry_interval (int, optional): リトライ間隔. Defaults to 5.
@@ -241,73 +235,8 @@ class Client(object):
         if " " in name:
             self.logger.warning(f"name contains whitespace.")
             return {"error": f"name contains whitespace."}
-        if train_type is None:
-            self.logger.warning(f"train_type is empty.")
-            return {"error": f"train_type is empty."}
-        if train_type not in common.BASE_TRAIN_MODELS and train_type != "Custom":
-            self.logger.warning(f"Unknown train_type. {train_type}")
-            return {"error": f"Unknown train_type. {train_type}"}
-        if dataset is None or not dataset.exists():
-            self.logger.warning(f"dataset path {str(dataset)} does not exist")
-            return {"error": f"dataset path {str(dataset)} does not exist"}
-        if not dataset.is_dir():
-            self.logger.warning(f"dataset path {str(dataset)} does not directory")
-            return {"error": f"dataset path {str(dataset)} does not directory"}
-        if model_conf_file is None or len([1 for f in model_conf_file if f.exists()]) != len(model_conf_file):
-            self.logger.warning(f"model_conf_file path {str(model_conf_file)} does not exist")
-            return {"error": f"model_conf_file path {str(model_conf_file)} does not exist"}
-        if train_type == 'Custom':
-            if custom_train_py is None or not custom_train_py.exists():
-                self.logger.warning(f"custom_train_py path {str(custom_train_py)} does not exist")
-                return {"error": f"custom_train_py path {str(custom_train_py)} does not exist"}
-            with open(custom_train_py, "rb") as pf:
-                custom_train_py_b64 = base64.b64encode(pf.read()).decode('utf-8')
-            train = module.load_custom_predict(custom_train_py, self.logger)
-        else:
-            custom_train_py_b64 = None
-        def _conf_b64(name:str, conf:Path):
-            if conf is not None and not conf.exists():
-                self.logger.warning(f"{name} {conf} does not exist")
-                return False, {"error": f"{name} {conf} does not exist"}
-            elif conf is not None:
-                with open(conf, "rb") as lf:
-                    conf_b64 = base64.b64encode(lf.read()).decode('utf-8')
-            else:
-                conf_b64 = None
-            return True, conf_b64
-        def _name_b64(aname:str, files:List[Path]):
-            if files is not None:
-                b64s = []
-                names = []
-                for p in files:
-                    if not p.exists():
-                        self.logger.warning(f"{aname} {p} does not exist")
-                        return False, {"error": f"{aname} {p} does not exist"}, None
-                    with open(p, "rb") as f:
-                        b64s.append(base64.b64encode(f.read()).decode('utf-8'))
-                    names.append(p.name)
-                return True, ','.join(names), ','.join(b64s)
-            return True, None, None
-        ret, model_conf_file_name, model_conf_bytes_b64 = _name_b64("model_conf_file", model_conf_file)
-        if not ret: return model_conf_file_name
 
-        if dataset_upload:
-            data_files = glob.glob(str(dataset / "**" / "*"), recursive=True)
-            svpath = Path(f"/{name}")
-            for f in data_files:
-                file_path = Path(f)
-                if file_path.is_dir():
-                    continue
-                p = f.replace(str(dataset.parent), '', 1).replace('\\', '/')
-                up_path = svpath / p[1:] if p.startswith('/') else svpath / p
-                res_json = self.file_upload(up_path, file_path, mkdir=True, orverwrite=True,
-                                            retry_count=retry_count, retry_interval=retry_interval, timeout=5)
-                if 'success' not in res_json:
-                    return res_json
-
-        res_json = self.redis_cli.send_cmd('train', [name, train_type,
-                                                     model_conf_file_name, model_conf_bytes_b64,
-                                                     custom_train_py_b64, overwrite],
+        res_json = self.redis_cli.send_cmd('train', [name, overwrite],
                                            retry_count=retry_count, retry_interval=retry_interval, outstatus=False, timeout=timeout)
         return res_json
 

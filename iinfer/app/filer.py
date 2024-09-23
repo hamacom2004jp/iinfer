@@ -177,7 +177,7 @@ class Filer(object):
             fname = abspath.name
             with open(abspath, "rb") as f:
                 fd = f.read()
-                if mime_type != 'image/svg+xml' and mime_type.startswith('image') and img_thumbnail > 0:
+                if mime_type is not None and mime_type != 'image/svg+xml' and mime_type.startswith('image') and img_thumbnail > 0:
                     img = convert.imgbytes2thumbnail(fd, (img_thumbnail, img_thumbnail))
                     fd = convert.img2byte(img, "jpeg")
                     fname = f"{fname}.thumbnail.jpg"

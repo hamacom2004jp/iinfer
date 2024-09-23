@@ -60,7 +60,7 @@ RESORCE_TEXT_FILES = dict(iinfer=['*.yml', 'extensions/*', 'extensions/*/*', 'ex
                                   'docker/*', 'docker/*/*', 'licenses/*',
                                   'tools/datas/*', 'tools/datas/*/*',
                                   'web/*', 'web/*/*', 'web/*/*/*', 'web/*/*/*/*', 'web/*/*/*/*/*'])
-
+EXCLUDE_RESORCE_TEXT_FILES =dict(iinfer=['extensions/data/*.json', 'extensions/data/*/*.jpg', 'extensions/data/*/*.svg'])
 class CustomInstallCommand(install):
     def run(self):
         super().run()
@@ -95,8 +95,9 @@ setup(
     license=LICENSE,
     keywords=KEYWORDS,
     install_requires=INSTALL_REQUIRES,
-    package_data=RESORCE_TEXT_FILES,
+    #package_data=RESORCE_TEXT_FILES,
     include_package_data=True,
+    #exclude_package_data=EXCLUDE_RESORCE_TEXT_FILES,
     entry_points=dict(console_scripts=['iinfer=iinfer.app.app:main']),
     cmdclass={'install': CustomInstallCommand},
 )
