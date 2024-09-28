@@ -1,30 +1,27 @@
 // ファイラーモーダル
 const fmodal = {};
 fmodal.left = $('#filer_modal');
-fmodal.filer_modal_func = async (target_id, modal_title, current_path, select_dir, is_client, call_back_func) => {
+fmodal.filer_modal_func = async (target_id, modal_title, current_path, select_dir, is_current, call_back_func) => {
     const filer_modal = $('#filer_modal');
     filer_modal.find('.modal-title').text(modal_title);
     filer_modal.find('.modal-body').html('<ul class="tree-menu overflow-auto border col-4"></ul><div class="file-list overflow-auto col-8"></div>');
     filer_modal.find('.tree-menu').css('height', 'calc(100vh - 180px)');
     filer_modal.find('.file-list').css('height', 'calc(100vh - 180px)');
     //filer_modal.find('.tree-menu').resizable({ghost:true});
-    if (is_client) {
-        filer_modal.find('.filer_server_bot').attr('disabled', true).removeClass('dropdown-toggle');
-    }
     filer_modal.find('.filer_address_bot').off('click').on('click', async () => {
         const c_path = filer_modal.find('.filer_address').val();
+        if (!c_path) return;
         const key = c_path.replace(/[\s\:\\\/\,\.\#\$\%\^\&\!\@\*\(\)\{\}\[\]\'\"\`]/g, `_`);
         const current_node = $(`#${key}`);
         if (current_node.length <= 0) {
-            alert(`invalid path:${key}`);
+            alert(`invalid path:${c_path}`);
             return;
         }
         await reload_tree(target_id, filer_modal.find('.tree-menu'), c_path, filer_modal.find('.file-list'));
     });
 
-    const reload_tree = async (target_id, current_node, current_path, file_list_elem, is_client) => {
-        //dict(name=part, is_dir=path.is_dir(), path=str(path), children=children)
-        const py_list_tree = is_client ? await fmodal.list_tree_client(current_path): await fmodal.list_tree_server(current_path);
+    const reload_tree = async (target_id, current_node, current_path, file_list_elem, is_current) => {
+        const py_list_tree = await fmodal.list_tree_server(current_path);
         current_node.html('');
         Object.entries(py_list_tree).forEach(([key, node]) => {
             if(!node['is_dir']) return;
@@ -38,7 +35,7 @@ fmodal.filer_modal_func = async (target_id, modal_title, current_path, select_di
             }
             const mk_func = (target_id, current_node, current_path) => {
                 // 左側ペインのフォルダを選択した時の処理
-                return () => reload_tree(target_id, current_node, current_path, file_list_elem, is_client);
+                return () => reload_tree(target_id, current_node, current_path, file_list_elem, is_current);
             }
             li_elem.find('a').off('click').on('click', mk_func(target_id, current_node, node['path']));
             if(node['children']) {
@@ -75,7 +72,7 @@ fmodal.filer_modal_func = async (target_id, modal_title, current_path, select_di
                         }
                     }
                     // 右側ペインのフォルダを選択した時の処理
-                    return () => reload_tree(target_id, current_node, current_path, file_list_elem, is_client);
+                    return () => reload_tree(target_id, current_node, current_path, file_list_elem, is_current);
                 }
                 Object.entries(node['children']).forEach(([k, n]) => {
                     if(!n['is_dir']) return;
@@ -111,43 +108,24 @@ fmodal.filer_modal_func = async (target_id, modal_title, current_path, select_di
                 }
             }
         }
+        iinfer.hide_loading();
     }
-    try {
-        fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
-            reload_tree(target_id, filer_modal.find('.tree-menu'), current_path, filer_modal.find('.file-list'), is_client);
-        };
-    } catch (e) {}
-    await reload_tree(target_id, filer_modal.find('.tree-menu'), current_path, filer_modal.find('.file-list'), is_client);
-    filer_modal.modal('show');
-};
-fmodal.list_tree_client = async (current_path) => {
     /*try {
-        const opt = iinfer.get_server_opt(false, fmodal.left);
-        opt['mode'] = 'client';
-        opt['cmd'] = 'file_list';
-        opt['capture_stdout'] = true;
-        opt['svpath'] = current_path;
-        const res = await iinfer.sv_exec_cmd(opt);
-        if(!res[0] || !res[0]['success']) {
-            iinfer.message(res);
-            return;
-        }
-        const data = Object.entries(res[0]['success']).sort();
-        const ret = {};
-        for (let i = 0; i < data.length; i++) {
-            const [key, value] = data[i];
-            if (!value['name']) continue;
-            ret[key] = value;
-        }
-        return ret;
-    } catch (e) {
-        return {};
-    }*/
-    const formData = new FormData();
-    formData.append('current_path', current_path);
-    const res = await fetch('gui/list_tree', {method: 'POST', body: formData});
-    return await res.json();
-}
+        fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
+            reload_tree(target_id, filer_modal.find('.tree-menu'), current_path, filer_modal.find('.file-list'), is_current);
+        };
+    } catch (e) {}*/
+    filer_modal.modal('show');
+    iinfer.get_server_opt(true, fmodal.left).then(() => {
+        iinfer.load_server_list(fmodal.left, (opt) => {
+            if (is_current) {
+                filer_modal.find('.filer_server_bot').attr('disabled', true).removeClass('dropdown-toggle');
+                current_path = current_path ? current_path : '.';
+            }
+            reload_tree(target_id, filer_modal.find('.tree-menu'), current_path, filer_modal.find('.file-list'), is_current);
+        }, false, is_current);
+    });
+};
 fmodal.list_tree_server = async (current_path) => {
     try {
         const opt = iinfer.get_server_opt(false, fmodal.left);

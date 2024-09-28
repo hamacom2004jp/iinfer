@@ -208,7 +208,7 @@ class Client(object):
                     continue
                 p = f.replace(str(train_dataset), '', 1).replace('\\', '/')
                 up_path = svpath / 'input' / p[1:] if p.startswith('/') else svpath / p
-                rj = self.file_upload(up_path, file_path, mkdir=True, orverwrite=True,
+                rj = self.file_upload(up_path, file_path, scope="server", mkdir=True, orverwrite=True,
                                             retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
                 if 'success' not in rj:
                     return rj
@@ -438,27 +438,6 @@ class Client(object):
                     return res_list
                 finally:
                     if f is not None: f.close()
-            elif pred_input_type == 'prompt':
-                f = None
-                try:
-                    f = image_file if type(image_file) is not str else open(image_file, "r", encoding='utf-8')
-                    res_list = []
-                    for line in f:
-                        if type(line) is bytes:
-                            line = line.decode('utf-8')
-                        prompt_data = line.strip().split(',')
-                        fn = Path(prompt_data[2].strip())
-                        res_json = self.predict(name, image=line, image_file=fn, image_file_enable=False, pred_input_type='prompt',
-                                                output_image_file=output_image_file, output_preview=output_preview, nodraw=nodraw,
-                                                retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
-                        res_list.append(res_json)
-                    if len(res_list) <= 0:
-                        return {"warn": f"prompt file is no data."}
-                    elif len(res_list) == 1:
-                        return res_list[0]
-                    return res_list
-                finally:
-                    if f is not None: f.close()
             else:
                 self.logger.warning(f"pred_input_type is invalid. {pred_input_type}.")
                 return {"error": f"pred_input_type is invalid. {pred_input_type}."}
@@ -480,11 +459,6 @@ class Client(object):
                     img_npy = convert.b64str2npy(img, shape=(h, w, c) if c > 0 else (h, w))
                 else:
                     img_npy = convert.imgbytes2npy(convert.b64str2bytes(img))
-            elif pred_input_type == 'prompt':
-                prompt_data = image.split(',')
-                t = prompt_data[0]
-                prompt_b64 = prompt_data[1]
-                if image_file is None: image_file = prompt_data[2]
             elif pred_input_type == 'output_json':
                 res_json = json.loads(image)
                 if not ("output_image" in res_json and "output_image_shape" in res_json and "output_image_name" in res_json):
@@ -502,16 +476,11 @@ class Client(object):
                 return {"error": f"pred_input_type is invalid. {pred_input_type}."}
 
         eimgloadtime = time.perf_counter()
-        if pred_input_type == 'prompt':
-            res_json = self.redis_cli.send_cmd('predict',
-                                  [name, prompt_b64, str(nodraw), str(-1), str(-1), str(-1), image_file],
-                                  retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
-        else:
-            npy_b64 = convert.npy2b64str(img_npy)
-            res_json = self.redis_cli.send_cmd('predict',
-                                  [name, npy_b64, str(nodraw), str(img_npy.shape[0]), str(img_npy.shape[1]),
-                                  str(img_npy.shape[2] if len(img_npy.shape) > 2 else '-1'), image_file],
-                                  retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
+        npy_b64 = convert.npy2b64str(img_npy)
+        res_json = self.redis_cli.send_cmd('predict',
+                                [name, npy_b64, str(nodraw), str(img_npy.shape[0]), str(img_npy.shape[1]),
+                                str(img_npy.shape[2] if len(img_npy.shape) > 2 else '-1'), image_file],
+                                retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
         soutputtime = time.perf_counter()
         if "output_image" in res_json and "output_image_shape" in res_json:
             img_npy = convert.b64str2npy(res_json["output_image"], res_json["output_image_shape"])
@@ -538,14 +507,15 @@ class Client(object):
             performance.append(dict(key="cl_pred", val=f"{epredtime-spredtime:.3f}s"))
         return res_json
     
-    def file_list(self, svpath:str, local_data:Path = None,
+    def file_list(self, svpath:str, scope:str="client", client_data:Path = None,
                   retry_count:int=3, retry_interval:int=5, timeout:int = 60):
         """
         サーバー上のファイルリストを取得する
 
         Args:
             svpath (Path): サーバー上のファイルパス
-            local_data (Path, optional): ローカルを参照させる場合のデータフォルダ. Defaults to None.
+            scope (str, optional): 参照先のスコープ. Defaults to "client".
+            client_data (Path, optional): ローカルを参照させる場合のデータフォルダ. Defaults to None.
             retry_count (int, optional): リトライ回数. Defaults to 3.
             retry_interval (int, optional): リトライ間隔. Defaults to 5.
             timeout (int, optional): タイムアウト時間. Defaults to 60.
@@ -553,22 +523,35 @@ class Client(object):
         Returns:
             dict: Redisサーバーからの応答
         """
-        if local_data is not None:
-            f = filer.Filer(local_data, self.logger)
+        if scope == "client":
+            if client_data is not None:
+                f = filer.Filer(client_data, self.logger)
+                _, res_json = f.file_list(svpath)
+                return res_json
+            else:
+                self.logger.warning(f"client_data is empty.")
+                return {"error": f"client_data is empty."}
+        elif scope == "current":
+            f = filer.Filer(Path.cwd(), self.logger)
             _, res_json = f.file_list(svpath)
             return res_json
-        res_json = self.redis_cli.send_cmd('file_list', [convert.str2b64str(str(svpath))],
-                                           retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
-        return res_json
+        elif scope == "server":
+            res_json = self.redis_cli.send_cmd('file_list', [convert.str2b64str(str(svpath))],
+                                            retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
+            return res_json
+        else:
+            self.logger.warning(f"scope is invalid. {scope}")
+            return {"error": f"scope is invalid. {scope}"}
 
-    def file_mkdir(self, svpath:str, local_data:Path = None,
+    def file_mkdir(self, svpath:str, scope:str="client", client_data:Path = None,
                    retry_count:int=3, retry_interval:int=5, timeout:int = 60):
         """
         サーバー上にディレクトリを作成する
 
         Args:
             svpath (Path): サーバー上のディレクトリパス
-            local_data (Path, optional): ローカルを参照させる場合のデータフォルダ. Defaults to None.
+            scope (str, optional): 参照先のスコープ. Defaults to "client".
+            client_data (Path, optional): ローカルを参照させる場合のデータフォルダ. Defaults to None.
             retry_count (int, optional): リトライ回数. Defaults to 3.
             retry_interval (int, optional): リトライ間隔. Defaults to 5.
             timeout (int, optional): タイムアウト時間. Defaults to 60.
@@ -576,22 +559,35 @@ class Client(object):
         Returns:
             dict: Redisサーバーからの応答
         """
-        if local_data is not None:
-            f = filer.Filer(local_data, self.logger)
+        if scope == "client":
+            if client_data is not None:
+                f = filer.Filer(client_data, self.logger)
+                _, res_json = f.file_mkdir(svpath)
+                return res_json
+            else:
+                self.logger.warning(f"client_data is empty.")
+                return {"error": f"client_data is empty."}
+        elif scope == "current":
+            f = filer.Filer(Path.cwd(), self.logger)
             _, res_json = f.file_mkdir(svpath)
             return res_json
-        res_json = self.redis_cli.send_cmd('file_mkdir', [convert.str2b64str(str(svpath))],
-                                           retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
-        return res_json
+        elif scope == "server":
+            res_json = self.redis_cli.send_cmd('file_mkdir', [convert.str2b64str(str(svpath))],
+                                            retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
+            return res_json
+        else:
+            self.logger.warning(f"scope is invalid. {scope}")
+            return {"error": f"scope is invalid. {scope}"}
     
-    def file_rmdir(self, svpath:str, local_data:Path = None,
+    def file_rmdir(self, svpath:str, scope:str="client", client_data:Path = None,
                    retry_count:int=3, retry_interval:int=5, timeout:int = 60):
         """
         サーバー上のディレクトリを削除する
 
         Args:
             svpath (Path): サーバー上のディレクトリパス
-            local_data (Path, optional): ローカルを参照させる場合のデータフォルダ. Defaults to None.
+            scope (str, optional): 参照先のスコープ. Defaults to "client".
+            client_data (Path, optional): ローカルを参照させる場合のデータフォルダ. Defaults to None.
             retry_count (int, optional): リトライ回数. Defaults to 3.
             retry_interval (int, optional): リトライ間隔. Defaults to 5.
             timeout (int, optional): タイムアウト時間. Defaults to 60.
@@ -599,15 +595,27 @@ class Client(object):
         Returns:
             dict: Redisサーバーからの応答
         """
-        if local_data is not None:
-            f = filer.Filer(local_data, self.logger)
+        if scope == "client":
+            if client_data is not None:
+                f = filer.Filer(client_data, self.logger)
+                _, res_json = f.file_rmdir(svpath)
+                return res_json
+            else:
+                self.logger.warning(f"client_data is empty.")
+                return {"error": f"client_data is empty."}
+        elif scope == "current":
+            f = filer.Filer(Path.cwd(), self.logger)
             _, res_json = f.file_rmdir(svpath)
             return res_json
-        res_json = self.redis_cli.send_cmd('file_rmdir', [convert.str2b64str(str(svpath))],
-                                           retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
-        return res_json
+        elif scope == "server":
+            res_json = self.redis_cli.send_cmd('file_rmdir', [convert.str2b64str(str(svpath))],
+                                            retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
+            return res_json
+        else:
+            self.logger.warning(f"scope is invalid. {scope}")
+            return {"error": f"scope is invalid. {scope}"}
     
-    def file_download(self, svpath:str, download_file:Path, local_data:Path = None, rpath:str="", img_thumbnail:float=0.0,
+    def file_download(self, svpath:str, download_file:Path, scope:str="client", client_data:Path = None, rpath:str="", img_thumbnail:float=0.0,
                       retry_count:int=3, retry_interval:int=5, timeout:int = 60):
         """
         サーバー上のファイルをダウンロードする
@@ -615,7 +623,8 @@ class Client(object):
         Args:
             svpath (Path): サーバー上のファイルパス
             download_file (Path): ローカルのファイルパス
-            local_data (Path, optional): ローカルを参照させる場合のデータフォルダ. Defaults to None.
+            scope (str, optional): 参照先のスコープ. Defaults to "client".
+            client_data (Path, optional): ローカルを参照させる場合のデータフォルダ. Defaults to None.
             rpath (str, optional): リクエストパス. Defaults to "".
             img_thumbnail (float, optional): サムネイル画像のサイズ. Defaults to 0.0.
             retry_count (int, optional): リトライ回数. Defaults to 3.
@@ -625,12 +634,22 @@ class Client(object):
         Returns:
             bytes: ダウンロードファイルの内容
         """
-        if local_data is not None:
-            f = filer.Filer(local_data, self.logger)
+        if scope == "client":
+            if client_data is not None:
+                f = filer.Filer(client_data, self.logger)
+                _, res_json = f.file_download(svpath, img_thumbnail)
+            else:
+                self.logger.warning(f"client_data is empty.")
+                return {"error": f"client_data is empty."}
+        elif scope == "current":
+            f = filer.Filer(Path.cwd(), self.logger)
             _, res_json = f.file_download(svpath, img_thumbnail)
-        else:
+        elif scope == "server":
             res_json = self.redis_cli.send_cmd('file_download', [convert.str2b64str(str(svpath)), str(img_thumbnail)],
                                                retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
+        else:
+            self.logger.warning(f"scope is invalid. {scope}")
+            return {"error": f"scope is invalid. {scope}"}
         if "success" in res_json:
             res_json["success"]["rpath"] = rpath
             res_json["success"]["svpath"] = svpath
@@ -646,7 +665,7 @@ class Client(object):
                     res_json["success"]["download_file"] = str(download_file.absolute())
         return res_json
     
-    def file_upload(self, svpath:str, upload_file:Path, local_data:Path = None, mkdir:bool=False, orverwrite:bool=False,
+    def file_upload(self, svpath:str, upload_file:Path, scope:str="client", client_data:Path=None, mkdir:bool=False, orverwrite:bool=False,
                     retry_count:int=3, retry_interval:int=5, timeout:int = 60):
         """
         サーバー上にファイルをアップロードする
@@ -654,9 +673,10 @@ class Client(object):
         Args:
             svpath (Path): サーバー上のファイルパス
             upload_file (Path): ローカルのファイルパス
+            scope (str, optional): 参照先のスコープ. Defaults to "client".
             mkdir (bool, optional): ディレクトリを作成するかどうか. Defaults to False.
             orverwrite (bool, optional): 上書きするかどうか. Defaults to False.
-            local_data (Path, optional): ローカルを参照させる場合のデータフォルダ. Defaults to None.
+            client_data (Path, optional): ローカルを参照させる場合のデータフォルダ. Defaults to None.
             retry_count (int, optional): リトライ回数. Defaults to 3.
             retry_interval (int, optional): リトライ間隔. Defaults to 5.
             timeout (int, optional): タイムアウト時間. Defaults to 60.
@@ -674,27 +694,40 @@ class Client(object):
             self.logger.warning(f"input_file {upload_file} is directory.")
             return {"error": f"input_file {upload_file} is directory."}
         with open(upload_file, "rb") as f:
-            if local_data is not None:
-                fi = filer.Filer(local_data, self.logger)
+            if scope == "client":
+                if client_data is not None:
+                    fi = filer.Filer(client_data, self.logger)
+                    _, res_json = fi.file_upload(svpath, upload_file.name, f.read(), mkdir, orverwrite)
+                    return res_json
+                else:
+                    self.logger.warning(f"client_data is empty.")
+                    return {"error": f"client_data is empty."}
+            elif scope == "current":
+                fi = filer.Filer(Path.cwd(), self.logger)
                 _, res_json = fi.file_upload(svpath, upload_file.name, f.read(), mkdir, orverwrite)
                 return res_json
-            res_json = self.redis_cli.send_cmd('file_upload',
-                                  [convert.str2b64str(str(svpath)),
-                                   convert.str2b64str(upload_file.name),
-                                   convert.bytes2b64str(f.read()),
-                                   str(mkdir),
-                                   str(orverwrite)],
-                                   retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
-            return res_json
+            elif scope == "server":
+                res_json = self.redis_cli.send_cmd('file_upload',
+                                    [convert.str2b64str(str(svpath)),
+                                    convert.str2b64str(upload_file.name),
+                                    convert.bytes2b64str(f.read()),
+                                    str(mkdir),
+                                    str(orverwrite)],
+                                    retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
+                return res_json
+            else:
+                self.logger.warning(f"scope is invalid. {scope}")
+                return {"error": f"scope is invalid. {scope}"}
 
-    def file_remove(self, svpath:str, local_data:Path = None,
+    def file_remove(self, svpath:str, scope:str="client", client_data:Path = None,
                     retry_count:int=3, retry_interval:int=5, timeout:int = 60):
         """
         サーバー上のファイルを削除する
 
         Args:
             svpath (Path): サーバー上のファイルパス
-            local_data (Path, optional): ローカルを参照させる場合のデータフォルダ. Defaults to None.
+            scope (str, optional): 参照先のスコープ. Defaults to "client".
+            client_data (Path, optional): ローカルを参照させる場合のデータフォルダ. Defaults to None.
             retry_count (int, optional): リトライ回数. Defaults to 3.
             retry_interval (int, optional): リトライ間隔. Defaults to 5.
             timeout (int, optional): タイムアウト時間. Defaults to 60.
@@ -702,13 +735,25 @@ class Client(object):
         Returns:
             dict: Redisサーバーからの応答
         """
-        if local_data is not None:
-            f = filer.Filer(local_data, self.logger)
+        if scope == "client":
+            if client_data is not None:
+                f = filer.Filer(client_data, self.logger)
+                _, res_json = f.file_remove(svpath)
+                return res_json
+            else:
+                self.logger.warning(f"client_data is empty.")
+                return {"error": f"client_data is empty."}
+        elif scope == "current":
+            f = filer.Filer(Path.cwd(), self.logger)
             _, res_json = f.file_remove(svpath)
             return res_json
-        res_json = self.redis_cli.send_cmd('file_remove', [convert.str2b64str(str(svpath))],
-                                           retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
-        return res_json
+        elif scope == "server":
+            res_json = self.redis_cli.send_cmd('file_remove', [convert.str2b64str(str(svpath))],
+                                            retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
+            return res_json
+        else:
+            self.logger.warning(f"scope is invalid. {scope}")
+            return {"error": f"scope is invalid. {scope}"}
 
     def read_dir(self, glob_str:str, read_input_type:str='jpeg', image_type:str='capture', root_dir:Path=Path('.'), include_hidden=True,
                  moveto:Path=None, polling:bool=False, polling_count:int=10, polling_interval:int=1):
@@ -849,20 +894,3 @@ class Client(object):
             self.logger.warning("KeyboardInterrupt", exc_info=True)
         finally:
             cap.release()
-
-    def prompt(self, prompt_format='{prompt}', prompt_form:bool=False):
-        try:
-            self.is_running = True
-            while self.is_running:
-                if not prompt_form:
-                    prompt = prompt_format.format(input('Enter the prompt > '))
-                else:
-                    prompt = common.show_input(common.APP_ID, 'Enter the prompt')
-                    prompt = prompt_format.format(prompt=prompt) if prompt is not None else ''
-                output_name = datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")
-                output_name = f"{output_name}.txt"
-                yield 'prompt', convert.str2b64str(prompt), output_name
-        except KeyboardInterrupt:
-            self.logger.warning("KeyboardInterrupt", exc_info=True)
-        finally:
-            pass

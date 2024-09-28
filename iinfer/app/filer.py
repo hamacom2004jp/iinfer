@@ -13,6 +13,7 @@ class Filer(object):
     def __init__(self, data_dir: Path, logger: logging.Logger,):
         self.data_dir = data_dir
         self.logger = logger
+        common.mkdirs(self.data_dir)
 
     def _file_exists(self, current_path:str, not_exists:bool=False, exists_chk:bool=True) -> Tuple[bool, Path, Dict[str, Any]]:
         """
@@ -65,29 +66,33 @@ class Filer(object):
         def _ts2str(ts):
             return datetime.datetime.fromtimestamp(ts)
 
-        current_path = f'/{current_path}' if not current_path.startswith('/') else current_path
-        current_path_parts = current_path.split("/")
+        #current_path = f'/{current_path}' if not current_path.startswith('/') else current_path
+        current_path_parts = current_path.replace('\\', '/').split("/")
         current_path_parts = current_path_parts[1:] if current_path=='/' else current_path_parts
+        current_path_parts = ['.'] + current_path_parts if current_path_parts[0] not in ['','.'] else current_path_parts
         path_tree = {}
         data_dir_len = len(str(self.data_dir))
         for i, cpart in enumerate(current_path_parts):
             cpath = '/'.join(current_path_parts[1:i+1])
             file_list:Path = self.data_dir / cpath
             children = dict()
+            if not file_list.is_dir():
+                continue
             for f in sorted(list(file_list.iterdir())):
                 parts = str(f)[data_dir_len:].replace("\\","/").split("/")
-                path = "/".join(parts[:i+2])
+                path = "/".join(parts[0:i+2])
+                path = f'.{path}' if current_path_parts[0] == '.' else path
                 key = common.safe_fname(path)
                 if key in children:
                     continue
                 mime_type, encoding = mimetypes.guess_type(str(f))
                 children[key] = dict(name=f.name,
-                                     is_dir=f.is_dir(),
-                                     path=path,
-                                     mime_type=mime_type,
-                                     size=f.stat().st_size,
-                                     last=_ts2str(f.stat().st_mtime),
-                                     depth=len(parts))
+                                    is_dir=f.is_dir(),
+                                    path=path,
+                                    mime_type=mime_type,
+                                    size=f.stat().st_size,
+                                    last=_ts2str(f.stat().st_mtime),
+                                    depth=len(parts))
 
             tpath = '/'.join(current_path_parts[:i+1])
             tpath = '/' if tpath=='' else tpath

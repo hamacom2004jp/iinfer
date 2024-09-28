@@ -129,6 +129,10 @@ fsapi.filer = (svpath, is_local) => {
     }
     iinfer.show_loading();
     const formData = new FormData();
+    const opt = iinfer.get_server_opt(false, fsapi.right);
+    Object.keys(opt).map((key) => {
+      formData.append(key, opt[key]);
+    });
     formData.append('current_path', event.originalEvent.dataTransfer.getData('path'));
     fetch('gui/list_downloads', {method: 'POST', body: formData}).then(async res => {
       const list_downloads = await res.json();
@@ -141,6 +145,7 @@ fsapi.filer = (svpath, is_local) => {
         opt['capture_stdout'] = true;
         opt['svpath'] = path['svpath'];
         opt['rpath'] = path['rpath'];
+        opt['maxsize'] = 1024**3*10;
         //opt['svpath'] = event.originalEvent.dataTransfer.getData('path');
         jobs.push(iinfer.sv_exec_cmd(opt).then(async res => {
           if(!res[0] || !res[0]['success']) {
@@ -249,7 +254,7 @@ fsapi.filer = (svpath, is_local) => {
   } else {
     iinfer.load_server_list(fsapi.right, (opt) => {
       fsapi.tree(fsapi.right, "/", fsapi.right.find('.tree-menu'), false);
-    });
+    }, false, false);
     //fsapi.load_server_list();
   }
   fsapi.left.find('.filer_local_bot').off('click').on('click', (event) => {
@@ -264,9 +269,17 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
   opt['cmd'] = 'file_list';
   opt['capture_stdout'] = true;
   opt['svpath'] = svpath;
-  const exec_cmd = is_local ? fsapi.local_exec_cmd : iinfer.sv_exec_cmd;
+  let exec_cmd = is_local ? fsapi.local_exec_cmd : iinfer.sv_exec_cmd;
   exec_cmd(opt).then(res => {
     current_ul_elem.html('');
+    if (typeof opt == 'string') { // currentの場合
+      res = [{"success": res}];
+      if (opt.length == 1) { // ルートディレクトリの場合
+        fsapi.treemem = res[0]['success']['_'];
+      } else if (fsapi.treemem) {
+        res[0]['success']['_'] = fsapi.treemem;
+      }
+    }
     if(!res[0] || !res[0]['success']) {
       iinfer.message(res);
       target.find('.file-list').html('');

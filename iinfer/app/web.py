@@ -30,7 +30,8 @@ import webbrowser
 
 class Web(options.Options):
     def __init__(self, logger:logging.Logger, data:Path, redis_host:str = "localhost", redis_port:int = 6379, redis_password:str = None, svname:str = 'server',
-                 client_only:bool=False, filer_html:str=None, showimg_html:str=None, webcap_html:str=None, assets:List[str]=None, gui_mode:bool=False):
+                 client_only:bool=False, filer_html:str=None, showimg_html:str=None, webcap_html:str=None, anno_html:str=None,
+                 assets:List[str]=None, gui_mode:bool=False):
         """
         iinferクライアント側のwebapiサービス
 
@@ -45,6 +46,7 @@ class Web(options.Options):
             filer_html (str, optional): ファイラーのHTMLファイル. Defaults to None.
             showimg_html (str, optional): 画像表示のHTMLファイル. Defaults to None.
             webcap_html (str, optional): ウェブカメラのHTMLファイル. Defaults to None.
+            anno_html (str, optional): アノテーション画面のHTMLファイル. Defaults to None.
             assets (List[str], optional): 静的ファイルのリスト. Defaults to None.
             gui_mode (bool, optional): GUIモードかどうか. Defaults to False.
         """
@@ -63,13 +65,18 @@ class Web(options.Options):
         self.filer_html = Path(filer_html) if filer_html is not None else None
         self.showimg_html = Path(showimg_html) if showimg_html is not None else None
         self.webcap_html = Path(webcap_html) if webcap_html is not None else None
+        self.anno_html = Path(anno_html) if anno_html is not None else None
         self.assets = [Path(a) for a in assets] if assets is not None else None
         self.filer_html_data = None
         self.showimg_html_data = None
         self.webcap_html_data = None
+        self.anno_html_data = None
         self.assets_data = None
         self.gui_mode = gui_mode
-        common.mkdirs(self.data)
+        self.cmds_path = self.data / ".cmds"
+        self.pipes_path = self.data / ".pipes"
+        common.mkdirs(self.cmds_path)
+        common.mkdirs(self.pipes_path)
         self.pipe_th = None
         self.img_queue = queue.Queue(1000)
         self.cb_queue = queue.Queue(1000)
@@ -112,7 +119,7 @@ class Web(options.Options):
             kwd = '*'
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"web.list_cmd: kwd={kwd}")
-        paths = glob.glob(str(self.data / f"cmd-{kwd}.json"))
+        paths = glob.glob(str(self.cmds_path / f"cmd-{kwd}.json"))
         ret = [common.loadopt(path) for path in paths]
         ret = sorted(ret, key=lambda cmd: cmd["title"])
         return ret
@@ -130,7 +137,7 @@ class Web(options.Options):
         """
         if common.check_fname(title):
             return dict(warn=f'The title contains invalid characters."{title}"')
-        opt_path = self.data / f"cmd-{title}.json"
+        opt_path = self.cmds_path / f"cmd-{title}.json"
         self.logger.info(f"save_cmd: opt_path={opt_path}, opt={opt}")
         common.saveopt(opt, opt_path)
         return dict(success=f'Command "{title}" saved in "{opt_path}".')
@@ -145,7 +152,7 @@ class Web(options.Options):
         Returns:
             dict: コマンドファイルの内容
         """
-        opt_path = self.data / f"cmd-{title}.json"
+        opt_path = self.cmds_path / f"cmd-{title}.json"
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"web.load_cmd: title={title}, opt_path={opt_path}")
         return common.loadopt(opt_path)
@@ -157,7 +164,7 @@ class Web(options.Options):
         Args:
             title (str): タイトル
         """
-        opt_path = self.data / f"cmd-{title}.json"
+        opt_path = self.cmds_path / f"cmd-{title}.json"
         self.logger.info(f"del_cmd: opt_path={opt_path}")
         opt_path.unlink()
 
@@ -206,7 +213,7 @@ class Web(options.Options):
         if use_redis == self.USE_REDIS_TRUE:
             return True, output
         for c in self.get_cmd_attr(opt['mode'], opt['cmd'], "choise"):
-            if c['opt'] == 'local_data' and 'local_data' in opt and opt['local_data'] is None:
+            if c['opt'] == 'client_data' and 'client_data' in opt and opt['client_data'] is None:
                 return True, output
         return False, None
 
@@ -244,20 +251,21 @@ class Web(options.Options):
             try:
                 iinfer_app.main(args_list=opt_list, file_dict=file_dict)
                 self.logger.disabled = False # ログ出力を有効にする
+                maxsize = opt['maxsize'] if 'maxsize' in opt else self.output_size_th
                 if 'capture_stdout' in opt and opt['capture_stdout']:
                     output = captured_output.getvalue().strip()
                     output_size = len(output)
-                    if output_size > self.output_size_th:
+                    if output_size > maxsize:
                         o = output.split('\n')
                         if len(o) > 0:
                             osize = len(o[0])
-                            oidx = int(self.output_size_th / osize)
+                            oidx = int(maxsize / osize)
                             if oidx > 0:
                                 output = '\n'.join(o[-oidx:])
                             else:
-                                output = [dict(warn=f'The captured stdout was discarded because its size was larger than {self.output_size_th} bytes.')]
+                                output = [dict(warn=f'The captured stdout was discarded because its size was larger than {maxsize} bytes.')]
                         else:
-                            output = [dict(warn=f'The captured stdout was discarded because its size was larger than {self.output_size_th} bytes.')]
+                            output = [dict(warn=f'The captured stdout was discarded because its size was larger than {maxsize} bytes.')]
                 else:
                     output = [dict(warn='capture_stdout is off.')]
             except Exception as e:
@@ -317,71 +325,27 @@ class Web(options.Options):
                 dict(type='optjson',raw=json.dumps(opt, default=common.default_json_enc)),
                 dict(type='curlcmd',raw=f'curl {curl_cmd_file} http://localhost:8081/exec_cmd/{title}')]
 
-    def list_tree(self, current_path:str) -> Dict[str, Any]:
-        """
-        クライアント側のディレクトリのツリーを取得する
-
-        Args:
-            current_path (str): カレントパス
-        
-        Returns:
-            dict: ディレクトリのツリー
-        """
-        if self.logger.level == logging.DEBUG:
-            self.logger.debug(f"web.list_tree: current_path={current_path}")
-        cwd = Path.cwd()
-        current_path:Path = Path('.') if current_path is None or current_path=='' else Path(current_path)
-        current_path:Path = current_path if current_path.is_dir() else current_path.parent
-        if str(cwd) not in str(current_path.absolute()):
-            current_path = Path('.')
-        path_tree = {}
-        def ts2str(ts):
-            return datetime.datetime.fromtimestamp(ts)
-        path_parts = current_path.parts
-        if len(path_parts) == 0:
-            path_parts = ['.']
-        for i, part in enumerate(path_parts):
-            path = Path('/'.join(path_parts[:i+1]).replace('//', '/'))
-            full_path = cwd / path
-            if not os.access(full_path, os.R_OK):
-                continue
-            path = '.' + str(full_path).replace(str(cwd),'')
-            path_key = common.safe_fname(path)
-            children = None
-            if full_path.is_dir():
-                try:
-                    children = {}
-                    for fp in full_path.iterdir():
-                        p = '.' + str(fp).replace(str(cwd),'')
-                        children[common.safe_fname(p)] = dict(name=fp.name,
-                                                              is_dir=fp.is_dir(),
-                                                              path=p,
-                                                              size=fp.stat().st_size,
-                                                              last=ts2str(fp.stat().st_mtime))
-                except:
-                    children = {}
-            path_tree[path_key] = dict(name=part, is_dir=full_path.is_dir(), path=str(path), children=children, size=full_path.stat().st_size, last=ts2str(full_path.stat().st_mtime))
-        return path_tree
-
-    def list_downloads(self, current_path:str, root_path:Path=None):
+    def list_downloads(self, current_path:str, root_path:Path=None, scope:str='client'):
         """
         ダウンロードファイルのリストを取得する
 
         Args:
             current_path (str): カレントパス
             root_path (Path, optional): ルートパス. Defaults to None.
+            scope (str, optional): スコープ. Defaults to 'client'.
         
         Returns:
             list: ダウンロードファイルのリスト
         """
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"web.list_downloads: current_path={current_path}, root_path={root_path}")
+        data_dir = self.data if scope == 'client' else Path.cwd()
         if type(current_path) == str:
             current_path = current_path[1:] if current_path.startswith('/') else current_path
-            current_path = self.data if current_path is None or current_path=='' else self.data / current_path
+            current_path = data_dir if current_path is None or current_path=='' else data_dir / current_path
             root_path = current_path
         if current_path.is_file():
-            svpath = str(current_path).replace(str(self.data), '')
+            svpath = str(current_path).replace(str(data_dir), '')
             rpath = str(current_path).replace(str(root_path), '')[1:]
             rpath = str(Path(root_path.name) / rpath)
             #dlpath = cpath.replace(str(Path(rpath).parent), '')
@@ -389,7 +353,7 @@ class Web(options.Options):
         download_files = []
         if current_path.is_dir():
             for f in current_path.iterdir():
-                download_files = download_files + self.list_downloads(f, root_path)
+                download_files = download_files + self.list_downloads(f, root_path, scope)
         return download_files
 
     def load_result(self, current_path:str) -> List[Dict[str, Any]]:
@@ -470,7 +434,7 @@ class Web(options.Options):
             kwd = '*'
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"web.list_pipe: kwd={kwd}")
-        paths = glob.glob(str(self.data / f"pipe-{kwd}.json"))
+        paths = glob.glob(str(self.pipes_path / f"pipe-{kwd}.json"))
         ret = [common.loadopt(path) for path in paths]
         ret = sorted(ret, key=lambda cmd: cmd["title"])
         return ret
@@ -608,8 +572,8 @@ class Web(options.Options):
             if i>0:
                 if chk_stdin and ('stdin' not in cmd_opt or not cmd_opt['stdin']):
                     errormsg.append(f'The "stdin" option should be specified for the second and subsequent commands. ({cmd_title})')
-                if chk_stdin and 'pred_input_type' in cmd_opt and cmd_opt['pred_input_type'] not in ['capture', 'prompt']:
-                    errormsg.append(f'When using the "stdin" option, "pred_input_type" cannot be other than "capture" or "prompt". ({cmd_title})')
+                if chk_stdin and 'pred_input_type' in cmd_opt and cmd_opt['pred_input_type'] not in ['capture']:
+                    errormsg.append(f'When using the "stdin" option, "pred_input_type" cannot be other than "capture". ({cmd_title})')
                 for ref in cmd_ref:
                     if 'fileio' in ref and ref['fileio'] == 'in' and ref['opt'] in cmd_opt and cmd_opt[ref['opt']] != '' and len([v for v in cmd_opt[ref['opt']] if v != '']) > 0:
                         errormsg.append(f'The "{ref["opt"]}" option should not be specified in a second or subsequent command. ({cmd_title})')
@@ -643,7 +607,7 @@ class Web(options.Options):
         """
         if common.check_fname(title):
             return dict(warn=f'The title contains invalid characters."{title}"')
-        opt_path = self.data / f"pipe-{title}.json"
+        opt_path = self.pipes_path / f"pipe-{title}.json"
         self.logger.info(f"save_pipe: opt_path={opt_path}, opt={opt}")
         common.saveopt(opt, opt_path)
         return dict(success=f'Pipeline "{title}" saved in "{opt_path}".')
@@ -655,7 +619,7 @@ class Web(options.Options):
         Args:
             title (str): タイトル
         """
-        opt_path = self.data / f"pipe-{title}.json"
+        opt_path = self.pipes_path / f"pipe-{title}.json"
         self.logger.info(f"del_pipe: opt_path={opt_path}")
         opt_path.unlink()
 
@@ -669,7 +633,7 @@ class Web(options.Options):
         Returns:
             dict: パイプラインの内容
         """
-        opt_path = self.data / f"pipe-{title}.json"
+        opt_path = self.pipes_path / f"pipe-{title}.json"
         if self.logger.level == logging.DEBUG:
             self.logger.debug(f"web.load_pipe: title={title}")
         return common.loadopt(opt_path)
@@ -732,7 +696,7 @@ class Web(options.Options):
         self.logger.info(f"filer_upload: svpath={svpath}")
         opt = dict(mode='client', cmd='file_upload',
                    host=q['host'], port=q['port'], password=q['password'], svname=q['svname'],
-                   local_data=q['local_data'], orverwrite=('orverwrite' in q))
+                   scope=q["scope"], client_data=q['client_data'], orverwrite=('orverwrite' in q))
         for file in request.files.getall('files'):
             with tempfile.TemporaryDirectory() as tmpdir:
                 raw_filename = file.raw_filename.replace('\\','/').replace('//','/')
@@ -857,6 +821,11 @@ class Web(options.Options):
                 raise FileNotFoundError(f'webcap_html is not found. ({self.webcap_html})')
             with open(self.webcap_html, 'r', encoding='utf-8') as f:
                 self.webcap_html_data = f.read()
+        if self.anno_html is not None:
+            if not self.anno_html.is_file():
+                raise FileNotFoundError(f'anno_html is not found. ({self.anno_html})')
+            with open(self.anno_html, 'r', encoding='utf-8') as f:
+                self.anno_html_data = f.read()
         if self.assets is not None:
             if type(self.assets) != list:
                 raise TypeError(f'assets is not list. ({self.assets})')
@@ -966,14 +935,8 @@ class Web(options.Options):
         @app.route('/gui/list_downloads', method='POST')
         def list_downloads():
             current_path = bottle.request.forms.get('current_path')
-            ret = self.list_downloads(current_path)
-            bottle.response.content_type = 'application/json'
-            return json.dumps(ret, default=common.default_json_enc)
-
-        @app.route('/gui/list_tree', method='POST')
-        def list_tree():
-            current_path = bottle.request.forms.get('current_path')
-            ret = self.list_tree(current_path)
+            scope = bottle.request.forms.get('scope')
+            ret = self.list_downloads(current_path, root_path=None, scope=scope)
             bottle.response.content_type = 'application/json'
             return json.dumps(ret, default=common.default_json_enc)
 
@@ -1090,7 +1053,9 @@ class Web(options.Options):
         def filer():
             if self.filer_html_data is not None:
                 return self.filer_html_data
-            return bottle.static_file('filer.html', root=static_root)
+            res:bottle.HTTPResponse = bottle.static_file('filer.html', root=static_root)
+            res.headers['Access-Control-Allow-Origin'] = '*'
+            return res
 
         @app.route('/filer/upload', method='POST')
         def filer_upload():
@@ -1100,7 +1065,9 @@ class Web(options.Options):
         def showimg():
             if self.showimg_html_data is not None:
                 return self.showimg_html_data
-            return bottle.static_file('showimg.html', root=static_root)
+            res:bottle.HTTPResponse = bottle.static_file('showimg.html', root=static_root)
+            res.headers['Access-Control-Allow-Origin'] = '*'
+            return res
 
         @app.route('/showimg/pub_img', method='POST')
         def pub_img():
@@ -1183,8 +1150,6 @@ class Web(options.Options):
 
         @app.route('/webcap')
         def webcap():
-            if self.logger.level == logging.DEBUG:
-                self.logger.debug(f"web.webcap")
             if self.webcap_html_data is not None:
                 return self.webcap_html_data
             res:bottle.HTTPResponse = bottle.static_file('webcap.html', root=static_root)
@@ -1226,9 +1191,11 @@ class Web(options.Options):
 
         @app.route('/annotation')
         def annotation():
-            #if self.annotation_html_data is not None:
-            #    return self.annotation_html_data
-            return bottle.static_file('annotation.html', root=static_root)
+            if self.anno_html_data is not None:
+                return self.anno_html_data
+            res:bottle.HTTPResponse = bottle.static_file('annotation.html', root=static_root)
+            res.headers['Access-Control-Allow-Origin'] = '*'
+            return res
 
         @app.route('/annotation/get_img/<constr>')
         def anno_get_img(constr:str):

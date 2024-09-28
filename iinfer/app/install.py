@@ -40,8 +40,7 @@ class Install(object):
 
     def server(self, data:Path, install_iinfer_tgt:str='iinfer', install_onnx:bool=True,
                install_mmdet:bool=True, install_mmseg:bool=True, install_mmcls:bool=False, install_mmpretrain:bool=True,
-               install_insightface=False, install_diffusers=True, install_llamaindex=True,
-               install_from:str=None, install_no_python:bool=False, install_tag:str=None, install_use_gpu:bool=False):
+               install_insightface=False, install_from:str=None, install_no_python:bool=False, install_tag:str=None, install_use_gpu:bool=False):
         if platform.system() == 'Windows':
             return {"warn": f"Build server command is Unsupported in windows platform."}
         from importlib.resources import read_text
@@ -67,7 +66,7 @@ class Install(object):
             install_use_gpu_opt = '--install_use_gpu' if install_use_gpu else ''
             base_image = 'python:3.11.9-slim' #'python:3.8.18-slim'
             if install_use_gpu:
-                base_image = 'nvidia/cuda:12.4.1-cudnn-runtime-ubuntu22.04' if install_llamaindex else 'nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu22.04'
+                base_image = 'nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu22.04'
             if install_from is not None and install_from != '':
                 base_image = install_from
             text = text.replace('#{FROM}', f'FROM {base_image}')
@@ -82,8 +81,6 @@ class Install(object):
             text = text.replace('#{INSTALL_MMCLS}', f'RUN iinfer -m install -c mmcls --data /home/{user}/.iinfer {install_use_gpu_opt}' if install_mmcls else '')
             text = text.replace('#{INSTALL_MMPRETRAIN}', f'RUN iinfer -m install -c mmpretrain --data /home/{user}/.iinfer {install_use_gpu_opt}' if install_mmpretrain else '')
             text = text.replace('#{INSTALL_INSIGHTFACE}', f'RUN iinfer -m install -c insightface --data /home/{user}/.iinfer {install_use_gpu_opt}' if install_insightface else '')
-            text = text.replace('#{INSTALL_DIFFUSERS}', f'RUN iinfer -m install -c diffusers --data /home/{user}/.iinfer {install_use_gpu_opt}' if install_diffusers else '')
-            text = text.replace('#{INSTALL_LLAMAINDEX}', f'RUN iinfer -m install -c llamaindex --data /home/{user}/.iinfer {install_use_gpu_opt}' if install_llamaindex else '')
             fp.write(text)
         docker_compose_path = Path('docker-compose.yml')
         if not docker_compose_path.exists():
@@ -308,34 +305,3 @@ class Install(object):
         if srcdir.exists():
             return {"success": f"Please remove '{srcdir}' manually."}
         return {"success": f"Success to install mmpretrain."}
-
-    def diffusers(self, data_dir:Path, install_use_gpu:bool=False):
-        ret = self._torch(install_use_gpu)
-        if "error" in ret: return ret
-        ret = self._transformers(install_use_gpu)
-        if "error" in ret: return ret
-
-        ret, _ = common.cmd('pip install diffusers peft', logger=self.logger, slise=-1)
-        if ret != 0:
-            self.logger.warning(f"Failed to install diffusers peft.")
-            return {"error": f"Failed to install diffusers peft."}
-
-        return {"success": f"Success to install diffusers peft."}
-
-    def llamaindex(self, data_dir:Path, install_use_gpu:bool=False):
-        ret = self._torch(install_use_gpu)
-        if "error" in ret: return ret
-        ret = self._transformers(install_use_gpu)
-        if "error" in ret: return ret
-
-        if install_use_gpu and platform.system() == 'Linux':
-            returncode, _ = common.cmd('apt-get install -y nvidia-cuda-toolkit', logger=self.logger, slise=-1)
-            returncode, _ = common.cmd('rm -rf /usr/lib/x86_64-linux-gnu/libnvidia-ml.so.1 /usr/lib/x86_64-linux-gnu/libcuda.so.1 /usr/lib/x86_64-linux-gnu/libcudadebugger.so.1', logger=self.logger, slise=-1)
-            returncode, _ = common.cmd('pip install llama_index llama-index-llms-huggingface llama-index-embeddings-huggingface', logger=self.logger, slise=-1)
-        else:
-            # llama-cpp-python
-            returncode, _ = common.cmd('pip install llama_index llama-index-llms-huggingface llama-index-embeddings-huggingface', logger=self.logger, slise=-1)
-        if returncode != 0:
-            self.logger.warning(f"Failed to install llama_index llama-index-llms-huggingface llama-index-embeddings-huggingface.")
-            return {"error": f"Failed to install llama_index llama-index-llms-huggingface llama-index-embeddings-huggingface."}
-        return {"success": f"Success to install llama_index llama-index-llms-huggingface llama-index-embeddings-huggingface."}

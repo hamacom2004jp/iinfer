@@ -21,8 +21,6 @@ class IinferApp:
         self.sv = None
         self.cl = None
         self.web = None
-        common.copy_sample()
-        common.mklogdir()
 
     def main(self, args_list:list=None, file_dict:dict=dict()):
         """
@@ -75,7 +73,11 @@ class IinferApp:
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append)
             return 1, msg
 
-        logger, _ = common.load_config(args.mode, debug=args.debug)
+        common.mklogdir(args.data)
+        common.copy_sample(args.data)
+        common.copy_sample(Path.cwd())
+
+        logger, _ = common.load_config(args.mode, debug=args.debug, data=args.data)
         if logger.level == logging.DEBUG:
             logger.debug(f"app.main: args.mode={args.mode}, args.cmd={args.cmd}")
         if args.mode == 'server':
@@ -120,7 +122,7 @@ class IinferApp:
                 #self.web = gui.Gui(logger, Path(args.data))
                 self.web = web.Web(logger, Path(args.data), redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname,
                                    client_only=args.client_only, filer_html=args.filer_html, showimg_html=args.showimg_html, webcap_html=args.webcap_html,
-                                   assets=args.assets, gui_mode=True)
+                                   anno_html=args.anno_html, assets=args.assets, gui_mode=True)
                 self.web.start()
                 msg = {"success":"eel web complate."}
                 common.print_format(msg, args.format, tm, args.output_json, args.output_json_append)
@@ -139,7 +141,7 @@ class IinferApp:
                 try:
                     self.web = web.Web(logger, Path(args.data), redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname,
                                     client_only=args.client_only, filer_html=args.filer_html, showimg_html=args.showimg_html, webcap_html=args.webcap_html,
-                                    assets=args.assets)
+                                    anno_html=args.anno_html, assets=args.assets)
                     self.web.start(args.allow_host, args.listen_port, outputs_key=args.outputs_key)
                     msg = {"success":"web complate."}
                     common.print_format(msg, args.format, tm, args.output_json, args.output_json_append)
@@ -262,7 +264,7 @@ class IinferApp:
                                 msg_str = common.to_str(msg, slise=100)
                                 self.cl.logger.debug(f"app.main: args.mode={args.mode}, args.cmd={args.cmd}, msg={msg_str}")
                             return 1, msg
-                        if args.pred_input_type in ['capture', 'prompt']:
+                        if args.pred_input_type in ['capture']:
                             def _pred(args, line, tm):
                                 if self.cl.logger.level == logging.DEBUG:
                                     line_str = common.to_str(line, slise=100)
@@ -306,42 +308,42 @@ class IinferApp:
                         pass
 
             elif args.cmd == 'file_list':
-                local_data = Path(args.local_data.replace('"','')) if args.local_data is not None else None
-                ret = self.cl.file_list(args.svpath.replace('"',''), local_data=local_data,
+                client_data = Path(args.client_data.replace('"','')) if args.client_data is not None else None
+                ret = self.cl.file_list(args.svpath.replace('"',''), scope=args.scope, client_data=client_data,
                                         retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
                 common.print_format(ret, args.format, tm, args.output_json, args.output_json_append)
                 if 'success' not in ret:
                     return 1, ret
             
             elif args.cmd == 'file_mkdir':
-                local_data = Path(args.local_data.replace('"','')) if args.local_data is not None else None
-                ret = self.cl.file_mkdir(args.svpath.replace('"',''), local_data=local_data,
+                client_data = Path(args.client_data.replace('"','')) if args.client_data is not None else None
+                ret = self.cl.file_mkdir(args.svpath.replace('"',''), scope=args.scope, client_data=client_data,
                                          retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
                 common.print_format(ret, args.format, tm, args.output_json, args.output_json_append)
                 if 'success' not in ret:
                     return 1, ret
             
             elif args.cmd == 'file_rmdir':
-                local_data = Path(args.local_data.replace('"','')) if args.local_data is not None else None
-                ret = self.cl.file_rmdir(args.svpath.replace('"',''), local_data=local_data,
+                client_data = Path(args.client_data.replace('"','')) if args.client_data is not None else None
+                ret = self.cl.file_rmdir(args.svpath.replace('"',''), scope=args.scope, client_data=client_data,
                                          retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
                 common.print_format(ret, args.format, tm, args.output_json, args.output_json_append)
                 if 'success' not in ret:
                     return 1, ret
             
             elif args.cmd == 'file_download':
-                local_data = Path(args.local_data.replace('"','')) if args.local_data is not None else None
+                client_data = Path(args.client_data.replace('"','')) if args.client_data is not None else None
                 download_file = Path(args.download_file.replace('"','')) if args.download_file is not None else None
-                ret = self.cl.file_download(args.svpath.replace('"',''), download_file, local_data=local_data, rpath=args.rpath, img_thumbnail=args.img_thumbnail,
+                ret = self.cl.file_download(args.svpath.replace('"',''), download_file, scope=args.scope, client_data=client_data, rpath=args.rpath, img_thumbnail=args.img_thumbnail,
                                             retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
                 common.print_format(ret, args.format, tm, args.output_json, args.output_json_append)
                 if 'success' not in ret:
                     return 1, ret
             
             elif args.cmd == 'file_upload':
-                local_data = Path(args.local_data.replace('"','')) if args.local_data is not None else None
+                client_data = Path(args.client_data.replace('"','')) if args.client_data is not None else None
                 upload_file = Path(args.upload_file.replace('"','')) if args.upload_file is not None else None
-                ret = self.cl.file_upload(args.svpath.replace('"',''), upload_file, local_data=local_data,
+                ret = self.cl.file_upload(args.svpath.replace('"',''), upload_file, scope=args.scope, client_data=client_data,
                                           mkdir=args.mkdir, orverwrite=args.orverwrite,
                                           retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
                 common.print_format(ret, args.format, tm, args.output_json, args.output_json_append)
@@ -349,8 +351,8 @@ class IinferApp:
                     return 1, ret
 
             elif args.cmd == 'file_remove':
-                local_data = Path(args.local_data.replace('"','')) if args.local_data is not None else None
-                ret = self.cl.file_remove(args.svpath.replace('"',''), local_data=local_data,
+                client_data = Path(args.client_data.replace('"','')) if args.client_data is not None else None
+                ret = self.cl.file_remove(args.svpath.replace('"',''), scope=args.scope, client_data=client_data,
                                           retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
                 common.print_format(ret, args.format, tm, args.output_json, args.output_json_append)
                 if 'success' not in ret:
@@ -413,24 +415,6 @@ class IinferApp:
                         cv2.destroyWindow('preview')
                     except:
                         pass
-
-            elif args.cmd == 'prompt':
-                count = 0
-                append = False
-                try:
-                    for t,b64,fn in self.cl.prompt(prompt_format=args.prompt_format, prompt_form=args.prompt_form):
-                        ret = f"{t},"+b64+f",{fn}"
-                        if args.output_csv is not None:
-                            with open(args.output_csv, 'a' if append else 'w', encoding="utf-8") as f:
-                                print(ret, file=f)
-                                append = True
-                        else: common.print_format(ret, False, tm, None, False)
-                        tm = time.perf_counter()
-                        count += 1
-                        if args.prompt_count > 0 and count >= args.prompt_count:
-                            break
-                finally:
-                    pass
 
             else:
                 msg = {"warn":f"Unkown command."}
@@ -644,8 +628,6 @@ class IinferApp:
                                        install_mmcls=args.install_mmcls,
                                        install_mmpretrain=args.install_mmpretrain,
                                        install_insightface=args.install_insightface,
-                                       install_diffusers=args.install_diffusers,
-                                       install_llamaindex=args.install_llamaindex,
                                        install_from=args.install_from,
                                        install_no_python=args.install_no_python,
                                        install_tag=args.install_tag, install_use_gpu=args.install_use_gpu)
@@ -701,26 +683,6 @@ class IinferApp:
                     common.print_format(msg, args.format, tm, args.output_json, args.output_json_append)
                     return 1, msg
                 ret = self.inst.insightface(Path(args.data), install_use_gpu=args.install_use_gpu)
-                common.print_format(ret, args.format, tm, args.output_json, args.output_json_append)
-                if 'success' not in ret:
-                    return 1, ret
-            
-            elif args.cmd == 'diffusers':
-                if args.data is None:
-                    msg = {"warn":f"Please specify the --data option."}
-                    common.print_format(msg, args.format, tm, args.output_json, args.output_json_append)
-                    return 1, msg
-                ret = self.inst.diffusers(Path(args.data), install_use_gpu=args.install_use_gpu)
-                common.print_format(ret, args.format, tm, args.output_json, args.output_json_append)
-                if 'success' not in ret:
-                    return 1, ret
-
-            elif args.cmd == 'llamaindex':
-                if args.data is None:
-                    msg = {"warn":f"Please specify the --data option."}
-                    common.print_format(msg, args.format, tm, args.output_json, args.output_json_append)
-                    return 1, msg
-                ret = self.inst.llamaindex(Path(args.data), install_use_gpu=args.install_use_gpu)
                 common.print_format(ret, args.format, tm, args.output_json, args.output_json_append)
                 if 'success' not in ret:
                     return 1, ret

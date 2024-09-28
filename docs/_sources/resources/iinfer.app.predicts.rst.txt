@@ -4,26 +4,10 @@ iinfer.app.predicts package
 Submodules
 ----------
 
-iinfer.app.predicts.diffusers\_stablediffusionpipeline\_txt2img module
-----------------------------------------------------------------------
-
-.. automodule:: iinfer.app.predicts.diffusers_stablediffusionpipeline_txt2img
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 iinfer.app.predicts.insightface\_det module
 -------------------------------------------
 
 .. automodule:: iinfer.app.predicts.insightface_det
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-iinfer.app.predicts.llamaindex\_elyza\_search module
-----------------------------------------------------
-
-.. automodule:: iinfer.app.predicts.llamaindex_elyza_search
    :members:
    :undoc-members:
    :show-inheritance:

@@ -17,7 +17,7 @@ handlers:
         backupCount: 5
         when : 'D'
         encoding : 'utf-8'
-        filename: logs/iinfer_redis.log
+        filename: .logs/iinfer_redis.log
 
 loggers:
     redis:

@@ -27,8 +27,6 @@ RUN pip install --upgrade pip && \
 #{INSTALL_MMCLS}
 #{INSTALL_MMPRETRAIN}
 #{INSTALL_INSIGHTFACE}
-#{INSTALL_DIFFUSERS}
-#{INSTALL_LLAMAINDEX}
 RUN mkdir -p /home/${MKUSER}/.iinfer && chown -R ${MKUSER}:${MKUSER} /home/${MKUSER}/.iinfer
 
 ENV REDIS_HOST=redis

@@ -235,7 +235,8 @@ iinfer.get_server_opt = (do_sv_exec_cmd, parent_elem) => {
         parent_elem.find('.filer_port').val(opt['port']);
         parent_elem.find('.filer_password').val(opt['password']);
         parent_elem.find('.filer_svname').val(opt['svname']);
-        parent_elem.find('.filer_local_data').val(opt['data']);
+        parent_elem.find('.filer_client_data').val("client");
+        parent_elem.find('.filer_client_data').val(opt['data']);
     });
     return prom;
   }
@@ -244,8 +245,9 @@ iinfer.get_server_opt = (do_sv_exec_cmd, parent_elem) => {
     const filer_port = parent_elem.find('.filer_port').val();
     const filer_password = parent_elem.find('.filer_password').val();
     const filer_svname = parent_elem.find('.filer_svname').val();
-    const filer_local_data = parent_elem.find('.filer_local_data').val();
-    return {"host":filer_host, "port":filer_port, "password":filer_password, "svname":filer_svname, "local_data": filer_local_data};
+    const filer_scope = parent_elem.find('.filer_scope').val();
+    const filer_client_data = parent_elem.find('.filer_client_data').val();
+    return {"host":filer_host, "port":filer_port, "password":filer_password, "svname":filer_svname, "scope": filer_scope, "client_data": filer_client_data};
   } catch (e) {
     console.log(e);
     return {};
@@ -256,8 +258,9 @@ iinfer.get_server_opt = (do_sv_exec_cmd, parent_elem) => {
  * @param {$} parent_elem - 接続先情報のhidden要素を含む祖先要素
  * @param {function} call_back_func - サーバーリストを選択した時のコールバック関数
  * @param {bool} server_only - サーバーのみ表示
+ * @param {bool} current_only - カレントのみ表示
  */
-iinfer.load_server_list = (parent_elem, call_back_func, server_only) => {
+iinfer.load_server_list = (parent_elem, call_back_func, server_only, current_only) => {
   iinfer.show_loading();
   parent_elem.find('.filer_svnames').remove();
   const mk_func = (elem) => {return ()=>{
@@ -266,11 +269,12 @@ iinfer.load_server_list = (parent_elem, call_back_func, server_only) => {
     parent_elem.find('.filer_port').val(elem.attr('data-port'));
     parent_elem.find('.filer_password').val(elem.attr('data-password'));
     parent_elem.find('.filer_svname').val(elem.attr('data-svname'));
-    parent_elem.find('.filer_local_data').val(elem.attr('data-local_data'));
+    parent_elem.find('.filer_scope').val(elem.attr('data-scope'));
+    parent_elem.find('.filer_client_data').val(elem.attr('data-client_data'));
     if (call_back_func) call_back_func(iinfer.get_server_opt(false, parent_elem));
     //fsapi.tree(fsapi.right, "/", fsapi.right.find('.tree-menu'), false);
   }};
-  if (!iinfer.initargs['client_only']) {
+  if (!iinfer.initargs['client_only'] && !current_only) {
     const opt = iinfer.get_server_opt(false, parent_elem);
     opt['mode'] = 'server';
     opt['cmd'] = 'list';
@@ -290,11 +294,12 @@ iinfer.load_server_list = (parent_elem, call_back_func, server_only) => {
         const svname = elem['svname'].split('-')[0];
         if (svnames[svname]) return;
         svnames[svname] = true;
-        const a_elem = $(`<a class="dropdown-item" href="#" data-local_data="">${svname} ( ${opt['host']}:${opt['port']} )</a>`);
+        const a_elem = $(`<a class="dropdown-item" href="#" data-client_data="">${svname} ( ${opt['host']}:${opt['port']} )</a>`);
         a_elem.attr('data-host', opt['host']);
         a_elem.attr('data-port', opt['port']);
         a_elem.attr('data-password', opt['password']);
         a_elem.attr('data-svname', svname);
+        a_elem.attr('data-scope', "server");
         a_elem.off("click").on("click", mk_func(a_elem));
         const li_elem = $('<li class="filer_svnames"></li>').append(a_elem);
         parent_elem.find('.filer_server').append(li_elem);
@@ -306,19 +311,27 @@ iinfer.load_server_list = (parent_elem, call_back_func, server_only) => {
       iinfer.hide_loading();
     });
   }
-  const cl = () => {
-    const a_elem = $(`<a class="dropdown-item" href="#">client</a>`);
+  const cl = (label, local_dir) => {
+    const a_elem = $(`<a class="dropdown-item" href="#">${label}</a>`);
     a_elem.attr('data-host', iinfer.initargs['host']);
     a_elem.attr('data-port', iinfer.initargs['port']);
     a_elem.attr('data-password', iinfer.initargs['password']);
-    a_elem.attr('data-svname', 'client');
-    a_elem.attr('data-local_data', iinfer.initargs['data']);
-    a_elem.off("click").on("click", mk_func(a_elem));
+    a_elem.attr('data-svname', label);
+    a_elem.attr('data-scope', label);
+    a_elem.attr('data-client_data', local_dir);
+    a_elem.off("click").on("click", (event) => {
+      parent_elem.find('.filer_address').val(current_only ? '.' : '/');
+      mk_func($(event.target))();
+    });
     const li_elem = $('<li class="filer_svnames"></li>').append(a_elem);
     parent_elem.find('.filer_server').append(li_elem);
-    parent_elem.find('.filer_server').find('.dropdown-item:first').click();
   }
-  if (!server_only) cl();
+  if (current_only) cl('current', '.');
+  else if (!server_only) {
+    cl('client', iinfer.initargs['data']);
+    cl('current', '.');
+  }
+  parent_elem.find('.filer_server').find('.dropdown-item:first').click();
 }
 /**
  * ファイルアップロード
@@ -331,10 +344,18 @@ iinfer.load_server_list = (parent_elem, call_back_func, server_only) => {
  * @param {function} error_func - エラー時のコールバック関数。呼出時の引数はtarget, svpath, data
  */
 iinfer.file_upload = (target, svpath, formData, orverwrite=false, progress_func=undefined, success_func=undefined, error_func=undefined) => {
-  param = {method: 'POST', body: formData};
-  opt = iinfer.get_server_opt(false, target);
+  const param = {method: 'POST', body: formData};
+  const opt = iinfer.get_server_opt(false, target);
+  let param_str = `host=${encodeURI(opt['host'])}`;
+  param_str += `&port=${encodeURI(opt['port'])}`;
+  param_str += `&password=${encodeURI(opt['password'])}`;
+  param_str += `&svname=${encodeURI(opt['svname'])}`;
+  param_str += `&orverwrite=${!!orverwrite}`;
+  param_str += `&svpath=${encodeURI(svpath)}`;
+  param_str += `&scope=${encodeURI(opt['scope'])}`;
+  param_str += `&client_data=${encodeURI(opt['client_data'])}`;
   $.ajax({ // fetchだとxhr.upload.onprogressが使えないため、$.ajaxを使用
-    url: `filer/upload?host=${encodeURI(opt['host'])}&port=${encodeURI(opt['port'])}&password=${encodeURI(opt['password'])}&svname=${encodeURI(opt['svname'])}&orverwrite=${!!orverwrite}&svpath=${encodeURI(svpath)}&local_data=${encodeURI(opt['local_data'])}`,
+    url: `filer/upload?${param_str}`,
     type: 'POST',
     processData: false,
     contentType: false,

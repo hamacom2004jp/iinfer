@@ -620,7 +620,8 @@ class Server(filer.Filer):
                 continue
             conf_path = dir / "conf.json"
             if not conf_path.exists():
-                self.logger.warn(f"Conf path {str(conf_path)} does not exist")
+                if self.logger.level == logging.DEBUG:
+                    self.logger.debug(f"Conf path {str(conf_path)} does not exist")
                 continue
             with open(conf_path, "r") as cf:
                 conf = json.load(cf)
@@ -940,9 +941,14 @@ class Server(filer.Filer):
         Returns:
             int: レスポンスコード
         """
-        rescode, msg = super().file_list(current_path)
-        self.redis_cli.rpush(reskey, msg)
-        return rescode
+        try:
+            rescode, msg = super().file_list(current_path)
+            self.redis_cli.rpush(reskey, msg)
+            return rescode
+        except Exception as e:
+            self.logger.warn(f"Failed to get file list: {e}", exc_info=True)
+            self.redis_cli.rpush(reskey, {"warn": f"Failed to get file list: {e}"})
+            return self.RESP_WARN
 
     def file_mkdir(self, reskey:str, current_path:str) -> int:
         """
@@ -955,9 +961,14 @@ class Server(filer.Filer):
         Returns:
             int: レスポンスコード
         """
-        rescode, msg = super().file_mkdir(current_path)
-        self.redis_cli.rpush(reskey, msg)
-        return rescode
+        try:
+            rescode, msg = super().file_mkdir(current_path)
+            self.redis_cli.rpush(reskey, msg)
+            return rescode
+        except Exception as e:
+            self.logger.warn(f"Failed to make directory: {e}", exc_info=True)
+            self.redis_cli.rpush(reskey, {"warn": f"Failed to make directory: {e}"})
+            return self.RESP_WARN
     
     def file_rmdir(self, reskey:str, current_path:str) -> int:
         """
@@ -970,9 +981,14 @@ class Server(filer.Filer):
         Returns:
             int: レスポンスコード
         """
-        rescode, msg = super().file_rmdir(current_path)
-        self.redis_cli.rpush(reskey, msg)
-        return rescode
+        try:
+            rescode, msg = super().file_rmdir(current_path)
+            self.redis_cli.rpush(reskey, msg)
+            return rescode
+        except Exception as e:
+            self.logger.warn(f"Failed to remove directory: {e}", exc_info=True)
+            self.redis_cli.rpush(reskey, {"warn": f"Failed to remove directory: {e}"})
+            return self.RESP_WARN
 
     def file_download(self, reskey:str, current_path:str, img_thumbnail:float=0.0) -> int:
         """
@@ -985,9 +1001,14 @@ class Server(filer.Filer):
         Returns:
             int: レスポンスコード
         """
-        rescode, msg = super().file_download(current_path, img_thumbnail)
-        self.redis_cli.rpush(reskey, msg)
-        return rescode
+        try:
+            rescode, msg = super().file_download(current_path, img_thumbnail)
+            self.redis_cli.rpush(reskey, msg)
+            return rescode
+        except Exception as e:
+            self.logger.warn(f"Failed to download file: {e}", exc_info=True)
+            self.redis_cli.rpush(reskey, {"warn": f"Failed to download file: {e}"})
+            return self.RESP_WARN
 
     def file_upload(self, reskey:str, current_path:str, file_name:str, file_data:bytes, mkdir:bool, orverwrite:bool) -> int:
         """
@@ -1004,9 +1025,14 @@ class Server(filer.Filer):
         Returns:
             int: レスポンスコード
         """
-        rescode, msg = super().file_upload(current_path, file_name, file_data, mkdir, orverwrite)
-        self.redis_cli.rpush(reskey, msg)
-        return rescode
+        try:
+            rescode, msg = super().file_upload(current_path, file_name, file_data, mkdir, orverwrite)
+            self.redis_cli.rpush(reskey, msg)
+            return rescode
+        except Exception as e:
+            self.logger.warn(f"Failed to upload file: {e}", exc_info=True)
+            self.redis_cli.rpush(reskey, {"warn": f"Failed to upload file: {e}"})
+            return self.RESP_WARN
 
     def file_remove(self, reskey:str, current_path:str) -> int:
         """
@@ -1019,6 +1045,11 @@ class Server(filer.Filer):
         Returns:
             int: レスポンスコード
         """
-        rescode, msg = super().file_remove(current_path)
-        self.redis_cli.rpush(reskey, msg)
-        return rescode
+        try:
+            rescode, msg = super().file_remove(current_path)
+            self.redis_cli.rpush(reskey, msg)
+            return rescode
+        except Exception as e:
+            self.logger.warn(f"Failed to remove file: {e}", exc_info=True)
+            self.redis_cli.rpush(reskey, {"warn": f"Failed to remove file: {e}"})
+            return self.RESP_WARN

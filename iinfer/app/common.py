@@ -24,13 +24,20 @@ import yaml
 APP_ID = 'iinfer'
 HOME_DIR = Path(os.path.expanduser("~"))
 
-def copy_sample(dst:Path=Path.cwd()/'sample'):
+def copy_sample(data:Path):
+    """
+    サンプルデータをコピーします。
+
+    Args:
+        data (Path): データディレクトリ
+    """
+    dst = Path(data) / '.samples' if data is not None else HOME_DIR / '.samples'
     if dst.exists():
         return
     src = Path(__file__).parent.parent / 'extensions'
     shutil.copytree(src, dst, dirs_exist_ok=True)
 
-def mklogdir(logdir:Path=Path.cwd()/'logs') -> Path:
+def mklogdir(data:Path) -> Path:
     """
     ログディレクトリを作成します。
 
@@ -40,23 +47,30 @@ def mklogdir(logdir:Path=Path.cwd()/'logs') -> Path:
     Returns:
         作成したログディレ作成したログディレクトリのパス
     """
+    logdir = Path(data) / '.logs' if data is not None else HOME_DIR / '.logs'
     if not logdir.exists():
         return mkdirs(logdir)
     return logdir
 
-def load_config(mode:str, debug:bool=False) -> Tuple[logging.Logger, dict]:
+def load_config(mode:str, debug:bool=False, data=HOME_DIR) -> Tuple[logging.Logger, dict]:
     """
     指定されたモードのロガーと設定を読み込みます。
 
     Args:
         mode (str): モード名
         debug (bool, optional): デバッグモード. Defaults to False
+        data (Path, optional): データディレクトリ. Defaults to HOME_DIR.
 
     Returns:
         logger (logging.Logger): ロガー
         config (dict): 設定
     """
+    data = Path(data) if data is not None else HOME_DIR
     log_config = yaml.safe_load(resource_string(APP_ID, f"logconf_{mode}.yml"))
+    for k, h in log_config['handlers'].items():
+        if 'filename' in h:
+            h['filename'] = data / h['filename']
+            mkdirs(h['filename'].parent)
     logging.config.dictConfig(log_config)
     logger = logging.getLogger(mode)
     set_debug(logger, debug)

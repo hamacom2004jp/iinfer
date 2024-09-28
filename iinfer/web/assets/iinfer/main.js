@@ -62,8 +62,8 @@ $(() => {
     };
     gui_callback();
 });
-const get_local_data = async () => {
-    const res = await fetch('gui/get_local_data', {method: 'GET'});
+const get_client_data = async () => {
+    const res = await fetch('gui/get_client_data', {method: 'GET'});
     return await res.text();
 }
 const bbforce_cmd = async () => {

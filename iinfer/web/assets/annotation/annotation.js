@@ -42,6 +42,10 @@ anno.deploy_list = () => {
  * @return {void}
  **/
 anno.load_conf = (svpath) => {
+  if (!svpath) {
+    iinfer.message('No deployments include train datasets.');
+    return;
+  }
   // conf.jsonの取得
   const opt = iinfer.get_server_opt(false, anno.left_container);
   opt['mode'] = 'client';
@@ -332,12 +336,7 @@ anno.save_anno = (svpath, image_path, svg_elem) => {
       const svg_elem = $(`<img src="${constr}?r=${iinfer.randam_string(8)}" data-path="${svpath}${image_path}.svg" style="position: absolute; left: 0px; top: 0px;"/>`);
       svg_elem.attr('width', fl_img_elem.attr('width')).attr('height', fl_img_elem.attr('height'));
       fl_img_elem.parent().append(svg_elem);
-    /*} else if (anno.tool.conf['train_dataset'] && anno.tool.conf['deploy_dir']){
-      // アノテーション画像が存在しない場合はファイルリストからリロード
-      const train_dataset = anno.tool.conf['train_dataset'].replace(anno.tool.conf['deploy_dir'], '').replace(/\\/, '/');
-      const image_dir = image_path.split('/').slice(0, -1).join('/');
-      anno.load_filelist(`${svpath}${train_dataset}`, `${svpath}${image_dir}`, anno.left_container.find('.tree-menu'));
-    */}
+    }
     iinfer.hide_loading();
     iinfer.message(`Saved in. image_path=${svpath}${image_path}.svg`);
   }, error_func=(target, svpath, data) => {
@@ -1243,7 +1242,7 @@ anno.init_tool_button = () => {
 anno.onload = () => {
   iinfer.show_loading();
   iinfer.get_server_opt(true, anno.left_container).then((opt) => {
-    iinfer.load_server_list(anno.left_container, (opt) => anno.deploy_list(), true);
+    iinfer.load_server_list(anno.left_container, (opt) => anno.deploy_list(), true, false);
   });
   anno.init_tool_button();
 };
