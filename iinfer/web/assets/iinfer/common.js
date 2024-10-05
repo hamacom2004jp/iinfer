@@ -8,14 +8,14 @@ iinfer.change_dark_mode = (dark_mode) => {
   if(dark_mode) html.attr('data-bs-theme','dark');
   else if(html.attr('data-bs-theme')=='dark') html.removeAttr('data-bs-theme');
   else html.attr('data-bs-theme','dark');
-}
+};
 /**
  * ローディング表示
  */
 iinfer.show_loading = () => {
   const elem = $('#loading');
   elem.removeClass('d-none');
-}
+};
 /**
  * ローディング非表示
  */
@@ -24,7 +24,7 @@ iinfer.hide_loading = () => {
   elem.addClass('d-none');
   const progress = $('#progress');
   progress.addClass('d-none');
-}
+};
 /**
  * テキストデータかどうか判定
  * @param {number[]} array - バイト配列
@@ -33,7 +33,7 @@ iinfer.hide_loading = () => {
 iinfer.is_text = (array) => {
   const textChars = [7, 8, 9, 10, 12, 13, 27, ...iinfer.range(0x20, 0xff, 1)];
   return array.every(e => textChars.includes(e));
-}
+};
 /**
  * Dateオブジェクトを日付文字列に変換
  * @param {Date} date - Dateオブジェクト
@@ -43,7 +43,7 @@ iinfer.toDateStr = (date) => {
   return date.toLocaleDateString('ja-JP', {
     year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit'
   });
-}
+};
 /**
  * 指定された範囲の数値の配列を生成する
  * @param {number} start - 開始値
@@ -53,7 +53,7 @@ iinfer.toDateStr = (date) => {
  */
 iinfer.range = (start, stop, step) => {
   return Array.from({ length: (stop - start) / step + 1 }, (_, i) => start + i * step);
-}
+};
 /**
  * アラートメッセージ表示
  * @param {object} res - レスポンス
@@ -62,14 +62,14 @@ iinfer.message = (res) => {
   msg = JSON.stringify(res)
   alert(msg.replace(/\\n/g, '\n'));
   iinfer.hide_loading();
-}
+};
 /**
  * コピーライト表示
  */
 iinfer.copyright = async () => {
   const res = await fetch('copyright', {method: 'GET'});
   $('.copyright').text(await res.text());
-}
+};
 /**
  * バージョンモーダルを初期化
  */
@@ -123,7 +123,7 @@ iinfer.init_version_modal = () => {
     };
     versions_used_func();
   });
-}
+};
 /**
  * モーダルボタン初期化
  */
@@ -155,7 +155,7 @@ iinfer.init_modal_button = () => {
       return false;
     }
   });
-}
+};
 /**
  * ファイルサイズ表記を取得する
  * @param {number} size - ファイルサイズ
@@ -197,7 +197,17 @@ iinfer.randam_color = (color=undefined) => {
   }
   code = color.map(e => ("00"+e.toString(16)).slice(-2)).join('');
   return code;
-}
+};
+/**
+ * カラーコードを取得する
+ * @param {number} id - ラベルID
+ * @returns {string} - カラーコード
+ **/
+iinfer.make_color4id = (id=0) => {
+  color = [(~~(256*(id/(256**3)))), (~~(256*(id/(256**2)))), (~~(256*(id/(256**1))))];
+  code = color.map(e => ("00"+e.toString(16)).slice(-2)).join('');
+  return code;
+};
 /**
  * ランダムな文字列を生成する
  * @param {number} length - 文字列の長さ
@@ -206,7 +216,28 @@ iinfer.randam_color = (color=undefined) => {
 iinfer.randam_string = (length) => {
   const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   return Array.from({length: length}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
-}
+};
+/**
+ * ファイル名から拡張子を取り除いた文字列を取得する
+ * @param {string} filename - ファイル名
+ * @returns {string} - 拡張子を取り除いた文字列
+ **/
+iinfer.chopext = (filename) => {
+  return filename.replace(/\.[^/.]+$/, "");
+};
+/**
+ * Imageオブジェクトを使用して画像を読み込むPromiseを生成する
+ * @param {string} url - 画像のURL
+ * @returns {Promise} - 画像の読み込みPromise
+ **/
+iinfer.load_img_sync = (url) => {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => reject(new Error(`Failed to load image's URL: ${url}`));
+    img.src = url;
+  });
+};
 /**
  * サーバーAPI実行
  * @param {object} opt - オプション
@@ -219,7 +250,9 @@ iinfer.sv_exec_cmd = async (opt) => {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify(opt)
-  }).then(response => response.json());
+  }).then(response => response.json()).catch((e) => {
+    console.log(e);
+  });
 };
 /**
  * 接続情報取得
@@ -252,7 +285,7 @@ iinfer.get_server_opt = (do_sv_exec_cmd, parent_elem) => {
     console.log(e);
     return {};
   }
-}
+};
 /**
  * サーバーリスト取得
  * @param {$} parent_elem - 接続先情報のhidden要素を含む祖先要素
@@ -332,7 +365,97 @@ iinfer.load_server_list = (parent_elem, call_back_func, server_only, current_onl
     cl('current', '.');
   }
   parent_elem.find('.filer_server').find('.dropdown-item:first').click();
-}
+};
+/**
+ * deployリスト取得
+ * @param {$} target - 接続先情報のhidden要素を含む祖先要素
+ * @param {function} error_func - エラー時のコールバック関数
+ * @returns {Promise} - レスポンス
+ **/
+iinfer.deploy_list = (target, error_func=undefined) => {
+  const opt = iinfer.get_server_opt(false, target);
+  opt['mode'] = 'client';
+  opt['cmd'] = 'deploy_list';
+  opt['capture_stdout'] = true;
+  iinfer.show_loading();
+  return iinfer.sv_exec_cmd(opt).then(res => {
+    if(!res[0] || !res[0]['success']) {
+      if (error_func) {
+        error_func(res);
+        return;
+      }
+      iinfer.hide_loading();
+      iinfer.message(res);
+      return;
+    }
+    if (!res[0]['success']['data']) {
+      iinfer.hide_loading();
+      return
+    }
+    return res[0]['success'];
+  });
+};
+/**
+ * ファイルリスト取得
+ * @param {$} target - 接続先情報のhidden要素を含む祖先要素
+ * @param {string} svpath - サーバーパス
+ * @param {function} error_func - エラー時のコールバック関数
+ * @param {function} exec_cmd - サーバーAPI実行関数
+ * @returns {Promise} - レスポンス
+ **/
+iinfer.file_list = (target, svpath, error_func=undefined, exec_cmd=undefined) => {
+  const opt = iinfer.get_server_opt(false, target);
+  opt['mode'] = 'client';
+  opt['cmd'] = 'file_list';
+  opt['capture_stdout'] = true;
+  opt['svpath'] = svpath;
+  iinfer.show_loading();
+  const exec = exec_cmd ? exec_cmd : iinfer.sv_exec_cmd;
+  return exec(opt).then(res => {
+    if(!res[0] || !res[0]['success']) {
+      if (error_func) {
+        error_func(res);
+        return;
+      }
+      iinfer.hide_loading();
+      iinfer.message(res);
+      return;
+    }
+    return res[0]['success'];
+  });
+};
+/**
+ * ファイルダウンロード
+ * @param {$} target - 接続先情報のhidden要素を含む祖先要素
+ * @param {string} svpath - サーバーパス
+ * @param {function} error_func - エラー時のコールバック関数
+ * @param {function} exec_cmd - サーバーAPI実行関数
+ * @returns {Promise} - レスポンス
+ **/
+iinfer.file_download = (target, svpath, error_func=undefined, exec_cmd=undefined) => {
+  const opt = iinfer.get_server_opt(false, target);
+  opt['mode'] = 'client';
+  opt['cmd'] = 'file_download';
+  opt['capture_stdout'] = true;
+  opt['svpath'] = svpath;
+  opt['maxsize'] = 1024**3*10;
+  iinfer.show_loading();
+  const exec = exec_cmd ? exec_cmd : iinfer.sv_exec_cmd;
+  return exec(opt).then(res => {
+    if(!res[0] || !res[0]['success'] || !res[0]['success']['data']) {
+      if (error_func) {
+        error_func(res);
+        return;
+      }
+      iinfer.hide_loading();
+      iinfer.message(res);
+      return;
+    }
+    return res[0]['success'];
+  }).catch((e) => {
+    console.log(e);
+  });
+};
 /**
  * ファイルアップロード
  * @param {$} target - 接続先情報のhidden要素を含む祖先要素
@@ -342,8 +465,9 @@ iinfer.load_server_list = (parent_elem, call_back_func, server_only, current_onl
  * @param {function} progress_func - 進捗状況を表示する関数。呼出時の引数はe(イベントオブジェクト)のみ
  * @param {function} success_func - 成功時のコールバック関数。呼出時の引数はtarget, svpath, data
  * @param {function} error_func - エラー時のコールバック関数。呼出時の引数はtarget, svpath, data
+ * @param {bool} async_fg - 非同期で実行するかどうか
  */
-iinfer.file_upload = (target, svpath, formData, orverwrite=false, progress_func=undefined, success_func=undefined, error_func=undefined) => {
+iinfer.file_upload = (target, svpath, formData, orverwrite=false, progress_func=undefined, success_func=undefined, error_func=undefined, async_fg=true) => {
   const param = {method: 'POST', body: formData};
   const opt = iinfer.get_server_opt(false, target);
   let param_str = `host=${encodeURI(opt['host'])}`;
@@ -359,7 +483,7 @@ iinfer.file_upload = (target, svpath, formData, orverwrite=false, progress_func=
     type: 'POST',
     processData: false,
     contentType: false,
-    async: true,
+    async: async_fg,
     data: formData,
     xhr: function() {
       const xhr = $.ajaxSettings.xhr();
@@ -384,3 +508,161 @@ iinfer.file_upload = (target, svpath, formData, orverwrite=false, progress_func=
     }
   });
 }
+/**
+ * ファイルコピ－
+ * @param {$} target - 接続先情報のhidden要素を含む祖先要素
+ * @param {string} from_path - コピー元パス
+ * @param {string} to_path - コピー先パス
+ * @param {bool} orverwrite - 上書きするかどうか
+ * @param {function} error_func - エラー時のコールバック関数
+ * @param {function} exec_cmd - サーバーAPI実行関数
+ * @returns {Promise} - レスポンス
+ */
+iinfer.file_copy = (target, from_path, to_path, orverwrite=false, error_func=undefined, exec_cmd=undefined) => {
+  const opt = iinfer.get_server_opt(false, target);
+  opt['mode'] = 'client';
+  opt['cmd'] = 'file_copy';
+  opt['capture_stdout'] = true;
+  opt['from_path'] = from_path;
+  opt['to_path'] = to_path;
+  opt['orverwrite'] = orverwrite;
+  iinfer.show_loading();
+  const exec = exec_cmd ? exec_cmd : iinfer.sv_exec_cmd;
+  return exec(opt).then(res => {
+    if(!res[0] || !res[0]['success']) {
+      if (error_func) {
+        error_func(res);
+        return;
+      }
+      iinfer.hide_loading();
+      iinfer.message(res);
+      return;
+    }
+    return res[0]['success'];
+  });
+};
+/**
+ * ファイル削除
+ * @param {$} target - 接続先情報のhidden要素を含む祖先要素
+ * @param {string} svpath - サーバーパス
+ * @param {function} error_func - エラー時のコールバック関数
+ * @param {function} exec_cmd - サーバーAPI実行関数
+ * @returns {Promise} - レスポンス
+ **/
+iinfer.file_remove = (target, svpath, error_func=undefined, exec_cmd=undefined) => {
+  const opt = iinfer.get_server_opt(false, target);
+  opt['mode'] = 'client';
+  opt['cmd'] = 'file_remove';
+  opt['capture_stdout'] = true;
+  opt['svpath'] = svpath;
+  iinfer.show_loading();
+  const exec = exec_cmd ? exec_cmd : iinfer.sv_exec_cmd;
+  return exec(opt).then(res => {
+    if(!res[0] || !res[0]['success']) {
+      if (error_func) {
+        error_func(res);
+        return;
+      }
+      iinfer.hide_loading();
+      iinfer.message(res);
+      return;
+    }
+    return res[0]['success'];
+  });
+};
+/**
+ * ディレクトリ削除
+ * @param {$} target - 接続先情報のhidden要素を含む祖先要素
+ * @param {string} svpath - サーバーパス
+ * @param {function} error_func - エラー時のコールバック関数
+ * @param {function} exec_cmd - サーバーAPI実行関数
+ * @returns {Promise} - レスポンス
+ **/
+iinfer.file_rmdir = (target, svpath, error_func=undefined, exec_cmd=undefined) => {
+  const opt = iinfer.get_server_opt(false, target);
+  opt['mode'] = 'client';
+  opt['cmd'] = 'file_rmdir';
+  opt['capture_stdout'] = true;
+  opt['svpath'] = svpath;
+  iinfer.show_loading();
+  const exec = exec_cmd ? exec_cmd : iinfer.sv_exec_cmd;
+  return exec(opt).then(res => {
+    if(!res[0] || !res[0]['success']) {
+      if (error_func) {
+        error_func(res);
+        return;
+      }
+      iinfer.hide_loading();
+      iinfer.message(res);
+      return;
+    }
+    return res[0]['success'];
+  });
+};
+/**
+ * ディレクトリ作成
+ * @param {$} target - 接続先情報のhidden要素を含む祖先要素
+ * @param {string} svpath - サーバーパス
+ * @param {function} error_func - エラー時のコールバック関数
+ * @param {function} exec_cmd - サーバーAPI実行関数
+ * @returns {Promise} - レスポンス
+ **/
+iinfer.file_mkdir = (target, svpath, error_func=undefined, exec_cmd=undefined) => {
+  const opt = iinfer.get_server_opt(false, target);
+  opt['mode'] = 'client';
+  opt['cmd'] = 'file_mkdir';
+  opt['capture_stdout'] = true;
+  opt['svpath'] = svpath;
+  iinfer.show_loading();
+  const exec = exec_cmd ? exec_cmd : iinfer.sv_exec_cmd;
+  return exec(opt).then(res => {
+    if(!res[0] || !res[0]['success']) {
+      if (error_func) {
+        error_func(res);
+        return;
+      }
+      iinfer.hide_loading();
+      iinfer.message(res);
+      return;
+    }
+    return res[0]['success'];
+  });
+};
+/**
+ * プログレスバー表示
+ * @param {number} _min - 最小値
+ * @param {number} _max - 最大値
+ * @param {number} _now - 現在値
+ * @param {string} _text - テキスト
+ * @param {bool} _show - 表示するかどうか
+ * @param {bool} _cycle - サイクル表示するかどうか
+ */
+iinfer.progress = (_min, _max, _now, _text, _show, _cycle) => {
+  const prog_elem = $('.progress');
+  const bar_elem = prog_elem.find('.progress-bar');
+  const bar_text = bar_elem.find('.progress-bar-text');
+  if(_show) prog_elem.removeClass('d-none');
+  else prog_elem.addClass('d-none');
+  prog_elem.attr('aria-valuemin', _min);
+  prog_elem.attr('aria-valuemax', _max);
+  prog_elem.attr('aria-valuenow', _now);
+  if (!_cycle) {
+    const par = Math.floor((_now / (_max-_min)) * 10000) / 100
+    bar_elem.css('left', 'auto').css('width', `${par}%`);
+    bar_text.text(`${par.toFixed(2)}% ( ${_now} / ${_max} ) ${_text}`);
+    clearTimeout(progress_handle);
+  } else {
+    let maxwidth = prog_elem.css('width');
+    maxwidth = parseInt(maxwidth.replace('px', ''));
+    let left = bar_elem.css('left');
+    if (!left || left=='auto') left = 0;
+    else left = parseInt(left.replace('px', ''));
+    if (left > maxwidth) left = -200;
+    left += 2;
+    bar_elem.css('width', '200px').css('position', 'relative').css('left', `${left}px`);
+    bar_text.text(_text?_text:'Server processing...');
+    var progress_handle = setTimeout(() => {
+      if (!$('#loading').is('.d-none')) iinfer.progress(_min, _max, _now, _text, _show, _cycle);
+    }, 20);
+  }
+};

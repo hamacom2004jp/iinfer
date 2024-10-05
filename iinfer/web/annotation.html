@@ -74,7 +74,7 @@
                 <!-- アノテーションツールボックス -->
                 <div class="input-group p-1">
                     <span class="input-group-text">annotation</span>
-                    <button class="btn btn-outline-secondary" type="button" title="saveall" data-bs-toggle="dropdown">
+                    <button class="btn btn-outline-secondary" type="button" title="export" data-bs-toggle="dropdown">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-up" viewBox="0 0 16 16">
                             <path fill-rule="evenodd" d="M3.5 6a.5.5 0 0 0-.5.5v8a.5.5 0 0 0 .5.5h9a.5.5 0 0 0 .5-.5v-8a.5.5 0 0 0-.5-.5h-2a.5.5 0 0 1 0-1h2A1.5 1.5 0 0 1 14 6.5v8a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 14.5v-8A1.5 1.5 0 0 1 3.5 5h2a.5.5 0 0 1 0 1h-2z"/>
                             <path fill-rule="evenodd" d="M7.646.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 1.707V10.5a.5.5 0 0 1-1 0V1.707L5.354 3.854a.5.5 0 1 1-.708-.708l3-3z"/>
@@ -83,7 +83,12 @@
                     <ul class="dropdown-menu">
                         <li>
                             <a class="dropdown-item d-flex pt-0 pb-0 tool_bot_annosave_all_coco" href="#">
-                                <span class="ms-2 mb-1">Save MS COCO format</span>
+                                <span class="ms-2 mb-1">Export MS COCO format</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item d-flex pt-0 pb-0 tool_bot_annosave_all_cityscapes" href="#">
+                                <span class="ms-2 mb-1">Export Cityscapes format</span>
                             </a>
                         </li>
                     </ul>
@@ -201,50 +206,6 @@
             <div class="progress-bar-text text-start w-50"></div>
         </div>
     </div>
-    <!-- ファイラーモーダル -->
-    <div id="filer_modal" class="modal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <form id="result_form" class="modal-content novalidate">
-                <div class="modal-header">
-                    <h5 class="modal-title text-nowrap">Modal title</h5>
-                    <div class="input-group p-1">
-                        <button class="btn btn-outline-secondary dropdown-toggle filer_server_bot" type="button" data-bs-toggle="dropdown" aria-expanded="false">Client</button>'
-                        <input name="filer_host" type="hidden" class="filer_host">
-                        <input name="filer_port" type="hidden" class="filer_port">
-                        <input name="filer_password" type="hidden" class="filer_password">
-                        <input name="filer_svname" type="hidden" class="filer_svname">
-                        <input name="filer_scope" type="hidden" class="filer_scope">
-                        <input name="filer_client_data" type="hidden" class="filer_client_data">
-                        <ul class="dropdown-menu filer_server"></ul>
-                        <input type="text" class="form-control filer_address" aria-describedby="button-addon2">
-                        <button class="btn btn-outline-secondary filer_address_bot" type="button" id="button-addon2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right-circle" viewBox="0 0 16 16">
-                                <path fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8zm15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z"/>
-                            </svg>
-                        </button>
-                    </div>
-                    <button type="button" class="btn btn_window_stack">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-window-stack" viewBox="0 0 16 16">
-                            <path d="M4.5 6a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1ZM6 6a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1Zm2-.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0Z"/>
-                            <path d="M12 1a2 2 0 0 1 2 2 2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2 2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h10ZM2 12V5a2 2 0 0 1 2-2h9a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1Zm1-4v5a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V8H3Zm12-1V5a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v2h12Z"/>
-                        </svg>
-                    </button>
-                    <button type="button" class="btn btn_window">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-window" viewBox="0 0 16 16">
-                            <path d="M2.5 4a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1zm2-.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zm1 .5a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>
-                            <path d="M2 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2H2zm13 2v2H1V3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1zM2 14a1 1 0 0 1-1-1V6h14v7a1 1 0 0 1-1 1H2z"/>
-                        </svg>
-                    </button>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="margin-left: 0px;"></button>
-                </div>
-                <div class="modal-body row">
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                </div>
-            </form>
-        </div>
-    </div>
     <!-- versionsモーダル -->
     <div id="versions_modal" class="modal" tabindex="-1">
         <div class="modal-dialog modal-lg">
@@ -291,33 +252,6 @@
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </form>
-        </div>
-    </div>
-    <!-- ビューアモーダル -->
-    <div id="viewer_modal" class="modal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <dic class="modal-content novalidate">
-                <div class="modal-header">
-                    <h5 class="modal-title">Versions</h5>
-                    <button type="button" class="btn btn_window_stack">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-window-stack" viewBox="0 0 16 16">
-                            <path d="M4.5 6a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1ZM6 6a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1Zm2-.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0Z"/>
-                            <path d="M12 1a2 2 0 0 1 2 2 2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2 2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h10ZM2 12V5a2 2 0 0 1 2-2h9a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1Zm1-4v5a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V8H3Zm12-1V5a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v2h12Z"/>
-                        </svg>
-                    </button>
-                    <button type="button" class="btn btn_window">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-window" viewBox="0 0 16 16">
-                            <path d="M2.5 4a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1zm2-.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zm1 .5a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>
-                            <path d="M2 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2H2zm13 2v2H1V3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1zM2 14a1 1 0 0 1-1-1V6h14v7a1 1 0 0 1-1 1H2z"/>
-                        </svg>
-                    </button>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="margin-left: 0px;"></button>
-                </div>
-                <div class="modal-body"></div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                </div>
-            </div>
         </div>
     </div>
     <!-- ローディングマスク -->

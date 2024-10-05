@@ -5,6 +5,7 @@ from typing import List, Dict, Any, Tuple, Union
 import logging
 import datetime
 import mimetypes
+import shutil
 
 class Filer(object):
     RESP_SCCESS:int = 0
@@ -30,22 +31,22 @@ class Filer(object):
             dict: メッセージ
         """
         if current_path is None or current_path == "":
-            self.logger.warn(f"current_path is empty.")
+            self.logger.warning(f"current_path is empty.")
             return False, None, {"warn": f"current_path is empty."}
         current_path = current_path.replace("\\","/")
         cp = current_path[1:] if current_path.startswith('/') else current_path
         abspath:Path = (self.data_dir / cp).resolve()
         if not str(abspath).startswith(str(self.data_dir)):
-            self.logger.warn(f"Path {abspath} is out of data directory. current_path={current_path}")
-            return False, None, {"warn": f"Path {abspath} is out of data directory. current_path={current_path}"}
+            self.logger.warning(f"Path {abspath} is out of data directory. current_path={current_path}")
+            return False, abspath, {"warn": f"Path {abspath} is out of data directory. current_path={current_path}"}
         if not exists_chk:
             return True, abspath, {"success": f"Path {abspath} not exists."}
         if not not_exists and not abspath.exists():
-            self.logger.warn(f"Path {abspath} does not exist. param={current_path}")
-            return False, None, {"warn": f"Path {abspath} does not exist. param={current_path}"}
+            self.logger.warning(f"Path {abspath} does not exist. param={current_path}")
+            return False, abspath, {"warn": f"Path {abspath} does not exist. param={current_path}"}
         if not_exists and abspath.exists():
-            self.logger.warn(f"Path {abspath} exist. param={current_path}")
-            return False, None, {"warn": f"Path {abspath} exist. param={current_path}"}
+            self.logger.warning(f"Path {abspath} exist. param={current_path}")
+            return False, abspath, {"warn": f"Path {abspath} exist. param={current_path}"}
         return True, abspath, {"success": f"Path {abspath} exists."}
 
     def file_list(self, current_path:str) -> Tuple[int, Dict[str, Any]]:
@@ -128,7 +129,7 @@ class Filer(object):
             ret_path = str(Path(current_path).parent).replace("\\","/")
             return self.RESP_SCCESS, {"success": {"path":f"{ret_path}","msg":f"Created {abspath}"}}
         except Exception as e:
-            self.logger.error(f"Failed to create {abspath}. {e}")
+            self.logger.warning(f"Failed to create {abspath}. {e}")
             return self.RESP_WARN, {"warn": f"Failed to create {abspath}. {e}"}
     
     def file_rmdir(self, current_path:str) -> Tuple[int, Dict[str, Any]]:
@@ -146,15 +147,15 @@ class Filer(object):
         if not chk:
             return self.RESP_WARN, msg
         if abspath == self.data_dir:
-            self.logger.warn(f"Path {abspath} is root directory.")
+            self.logger.warning(f"Path {abspath} is root directory.")
             return self.RESP_WARN, {"warn": f"Path {abspath} is root directory."}
 
         try:
-            common.rmdirs(abspath)
+            common.rmdirs(abspath, ignore_errors=False)
             ret_path = str(Path(current_path).parent).replace("\\","/")
             return self.RESP_SCCESS, {"success": {"path":f"{ret_path}","msg":f"Removed {abspath}"}}
         except Exception as e:
-            self.logger.error(f"Failed to remove {abspath}. {e}")
+            self.logger.warning(f"Failed to remove {abspath}. {e}")
             return self.RESP_WARN, {"warn": f"Failed to remove {abspath}. {e}"}
 
     def file_download(self, current_path:str, img_thumbnail:float=0.0) -> Tuple[int, Dict[str, Any]]:
@@ -174,7 +175,7 @@ class Filer(object):
         if not chk:
             return self.RESP_WARN, msg
         if abspath.is_dir():
-            self.logger.warn(f"Path {abspath} is directory.")
+            self.logger.warning(f"Path {abspath} is directory.")
             return self.RESP_WARN, {"warn": f"Path {abspath} is directory."}
 
         try:
@@ -189,7 +190,7 @@ class Filer(object):
                 data = convert.bytes2b64str(fd)
             return self.RESP_SCCESS, {"success":{"name":fname, "data":data, "mime_type":mime_type}}
         except Exception as e:
-            self.logger.error(f"Failed to download {abspath}. {e}")
+            self.logger.warning(f"Failed to download {abspath}. {e}")
             return self.RESP_WARN, {"warn": f"Failed to download {abspath}. {e}"}
 
     def file_upload(self, current_path:str, file_name:str, file_data:bytes, mkdir:bool, orverwrite:bool) -> Tuple[int, Dict[str, Any]]:
@@ -215,7 +216,7 @@ class Filer(object):
             if abspath.is_dir():
                 abspath = abspath / file_name
             if abspath.is_file() and not orverwrite:
-                self.logger.warn(f"Path {abspath} already exist. param={current_path}")
+                self.logger.warning(f"Path {abspath} already exist. param={current_path}")
                 return self.RESP_WARN, {"warn": f"Path {abspath} already exist. param={current_path}"}
             save_path = abspath
         elif abspath.suffix == '':
@@ -230,7 +231,7 @@ class Filer(object):
                 f.write(file_data)
             return self.RESP_SCCESS, {"success": f"Uploaded {save_path}"}
         except Exception as e:
-            self.logger.error(f"Failed to upload {save_path}. {e}")
+            self.logger.warning(f"Failed to upload {save_path}. {e}")
             return self.RESP_WARN, {"warn": f"Failed to upload {save_path}. {e}"}
 
     def file_remove(self, current_path:str) -> Tuple[int, Dict[str, Any]]:
@@ -248,7 +249,7 @@ class Filer(object):
         if not chk:
             return self.RESP_WARN, msg
         if abspath.is_dir():
-            self.logger.warn(f"Path {abspath} is directory.")
+            self.logger.warning(f"Path {abspath} is directory.")
             return self.RESP_WARN, {"warn": f"Path {abspath} is directory."}
 
         try:
@@ -256,6 +257,38 @@ class Filer(object):
             ret_path = str(Path(current_path).parent).replace("\\","/")
             return self.RESP_SCCESS, {"success": {"path":f"{ret_path}","msg":f"Removed {abspath}"}}
         except Exception as e:
-            self.logger.error(f"Failed to remove {abspath}. {e}")
+            self.logger.warning(f"Failed to remove {abspath}. {e}")
             return self.RESP_WARN, {"warn": f"Failed to remove {abspath}. {e}"}
-        
+
+    def file_copy(self, from_path:str, to_path:str, orverwrite:bool) -> Tuple[int, Dict[str, Any]]:
+        """
+        ファイルをコピーする
+
+        Args:
+            from_path (str): コピー元パス
+            to_path (str): コピー先パス
+            orverwrite (bool): 上書きするかどうか
+
+        Returns:
+            int: レスポンスコード
+            dict: メッセージ
+        """
+        chk, from_abspath, msg = self._file_exists(from_path)
+        if not chk:
+            return self.RESP_WARN, msg
+
+        chk, to_abspath, msg = self._file_exists(to_path, not_exists=True)
+        if not chk and not orverwrite:
+            return self.RESP_WARN, msg
+        if orverwrite and not to_abspath.parent.exists():
+            to_abspath.parent.mkdir(parents=True, exist_ok=True)
+
+        if from_abspath.is_dir():
+            ret_path = shutil.copytree(from_abspath, to_abspath, dirs_exist_ok=True)
+        elif from_abspath.is_file():
+            ret_path = shutil.copy(from_abspath, to_abspath)
+        else:
+            self.logger.warning(f"Path {from_abspath} is not file or directory.")
+            return self.RESP_WARN, {"warn": f"Path {from_abspath} is not file or directory."}
+
+        return self.RESP_SCCESS, {"success": {"path":f"{ret_path}","msg":f"Copy from '{from_path}' to '{to_path}'. write '{ret_path}'"}}

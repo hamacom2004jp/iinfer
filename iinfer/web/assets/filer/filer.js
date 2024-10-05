@@ -1,36 +1,6 @@
 const fsapi = {};
 fsapi.left = $('#left_container');
 fsapi.right = $('#right_container');
-fsapi.loading = $('#loading');
-fsapi.progress = (_min, _max, _now, _text, _show, _cycle) => {
-  const prog_elem = $('.progress');
-  const bar_elem = prog_elem.find('.progress-bar');
-  const bar_text = bar_elem.find('.progress-bar-text');
-  if(_show) prog_elem.removeClass('d-none');
-  else prog_elem.addClass('d-none');
-  prog_elem.attr('aria-valuemin', _min);
-  prog_elem.attr('aria-valuemax', _max);
-  prog_elem.attr('aria-valuenow', _now);
-  if (!_cycle) {
-    const par = Math.floor((_now / (_max-_min)) * 10000) / 100
-    bar_elem.css('left', 'auto').css('width', `${par}%`);
-    bar_text.text(`${par.toFixed(2)}% ( ${_now} / ${_max} ) ${_text}`);
-    clearTimeout(progress_handle);
-  } else {
-    let maxwidth = prog_elem.css('width');
-    maxwidth = parseInt(maxwidth.replace('px', ''));
-    let left = bar_elem.css('left');
-    if (!left || left=='auto') left = 0;
-    else left = parseInt(left.replace('px', ''));
-    if (left > maxwidth) left = -200;
-    left += 2;
-    bar_elem.css('width', '200px').css('position', 'relative').css('left', `${left}px`);
-    bar_text.text('Server processing...');
-    var progress_handle = setTimeout(() => {
-      if (!fsapi.loading.is('.d-none')) fsapi.progress(_min, _max, _now, _text, _show, _cycle);
-    }, 20);
-  }
-};
 fsapi.filer = (svpath, is_local) => {
   // ファイルアップロード ========================================================
   const upload = async (event) => {
@@ -114,7 +84,7 @@ fsapi.filer = (svpath, is_local) => {
     svpath = fsapi.right.find('.filer_address').val();
     // https://developer.mozilla.org/ja/docs/Web/API/fetch
     iinfer.file_upload(fsapi.right, svpath, formData, orverwrite=false, progress_func=(e) => {
-      fsapi.progress(0, e.total, e.loaded, '', true, e.total==e.loaded);
+      iinfer.progress(0, e.total, e.loaded, '', true, e.total==e.loaded);
     }, success_func=(target, svpath, data) => {
       fsapi.tree(target, svpath, target.find('.tree-menu'), false);
     }, error_func=(target, svpath, data) => {
@@ -138,7 +108,7 @@ fsapi.filer = (svpath, is_local) => {
       const list_downloads = await res.json();
       const jobs = [];
       fsapi.download_now = 0;
-      fsapi.progress(0, list_downloads.length, fsapi.download_now, '', true, false)
+      iinfer.progress(0, list_downloads.length, fsapi.download_now, '', true, false)
       list_downloads.forEach(async path => {
         opt['mode'] = 'client';
         opt['cmd'] = 'file_download';
@@ -150,7 +120,7 @@ fsapi.filer = (svpath, is_local) => {
         jobs.push(iinfer.sv_exec_cmd(opt).then(async res => {
           if(!res[0] || !res[0]['success']) {
             fsapi.download_now ++;
-            fsapi.progress(0, list_downloads.length, fsapi.download_now, '', true, false)
+            iinfer.progress(0, list_downloads.length, fsapi.download_now, '', true, false)
             iinfer.message(res);
             return;
           }
@@ -166,7 +136,7 @@ fsapi.filer = (svpath, is_local) => {
           const rpath = res[0]['success']['rpath'];
           let file_path = fsapi.left.find('.filer_address').val() + '/' + rpath;
           file_path = file_path.replaceAll("\\","/").replaceAll("//","/");
-          fsapi.progress(0, list_downloads.length, fsapi.download_now, file_path, true, false)
+          iinfer.progress(0, list_downloads.length, fsapi.download_now, file_path, true, false)
           const file_path_parts = file_path.split('/');
           let dh = fsapi.handles['/'];
           for (let i=0; i<file_path_parts.length-1; i++){
@@ -191,14 +161,14 @@ fsapi.filer = (svpath, is_local) => {
             console.log(e);
           }
           fsapi.download_now ++;
-          fsapi.progress(0, list_downloads.length, fsapi.download_now, file_path, true, false)
+          iinfer.progress(0, list_downloads.length, fsapi.download_now, file_path, true, false)
         }).catch((e) => {
           console.log(e);
         }));
       });
       Promise.all(jobs).then(() => {
         iinfer.hide_loading();
-        fsapi.progress(0, list_downloads.length, fsapi.download_now, '', false, false)
+        iinfer.progress(0, list_downloads.length, fsapi.download_now, '', false, false)
         fsapi.download_now = 0;
         fsapi.tree(fsapi.left, fsapi.left.find('.filer_address').val(), fsapi.left.find('.tree-menu'), true);
       });
@@ -332,21 +302,15 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
         // 削除関数の生成
         const mk_delete = (_p, _e, is_dir, _l) => {return ()=>{
           if(confirm(`Do you want to delete "${_p}"？${is_dir?"\nNote: In the case of directories, the contents will also be deleted.":""}`)) {
-            const remote = is_dir ? 'file_rmdir' : 'file_remove';
-            iinfer.show_loading();
-            const opt = iinfer.get_server_opt(false, fsapi.right);
-            opt['mode'] = 'client';
-            opt['cmd'] = remote;
-            opt['capture_stdout'] = true;
-            opt['svpath'] = _p;
+            const remote = is_dir ? iinfer.file_rmdir : iinfer.file_remove;
             const exec_cmd = _l ? fsapi.local_exec_cmd : iinfer.sv_exec_cmd;
-            exec_cmd(opt).then(res => {
-              if(!res[0] || !res[0]['success']) {
-                iinfer.message(res);
-                return;
-              }
+            iinfer.show_loading();
+            remote(fsapi.right, _p, undefined, exec_cmd).then(res => {
+              if(!res) return;
               iinfer.hide_loading();
-              fsapi.tree(target, res[0]['success']['path'], _e, _l);
+              fsapi.tree(target, res['path'], _e, _l);
+            }).finally(() => {
+              iinfer.hide_loading();
             });
           }
         }};
@@ -359,20 +323,14 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
         }
         // ダウンロード関数の生成
         mk_download = (_p) => {return ()=>{
-          iinfer.show_loading();
-          const opt = iinfer.get_server_opt(false, fsapi.right);
-          opt['mode'] = 'client';
-          opt['cmd'] = 'file_download';
-          opt['capture_stdout'] = true;
-          opt['svpath'] = _p;
-          iinfer.sv_exec_cmd(opt).then(res => {
-            if(!res[0] || !res[0]['success']) {
-              iinfer.message(res);
+          iinfer.file_download(fsapi.right, _p).then(res => {
+            if(!res) {
+              iinfer.hide_loading();
               return;
             }
-            const blob = mk_blob(res[0]['success']['data']);
+            const blob = mk_blob(res['data']);
             const link = target.find('.filer_download');
-            link.attr('download', res[0]['success']['name']);
+            link.attr('download', res['name']);
             link.get(0).href = window.URL.createObjectURL(blob);
             link.get(0).click();
             URL.revokeObjectURL(link.get(0).href);
@@ -383,20 +341,10 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
           _p = _p.substring(0, _p.lastIndexOf('/')+1);
           const prompt_text = prompt('Enter a new folder name.');
           if(prompt_text) {
-            iinfer.show_loading();
-            const opt = iinfer.get_server_opt(false, fsapi.right);
-            opt['mode'] = 'client';
-            opt['cmd'] = 'file_mkdir';
-            opt['capture_stdout'] = true;
-            opt['svpath'] = `${_p=="/"?"":_p}/${prompt_text}`.replace("//","/");
             const exec_cmd = _l ? fsapi.local_exec_cmd : iinfer.sv_exec_cmd;
-            exec_cmd(opt).then(res => {
-              if(!res[0] || !res[0]['success']) {
-                iinfer.message(res);
-                return;
-              }
+            iinfer.file_mkdir(fsapi.right, `${_p=="/"?"":_p}/${prompt_text}`.replace("//","/"), undefined, exec_cmd).then(res => {
               iinfer.hide_loading();
-              fsapi.tree(_t, res[0]['success']['path'], _e, _l);
+              fsapi.tree(_t, res['path'], _e, _l);
             });
           }
         }};
@@ -410,19 +358,11 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
             iinfer.message({warn: `The file size is too large to view. (${_size} > 5M)`});
             return;
           }
-          iinfer.show_loading();
-          const opt = iinfer.get_server_opt(false, fsapi.right);
-          opt['mode'] = 'client';
-          opt['cmd'] = 'file_download';
-          opt['capture_stdout'] = true;
-          opt['svpath'] = _p;
           const exec_cmd = _l ? fsapi.local_exec_cmd : iinfer.sv_exec_cmd;
-          exec_cmd(opt).then(res => {
-            if(!res[0] || !res[0]['success']) {
-              iinfer.message(res);
-              return;
-            }
-            fsapi.viewer(_p, res[0]['success']['data'], _mime);
+          iinfer.file_download(fsapi.right, _p, undefined, exec_cmd).then(res => {
+            if(!res) return;
+            fsapi.viewer(_p, res['data'], _mime);
+          }).finally(() => {
             iinfer.hide_loading();
           });
         }};

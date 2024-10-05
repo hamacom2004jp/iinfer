@@ -357,6 +357,15 @@ class IinferApp:
                 common.print_format(ret, args.format, tm, args.output_json, args.output_json_append)
                 if 'success' not in ret:
                     return 1, ret
+            
+            elif args.cmd == 'file_copy':
+                client_data = Path(args.client_data.replace('"','')) if args.client_data is not None else None
+                ret = self.cl.file_copy(args.from_path.replace('"',''), args.to_path.replace('"',''), orverwrite=args.orverwrite,
+                                        scope=args.scope, client_data=client_data,
+                                        retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
+                common.print_format(ret, args.format, tm, args.output_json, args.output_json_append)
+                if 'success' not in ret:
+                    return 1, ret
 
             elif args.cmd == 'predict_type_list':
                 type_list = [dict(predict_type=key, site=val['site'], image_width=val['image_width'], image_height=val['image_height'],
