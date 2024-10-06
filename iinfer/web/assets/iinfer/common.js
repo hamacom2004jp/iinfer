@@ -650,7 +650,7 @@ iinfer.progress = (_min, _max, _now, _text, _show, _cycle) => {
     const par = Math.floor((_now / (_max-_min)) * 10000) / 100
     bar_elem.css('left', 'auto').css('width', `${par}%`);
     bar_text.text(`${par.toFixed(2)}% ( ${_now} / ${_max} ) ${_text}`);
-    clearTimeout(progress_handle);
+    if (iinfer.progress_handle) clearTimeout(iinfer.progress_handle);
   } else {
     let maxwidth = prog_elem.css('width');
     maxwidth = parseInt(maxwidth.replace('px', ''));
@@ -661,7 +661,7 @@ iinfer.progress = (_min, _max, _now, _text, _show, _cycle) => {
     left += 2;
     bar_elem.css('width', '200px').css('position', 'relative').css('left', `${left}px`);
     bar_text.text(_text?_text:'Server processing...');
-    var progress_handle = setTimeout(() => {
+    iinfer.progress_handle = setTimeout(() => {
       if (!$('#loading').is('.d-none')) iinfer.progress(_min, _max, _now, _text, _show, _cycle);
     }, 20);
   }

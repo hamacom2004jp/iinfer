@@ -626,6 +626,10 @@ class Server(filer.Filer):
         for dir in self.data_dir.iterdir():
             if not dir.is_dir():
                 continue
+            if dir.name.startswith("."):
+                continue
+            if dir.name in ["mmpretrain", "mmdetection", "mmsegmentation"]:
+                continue
             conf_path = dir / "conf.json"
             if not conf_path.exists():
                 if self.logger.level == logging.DEBUG:
@@ -799,7 +803,7 @@ class Server(filer.Filer):
                     self.redis_cli.rpush(reskey, {"warn": f"color_file path {str(color_file)} does not exist"})
                     return self.RESP_WARN
                 with open(color_file, "r") as f:
-                    colors = f.read().splitlines()
+                    colors = [tuple([int(c) for c in line.split(',')]) for line in f.read().splitlines()]
             else:
                 colors = None
             try:

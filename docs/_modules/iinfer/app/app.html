@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>iinfer.app.app &mdash; iinfer 2024/10/05 documentation</title>
+  <title>iinfer.app.app &mdash; iinfer 2024/10/06 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -15,7 +15,7 @@
   
         <script src="../../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=a15ace73"></script>
+        <script src="../../../_static/documentation_options.js?v=96a24419"></script>
         <script src="../../../_static/doctools.js?v=9a2dae69"></script>
         <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -89,7 +89,7 @@
   <h1>Source code for iinfer.app.app</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">iinfer</span> <span class="kn">import</span> <span class="n">version</span>
 <span class="kn">from</span> <span class="nn">iinfer.app</span> <span class="kn">import</span> <span class="n">common</span><span class="p">,</span> <span class="n">client</span><span class="p">,</span> <span class="n">install</span><span class="p">,</span> <span class="n">options</span><span class="p">,</span> <span class="n">postprocess</span><span class="p">,</span> <span class="n">redis</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="n">web</span>
-<span class="kn">from</span> <span class="nn">iinfer.app.postprocesses</span> <span class="kn">import</span> <span class="n">cls_jadge</span><span class="p">,</span> <span class="n">csv</span><span class="p">,</span> <span class="n">det_clip</span><span class="p">,</span> <span class="n">det_face_store</span><span class="p">,</span> <span class="n">det_filter</span><span class="p">,</span> <span class="n">det_jadge</span><span class="p">,</span> <span class="n">httpreq</span><span class="p">,</span> <span class="n">seg_bbox</span><span class="p">,</span> <span class="n">seg_filter</span><span class="p">,</span> <span class="n">showimg</span>
+<span class="kn">from</span> <span class="nn">iinfer.app.postprocesses</span> <span class="kn">import</span> <span class="n">cls_jadge</span><span class="p">,</span> <span class="n">cmd</span><span class="p">,</span> <span class="n">csv</span><span class="p">,</span> <span class="n">det_clip</span><span class="p">,</span> <span class="n">det_face_store</span><span class="p">,</span> <span class="n">det_filter</span><span class="p">,</span> <span class="n">det_jadge</span><span class="p">,</span> <span class="n">httpreq</span><span class="p">,</span> <span class="n">seg_bbox</span><span class="p">,</span> <span class="n">seg_filter</span><span class="p">,</span> <span class="n">showimg</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">import</span> <span class="nn">argparse</span>
 <span class="kn">import</span> <span class="nn">argcomplete</span>
@@ -584,6 +584,17 @@
                     <span class="k">return</span> <span class="mi">1</span><span class="p">,</span> <span class="n">msg</span>
                 <span class="n">code</span><span class="p">,</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">_exec_proc</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">input_file</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">stdin</span><span class="p">,</span> <span class="n">proc</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span>
                                        <span class="n">args</span><span class="o">.</span><span class="n">output_json</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json_append</span><span class="p">,</span> <span class="n">output_image_file</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">output_image</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">code</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">code</span><span class="p">,</span> <span class="n">ret</span>
+
+            <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">cmd</span> <span class="o">==</span> <span class="s1">&#39;cmd&#39;</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">proc</span> <span class="o">=</span> <span class="n">cmd</span><span class="o">.</span><span class="n">Cmd</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="n">cmdline</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">cmdline</span><span class="p">,</span> <span class="n">output_image_ext</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">output_image_ext</span><span class="p">,</span> <span class="n">output_maxsize</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">output_maxsize</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="n">common</span><span class="o">.</span><span class="n">print_format</span><span class="p">({</span><span class="s2">&quot;warn&quot;</span><span class="p">:</span><span class="sa">f</span><span class="s2">&quot;Invalid options. </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">},</span> <span class="n">args</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="mi">1</span><span class="p">,</span> <span class="n">msg</span>
+                <span class="n">code</span><span class="p">,</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">_exec_proc</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">input_file</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">stdin</span><span class="p">,</span> <span class="n">proc</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span>
+                                       <span class="kc">None</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">output_image_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">output_csv</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">code</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="k">return</span> <span class="n">code</span><span class="p">,</span> <span class="n">ret</span>
 

@@ -18,3 +18,13 @@ pre span.row-number::before {
   display: inline-block;
   color: #aaa;
 }
+/** 選択状態のスタイル */
+.card-hover:hover {
+  box-shadow: 0 0 8px gray;
+}
+.card-selected {
+  box-shadow: 0 0 8px red;
+}
+.pointer {
+  cursor: pointer;
+}

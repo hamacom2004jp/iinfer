@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>インジェクション &mdash; iinfer 2024/10/05 documentation</title>
+  <title>インジェクション &mdash; iinfer 2024/10/06 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -16,7 +16,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=a15ace73"></script>
+        <script src="../_static/documentation_options.js?v=96a24419"></script>
         <script src="../_static/doctools.js?v=9a2dae69"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -256,6 +256,45 @@
 <span class="w">    </span><span class="nt">&quot;ext_classes&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
 <span class="w">    </span><span class="nt">&quot;ext_labels&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
 <span class="w">    </span><span class="nt">&quot;nodraw&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p><cite>after_cmd_injection</cite></p>
+<blockquote>
+<div><table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 10.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>cmdline</p></td>
+<td><p>str</p></td>
+<td><p>実行するコマンド。設定される環境変数は <cite>outputs</cite> , <cite>output_image</cite> 。この値は一時ファイルのファイルパス。</p></td>
+</tr>
+<tr class="row-odd"><td><p>output_image_ext</p></td>
+<td><p>str</p></td>
+<td><p>出力画像のフォーマットを指定します。指定可能な画像タイプは <cite>bmp</cite> , <cite>png</cite> , <cite>jpeg</cite></p></td>
+</tr>
+<tr class="row-even"><td><p>output_maxsize</p></td>
+<td><p>int</p></td>
+<td><p>コマンド実行結果をキャプチャーする最大サイズ</p></td>
+</tr>
+</tbody>
+</table>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="cm">/** サンプル設定ファイル **/</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;cmdline&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;pwd&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;output_image_ext&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;jpeg&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;output_maxsize&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">5242880</span>
 <span class="p">}</span>
 </pre></div>
 </div>

@@ -1,6 +1,6 @@
 from iinfer import version
 from iinfer.app import common, client, install, options, postprocess, redis, server, web
-from iinfer.app.postprocesses import cls_jadge, csv, det_clip, det_face_store, det_filter, det_jadge, httpreq, seg_bbox, seg_filter, showimg
+from iinfer.app.postprocesses import cls_jadge, cmd, csv, det_clip, det_face_store, det_filter, det_jadge, httpreq, seg_bbox, seg_filter, showimg
 from pathlib import Path
 import argparse
 import argcomplete
@@ -488,6 +488,17 @@ class IinferApp:
                     return 1, msg
                 code, ret = _exec_proc(args.input_file, args.stdin, proc, args.timeout, args.format, tm,
                                        args.output_json, args.output_json_append, output_image_file=args.output_image)
+                if code != 0:
+                    return code, ret
+
+            elif args.cmd == 'cmd':
+                try:
+                    proc = cmd.Cmd(logger, cmdline=args.cmdline, output_image_ext=args.output_image_ext, output_maxsize=args.output_maxsize)
+                except Exception as e:
+                    common.print_format({"warn":f"Invalid options. {e}"}, args.format, tm, None, False)
+                    return 1, msg
+                code, ret = _exec_proc(args.input_file, args.stdin, proc, args.timeout, args.format, tm,
+                                       None, False, output_image_file=None, output_csv=None)
                 if code != 0:
                     return code, ret
 

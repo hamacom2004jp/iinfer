@@ -4,12 +4,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" href="assets/iinfer/favicon.ico">
     <title>annotation</title>
-    <style type="text/css">
-    .card-hover:hover {
-        box-shadow: 0 0 8px gray;
-        cursor: pointer;
-    }
-    </style>
 </head>
 <body lang="ja" class="overflow-hidden p-2">
     <!-- ナビゲーションバー -->
@@ -44,7 +38,7 @@
     </nav>
     <div id="main_container" class="container-fluid overflow-auto split-pane fixed-left" style="margin-top:46px;height:calc(100vh - 105px);">
         <!-- 左側ペイン -->
-        <div id="left_container" class="split-pane-component" style="width:20%;">
+        <div id="left_container" class="split-pane-component" style="width:30%;">
             <div class="input-group p-1" style="top:0%;">
                 <button class="btn btn-outline-secondary dropdown-toggle filer_server_bot" type="button" data-bs-toggle="dropdown" aria-expanded="false">Server</button>
                 <input name="filer_host" type="hidden" class="filer_host">
@@ -62,49 +56,40 @@
                 <ul class="split-pane-component tree-menu tree_ul overflow-auto border w-100" style="height:20%;min-height:100px;"></ul>
                 <!-- 上下のスプリッター -->
                 <div class="split-pane-divider filer-pane-divider" style="top:20%;"></div>
-                <!-- ファイルリスト -->
-                <div class="split-pane-component file-list drop-area overflow-auto p-1" style="top:20%;"></div>
+                <!-- 下側の一覧 -->
+                <div class="split-pane-component overflow-auto" style="top:20%;">
+                    <!-- アノテーションのエクスポート -->
+                    <div class="input-group p-1">
+                        <span class="input-group-text">annotation</span>
+                        <button class="btn btn-outline-secondary" type="button" title="export" data-bs-toggle="dropdown">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-up" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M3.5 6a.5.5 0 0 0-.5.5v8a.5.5 0 0 0 .5.5h9a.5.5 0 0 0 .5-.5v-8a.5.5 0 0 0-.5-.5h-2a.5.5 0 0 1 0-1h2A1.5 1.5 0 0 1 14 6.5v8a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 14.5v-8A1.5 1.5 0 0 1 3.5 5h2a.5.5 0 0 1 0 1h-2z"/>
+                                <path fill-rule="evenodd" d="M7.646.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 1.707V10.5a.5.5 0 0 1-1 0V1.707L5.354 3.854a.5.5 0 1 1-.708-.708l3-3z"/>
+                            </svg>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class="dropdown-item d-flex pt-0 pb-0 tool_bot_annosave_all_coco" href="#">
+                                    <span class="ms-2 mb-1">Export MS COCO format</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item d-flex pt-0 pb-0 tool_bot_annosave_all_cityscapes" href="#">
+                                    <span class="ms-2 mb-1">Export Cityscapes format</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- ファイルリスト -->
+                    <div class="border file-list p-1"></div>
+                </div>
             </div>
         </div>
         <!-- 左右のスプリッター -->
-        <div class="split-pane-divider filer-pane-divider" style="left:20%;"></div>
+        <div class="split-pane-divider filer-pane-divider" style="left:30%;"></div>
         <!-- 右側ペイン -->
-        <div id="canvas_container" class="split-pane-component filer-pane-right" style="left:20%;">
+        <div id="canvas_container" class="split-pane-component filer-pane-right" style="left:30%;">
             <div class="btn-toolbar mb-1" role="toolbar" aria-label="Toolbar with button groups">
-                <!-- アノテーションツールボックス -->
-                <div class="input-group p-1">
-                    <span class="input-group-text">annotation</span>
-                    <button class="btn btn-outline-secondary" type="button" title="export" data-bs-toggle="dropdown">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-up" viewBox="0 0 16 16">
-                            <path fill-rule="evenodd" d="M3.5 6a.5.5 0 0 0-.5.5v8a.5.5 0 0 0 .5.5h9a.5.5 0 0 0 .5-.5v-8a.5.5 0 0 0-.5-.5h-2a.5.5 0 0 1 0-1h2A1.5 1.5 0 0 1 14 6.5v8a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 14.5v-8A1.5 1.5 0 0 1 3.5 5h2a.5.5 0 0 1 0 1h-2z"/>
-                            <path fill-rule="evenodd" d="M7.646.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 1.707V10.5a.5.5 0 0 1-1 0V1.707L5.354 3.854a.5.5 0 1 1-.708-.708l3-3z"/>
-                        </svg>
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li>
-                            <a class="dropdown-item d-flex pt-0 pb-0 tool_bot_annosave_all_coco" href="#">
-                                <span class="ms-2 mb-1">Export MS COCO format</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item d-flex pt-0 pb-0 tool_bot_annosave_all_cityscapes" href="#">
-                                <span class="ms-2 mb-1">Export Cityscapes format</span>
-                            </a>
-                        </li>
-                    </ul>
-                    <button class="btn btn-outline-secondary tool_bot_annoreload" type="button" title="reload">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16">
-                            <path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/>
-                            <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/>
-                        </svg>
-                    </button>
-                    <button class="btn btn-outline-secondary tool_bot_annosave" type="button" title="save">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
-                            <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
-                            <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
-                        </svg>
-                    </button>
-                </div>
                 <!-- ラベルツールボックス -->
                 <div class="input-group p-1">
                     <span class="input-group-text">label</span>
@@ -143,9 +128,33 @@
                         </svg>
                     </button>
                 </div>
-                <!-- 画像アドレス -->
-                <div class="input-group p-1" style="width:calc(100% - 650px);">
-                    <span class="input-group-text">Image</span>
+                <!-- 画像移動ツールボックス -->
+                <div class="input-group p-1" style="width:calc(100% - 400px);">
+                    <span class="input-group-text">image</span>
+                    <button class="btn btn-outline-secondary tool_bot_imgprev" type="button" title="prev">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+                        </svg>
+                    </button>
+                    <button class="btn btn-outline-secondary tool_bot_imgnext" type="button" title="next">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
+                        </svg>
+                    </button>
+                    <button class="btn btn-outline-secondary tool_bot_annoreload" type="button" title="reload">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/>
+                            <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/>
+                        </svg>
+                    </button>
+                    <!-- アノテーション保存 -->
+                    <button class="btn btn-outline-secondary tool_bot_annosave" type="button" title="save">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                            <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                            <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+                        </svg>
+                    </button>
+                    <!-- 画像アドレス -->
                     <input type="text" class="form-control image_address" aria-describedby="button-addon3" disabled>
                 </div>
             </div>

@@ -86,6 +86,26 @@
             "nodraw": false
         }
 
+- `after_cmd_injection`
+
+    .. csv-table::
+        :widths: 20, 10, 70
+        :header-rows: 1
+
+        "Option","Type","Description"
+        "cmdline","str","実行するコマンド。設定される環境変数は `outputs` , `output_image` 。この値は一時ファイルのファイルパス。"
+        "output_image_ext","str","出力画像のフォーマットを指定します。指定可能な画像タイプは `bmp` , `png` , `jpeg`"
+        "output_maxsize","int","コマンド実行結果をキャプチャーする最大サイズ"
+
+    .. code-block:: json
+
+        /** サンプル設定ファイル **/
+        {
+            "cmdline": "pwd",
+            "output_image_ext": "jpeg",
+            "output_maxsize": 5242880
+        }
+
 - `after_csv_injection`
 
     .. csv-table::
