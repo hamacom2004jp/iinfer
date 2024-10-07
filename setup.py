@@ -95,9 +95,9 @@ setup(
     license=LICENSE,
     keywords=KEYWORDS,
     install_requires=INSTALL_REQUIRES,
-    #package_data=RESORCE_TEXT_FILES,
+    package_data=RESORCE_TEXT_FILES,
     include_package_data=True,
-    #exclude_package_data=EXCLUDE_RESORCE_TEXT_FILES,
+    exclude_package_data=EXCLUDE_RESORCE_TEXT_FILES,
     entry_points=dict(console_scripts=['iinfer=iinfer.app.app:main']),
     cmdclass={'install': CustomInstallCommand},
 )
