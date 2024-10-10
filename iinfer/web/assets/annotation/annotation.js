@@ -452,6 +452,37 @@ anno.load_image = (node, opt) => {
   img_elem.data('node', node);
   img_elem.data('opt', opt);
   const img = img_elem.off('wheel').get(0);
+  anno.canvas_scale = anno.canvas_scale ? anno.canvas_scale : 1.0;
+  anno.card_left = 0;
+  anno.card_top = 0;
+  const canvas_elem = anno.canvas_container.find('#canvas');
+  const zoom_label = anno.canvas_container.find('.tool_label_zoom');
+  const zoom_bot = anno.canvas_container.find('.tool_bot_zoom');
+  const rescale = (card_elem, img, svg_elem, offsetX, offsetY, deltaY) => {
+    zoom_bot.find('.bi').hide();
+    if (anno.canvas_scale < 1.0) zoom_bot.find('.bi-zoom-out').show();
+    else if (anno.canvas_scale > 1.0) zoom_bot.find('.bi-zoom-in').show();
+    else zoom_bot.find('.bi-search').show();
+    anno.canvas_scale += deltaY * -0.001;
+    anno.canvas_scale = Math.min(Math.max(0.125, anno.canvas_scale), 4);
+    img.width = img.naturalWidth * anno.canvas_scale;
+    img.height = img.naturalHeight * anno.canvas_scale;
+    /*
+    const cx = card_elem.css('left') ? parseInt(card_elem.css('left')) : 0;
+    const cy = card_elem.css('top') ? parseInt(card_elem.css('top')) : 0;
+    const card = card_elem.get(0);
+    const sx = (img.width - img.naturalWidth) / ((offsetX - card.offsetLeft) * anno.canvas_scale);
+    const sy = (img.height - img.naturalHeight) / ((offsetY - card.offsetTop) * anno.canvas_scale);
+    */
+    svg_elem.css('width', `${img.width}px`).css('height', `${img.height}px`);
+    //card_elem.css('left', `${cx-sx}px`).css('top', `${cy-sy}px`);
+    zoom_label.text(`${(anno.canvas_scale * 100).toFixed(0)}%`);
+  };
+  zoom_bot.off('click').on('click', (event) => {
+    anno.canvas_scale = 1.0;
+    const svg_elem = canvas_elem.find('svg');
+    rescale(card_elem, img, svg_elem, 0, 0, 0);
+  });
   // 画像が読み込まれたとき
   img_elem.off('load').on('load', () => {
     const image_path = anno.canvas_container.find('.image_address').val();
@@ -469,6 +500,7 @@ anno.load_image = (node, opt) => {
       anno.svg_mouse_action(svg_elem, svg); // アノテーション画面のマウスアクション
       anno.reflesh_svg();
       anno.load_annolist(svg_elem);
+      rescale(card_elem, img, svg_elem, 0, 0, 0);
     }, () => {
       // アノテーションが見つからなかった場合
       const svg_elem = $(`<svg id="svg" xmlns="http://www.w3.org/2000/svg" width="${img.naturalWidth}" height="${img.naturalHeight}" viewBox="0 0 ${img.naturalWidth} ${img.naturalHeight}"/>`);
@@ -478,21 +510,17 @@ anno.load_image = (node, opt) => {
       const svg = svg_elem.get(0);
       anno.svg_mouse_action(svg_elem, svg); // アノテーション画面のマウスアクション
       anno.load_annolist(svg_elem);
+      rescale(card_elem, img, svg_elem, 0, 0, 0);
     });
   });
-  const canvas_elem = anno.canvas_container.find('#canvas');
   const canvas = canvas_elem.get(0);
-  anno.canvas_scale = 1.0;
   // 拡大縮小イベント処理
   canvas.onwheel = (event) => {
     if (!event.ctrlKey) return;
     event.stopPropagation();
     event.preventDefault();
-    anno.canvas_scale += event.deltaY * -0.001;
-    anno.canvas_scale = Math.min(Math.max(0.125, anno.canvas_scale), 4);
-    img.width = img.naturalWidth * anno.canvas_scale;
     const svg_elem = canvas_elem.find('svg');
-    svg_elem.css('width', `${img.width}px`).css('height', `${img.height}px`);
+    rescale(card_elem, img, svg_elem, event.offsetX, event.offsetY, event.deltaY);
   }  
   card_elem.find('.card-body').append(img_elem);
   canvas_elem.html('');
@@ -952,8 +980,8 @@ anno.dragscroll = (target_elem, target) => {
     let move_y = target_elem.data("y") - event.clientY;
     move_x = target_elem.data("scrollleft") - move_x;
     move_y = target_elem.data("scrolltop") - move_y;
-    move_x = move_x<0 ? 0 : move_x;
-    move_y = move_y<0 ? 0 : move_y;
+    //move_x = move_x<0 ? 0 : move_x;
+    //move_y = move_y<0 ? 0 : move_y;
     target_elem.css('left', move_x + 'px').data("sl", move_x);
     target_elem.css('top', move_y + 'px').data("st", move_y);
     return false;
