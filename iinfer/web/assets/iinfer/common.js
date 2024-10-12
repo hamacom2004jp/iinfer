@@ -438,7 +438,7 @@ iinfer.file_download = (target, svpath, error_func=undefined, exec_cmd=undefined
   opt['cmd'] = 'file_download';
   opt['capture_stdout'] = true;
   opt['svpath'] = svpath;
-  opt['maxsize'] = 1024**3*10;
+  opt['capture_maxsize'] = 1024**3*10;
   iinfer.show_loading();
   const exec = exec_cmd ? exec_cmd : iinfer.sv_exec_cmd;
   return exec(opt).then(res => {

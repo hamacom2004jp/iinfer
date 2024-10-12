@@ -55,7 +55,6 @@ class Web(options.Options):
         self.logger = logger
         self.data = data
         self.container = dict()
-        self.output_size_th = 1024*1024*5
         self.redis_host = redis_host
         self.redis_port = redis_port
         self.redis_password = redis_password
@@ -252,21 +251,21 @@ class Web(options.Options):
             try:
                 iinfer_app.main(args_list=opt_list, file_dict=file_dict)
                 self.logger.disabled = False # ログ出力を有効にする
-                maxsize = opt['maxsize'] if 'maxsize' in opt else self.output_size_th
+                capture_maxsize = opt['capture_maxsize'] if 'capture_maxsize' in opt else options.Options.DEFAULT_CAPTURE_MAXSIZE
                 if 'capture_stdout' in opt and opt['capture_stdout']:
                     output = captured_output.getvalue().strip()
                     output_size = len(output)
-                    if output_size > maxsize:
+                    if output_size > capture_maxsize:
                         o = output.split('\n')
                         if len(o) > 0:
                             osize = len(o[0])
-                            oidx = int(maxsize / osize)
+                            oidx = int(capture_maxsize / osize)
                             if oidx > 0:
                                 output = '\n'.join(o[-oidx:])
                             else:
-                                output = [dict(warn=f'The captured stdout was discarded because its size was larger than {maxsize} bytes.')]
+                                output = [dict(warn=f'The captured stdout was discarded because its size was larger than {capture_maxsize} bytes.')]
                         else:
-                            output = [dict(warn=f'The captured stdout was discarded because its size was larger than {maxsize} bytes.')]
+                            output = [dict(warn=f'The captured stdout was discarded because its size was larger than {capture_maxsize} bytes.')]
                 else:
                     output = [dict(warn='capture_stdout is off.')]
             except Exception as e:
@@ -504,14 +503,14 @@ class Web(options.Options):
                         if 0 >= len(o):
                             continue
                         try:
-                            if len(o) < self.output_size_th:
+                            if len(o) < options.Options.DEFAULT_CAPTURE_MAXSIZE:
                                 try:
                                     o = to_json(o)
                                 except:
                                     pass
                                 self.callback_return_stream_log_func(o)
                             else:
-                                o = [dict(warn=f'The captured stdout was discarded because its size was larger than {self.output_size_th} bytes.')]
+                                o = [dict(warn=f'The captured stdout was discarded because its size was larger than {options.Options.DEFAULT_CAPTURE_MAXSIZE} bytes.')]
                                 self.callback_return_stream_log_func(o)
                         except:
                             o = [dict(warn=f'<pre>{html.escape(o)}</pre><br><pre>{html.escape(traceback.format_exc())}</pre>')]

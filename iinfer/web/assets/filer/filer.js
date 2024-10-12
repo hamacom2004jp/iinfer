@@ -115,7 +115,7 @@ fsapi.filer = (svpath, is_local) => {
         opt['capture_stdout'] = true;
         opt['svpath'] = path['svpath'];
         opt['rpath'] = path['rpath'];
-        opt['maxsize'] = 1024**3*10;
+        opt['capture_maxsize'] = 1024**3*10;
         //opt['svpath'] = event.originalEvent.dataTransfer.getData('path');
         jobs.push(iinfer.sv_exec_cmd(opt).then(async res => {
           if(!res[0] || !res[0]['success']) {

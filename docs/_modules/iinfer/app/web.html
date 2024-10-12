@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>iinfer.app.web &mdash; iinfer 2024/10/05 documentation</title>
+  <title>iinfer.app.web &mdash; iinfer 2024/10/13 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -15,7 +15,7 @@
   
         <script src="../../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=a15ace73"></script>
+        <script src="../../../_static/documentation_options.js?v=aa640ae3"></script>
         <script src="../../../_static/doctools.js?v=9a2dae69"></script>
         <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -146,7 +146,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logger</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">container</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">output_size_th</span> <span class="o">=</span> <span class="mi">1024</span><span class="o">*</span><span class="mi">1024</span><span class="o">*</span><span class="mi">5</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">redis_host</span> <span class="o">=</span> <span class="n">redis_host</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">redis_port</span> <span class="o">=</span> <span class="n">redis_port</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">redis_password</span> <span class="o">=</span> <span class="n">redis_password</span>
@@ -366,21 +365,21 @@
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">iinfer_app</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="n">args_list</span><span class="o">=</span><span class="n">opt_list</span><span class="p">,</span> <span class="n">file_dict</span><span class="o">=</span><span class="n">file_dict</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="kc">False</span> <span class="c1"># ログ出力を有効にする</span>
-                <span class="n">maxsize</span> <span class="o">=</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;maxsize&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="s1">&#39;maxsize&#39;</span> <span class="ow">in</span> <span class="n">opt</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_size_th</span>
+                <span class="n">capture_maxsize</span> <span class="o">=</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;capture_maxsize&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="s1">&#39;capture_maxsize&#39;</span> <span class="ow">in</span> <span class="n">opt</span> <span class="k">else</span> <span class="n">options</span><span class="o">.</span><span class="n">Options</span><span class="o">.</span><span class="n">DEFAULT_CAPTURE_MAXSIZE</span>
                 <span class="k">if</span> <span class="s1">&#39;capture_stdout&#39;</span> <span class="ow">in</span> <span class="n">opt</span> <span class="ow">and</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;capture_stdout&#39;</span><span class="p">]:</span>
                     <span class="n">output</span> <span class="o">=</span> <span class="n">captured_output</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
                     <span class="n">output_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="n">output_size</span> <span class="o">&gt;</span> <span class="n">maxsize</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">output_size</span> <span class="o">&gt;</span> <span class="n">capture_maxsize</span><span class="p">:</span>
                         <span class="n">o</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
                         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">o</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                             <span class="n">osize</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-                            <span class="n">oidx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">maxsize</span> <span class="o">/</span> <span class="n">osize</span><span class="p">)</span>
+                            <span class="n">oidx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">capture_maxsize</span> <span class="o">/</span> <span class="n">osize</span><span class="p">)</span>
                             <span class="k">if</span> <span class="n">oidx</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                                 <span class="n">output</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="o">-</span><span class="n">oidx</span><span class="p">:])</span>
                             <span class="k">else</span><span class="p">:</span>
-                                <span class="n">output</span> <span class="o">=</span> <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;The captured stdout was discarded because its size was larger than </span><span class="si">{</span><span class="n">maxsize</span><span class="si">}</span><span class="s1"> bytes.&#39;</span><span class="p">)]</span>
+                                <span class="n">output</span> <span class="o">=</span> <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;The captured stdout was discarded because its size was larger than </span><span class="si">{</span><span class="n">capture_maxsize</span><span class="si">}</span><span class="s1"> bytes.&#39;</span><span class="p">)]</span>
                         <span class="k">else</span><span class="p">:</span>
-                            <span class="n">output</span> <span class="o">=</span> <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;The captured stdout was discarded because its size was larger than </span><span class="si">{</span><span class="n">maxsize</span><span class="si">}</span><span class="s1"> bytes.&#39;</span><span class="p">)]</span>
+                            <span class="n">output</span> <span class="o">=</span> <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;The captured stdout was discarded because its size was larger than </span><span class="si">{</span><span class="n">capture_maxsize</span><span class="si">}</span><span class="s1"> bytes.&#39;</span><span class="p">)]</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">output</span> <span class="o">=</span> <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="s1">&#39;capture_stdout is off.&#39;</span><span class="p">)]</span>
             <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
@@ -636,14 +635,14 @@
                         <span class="k">if</span> <span class="mi">0</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">o</span><span class="p">):</span>
                             <span class="k">continue</span>
                         <span class="k">try</span><span class="p">:</span>
-                            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">o</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_size_th</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">o</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">options</span><span class="o">.</span><span class="n">Options</span><span class="o">.</span><span class="n">DEFAULT_CAPTURE_MAXSIZE</span><span class="p">:</span>
                                 <span class="k">try</span><span class="p">:</span>
                                     <span class="n">o</span> <span class="o">=</span> <span class="n">to_json</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
                                 <span class="k">except</span><span class="p">:</span>
                                     <span class="k">pass</span>
                                 <span class="bp">self</span><span class="o">.</span><span class="n">callback_return_stream_log_func</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
                             <span class="k">else</span><span class="p">:</span>
-                                <span class="n">o</span> <span class="o">=</span> <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;The captured stdout was discarded because its size was larger than </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">output_size_th</span><span class="si">}</span><span class="s1"> bytes.&#39;</span><span class="p">)]</span>
+                                <span class="n">o</span> <span class="o">=</span> <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;The captured stdout was discarded because its size was larger than </span><span class="si">{</span><span class="n">options</span><span class="o">.</span><span class="n">Options</span><span class="o">.</span><span class="n">DEFAULT_CAPTURE_MAXSIZE</span><span class="si">}</span><span class="s1"> bytes.&#39;</span><span class="p">)]</span>
                                 <span class="bp">self</span><span class="o">.</span><span class="n">callback_return_stream_log_func</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
                         <span class="k">except</span><span class="p">:</span>
                             <span class="n">o</span> <span class="o">=</span> <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;&lt;pre&gt;</span><span class="si">{</span><span class="n">html</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">o</span><span class="p">)</span><span class="si">}</span><span class="s1">&lt;/pre&gt;&lt;br&gt;&lt;pre&gt;</span><span class="si">{</span><span class="n">html</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span><span class="si">}</span><span class="s1">&lt;/pre&gt;&#39;</span><span class="p">)]</span>

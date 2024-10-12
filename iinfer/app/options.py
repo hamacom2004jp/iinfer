@@ -8,6 +8,7 @@ class Options:
     USE_REDIS_FALSE = -1
     USE_REDIS_MEIGHT = 0
     USE_REDIS_TRUE = 1
+    DEFAULT_CAPTURE_MAXSIZE = 1024 * 1024 * 10
     def __init__(self):
         self._options = dict()
         self.init_options()
@@ -227,6 +228,9 @@ class Options:
                         dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False],
                              discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
                              discription_en="Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."),
+                        dict(opt="capture_maxsize", type="int", default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choise=None,
+                             discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します。",
+                             discription_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."),
                     ]
                 ),
                 mmdet=dict(
@@ -250,6 +254,9 @@ class Options:
                         dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False],
                              discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
                              discription_en="Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."),
+                        dict(opt="capture_maxsize", type="int", default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choise=None,
+                             discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します。",
+                             discription_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."),
                     ]
                 ),
                 mmseg=dict(
@@ -273,6 +280,9 @@ class Options:
                         dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False],
                              discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
                              discription_en="Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."),
+                        dict(opt="capture_maxsize", type="int", default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choise=None,
+                             discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します。",
+                             discription_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."),
                     ]
                 ),
                 mmcls=dict(
@@ -295,6 +305,9 @@ class Options:
                         dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False],
                              discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
                              discription_en="Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."),
+                        dict(opt="capture_maxsize", type="int", default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choise=None,
+                             discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します。",
+                             discription_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."),
                     ]
                 ),
                 mmpretrain=dict(
@@ -318,6 +331,9 @@ class Options:
                         dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False],
                              discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
                              discription_en="Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."),
+                        dict(opt="capture_maxsize", type="int", default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choise=None,
+                             discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します。",
+                             discription_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."),
                     ]
                 ),
                 insightface=dict(
@@ -341,6 +357,9 @@ class Options:
                         dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False],
                              discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
                              discription_en="Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."),
+                        dict(opt="capture_maxsize", type="int", default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choise=None,
+                             discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します。",
+                             discription_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."),
                     ]
                 ),
                 redis=dict(
@@ -368,6 +387,9 @@ class Options:
                         dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False],
                              discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
                              discription_en="Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."),
+                        dict(opt="capture_maxsize", type="int", default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choise=None,
+                             discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します。",
+                             discription_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."),
                     ]
                 ),
                 server=dict(
@@ -424,6 +446,9 @@ class Options:
                         dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False],
                              discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
                              discription_en="Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."),
+                        dict(opt="capture_maxsize", type="int", default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choise=None,
+                             discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します。",
+                             discription_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."),
                     ]
                 ),
             ),
@@ -489,6 +514,9 @@ class Options:
                         dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False],
                              discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
                              discription_en="Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."),
+                        dict(opt="capture_maxsize", type="int", default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choise=None,
+                             discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します。",
+                             discription_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."),
                     ]
                 ),
                 capture=dict(
@@ -543,6 +571,9 @@ class Options:
                         dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False],
                              discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
                              discription_en="Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."),
+                        dict(opt="capture_maxsize", type="int", default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choise=None,
+                             discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します。",
+                             discription_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."),
                     ]
                 ),
                 deploy=dict(
@@ -778,6 +809,9 @@ class Options:
                         dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False],
                             discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
                             discription_en="Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."),
+                        dict(opt="capture_maxsize", type="int", default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choise=None,
+                             discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します。",
+                             discription_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."),
                     ]
                 ),
                 train=dict(
@@ -824,6 +858,9 @@ class Options:
                         dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False],
                             discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
                             discription_en="Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."),
+                        dict(opt="capture_maxsize", type="int", default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choise=None,
+                             discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します。",
+                             discription_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."),
                     ]
                 ),
                 deploy_list=dict(
@@ -871,6 +908,9 @@ class Options:
                         dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False],
                              discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
                              discription_en="Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."),
+                        dict(opt="capture_maxsize", type="int", default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choise=None,
+                             discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します。",
+                             discription_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."),
                     ]
                 ),
                 start=dict(
@@ -948,6 +988,9 @@ class Options:
                         dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False],
                              discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
                              discription_en="Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."),
+                        dict(opt="capture_maxsize", type="int", default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choise=None,
+                             discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します。",
+                             discription_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."),
                     ]
                 ),
                 predict_type_list=dict(
@@ -968,6 +1011,9 @@ class Options:
                         dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False],
                              discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
                              discription_en="Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."),
+                        dict(opt="capture_maxsize", type="int", default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choise=None,
+                             discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します。",
+                             discription_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."),
                     ]
                 ),
                 train_type_list=dict(
@@ -988,6 +1034,9 @@ class Options:
                         dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False],
                              discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
                              discription_en="Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."),
+                        dict(opt="capture_maxsize", type="int", default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choise=None,
+                             discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します。",
+                             discription_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."),
                     ]
                 ),
                 predict=dict(
@@ -1106,6 +1155,9 @@ class Options:
                         dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False],
                              discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
                              discription_en="Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."),
+                        dict(opt="capture_maxsize", type="int", default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choise=None,
+                             discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します。",
+                             discription_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."),
                     ]
                 ),
                 stop=dict(
@@ -1158,6 +1210,9 @@ class Options:
                         dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False],
                              discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
                              discription_en="Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."),
+                        dict(opt="capture_maxsize", type="int", default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choise=None,
+                             discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します。",
+                             discription_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."),
                     ]
                 ),
                 undeploy=dict(
@@ -1210,6 +1265,9 @@ class Options:
                         dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False],
                              discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
                              discription_en="Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."),
+                        dict(opt="capture_maxsize", type="int", default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choise=None,
+                             discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します。",
+                             discription_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."),
                     ]
                 ),
                 file_list=dict(
@@ -1265,6 +1323,9 @@ class Options:
                         dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False],
                              discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
                              discription_en="Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."),
+                        dict(opt="capture_maxsize", type="int", default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choise=None,
+                             discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します。",
+                             discription_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."),
                     ]
                 ),
                 file_mkdir=dict(
@@ -1321,6 +1382,9 @@ class Options:
                         dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False],
                              discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
                              discription_en="Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."),
+                        dict(opt="capture_maxsize", type="int", default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choise=None,
+                             discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します。",
+                             discription_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."),
                     ]
                 ),
                 file_rmdir=dict(
@@ -1377,6 +1441,9 @@ class Options:
                         dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False],
                              discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
                              discription_en="Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."),
+                        dict(opt="capture_maxsize", type="int", default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choise=None,
+                             discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します。",
+                             discription_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."),
                     ]
                 ),
                 file_upload=dict(
@@ -1438,6 +1505,9 @@ class Options:
                         dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False],
                              discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
                              discription_en="Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."),
+                        dict(opt="capture_maxsize", type="int", default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choise=None,
+                             discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します。",
+                             discription_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."),
                     ]
                 ),
                 file_download=dict(
@@ -1499,6 +1569,9 @@ class Options:
                         dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False],
                              discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
                              discription_en="Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."),
+                        dict(opt="capture_maxsize", type="int", default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choise=None,
+                             discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します。",
+                             discription_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."),
                     ]
                 ),
                 file_remove=dict(
@@ -1551,6 +1624,9 @@ class Options:
                         dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False],
                              discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
                              discription_en="Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."),
+                        dict(opt="capture_maxsize", type="int", default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choise=None,
+                             discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します。",
+                             discription_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."),
                     ]
                 ),
                 file_copy=dict(
@@ -1609,6 +1685,9 @@ class Options:
                         dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False],
                              discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
                              discription_en="Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."),
+                        dict(opt="capture_maxsize", type="int", default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choise=None,
+                             discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します。",
+                             discription_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."),
                     ]
                 ),
             ),
@@ -1674,6 +1753,9 @@ class Options:
                         dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False],
                              discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
                              discription_en="Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."),
+                        dict(opt="capture_maxsize", type="int", default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choise=None,
+                             discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します。",
+                             discription_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."),
                     ]
                 ),
                 cmd=dict(
@@ -1702,6 +1784,9 @@ class Options:
                         dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False],
                              discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
                              discription_en="Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."),
+                        dict(opt="capture_maxsize", type="int", default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choise=None,
+                             discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します。",
+                             discription_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."),
                     ]
                 ),
                 csv=dict(
@@ -1730,6 +1815,9 @@ class Options:
                         dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False],
                              discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
                              discription_en="Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."),
+                        dict(opt="capture_maxsize", type="int", default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choise=None,
+                             discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します。",
+                             discription_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."),
                     ]
                 ),
                 det_clip=dict(
@@ -1758,6 +1846,9 @@ class Options:
                         dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False],
                              discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
                              discription_en="Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."),
+                        dict(opt="capture_maxsize", type="int", default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choise=None,
+                             discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します。",
+                             discription_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."),
                     ]
                 ),
                 det_face_store=dict(
@@ -1786,6 +1877,9 @@ class Options:
                         dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False],
                              discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
                              discription_en="Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."),
+                        dict(opt="capture_maxsize", type="int", default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choise=None,
+                             discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します。",
+                             discription_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."),
                     ]
                 ),
                 det_filter=dict(
@@ -1835,6 +1929,9 @@ class Options:
                         dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False],
                              discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
                              discription_en="Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."),
+                        dict(opt="capture_maxsize", type="int", default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choise=None,
+                             discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します。",
+                             discription_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."),
                     ]
                 ),
                 det_jadge=dict(
@@ -1896,6 +1993,9 @@ class Options:
                         dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False],
                              discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
                              discription_en="Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."),
+                        dict(opt="capture_maxsize", type="int", default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choise=None,
+                             discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します。",
+                             discription_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."),
                     ]
                 ),
                 httpreq=dict(
@@ -1921,6 +2021,9 @@ class Options:
                         dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False],
                              discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
                              discription_en="Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."),
+                        dict(opt="capture_maxsize", type="int", default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choise=None,
+                             discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します。",
+                             discription_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."),
                     ]
                 ),
                 seg_bbox=dict(
@@ -1964,6 +2067,9 @@ class Options:
                         dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False],
                              discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
                              discription_en="Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."),
+                        dict(opt="capture_maxsize", type="int", default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choise=None,
+                             discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します。",
+                             discription_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."),
                     ]
                 ),
                 seg_filter=dict(
@@ -2013,6 +2119,9 @@ class Options:
                         dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False],
                              discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
                              discription_en="Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."),
+                        dict(opt="capture_maxsize", type="int", default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choise=None,
+                             discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します。",
+                             discription_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."),
                     ]
                 ),
                 showimg=dict(
@@ -2047,6 +2156,9 @@ class Options:
                         dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False],
                              discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
                              discription_en="Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."),
+                        dict(opt="capture_maxsize", type="int", default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choise=None,
+                             discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します。",
+                             discription_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."),
                     ]
                 ),
             ),
@@ -2091,6 +2203,9 @@ class Options:
                         dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False],
                              discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
                              discription_en="Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."),
+                        dict(opt="capture_maxsize", type="int", default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choise=None,
+                             discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します。",
+                             discription_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."),
                     ]
                 ),
                 stop=dict(
@@ -2131,6 +2246,9 @@ class Options:
                         dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False],
                              discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
                              discription_en="Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."),
+                        dict(opt="capture_maxsize", type="int", default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choise=None,
+                             discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します。",
+                             discription_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."),
                     ]
                 ),
                 list=dict(
@@ -2162,6 +2280,9 @@ class Options:
                         dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False],
                              discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
                              discription_en="Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."),
+                        dict(opt="capture_maxsize", type="int", default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choise=None,
+                             discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します。",
+                             discription_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."),
                     ]
                 ),
             ),
@@ -2197,6 +2318,9 @@ class Options:
                         dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False],
                              discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
                              discription_en="Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."),
+                        dict(opt="capture_maxsize", type="int", default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choise=None,
+                             discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します。",
+                             discription_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."),
                     ]
                 ),
                 docker_stop=dict(
@@ -2222,6 +2346,9 @@ class Options:
                         dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False],
                              discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
                              discription_en="Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."),
+                        dict(opt="capture_maxsize", type="int", default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choise=None,
+                             discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します。",
+                             discription_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."),
                     ]
                 ),
             ),
@@ -2278,6 +2405,9 @@ class Options:
                         dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False],
                              discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
                              discription_en="Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."),
+                        dict(opt="capture_maxsize", type="int", default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choise=None,
+                             discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します。",
+                             discription_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."),
                     ]
                 ),
                 stop=dict(
@@ -2291,6 +2421,9 @@ class Options:
                         dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False],
                              discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
                              discription_en="Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."),
+                        dict(opt="capture_maxsize", type="int", default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choise=None,
+                             discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します。",
+                             discription_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."),
                     ]
                 ),
                webcap=dict(
@@ -2328,6 +2461,9 @@ class Options:
                         dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False],
                              discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
                              discription_en="Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."),
+                        dict(opt="capture_maxsize", type="int", default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choise=None,
+                             discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します。",
+                             discription_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."),
                     ]
                 ),
             ),
@@ -2378,6 +2514,9 @@ class Options:
                         dict(opt="assets", type="file", default=None, required=False, multi=True, hide=False, choise=None,
                              discription_ja="htmlファイルを使用する場合に必要なアセットファイルを指定します。",
                              discription_en="Specify the asset file required when using html files."),
+                        dict(opt="capture_maxsize", type="int", default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choise=None,
+                             discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します。",
+                             discription_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."),
                     ]
                 ),
             )
