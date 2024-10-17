@@ -1099,7 +1099,7 @@ anno.save_annoall_coco = (menu_elem) => {
         const img_id = coco['images'].length;
         coco['images'].push({
           "id": img_id,
-          "file_name": n['name'].replace(/\.svg$/, ''),
+          "file_name": `${node['name']}/${n['name'].replace(/\.svg$/, '')}`,
           "height": parseInt(svg_elem.attr('height')),
           "width": parseInt(svg_elem.attr('width')),
           "license": 0,

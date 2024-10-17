@@ -314,7 +314,7 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
             });
           }
         }};
-        mk_blob = (base64) => {
+        const mk_blob = (base64) => {
           const bin = atob(base64.replace(/^.*,/, ''));
           const buffer = new Uint8Array(bin.length);
           for (i=0; i<bin.length; i++) buffer[i] = bin.charCodeAt(i);
@@ -322,7 +322,7 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
           return blob;
         }
         // ダウンロード関数の生成
-        mk_download = (_p) => {return ()=>{
+        const mk_download = (_p) => {return ()=>{
           iinfer.file_download(fsapi.right, _p).then(res => {
             if(!res) {
               iinfer.hide_loading();
@@ -337,7 +337,7 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
           });
         }};
         // フォルダ作成関数の生成
-        mk_mkdir = (_t, _p, _e, is_dir, _l) => {return ()=>{
+        const mk_mkdir = (_t, _p, _e, is_dir, _l) => {return ()=>{
           _p = _p.substring(0, _p.lastIndexOf('/')+1);
           const prompt_text = prompt('Enter a new folder name.');
           if(prompt_text) {
@@ -348,8 +348,30 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
             });
           }
         }};
+        // コピー関数の生成
+        const mk_copy = (_t, _p, _e, is_dir, _l) => {return ()=>{
+          const prompt_text = prompt(`From: '${_p}'\nEnter a to path.`, `${_p}_copy`);
+          if(prompt_text) {
+            const exec_cmd = _l ? fsapi.local_exec_cmd : iinfer.sv_exec_cmd;
+            iinfer.file_copy(fsapi.right, _p, prompt_text, false, undefined, exec_cmd).then(res => {
+              iinfer.hide_loading();
+              if (res) fsapi.tree(_t, res['path'], _e, _l);
+            });
+          }
+        }};
+        // 移動関数の生成
+        const mk_move = (_t, _p, _e, is_dir, _l) => {return ()=>{
+          const prompt_text = prompt(`From: '${_p}'\nEnter a to path.`, `${_p}`);
+          if(prompt_text) {
+            const exec_cmd = _l ? fsapi.local_exec_cmd : iinfer.sv_exec_cmd;
+            iinfer.file_move(fsapi.right, _p, prompt_text, undefined, exec_cmd).then(res => {
+              iinfer.hide_loading();
+              if (res) fsapi.tree(_t, res['path'], _e, _l);
+            });
+          }
+        }};
         // ビューアー関数の生成
-        mk_view = (_p, _mime, _size, _l) => {return ()=>{
+        const mk_view = (_p, _mime, _size, _l) => {return ()=>{
           if (_size.indexOf('G') >= 0 || _size.indexOf('T') >= 0) {
             iinfer.message({warn: `The file size is too large to view. (${_size})`});
             return;
@@ -390,15 +412,21 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
           if (_n["is_dir"]) {
             tr.find('.dropdown-menu').append('<li><a class="dropdown-item open" href="#">Open</a></li>');
             tr.find('.dropdown-menu').append('<li><a class="dropdown-item mkdir" href="#">Create Folder</a></li>');
+            tr.find('.dropdown-menu').append('<li><a class="dropdown-item copy" href="#">Copy Folder</a></li>');
+            tr.find('.dropdown-menu').append('<li><a class="dropdown-item move" href="#">Move Folder</a></li>');
             tr.find('.dropdown-menu').append('<li><a class="dropdown-item delete" href="#">Delete</a></li>');
           } else {
             tr.find('.dropdown-menu').append('<li><a class="dropdown-item mkdir" href="#">Create Folder</a></li>');
+            tr.find('.dropdown-menu').append('<li><a class="dropdown-item copy" href="#">Copy</a></li>');
+            tr.find('.dropdown-menu').append('<li><a class="dropdown-item move" href="#">Move</a></li>');
             tr.find('.dropdown-menu').append('<li><a class="dropdown-item delete" href="#">Delete</a></li>');
             tr.find('.dropdown-menu').append('<li><a class="dropdown-item view" href="#">View</a></li>');
           }
           tr.find('.open').off('click').on('click', mk_tree(_t, _p, _e, _l));
           tr.find('.delete').off('click').on('click', mk_delete(_p, _e, _n["is_dir"], _l));
           tr.find('.mkdir').off('click').on('click', mk_mkdir(_t, _p, _e, _n["is_dir"], _l));
+          tr.find('.copy').off('click').on('click', mk_copy(_t, _p, _e, _n["is_dir"], _l));
+          tr.find('.move').off('click').on('click', mk_move(_t, _p, _e, _n["is_dir"], _l));
           tr.find('.view').off('click').on('click', mk_view(_p, tr.find('.mime_type').text(), tr.find('.file_size').text(), _l));
           return tr;
         };

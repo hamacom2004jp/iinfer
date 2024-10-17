@@ -329,6 +329,13 @@ class Server(filer.Filer):
                     to_path = convert.b64str2str(msg[3])
                     orverwrite = msg[4]=='True'
                     st = self.file_copy(msg[1], from_path, to_path, orverwrite)
+                elif msg[0] == 'file_move':
+                    if to_cluster:
+                        _publish(msg_str)
+                        continue
+                    from_path = convert.b64str2str(msg[2])
+                    to_path = convert.b64str2str(msg[3])
+                    st = self.file_move(msg[1], from_path, to_path)
                 else:
                     self.logger.warning(f"Unknown command {msg}")
                     st = self.RESP_WARN
@@ -1086,4 +1093,25 @@ class Server(filer.Filer):
         except Exception as e:
             self.logger.warning(f"Failed to copy file: {e}", exc_info=True)
             self.redis_cli.rpush(reskey, {"warn": f"Failed to copy file: {e}"})
+            return self.RESP_WARN
+
+    def file_move(self, reskey:str, from_path:str, to_path:str) -> int:
+        """
+        ファイルを移動する
+
+        Args:
+            reskey (str): レスポンスキー
+            from_path (str): 移動元ファイルパス
+            to_path (str): 移動先ファイルパス
+
+        Returns:
+            int: レスポンスコード
+        """
+        try:
+            rescode, msg = super().file_move(from_path, to_path)
+            self.redis_cli.rpush(reskey, msg)
+            return rescode
+        except Exception as e:
+            self.logger.warning(f"Failed to move file: {e}", exc_info=True)
+            self.redis_cli.rpush(reskey, {"warn": f"Failed to move file: {e}"})
             return self.RESP_WARN

@@ -33,7 +33,7 @@ class Filer(object):
         if current_path is None or current_path == "":
             self.logger.warning(f"current_path is empty.")
             return False, None, {"warn": f"current_path is empty."}
-        current_path = current_path.replace("\\","/")
+        current_path = current_path.replace("\\","/").replace("//","/")
         cp = current_path[1:] if current_path.startswith('/') else current_path
         abspath:Path = (self.data_dir / cp).resolve()
         if not str(abspath).startswith(str(self.data_dir)):
@@ -291,4 +291,36 @@ class Filer(object):
             self.logger.warning(f"Path {from_abspath} is not file or directory.")
             return self.RESP_WARN, {"warn": f"Path {from_abspath} is not file or directory."}
 
-        return self.RESP_SCCESS, {"success": {"path":f"{ret_path}","msg":f"Copy from '{from_path}' to '{to_path}'. write '{ret_path}'"}}
+        return self.RESP_SCCESS, {"success": {"path":f"{to_path}",
+                                              "to_path":f"{to_path}",
+                                              "from_path":f"{from_path}",
+                                              "ret_path":f"{ret_path}",
+                                              "msg":f"Copy from '{from_path}' to '{to_path}'. write '{ret_path}'"}}
+
+    def file_move(self, from_path:str, to_path:str) -> Tuple[int, Dict[str, Any]]:
+        """
+        ファイルを移動する
+
+        Args:
+            from_path (str): 移動元パス
+            to_path (str): 移動先パス
+
+        Returns:
+            int: レスポンスコード
+            dict: メッセージ
+        """
+        chk, from_abspath, msg = self._file_exists(from_path)
+        if not chk:
+            return self.RESP_WARN, msg
+
+        chk, to_abspath, msg = self._file_exists(to_path, not_exists=True)
+        if not chk:
+            return self.RESP_WARN, msg
+
+        ret_path = shutil.move(from_abspath, to_abspath)
+
+        return self.RESP_SCCESS, {"success": {"path":f"{to_path}",
+                                              "to_path":f"{to_path}",
+                                              "from_path":f"{from_path}",
+                                              "ret_path":f"{ret_path}",
+                                              "msg":f"Move from '{from_path}' to '{to_path}'. write '{ret_path}'"}}

@@ -542,6 +542,37 @@ iinfer.file_copy = (target, from_path, to_path, orverwrite=false, error_func=und
   });
 };
 /**
+ * ファイル移動
+ * @param {$} target - 接続先情報のhidden要素を含む祖先要素
+ * @param {string} from_path - 移動元パス
+ * @param {string} to_path - 移動先パス
+ * @param {function} error_func - エラー時のコールバック関数
+ * @param {function} exec_cmd - サーバーAPI実行関数
+ * @returns {Promise} - レスポンス
+ */
+iinfer.file_move = (target, from_path, to_path, error_func=undefined, exec_cmd=undefined) => {
+  const opt = iinfer.get_server_opt(false, target);
+  opt['mode'] = 'client';
+  opt['cmd'] = 'file_move';
+  opt['capture_stdout'] = true;
+  opt['from_path'] = from_path;
+  opt['to_path'] = to_path;
+  iinfer.show_loading();
+  const exec = exec_cmd ? exec_cmd : iinfer.sv_exec_cmd;
+  return exec(opt).then(res => {
+    if(!res[0] || !res[0]['success']) {
+      if (error_func) {
+        error_func(res);
+        return;
+      }
+      iinfer.hide_loading();
+      iinfer.message(res);
+      return;
+    }
+    return res[0]['success'];
+  });
+};
+/**
  * ファイル削除
  * @param {$} target - 接続先情報のhidden要素を含む祖先要素
  * @param {string} svpath - サーバーパス
