@@ -412,13 +412,17 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
           if (_n["is_dir"]) {
             tr.find('.dropdown-menu').append('<li><a class="dropdown-item open" href="#">Open</a></li>');
             tr.find('.dropdown-menu').append('<li><a class="dropdown-item mkdir" href="#">Create Folder</a></li>');
-            tr.find('.dropdown-menu').append('<li><a class="dropdown-item copy" href="#">Copy Folder</a></li>');
-            tr.find('.dropdown-menu').append('<li><a class="dropdown-item move" href="#">Move Folder</a></li>');
+            if (!_l) {
+              tr.find('.dropdown-menu').append('<li><a class="dropdown-item copy" href="#">Copy Folder</a></li>');
+              tr.find('.dropdown-menu').append('<li><a class="dropdown-item move" href="#">Move Folder</a></li>');
+            }
             tr.find('.dropdown-menu').append('<li><a class="dropdown-item delete" href="#">Delete</a></li>');
           } else {
             tr.find('.dropdown-menu').append('<li><a class="dropdown-item mkdir" href="#">Create Folder</a></li>');
-            tr.find('.dropdown-menu').append('<li><a class="dropdown-item copy" href="#">Copy</a></li>');
-            tr.find('.dropdown-menu').append('<li><a class="dropdown-item move" href="#">Move</a></li>');
+            if (!_l) {
+              tr.find('.dropdown-menu').append('<li><a class="dropdown-item copy" href="#">Copy</a></li>');
+              tr.find('.dropdown-menu').append('<li><a class="dropdown-item move" href="#">Move</a></li>');
+            }
             tr.find('.dropdown-menu').append('<li><a class="dropdown-item delete" href="#">Delete</a></li>');
             tr.find('.dropdown-menu').append('<li><a class="dropdown-item view" href="#">View</a></li>');
           }
