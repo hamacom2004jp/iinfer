@@ -377,8 +377,9 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
             return;
           }
           else if (_size.indexOf('M') >= 0 && parseInt(_size.replace('M','')) > 5) {
-            iinfer.message({warn: `The file size is too large to view. (${_size} > 5M)`});
-            return;
+            if (!window.confirm(`The file size is too large to view. (${_size} > 5M)\nDo you still want to open the Viewer?`)) {
+              return;
+            }
           }
           const exec_cmd = _l ? fsapi.local_exec_cmd : iinfer.sv_exec_cmd;
           iinfer.file_download(fsapi.right, _p, undefined, exec_cmd).then(res => {
@@ -418,13 +419,13 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
             }
             tr.find('.dropdown-menu').append('<li><a class="dropdown-item delete" href="#">Delete</a></li>');
           } else {
+            tr.find('.dropdown-menu').append('<li><a class="dropdown-item view" href="#">View</a></li>');
             tr.find('.dropdown-menu').append('<li><a class="dropdown-item mkdir" href="#">Create Folder</a></li>');
             if (!_l) {
               tr.find('.dropdown-menu').append('<li><a class="dropdown-item copy" href="#">Copy</a></li>');
               tr.find('.dropdown-menu').append('<li><a class="dropdown-item move" href="#">Move</a></li>');
             }
             tr.find('.dropdown-menu').append('<li><a class="dropdown-item delete" href="#">Delete</a></li>');
-            tr.find('.dropdown-menu').append('<li><a class="dropdown-item view" href="#">View</a></li>');
           }
           tr.find('.open').off('click').on('click', mk_tree(_t, _p, _e, _l));
           tr.find('.delete').off('click').on('click', mk_delete(_p, _e, _n["is_dir"], _l));

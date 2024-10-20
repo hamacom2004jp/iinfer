@@ -24,6 +24,20 @@ anno.deploy_list = () => {
   });
 };
 /**
+ * キャンバスを初期化
+ **/
+anno.clear_canvas = () => {
+  anno.canvas_container.find('#canvas').html('');
+  anno.canvas_container.find('.anno-list').html('');
+};
+/**
+ * ラベルとカラーを初期化
+ **/
+anno.clear_labels = () => {
+  anno.canvas_container.find('#tags_labels .dropdown-labels').remove();
+  anno.canvas_container.find('.tag_label').text("");
+};
+/**
  * conf.jsonの取得
  * @param {string} svpath 読込むフォルダのパス
  * @return {void}
@@ -36,6 +50,8 @@ anno.load_conf = (svpath) => {
   // conf.jsonの取得
   iinfer.file_download(anno.left_container, `${svpath}/conf.json`).then(res => {
     if (!res) return;
+    anno.clear_canvas();
+    anno.clear_labels();
     const conf = anno.tool.conf = JSON.parse(atob(res['data']));
     if (conf['label_file'] && conf['deploy_dir']){
       const label_file = conf['label_file'].replace(conf['deploy_dir'], '').replace(/\\/, '/');
@@ -247,16 +263,17 @@ anno.load_anno = (image_path, exists_func, notfound_func) => {
  * @param {string} svpath 保存するフォルダのパス
  * @param {string} image_path 画像のパス
  * @param {$} svg_elem SVG要素
+ * @param {bool} nomsg メッセージを表示しない
  * @return {void}
  **/
-anno.save_anno = (svpath, image_path, svg_elem) => {
+anno.save_anno = (svpath, image_path, svg_elem, nomsg=false, success_func=undefined) => {
   iinfer.show_loading();
-  anno.blur_comp();
+  anno.blur_comp(svg_elem);
   const svg_str = svg_elem.prop('outerHTML');
   const formData = new FormData();
   image_path = image_path.replace(svpath, '');
   formData.append('files', new Blob([svg_str], {type:"image/svg+xml"}), `${image_path}.svg`);
-  iinfer.file_upload(anno.left_container, svpath, formData, orverwrite=true, progress_func=(e) => {}, success_func=(target, svpath, data) => {
+  iinfer.file_upload(anno.left_container, svpath, formData, orverwrite=true, (e) => {}, (target, svpath, data) => {
     const fl_svg_elem = anno.left_container.find(`.file-list [data-path='${svpath}${image_path}.svg']`);
     const fl_img_elem = anno.left_container.find(`.file-list [data-path='${svpath}${image_path}']`);
     const svg_src = fl_svg_elem.attr('src');
@@ -273,7 +290,8 @@ anno.save_anno = (svpath, image_path, svg_elem) => {
       fl_img_elem.parent().append(svg_elem);
     }
     iinfer.hide_loading();
-    iinfer.message(`Saved in. image_path=${svpath}${image_path}.svg`);
+    if (!nomsg) iinfer.message(`Saved in. image_path=${svpath}${image_path}.svg`);
+    if (success_func) success_func(`${svpath}${image_path}.svg`);
   }, error_func=(target, svpath, data) => {
     iinfer.hide_loading();
   });
@@ -313,10 +331,36 @@ anno.reflesh_svg = () => {
 anno.load_filelist = (basepath, svpath, current_ul_elem) => {
   const path_parts = svpath.split('/');
   // MS COCO Object Detection formatの保存先を設定
-  if (path_parts.length > 3) {
+  if (path_parts.length <= 3) {
+    const clean_menu = (menu_elem, menu_html) => {
+      menu_elem.find('span').html(menu_html);
+      menu_elem.removeAttr('data-load-type');
+      menu_elem.removeAttr('data-load-path');
+      menu_elem.removeAttr('data-load-input-path');
+      menu_elem.removeAttr('data-load-src');
+      menu_elem.off('click');
+    };
+    clean_menu(anno.left_container.find('.tool_bot_annoload_all_coco'), `Import MS COCO format`);
+    clean_menu(anno.left_container.find('.tool_bot_annosave_all_coco'), `Export MS COCO format`);
+    clean_menu(anno.left_container.find('.tool_bot_annosave_all_cityscapes'), `Export Cityscapes format`);
+  }
+  else if (path_parts.length > 3) {
     const deploy_name = path_parts[1];
     const input_name = path_parts[2];
     const subset = path_parts.slice(-1)[0];
+    {
+      const load_path = `/${deploy_name}/${input_name}/${subset}.json`;
+      const load_input_path = `/${deploy_name}/${input_name}`;
+      const menu_elem = anno.left_container.find('.tool_bot_annoload_all_coco');
+      menu_elem.find('span').html(`Import MS COCO format from "${load_path}" to "${load_input_path}/${subset}"`);
+      menu_elem.attr('data-load-type', 'coco');
+      menu_elem.attr('data-load-path', load_path);
+      menu_elem.attr('data-load-input-path', load_input_path);
+      menu_elem.attr('data-load-src', svpath);
+      menu_elem.off('click').on('click', () => {
+        anno.load_annoall_coco(menu_elem);
+      });
+    }
     {
       const save_path = `/${deploy_name}/${input_name}/${subset}.json`;
       const menu_elem = anno.left_container.find('.tool_bot_annosave_all_coco');
@@ -363,7 +407,8 @@ anno.load_filelist = (basepath, svpath, current_ul_elem) => {
       const font_color = "color:rgba(var(--bs-link-color-rgb),var(--bs-link-opacity,1));font-size:initial;";
       const current_a_elem = $(`<a href="#" class="folder-open" style="${font_color}" draggable="false">${node['name']}</a>`);
       current_li_elem.append(current_a_elem);
-      mk_func = (_b, _p, _e) => {return ()=>{
+      const mk_func = (_b, _p, _e) => {return ()=>{
+        anno.clear_canvas();
         anno.load_filelist(_b, _p, _e);
         event.stopPropagation();
       }}
@@ -564,9 +609,9 @@ anno.load_annolist = (svg_elem) => {
       const svg_elem = anno.canvas_container.find('#canvas svg');
       const comp_elem = svg_elem.find(`#${a_elem.attr('data-anno-id')}`);
       if (comp_elem.length <= 0) return;
-      anno.blur_comp();
       svg_elem.data('selectcomp', comp_elem.get(0));
       svg_elem.append(comp_elem); // 最前面に移動
+      anno.blur_comp(svg_elem);
       comp_elem.attr('stroke-width', `5.0`);
       a_elem.css('background-color', 'var(--bs-list-group-action-active-bg)');
     });
@@ -664,7 +709,7 @@ anno.svg_mouse_action = (svg_elem, svg) => {
       }
       svg_elem.data('selectcomp', comp);
       svg_elem.append(comp_elem); // 最前面に移動
-      anno.blur_comp();
+      anno.blur_comp(svg_elem);
       comp_elem.attr('stroke-width', `5.0`);
       const id = comp_elem.attr('id');
       anno.canvas_container.find('.anno-list').find(`[data-anno-id='${id}']`).css('background-color', 'var(--bs-list-group-action-active-bg)');
@@ -955,9 +1000,10 @@ anno.join_points = (points_ary) => {
 /**
  * コンポーネントの選択状態を解除
  **/
-anno.blur_comp = () => {
+anno.blur_comp = (svg_elem) => {
   anno.canvas_container.find('.anno-list').find(`a`).css('background-color', '');
-  anno.canvas_container.find('#svg').children().attr('stroke-width', `2.0`);
+  svg_elem = svg_elem ? svg_elem : anno.canvas_container.find('#svg');
+  svg_elem.find('[stroke-width]').attr('stroke-width', '2');
 };
 /**
  * 右クリックメニューを無効化
@@ -1015,6 +1061,95 @@ anno.dragscroll = (target_elem, target) => {
     return false;
   };
 };
+anno.load_annoall_coco = (menu_elem) => {
+  const load_type = menu_elem.attr('data-load-type');
+  const load_src = menu_elem.attr('data-load-src');
+  const deploy_dir = anno.left_container.find('.deploy_names').val();
+  const conf = anno.tool.conf;
+  const load_path = menu_elem.attr('data-load-path');
+  const load_input_path = menu_elem.attr('data-load-input-path');
+  if (!load_type || !load_path || !load_input_path || !conf) {
+    iinfer.message('Annotation import error.');
+    return;
+  }
+  if (!window.confirm('Caution!!: Please check the following points.\n'
+    +`This operation generates an SVG file based on the annotation data in the “${load_path}” file.\n`
+    +'The SVG file records the result of annotating the image.\n'
+    +'If an SVG file with the same name already exists, it will be overwritten.\n'
+    +'\nShall we continue?')) return;
+  iinfer.show_loading();
+  iinfer.progress(0, 1, 0, `Loading “${load_path}” file.`, true, true);
+  iinfer.file_download(anno.left_container, load_path).then(async res => {
+    if (!res) {
+      iinfer.hide_loading();
+      return;
+    }
+    const anno_json = JSON.parse(atob(res['data']));
+    const labels = anno_json['categories'];
+    const images = anno_json['images'];
+    const annotaions = anno_json['annotations'];
+
+    // ラベル＆カラーの再読み込み
+    const colors = anno.get_tool_colors();
+    const tags_labels_elem = anno.canvas_container.find('#tags_labels');
+    tags_labels_elem.children('.dropdown-labels').remove();
+    for (let i=0; i<labels.length; i++) {
+      if (i >= colors.length) colors.push(iinfer.randam_color());
+      anno.add_label(labels[i]['name'], colors[i], tags_labels_elem);
+    }
+    anno.canvas_container.find('#tags_labels').find('.dropdown-item:first').click();
+    // 画像ファイルの存在チェック
+    for(let i=0; i<images.length; i++) {
+      const img = images[i];
+      iinfer.show_loading();
+      iinfer.progress(0, images.length, i, `Check image “${img['file_name']}” file.`, true, false);
+      const res = await iinfer.file_list(anno.left_container, `${load_input_path}/${img['file_name']}`);
+      if (!res) return;
+    }
+    iinfer.show_loading();
+    // アノテーションファイル内に定義されている画像単位で処理
+    let cnt = 0;
+    for(const img of images) {
+      // 画像に設定されているアノテーションリストを取得
+      const annos = annotaions.filter(row => row['image_id']==img['id']);
+      if (annos.length <= 0) continue;
+      // アノテーションリストからSVGエレメントを作成
+      $('#anno_svg').remove();
+      const svg_elem = $(`<svg id="anno_svg" xmlns="http://www.w3.org/2000/svg" width="${img['width']}" height="${img['height']}" viewBox="0 0 ${img['width']} ${img['height']}"/>`);
+      for(const anno_obj of annos) {
+        const label = labels.find(row => row['id']==anno_obj['category_id']);
+        const color = colors[labels.indexOf(label)];
+        const bbox = anno_obj['bbox'];
+        const segs = anno_obj['segmentation'];
+        // segの場合
+        if (segs && segs.length > 0) {
+          const points = [];
+          for (const seg of segs) {
+            for (let j=0; j<seg.length; j+=2) points.push([seg[j], seg[j+1]]);
+          }
+          const comp = anno.make_polylines_dom(anno.join_points(points), `#${color}`, '#ffffff', 2, label['name']);
+          svg_elem.append($(comp));
+        }
+        // bboxの場合
+        else if (bbox && bbox.length >= 4) {
+          const comp = anno.make_rect_dom(bbox[0], bbox[1], bbox[0]+bbox[2], bbox[1]+bbox[3], `#${color}`, '#ffffff', 2, label['name']);
+          svg_elem.append($(comp));
+        }
+      }
+      iinfer.show_loading();
+      anno.save_anno(deploy_dir, `${load_input_path}/${img['file_name']}`, svg_elem, true, (svg_path) => {
+        iinfer.progress(0, images.length, ++cnt, `Generate and save svg file. “${svg_path}”.`, true, false);
+        if(cnt >= images.length) {
+          iinfer.hide_loading();
+          iinfer.message(`Import complate. load_path=${load_path}, last_save_svg=${svg_path}`);
+          const current_ul_elem = anno.left_container.find('.tree-menu');
+          anno.clear_canvas();
+          anno.load_filelist(load_input_path, load_src, current_ul_elem);
+        }
+      });
+    }
+  });
+};
 /**
  * 選択中のフォルダ内のSVGファイルを元にアノテーションファイルを生成して保存
  * @param {$} menu_elem メニュー要素
@@ -1025,7 +1160,7 @@ anno.save_annoall_coco = (menu_elem) => {
   const deploy_dir = anno.left_container.find('.deploy_names').val();
   const conf = anno.tool.conf;
   if (!save_type || !save_src || !conf) {
-    iinfer.message('Annotation save error.');
+    iinfer.message('Annotation export error.');
     return;
   }
   const save_path = menu_elem.attr('data-save-path').replace(deploy_dir, '');
@@ -1034,7 +1169,7 @@ anno.save_annoall_coco = (menu_elem) => {
     iinfer.message('The label is not set.');
     return;
   }
-  if (!window.confirm('Caution:\n'
+  if (!window.confirm('Caution!!: Please check the following points.\n'
                     +'1.Save the label before performing this operation.\n'
                     +'2.Save the annotation before performing this operation.\n'
                     +'3.If an annotation file has already been saved, it will be overwritten.\n'
@@ -1253,13 +1388,13 @@ anno.save_annoall_cityscapes = (menu_elem) => {
                 const svg_elem = $(svg_str);
                 // SVGからPNGを生成
                 svg_elem.attr('id', null);
-                svg_elem.attr('stroke-width', '1.0');
+                svg_elem.attr('stroke-width', '2.0');
                 svg_elem.children().each((i, comp) => {
                   const comp_elem = $(comp);
                   const index = labels.indexOf(comp_elem.attr('data-anno-label'));
                   const color = iinfer.make_color4id(index); // ラベルに対応する色を取得
                   comp_elem.attr('stroke', `#${color}`);
-                  comp_elem.attr('stroke-width', `1.0`);
+                  comp_elem.attr('stroke-width', `2.0`);
                   comp_elem.attr('fill', `#${color}`);
                   comp_elem.attr('fill-opacity', `1`);
                 });

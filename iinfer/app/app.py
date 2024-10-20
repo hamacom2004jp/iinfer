@@ -573,7 +573,9 @@ class IinferApp:
 
             elif args.cmd == 'httpreq':
                 try:
-                    proc = httpreq.Httpreq(logger, fileup_name=args.fileup_name, json_without_img=args.json_without_img)
+                    proc = httpreq.Httpreq(logger, fileup_name=args.fileup_name, outputs_url=args.outputs_url, output_image_url=args.output_image_url,
+                                           output_image_ext=args.output_image_ext, output_image_prefix=args.output_image_prefix,
+                                           json_without_img=args.json_without_img)
                 except Exception as e:
                     common.print_format({"warn":f"Invalid options. {e}"}, args.format, tm, args.output_json, args.output_json_append)
                     return 1, msg

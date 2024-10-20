@@ -17,9 +17,8 @@ class Httpreq(postprocess.Postprocess):
         Args:
             logger (logging.Logger): ロガー
             fileup_name (str, optional): ファイルアップロード名。デフォルトは'file'。
-            json_url (str, optional): JSONの送信先URL。デフォルトはNone。
-            img_url (str, optional): 画像の送信先URL。デフォルトはNone。
-            text_url (str, optional): テキストの送信先URL。デフォルトはNone。
+            outputs_url (str, optional): JSONの送信先URL。デフォルトはNone。
+            output_image_url (str, optional): 画像の送信先URL。デフォルトはNone。
             output_image_ext (str, optional): 画像の拡張子。デフォルトは'jpeg'。
             output_image_prefix (str, optional): 画像のファイル名の接頭辞。デフォルトは'output_'。
             json_without_img (bool, optional): JSONに画像を含めない場合はTrue。デフォルトはFalse。
