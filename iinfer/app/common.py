@@ -52,7 +52,7 @@ def mklogdir(data:Path) -> Path:
         return mkdirs(logdir)
     return logdir
 
-def load_config(mode:str, debug:bool=False, data=HOME_DIR) -> Tuple[logging.Logger, dict]:
+def load_config(mode:str, debug:bool=False, data=HOME_DIR, webcall:bool=False) -> Tuple[logging.Logger, dict]:
     """
     指定されたモードのロガーと設定を読み込みます。
 
@@ -60,6 +60,7 @@ def load_config(mode:str, debug:bool=False, data=HOME_DIR) -> Tuple[logging.Logg
         mode (str): モード名
         debug (bool, optional): デバッグモード. Defaults to False
         data (Path, optional): データディレクトリ. Defaults to HOME_DIR.
+        webcall (bool, optional): WebAPIからの呼出しの場合はTrue. setHandlerを削除します。. Defaults to False.
 
     Returns:
         logger (logging.Logger): ロガー
@@ -67,10 +68,17 @@ def load_config(mode:str, debug:bool=False, data=HOME_DIR) -> Tuple[logging.Logg
     """
     data = Path(data) if data is not None else HOME_DIR
     log_config = yaml.safe_load(resource_string(APP_ID, f"logconf_{mode}.yml"))
+    std_key = None
     for k, h in log_config['handlers'].items():
         if 'filename' in h:
             h['filename'] = data / h['filename']
             mkdirs(h['filename'].parent)
+        if 'class' in h and h['class'] == 'logging.StreamHandler':
+            std_key = k
+    if webcall and std_key is not None:
+        for k, l in log_config['loggers'].items():
+            if 'handlers' in l and std_key in l['handlers']:
+                l['handlers'].remove(std_key)
     logging.config.dictConfig(log_config)
     logger = logging.getLogger(mode)
     set_debug(logger, debug)

@@ -44,6 +44,11 @@ class Server(filer.Filer):
         self.is_running = False
         self.train_thread = None
         self.cleaning_interval = 10
+        self.logger.info(f"initialization parameter.")
+        self.logger.info(f" redis_host={self.redis_host}")
+        self.logger.info(f" redis_port={self.redis_port}")
+        self.logger.info(f" redis_password=********")
+        self.logger.info(f" svname={self.svname}")
 
     def __enter__(self):
         self.start_server()
@@ -57,8 +62,13 @@ class Server(filer.Filer):
         サーバー処理を開始する
         """
         self.is_running = False
+        self.retry_count = retry_count
+        self.retry_interval = retry_interval
+        self.logger.info(f"start_server parameter.")
+        self.logger.info(f" retry_count={self.retry_count}")
+        self.logger.info(f" retry_interval={self.retry_interval}")
         self.redis_cli = redis_client.RedisClient(self.logger, host=self.redis_host, port=self.redis_port, password=self.redis_password, svname=self.svname)
-        if self.redis_cli.check_server(find_svname=False, retry_count=retry_count, retry_interval=retry_interval, outstatus=True):
+        if self.redis_cli.check_server(find_svname=False, retry_count=self.retry_count, retry_interval=self.retry_interval, outstatus=True):
             self.is_running = True
             self._run_server()
 
@@ -353,9 +363,13 @@ class Server(filer.Filer):
             except redis.exceptions.TimeoutError:
                 pass
             except redis.exceptions.ConnectionError as e:
-                self.logger.warning(f"Connection to the server was lost. {e}")
-                self.is_running = False
-                break
+                self.logger.warning(f"Connection to the server was lost. {e}", exec_info=True)
+                if not self.redis_cli.check_server(find_svname=False, retry_count=self.retry_count, retry_interval=self.retry_interval, outstatus=True):
+                    self.is_running = False
+                    break
+            except OSError as e:
+                self.logger.warning(f"OSError. {e}", exec_info=True)
+                pass
             except KeyboardInterrupt as e:
                 self.is_running = False
                 break

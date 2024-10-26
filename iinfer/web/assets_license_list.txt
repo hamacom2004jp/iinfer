@@ -7,3 +7,4 @@ Lokesh Dhakar	MIT	lightbox2	http://lokeshdhakar.com/projects/lightbox2/	v2.11.4	
 Simon Hagström	MIT	split-pane	https://github.com/shagstrom/split-pane	v0.9.4	-
 杜甫々	-	tree-menu	https://www.tohoho-web.com/tech/tree-menu.htm	Ver1.1	-
 polygonplanet   MIT encoding-japanese   https://github.com/polygonplanet/encoding.js    v2.2.0  -
+Alan Williamson MIT jquery-linedtextarea    https://github.com/cotenoni/jquery-linedtextarea    -   -

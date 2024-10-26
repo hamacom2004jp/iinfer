@@ -389,6 +389,25 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
             iinfer.hide_loading();
           });
         }};
+        // エディター関数の生成
+        const mk_editer = (_p, _mime, _size, _l) => {return ()=>{
+          if (_size.indexOf('G') >= 0 || _size.indexOf('T') >= 0) {
+            iinfer.message({warn: `The file size is too large to view. (${_size})`});
+            return;
+          }
+          else if (_size.indexOf('M') >= 0 && parseInt(_size.replace('M','')) > 5) {
+            if (!window.confirm(`The file size is too large to view. (${_size} > 5M)\nDo you still want to open the Viewer?`)) {
+              return;
+            }
+          }
+          const exec_cmd = _l ? fsapi.local_exec_cmd : iinfer.sv_exec_cmd;
+          iinfer.file_download(fsapi.right, _p, undefined, exec_cmd).then(res => {
+            if(!res) return;
+            fsapi.editer(_p, res['data'], _mime, _l);
+          }).finally(() => {
+            iinfer.hide_loading();
+          });
+        }};
         // ファイルリストの生成
         const mk_tr = (_t, _p, _e, _n, _l) => {
           const png = _n["is_dir"] ? 'folder-close.png' : 'file.png';
@@ -420,6 +439,7 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
             tr.find('.dropdown-menu').append('<li><a class="dropdown-item delete" href="#">Delete</a></li>');
           } else {
             tr.find('.dropdown-menu').append('<li><a class="dropdown-item view" href="#">View</a></li>');
+            tr.find('.dropdown-menu').append('<li><a class="dropdown-item edit" href="#">Edit</a></li>');
             tr.find('.dropdown-menu').append('<li><a class="dropdown-item mkdir" href="#">Create Folder</a></li>');
             if (!_l) {
               tr.find('.dropdown-menu').append('<li><a class="dropdown-item copy" href="#">Copy</a></li>');
@@ -433,6 +453,7 @@ fsapi.tree = (target, svpath, current_ul_elem, is_local) => {
           tr.find('.copy').off('click').on('click', mk_copy(_t, _p, _e, _n["is_dir"], _l));
           tr.find('.move').off('click').on('click', mk_move(_t, _p, _e, _n["is_dir"], _l));
           tr.find('.view').off('click').on('click', mk_view(_p, tr.find('.mime_type').text(), tr.find('.file_size').text(), _l));
+          tr.find('.edit').off('click').on('click', mk_editer(_p, tr.find('.mime_type').text(), tr.find('.file_size').text(), _l));
           return tr;
         };
         // ディレクトリを先に表示
@@ -554,6 +575,7 @@ fsapi.local_exec_cmd = async (opt) => {
 fsapi.viewer = (title, data, mime) => {
   const viewer = $('#viewer_modal');
   viewer.find('.modal-title').text(title);
+  viewer.find('.btn-save').remove();
   const viewer_body = viewer.find('.modal-body');
   viewer_body.html('');
   if (mime.indexOf('image') >= 0) {
@@ -581,14 +603,93 @@ fsapi.viewer = (title, data, mime) => {
         type: 'string'
       });
       pre.find('code').text(unicodeString.replace(/\r/g, ''));
-      viewer.find('.modal-title').text(`${title} ( ${detectedEncoding} -> UNICODE )`);
+      viewer.find('.modal-title').text(`[View] ${title} ( ${detectedEncoding} -> UNICODE )`);
     } else {
       pre.find('code').text('< This file is not text or image data. >');
     }
   }
   hljs.initHighlightingOnLoad();
   viewer.modal('show');
-}
+};
+fsapi.editer = (svpath, data, mime, is_local) => {
+  const viewer = $('#viewer_modal');
+  viewer.find('.modal-title').text(svpath);
+  viewer.find('.btn-save').remove();
+  const viewer_body = viewer.find('.modal-body');
+  viewer_body.html('');
+  if (mime.indexOf('image') >= 0) {
+    iinfer.message({warn: 'This file is not text data.'});
+    return;
+  } else {
+    const txt = atob(data);
+    const istxt = iinfer.is_text(new TextEncoder().encode(txt));
+    if (!istxt) {
+      iinfer.message({warn: 'This file is not text data.'});
+      return;
+    }
+    // 文字コード判定
+    const codes = Encoding.stringToCode(txt);
+    let detectedEncoding = Encoding.detect(codes);
+    detectedEncoding = detectedEncoding?detectedEncoding:'SJIS'
+    // 文字コード変換
+    const unicodeString = Encoding.convert(codes, {
+      to: 'UNICODE',
+      from: detectedEncoding,
+      type: 'string'
+    });
+    viewer.find('.modal-title').text(`[Edit] ${svpath} ( ${detectedEncoding} -> UNICODE )`);
+    const textarea = $(`<textarea class="editer_code" style="width: calc(100% - 50px)"></textarea>`);
+    let line_num = unicodeString.split('\n').length;
+    line_num = line_num < 10 ? 10 : line_num;
+    textarea.css('height', `${line_num*1.2}em`);
+    viewer_body.append(textarea);
+    textarea.html(unicodeString.replace(/\r/g, ''));
+    const view_footer = viewer.find('.modal-footer');
+    if (view_footer.find('.btn-save').length <= 0) {
+      const btn_save = $('<button type="button" class="btn btn-success btn-save">Save</button>');
+      view_footer.append(btn_save);
+      btn_save.off('click').on('click', async () => {
+        if (!window.confirm('Do you want to save the changes?')) return;
+        // 保存処理
+        const text = textarea.val();
+        const ppath = svpath.slice(0, svpath.lastIndexOf('/'));
+        const fpath = svpath.slice(svpath.lastIndexOf('/')+1);
+        const blob = new Blob([text], {type:mime});
+        if (!is_local) {
+          // リモート側に保存
+          const formData = new FormData();
+          formData.append('files', blob, fpath);
+          iinfer.file_upload(fsapi.right, ppath, formData, true, undefined, (target, svpath, data) => {
+            iinfer.message(data);
+            viewer.modal('hide');
+          }, (target, svpath, data) => {
+            iinfer.message(data);
+            viewer.modal('hide');
+          });
+        } else {
+          // ローカル側に保存
+          try {
+            const down_dir = fsapi.handles[ppath?ppath:"/"];
+            const down_file = await down_dir.getFileHandle(fpath, {create: true});
+            const writable = await down_file.createWritable();
+            await writable.write(blob);
+            await writable.close();
+            iinfer.message('Save successed.');
+            viewer.modal('hide');
+          } catch (e) {
+            iinfer.message(e);
+            viewer.modal('hide');
+          }
+        }
+      });
+    }
+    viewer.modal('show');
+    textarea.linedtextarea();
+    viewer_body.find('.linedwrap').css('width','100%').css('height','100%');
+    viewer_body.find('.lines').css('height','100%');
+    textarea.css('width','calc(100% - 60px)').css('resize','');
+  }
+};
 fsapi.onload = () => {
   iinfer.get_server_opt(true, fsapi.right).then((opt) => {
     fsapi.filer("/", false);

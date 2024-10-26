@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>iinfer.app.common &mdash; iinfer 2024/09/28 documentation</title>
+  <title>iinfer.app.common &mdash; iinfer 2024/10/26 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -15,7 +15,7 @@
   
         <script src="../../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=6ad820c6"></script>
+        <script src="../../../_static/documentation_options.js?v=5f3de491"></script>
         <script src="../../../_static/doctools.js?v=9a2dae69"></script>
         <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -149,7 +149,7 @@
 
 <div class="viewcode-block" id="load_config">
 <a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.common.load_config">[docs]</a>
-<span class="k">def</span> <span class="nf">load_config</span><span class="p">(</span><span class="n">mode</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">debug</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">HOME_DIR</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]:</span>
+<span class="k">def</span> <span class="nf">load_config</span><span class="p">(</span><span class="n">mode</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">debug</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">HOME_DIR</span><span class="p">,</span> <span class="n">webcall</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    指定されたモードのロガーと設定を読み込みます。</span>
 
@@ -157,6 +157,7 @@
 <span class="sd">        mode (str): モード名</span>
 <span class="sd">        debug (bool, optional): デバッグモード. Defaults to False</span>
 <span class="sd">        data (Path, optional): データディレクトリ. Defaults to HOME_DIR.</span>
+<span class="sd">        webcall (bool, optional): WebAPIからの呼出しの場合はTrue. setHandlerを削除します。. Defaults to False.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        logger (logging.Logger): ロガー</span>
@@ -164,10 +165,17 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">data</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">HOME_DIR</span>
     <span class="n">log_config</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">resource_string</span><span class="p">(</span><span class="n">APP_ID</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;logconf_</span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s2">.yml&quot;</span><span class="p">))</span>
+    <span class="n">std_key</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">log_config</span><span class="p">[</span><span class="s1">&#39;handlers&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="k">if</span> <span class="s1">&#39;filename&#39;</span> <span class="ow">in</span> <span class="n">h</span><span class="p">:</span>
             <span class="n">h</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span> <span class="o">/</span> <span class="n">h</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">]</span>
             <span class="n">mkdirs</span><span class="p">(</span><span class="n">h</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;class&#39;</span> <span class="ow">in</span> <span class="n">h</span> <span class="ow">and</span> <span class="n">h</span><span class="p">[</span><span class="s1">&#39;class&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;logging.StreamHandler&#39;</span><span class="p">:</span>
+            <span class="n">std_key</span> <span class="o">=</span> <span class="n">k</span>
+    <span class="k">if</span> <span class="n">webcall</span> <span class="ow">and</span> <span class="n">std_key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">log_config</span><span class="p">[</span><span class="s1">&#39;loggers&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="s1">&#39;handlers&#39;</span> <span class="ow">in</span> <span class="n">l</span> <span class="ow">and</span> <span class="n">std_key</span> <span class="ow">in</span> <span class="n">l</span><span class="p">[</span><span class="s1">&#39;handlers&#39;</span><span class="p">]:</span>
+                <span class="n">l</span><span class="p">[</span><span class="s1">&#39;handlers&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">std_key</span><span class="p">)</span>
     <span class="n">logging</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">dictConfig</span><span class="p">(</span><span class="n">log_config</span><span class="p">)</span>
     <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">mode</span><span class="p">)</span>
     <span class="n">set_debug</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="n">debug</span><span class="p">)</span>

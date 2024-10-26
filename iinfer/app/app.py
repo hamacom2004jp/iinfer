@@ -22,7 +22,7 @@ class IinferApp:
         self.cl = None
         self.web = None
 
-    def main(self, args_list:list=None, file_dict:dict=dict()):
+    def main(self, args_list:list=None, file_dict:dict=dict(), webcall:bool=False):
         """
         コマンドライン引数を処理し、サーバーまたはクライアントを起動し、コマンドを実行する。
         """
@@ -77,7 +77,7 @@ class IinferApp:
         common.copy_sample(args.data)
         common.copy_sample(Path.cwd())
 
-        logger, _ = common.load_config(args.mode, debug=args.debug, data=args.data)
+        logger, _ = common.load_config(args.mode, debug=args.debug, data=args.data, webcall=webcall)
         if logger.level == logging.DEBUG:
             logger.debug(f"app.main: args.mode={args.mode}, args.cmd={args.cmd}")
         if args.mode == 'server':

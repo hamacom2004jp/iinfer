@@ -21,7 +21,7 @@ handlers:
 
 loggers:
     gui:
-        handlers: [gui]
+        handlers: [gui, std]
         level: INFO
         qualname: gui
  

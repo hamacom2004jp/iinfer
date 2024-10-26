@@ -31,7 +31,7 @@ def test_load_custom_predict():
          patch('inspect.getmembers', return_value=[('CustomPredict', CustomPredict)]):
         
         # load_custom_predict関数を呼び出します
-        result = module.load_custom_predict(Path('custom_predict.py'), logger)
+        result = module.load_custom_predict(Path('iinfer/tools/datas/predicts/mmdet_det_YoloX2.py'), logger)
 
         # 返されたオブジェクトがCustomPredictクラスのインスタンスであることを確認します
         assert isinstance(result, CustomPredict)

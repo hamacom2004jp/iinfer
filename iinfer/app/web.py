@@ -82,6 +82,21 @@ class Web(options.Options):
         self.cb_queue = queue.Queue(1000)
         #self.webcap_client = httpx.Client()
         self.webcap_client = requests.Session()
+        self.logger.info(f"initialization parameter.")
+        self.logger.info(f" redis_host={self.redis_host}")
+        self.logger.info(f" redis_port={self.redis_port}")
+        self.logger.info(f" redis_password=********")
+        self.logger.info(f" svname={self.svname}")
+        self.logger.info(f" data={self.data} -> {self.data.absolute()}")
+        self.logger.info(f" client_only={self.client_only}")
+        self.logger.info(f" filer_html={self.filer_html}")
+        self.logger.info(f" showimg_html={self.showimg_html}")
+        self.logger.info(f" webcap_html={self.webcap_html}")
+        self.logger.info(f" anno_html={self.anno_html}")
+        self.logger.info(f" assets={self.assets}")
+        self.logger.info(f" gui_mode={self.gui_mode}")
+        self.logger.info(f" cmds_path={self.cmds_path} -> {self.cmds_path.absolute()}")
+        self.logger.info(f" pipes_path={self.pipes_path} -> {self.pipes_path.absolute()}")
 
     def mk_curl_fileup(self, cmd_opt:Dict[str, Any]) -> str:
         """
@@ -249,7 +264,7 @@ class Web(options.Options):
             if 'capture_stdout' in opt and opt['capture_stdout']:
                 sys.stdout = captured_output = io.StringIO()
             try:
-                iinfer_app.main(args_list=opt_list, file_dict=file_dict)
+                iinfer_app.main(args_list=opt_list, file_dict=file_dict, webcall=True)
                 self.logger.disabled = False # ログ出力を有効にする
                 capture_maxsize = opt['capture_maxsize'] if 'capture_maxsize' in opt else options.Options.DEFAULT_CAPTURE_MAXSIZE
                 if 'capture_stdout' in opt and opt['capture_stdout']:
@@ -802,7 +817,10 @@ class Web(options.Options):
         self.allow_host = allow_host
         self.listen_port = listen_port
         self.outputs_key = outputs_key
-        self.logger.info(f"Start web. allow_host={self.allow_host} listen_port={self.listen_port}")
+        self.logger.info(f"start parameter.")
+        self.logger.info(f" allow_host={self.allow_host}")
+        self.logger.info(f" listen_port={self.listen_port}")
+        self.logger.info(f" outputs_key={self.outputs_key}")
 
         app = bottle.Bottle()
 
@@ -1335,7 +1353,14 @@ class Web(options.Options):
         self.capture_count = capture_count
         self.capture_fps = capture_fps
         self.count = 0
-        self.logger.info(f"Start webcap. allow_host={self.allow_host} listen_port={self.listen_port}")
+        self.logger.info(f"start webcap parameter.")
+        self.logger.info(f" allow_host={self.allow_host}")
+        self.logger.info(f" listen_port={self.listen_port}")
+        self.logger.info(f" outputs_key={self.outputs_key}")
+        self.logger.info(f" capture_frame_width={self.capture_frame_width}")
+        self.logger.info(f" capture_frame_height={self.capture_frame_height}")
+        self.logger.info(f" capture_count={self.capture_count}")
+        self.logger.info(f" capture_fps={self.capture_fps}")
 
         app = bottle.Bottle()
 

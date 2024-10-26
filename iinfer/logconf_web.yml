@@ -21,7 +21,7 @@ handlers:
 
 loggers:
     web:
-        handlers: [web]
+        handlers: [web, std]
         level: INFO
         qualname: web
  
