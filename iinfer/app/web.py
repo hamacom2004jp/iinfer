@@ -1,3 +1,4 @@
+from beaker.middleware import SessionMiddleware
 from iinfer import version
 from iinfer.app import app, common, options
 from iinfer.app.commons import convert, redis_client
@@ -10,13 +11,13 @@ import cv2
 import datetime
 import glob
 import gevent
+import hashlib
 import html
 import iinfer
 import io
 import json
 import logging
 import os
-import re
 import requests
 import queue
 import signal
@@ -31,8 +32,8 @@ import webbrowser
 
 class Web(options.Options):
     def __init__(self, logger:logging.Logger, data:Path, redis_host:str = "localhost", redis_port:int = 6379, redis_password:str = None, svname:str = 'server',
-                 client_only:bool=False, filer_html:str=None, showimg_html:str=None, webcap_html:str=None, anno_html:str=None,
-                 assets:List[str]=None, gui_mode:bool=False):
+                 client_only:bool=False, gui_html:str=None, filer_html:str=None, showimg_html:str=None, webcap_html:str=None, anno_html:str=None,
+                 assets:List[str]=None, signin_html:str=None, signin_file:str=None, gui_mode:bool=False):
         """
         iinferクライアント側のwebapiサービス
 
@@ -44,11 +45,14 @@ class Web(options.Options):
             redis_password (str, optional): Redisサーバーのパスワード. Defaults to None.
             svname (str, optional): 推論サーバーのサービス名. Defaults to 'server'.
             client_only (bool, optional): クライアントのみのサービスかどうか. Defaults to False.
+            gui_html (str, optional): GUIのHTMLファイル. Defaults to None.
             filer_html (str, optional): ファイラーのHTMLファイル. Defaults to None.
             showimg_html (str, optional): 画像表示のHTMLファイル. Defaults to None.
             webcap_html (str, optional): ウェブカメラのHTMLファイル. Defaults to None.
             anno_html (str, optional): アノテーション画面のHTMLファイル. Defaults to None.
             assets (List[str], optional): 静的ファイルのリスト. Defaults to None.
+            signin_html (str, optional): ログイン画面のHTMLファイル. Defaults to None.
+            signin_file (str, optional): ログイン情報のファイル. Defaults to args.signin_file.
             gui_mode (bool, optional): GUIモードかどうか. Defaults to False.
         """
         super().__init__()
@@ -62,16 +66,21 @@ class Web(options.Options):
         self.client_only = client_only
         if self.client_only:
             self.svname = 'client'
+        self.gui_html = Path(gui_html) if gui_html is not None else None
         self.filer_html = Path(filer_html) if filer_html is not None else None
         self.showimg_html = Path(showimg_html) if showimg_html is not None else None
         self.webcap_html = Path(webcap_html) if webcap_html is not None else None
         self.anno_html = Path(anno_html) if anno_html is not None else None
         self.assets = [Path(a) for a in assets] if assets is not None else None
+        self.signin_html = Path(signin_html) if signin_html is not None else None
+        self.signin_file = Path(signin_file) if signin_file is not None else None
+        self.gui_html_data = None
         self.filer_html_data = None
         self.showimg_html_data = None
         self.webcap_html_data = None
         self.anno_html_data = None
-        self.assets_data = None
+        self.signin_html_data = None
+        self.signin_file_data = None
         self.gui_mode = gui_mode
         self.cmds_path = self.data / ".cmds"
         self.pipes_path = self.data / ".pipes"
@@ -89,11 +98,14 @@ class Web(options.Options):
         self.logger.info(f" svname={self.svname}")
         self.logger.info(f" data={self.data} -> {self.data.absolute()}")
         self.logger.info(f" client_only={self.client_only}")
+        self.logger.info(f" gui_html={self.gui_html}")
         self.logger.info(f" filer_html={self.filer_html}")
         self.logger.info(f" showimg_html={self.showimg_html}")
         self.logger.info(f" webcap_html={self.webcap_html}")
         self.logger.info(f" anno_html={self.anno_html}")
         self.logger.info(f" assets={self.assets}")
+        self.logger.info(f" signin_html={self.signin_html}")
+        self.logger.info(f" signin_file={self.signin_file}")
         self.logger.info(f" gui_mode={self.gui_mode}")
         self.logger.info(f" cmds_path={self.cmds_path} -> {self.cmds_path.absolute()}")
         self.logger.info(f" pipes_path={self.pipes_path} -> {self.pipes_path.absolute()}")
@@ -339,37 +351,6 @@ class Web(options.Options):
         return [dict(type='cmdline',raw=' '.join(['python','-m','iinfer']+opt_list)),
                 dict(type='optjson',raw=json.dumps(opt, default=common.default_json_enc)),
                 dict(type='curlcmd',raw=f'curl {curl_cmd_file} http://localhost:8081/exec_cmd/{title}')]
-
-    def list_downloads(self, current_path:str, root_path:Path=None, scope:str='client'):
-        """
-        ダウンロードファイルのリストを取得する
-
-        Args:
-            current_path (str): カレントパス
-            root_path (Path, optional): ルートパス. Defaults to None.
-            scope (str, optional): スコープ. Defaults to 'client'.
-        
-        Returns:
-            list: ダウンロードファイルのリスト
-        """
-        if self.logger.level == logging.DEBUG:
-            self.logger.debug(f"web.list_downloads: current_path={current_path}, root_path={root_path}")
-        data_dir = self.data if scope == 'client' else Path.cwd()
-        if type(current_path) == str:
-            current_path = current_path[1:] if current_path.startswith('/') else current_path
-            current_path = data_dir if current_path is None or current_path=='' else data_dir / current_path
-            root_path = current_path
-        if current_path.is_file():
-            svpath = str(current_path).replace(str(data_dir), '')
-            rpath = str(current_path).replace(str(root_path), '')[1:]
-            rpath = str(Path(root_path.name) / rpath)
-            #dlpath = cpath.replace(str(Path(rpath).parent), '')
-            return [dict(svpath=svpath, rpath=rpath)]
-        download_files = []
-        if current_path.is_dir():
-            for f in current_path.iterdir():
-                download_files = download_files + self.list_downloads(f, root_path, scope)
-        return download_files
 
     def load_result(self, current_path:str) -> List[Dict[str, Any]]:
         """
@@ -805,6 +786,21 @@ class Web(options.Options):
                 bottle.abort(400, 'Expected WebSocket request.')
                 return
 
+    def load_signin_file(self):
+        if self.signin_file is not None:
+            if not self.signin_file.is_file():
+                raise FileNotFoundError(f'signin_file is not found. ({self.signin_file})')
+            with open(self.signin_file, 'r', encoding='utf-8') as f:
+                self.signin_file_data = dict()
+                for line in f:
+                    if line.strip() == '': continue
+                    parts = line.strip().split(':')
+                    if len(parts) <= 2:
+                        raise ValueError(f'signin_file format error. Format must be "userid:passwd:algname\\n". ({self.signin_file}). {line} split={parts} len={len(parts)}')
+                    self.signin_file_data[parts[0]] = dict(password=parts[1], algname=parts[2])
+                    if parts[2] not in ['plain', 'md5', 'sha1', 'sha256']:
+                        raise ValueError(f'signin_file format error. Algorithms not supported. ({self.signin_file}). algname={parts[2]} "plain", "md5", "sha1", "sha256" only.')
+
     def start(self, allow_host:str="0.0.0.0", listen_port:int=8081, outputs_key:List[str]=[]):
         """
         Webサーバを起動する
@@ -823,7 +819,16 @@ class Web(options.Options):
         self.logger.info(f" outputs_key={self.outputs_key}")
 
         app = bottle.Bottle()
-
+        app_session = SessionMiddleware(app, {
+            'session.type': 'memory',
+            'session.cookie_expires': 300,
+            'session.auto': True
+        })
+        if self.gui_html is not None:
+            if not self.gui_html.is_file():
+                raise FileNotFoundError(f'gui_html is not found. ({self.gui_html})')
+            with open(self.gui_html, 'r', encoding='utf-8') as f:
+                self.gui_html_data = f.read()
         if self.filer_html is not None:
             if not self.filer_html.is_file():
                 raise FileNotFoundError(f'filer_html is not found. ({self.filer_html})')
@@ -858,10 +863,77 @@ class Web(options.Options):
                             return asset_data
                         return func
                     asset_func(asset_data)
+        self.load_signin_file()
+        if self.signin_html is not None:
+            if not self.signin_html.is_file():
+                raise FileNotFoundError(f'signin_html is not found. ({self.signin_html})')
+            with open(self.signin_html, 'r', encoding='utf-8') as f:
+                self.signin_html_data = f.read()
 
         redis_cli = None
         if not self.client_only:
             redis_cli = redis_client.RedisClient(self.logger, host=self.redis_host, port=self.redis_port, password=self.redis_password, svname=self.svname)
+
+        def check_signin():
+            """
+            ログインチェック
+            """
+            if self.signin_file is None:
+                return True
+            if self.signin_file_data is None:
+                raise ValueError(f'signin_file_data is None. ({self.signin_file})')
+            session = bottle.request.environ.get('beaker.session')
+            if 'signin' in session:
+                userid = session['signin']['userid']
+                passwd = session['signin']['password']
+                if userid in self.signin_file_data and passwd == self.signin_file_data[userid]['password']:
+                    return True
+            return False
+
+        @app.route('/usesignout')
+        @app.route('/signin/usesignout')
+        def usesignout():
+            if self.signin_file is not None:
+                return dict(success={'usesignout': True})
+            return dict(success={'usesignout': False})
+
+        @app.route('/signin/<next>')
+        def signin(next):
+            if self.signin_html_data is not None:
+                return self.signin_html_data
+            res:bottle.HTTPResponse = bottle.static_file('signin.html', root=static_root)
+            res.headers['Access-Control-Allow-Origin'] = '*'
+            return res
+
+        @app.route('/signin/<next>', method='POST')
+        def do_signin(next):
+            userid = bottle.request.forms.get('userid')
+            passwd = bottle.request.forms.get('password')
+            if userid == '' or passwd == '':
+                bottle.redirect(f'/signin/{next}?error=1')
+                return
+            self.load_signin_file()
+            if userid not in self.signin_file_data:
+                bottle.redirect(f'/signin/{next}?error=1')
+                return
+            algname = self.signin_file_data[userid]['algname']
+            if algname != 'plain':
+                h = hashlib.new(algname)
+                h.update(passwd.encode('utf-8'))
+                passwd = h.hexdigest()
+            if passwd != self.signin_file_data[userid]['password']:
+                bottle.redirect(f'/signin/{next}?error=1')
+                return
+            session = bottle.request.environ.get('beaker.session')
+            session['signin'] = dict(userid=userid, password=passwd)
+            session.save()
+            bottle.redirect(f'/{next}')
+
+        @app.route('/signout/<next>')
+        def do_signout(next):
+            session = bottle.request.environ.get('beaker.session')
+            session.delete()
+            bottle.redirect(f'/{next}')
 
         @app.hook('after_request')
         def enable_cors():
@@ -874,6 +946,8 @@ class Web(options.Options):
 
         @app.route('/bbforce_cmd')
         def bbforce_cmd():
+            if not check_signin():
+                return bottle.redirect('/signin/bbforce_cmd')
             self.bbforce_cmd()
             return dict(success='bbforce_cmd')
 
@@ -882,6 +956,8 @@ class Web(options.Options):
         @app.route('/exec_cmd/<title>', method='POST')
         def exec_cmd(title=None):
             try:
+                if not check_signin():
+                    return common.to_str(dict(warn=f'Command "{title}" failed. Please log in to retrieve session.'))
                 opt = None
                 if bottle.request.content_type.startswith('multipart/form-data'):
                     opt = self.load_cmd(title)
@@ -903,6 +979,8 @@ class Web(options.Options):
         def exec_pipe(title):
             upfiles = dict()
             try:
+                if not check_signin():
+                    return common.to_str(dict(warn=f'Pipeline "{title}" failed. Please log in to retrieve session.'))
                 opt = None
                 if bottle.request.content_type.startswith('multipart/form-data'):
                     opt = self.load_pipe(title)
@@ -934,10 +1012,15 @@ class Web(options.Options):
 
         @app.route('/versions_iinfer')
         def versions_iinfer():
+            if not check_signin():
+                return common.to_str(dict(warn=f'Please log in to retrieve session.'))
             return self.versions_iinfer()
 
         @app.route('/gui/callback')
         def gui_callback():
+            if not check_signin():
+                bottle.abort(401, 'Please log in to retrieve session.')
+                return
             return self.gui_callback()
 
         static_root = Path(__file__).parent.parent / 'web'
@@ -948,18 +1031,18 @@ class Web(options.Options):
         
         @app.route('/gui')
         def gui():
-            return bottle.static_file('gui.html', root=static_root)
-
-        @app.route('/gui/list_downloads', method='POST')
-        def list_downloads():
-            current_path = bottle.request.forms.get('current_path')
-            scope = bottle.request.forms.get('scope')
-            ret = self.list_downloads(current_path, root_path=None, scope=scope)
-            bottle.response.content_type = 'application/json'
-            return json.dumps(ret, default=common.default_json_enc)
+            if not check_signin():
+                return bottle.redirect('/signin/gui')
+            if self.gui_html_data is not None:
+                return self.gui_html_data
+            res:bottle.HTTPResponse = bottle.static_file('gui.html', root=static_root)
+            res.headers['Access-Control-Allow-Origin'] = '*'
+            return res
 
         @app.route('/gui/list_cmd', method='POST')
         def list_cmd():
+            if not check_signin():
+                return common.to_str(dict(warn=f'Please log in to retrieve session.'))
             kwd = bottle.request.forms.get('kwd')
             ret = self.list_cmd(kwd)
             bottle.response.content_type = 'application/json'
@@ -967,12 +1050,16 @@ class Web(options.Options):
 
         @app.route('/gui/get_modes')
         def get_modes():
+            if not check_signin():
+                return common.to_str(dict(warn=f'Please log in to retrieve session.'))
             ret = self.get_modes()
             bottle.response.content_type = 'application/json'
             return json.dumps(ret, default=common.default_json_enc)
 
         @app.route('/gui/get_cmds', method='POST')
         def get_cmds():
+            if not check_signin():
+                return common.to_str(dict(warn=f'Please log in to retrieve session.'))
             mode = bottle.request.forms.get('mode')
             ret = self.get_cmds(mode)
             bottle.response.content_type = 'application/json'
@@ -980,6 +1067,8 @@ class Web(options.Options):
 
         @app.route('/gui/get_cmd_choices', method='POST')
         def get_cmd_choices():
+            if not check_signin():
+                return common.to_str(dict(warn=f'Please log in to retrieve session.'))
             mode = bottle.request.forms.get('mode')
             cmd = bottle.request.forms.get('cmd')
             ret = self.get_cmd_choices(mode, cmd)
@@ -988,6 +1077,8 @@ class Web(options.Options):
 
         @app.route('/gui/load_cmd', method='POST')
         def load_cmd():
+            if not check_signin():
+                return common.to_str(dict(warn=f'Please log in to retrieve session.'))
             title = bottle.request.forms.get('title')
             ret = self.load_cmd(title)
             bottle.response.content_type = 'application/json'
@@ -995,6 +1086,8 @@ class Web(options.Options):
 
         @app.route('/gui/save_cmd', method='POST')
         def save_cmd():
+            if not check_signin():
+                return common.to_str(dict(warn=f'Please log in to retrieve session.'))
             title = bottle.request.forms.get('title')
             opt = bottle.request.forms.get('opt')
             ret = self.save_cmd(title, json.loads(opt))
@@ -1003,6 +1096,8 @@ class Web(options.Options):
 
         @app.route('/gui/del_cmd', method='POST')
         def del_cmd():
+            if not check_signin():
+                return common.to_str(dict(warn=f'Please log in to retrieve session.'))
             title = bottle.request.forms.get('title')
             self.del_cmd(title)
             bottle.response.content_type = 'application/json'
@@ -1010,6 +1105,8 @@ class Web(options.Options):
 
         @app.route('/gui/raw_cmd', method='POST')
         def raw_cmd():
+            if not check_signin():
+                return common.to_str(dict(warn=f'Please log in to retrieve session.'))
             title = bottle.request.forms.get('title')
             opt = bottle.request.forms.get('opt')
             ret = self.raw_cmd(title, json.loads(opt))
@@ -1018,6 +1115,8 @@ class Web(options.Options):
 
         @app.route('/gui/list_pipe', method='POST')
         def list_pipe():
+            if not check_signin():
+                return common.to_str(dict(warn=f'Please log in to retrieve session.'))
             kwd = bottle.request.forms.get('kwd')
             ret = self.list_pipe(kwd)
             bottle.response.content_type = 'application/json'
@@ -1025,6 +1124,8 @@ class Web(options.Options):
 
         @app.route('/gui/load_pipe', method='POST')
         def load_pipe():
+            if not check_signin():
+                return common.to_str(dict(warn=f'Please log in to retrieve session.'))
             title = bottle.request.forms.get('title')
             ret = self.load_pipe(title)
             bottle.response.content_type = 'application/json'
@@ -1032,6 +1133,8 @@ class Web(options.Options):
 
         @app.route('/gui/save_pipe', method='POST')
         def save_pipe():
+            if not check_signin():
+                return common.to_str(dict(warn=f'Please log in to retrieve session.'))
             title = bottle.request.forms.get('title')
             opt = bottle.request.forms.get('opt')
             ret = self.save_pipe(title, json.loads(opt))
@@ -1040,6 +1143,8 @@ class Web(options.Options):
 
         @app.route('/gui/del_pipe', method='POST')
         def del_pipe():
+            if not check_signin():
+                return common.to_str(dict(warn=f'Please log in to retrieve session.'))
             title = bottle.request.forms.get('title')
             self.del_pipe(title)
             bottle.response.content_type = 'application/json'
@@ -1047,6 +1152,8 @@ class Web(options.Options):
 
         @app.route('/gui/raw_pipe', method='POST')
         def raw_pipe():
+            if not check_signin():
+                return common.to_str(dict(warn=f'Please log in to retrieve session.'))
             title = bottle.request.forms.get('title')
             opt = bottle.request.forms.get('opt')
             ret = self.raw_pipe(title, json.loads(opt))
@@ -1055,6 +1162,8 @@ class Web(options.Options):
 
         @app.route('/gui/load_capture', method='POST')
         def load_capture():
+            if not check_signin():
+                return common.to_str(dict(warn=f'Please log in to retrieve session.'))
             current_path = bottle.request.forms.get('current_path')
             ret = self.load_capture(current_path)
             bottle.response.content_type = 'application/json'
@@ -1062,6 +1171,8 @@ class Web(options.Options):
 
         @app.route('/gui/load_result', method='POST')
         def load_result():
+            if not check_signin():
+                return common.to_str(dict(warn=f'Please log in to retrieve session.'))
             current_path = bottle.request.forms.get('current_path')
             ret = self.load_result(current_path)
             bottle.response.content_type = 'application/json'
@@ -1069,6 +1180,8 @@ class Web(options.Options):
 
         @app.route('/filer')
         def filer():
+            if not check_signin():
+                return bottle.redirect('/signin/filer')
             if self.filer_html_data is not None:
                 return self.filer_html_data
             res:bottle.HTTPResponse = bottle.static_file('filer.html', root=static_root)
@@ -1077,10 +1190,14 @@ class Web(options.Options):
 
         @app.route('/filer/upload', method='POST')
         def filer_upload():
+            if not check_signin():
+                return common.to_str(dict(warn=f'Please log in to retrieve session.'))
             return self.filer_upload(bottle.request)
 
         @app.route('/showimg')
         def showimg():
+            if not check_signin():
+                return bottle.redirect('/signin/showimg')
             if self.showimg_html_data is not None:
                 return self.showimg_html_data
             res:bottle.HTTPResponse = bottle.static_file('showimg.html', root=static_root)
@@ -1089,6 +1206,8 @@ class Web(options.Options):
 
         @app.route('/showimg/pub_img', method='POST')
         def pub_img():
+            if not check_signin():
+                return common.to_str(dict(warn=f'Please log in to retrieve session.'))
             try:
                 tm = time.time()
                 if bottle.request.content_type.startswith('multipart/form-data'):
@@ -1108,6 +1227,8 @@ class Web(options.Options):
         @app.route('/webcap/sub_img')
         @app.route('/showimg/sub_img')
         def sub_img():
+            if not check_signin():
+                return common.to_str(dict(warn=f'Please log in to retrieve session.'))
             wsock = bottle.request.environ.get('wsgi.websocket') # type: ignore
             if self.logger.level == logging.DEBUG:
                 self.logger.debug(f"web.sub_img: connected")
@@ -1168,6 +1289,8 @@ class Web(options.Options):
 
         @app.route('/webcap')
         def webcap():
+            if not check_signin():
+                return bottle.redirect(f'/signin/webcap')
             if self.webcap_html_data is not None:
                 return self.webcap_html_data
             res:bottle.HTTPResponse = bottle.static_file('webcap.html', root=static_root)
@@ -1176,6 +1299,8 @@ class Web(options.Options):
 
         @app.route('/webcap/pub_img/<port:int>', method='GET')
         def pub_img_proxy_chk(port:int):
+            if not check_signin():
+                return common.to_str(dict(warn=f'Please log in to retrieve session.'))
             try:
                 # 事前に接続テストすることで、keepaliveを有効にしておく（画像送信時のTCP接続が高速化できる）
                 responce = self.webcap_client.get(f'http://localhost:{port}/webcap/pub_img')
@@ -1185,6 +1310,8 @@ class Web(options.Options):
 
         @app.route('/webcap/pub_img/<port:int>', method='POST')
         def pub_img_proxy(port:int):
+            if not check_signin():
+                return common.to_str(dict(warn=f'Please log in to retrieve session.'))
             if self.logger.level == logging.DEBUG:
                 self.logger.debug(f"web.pub_img_proxy: port=http://localhost:{port}/webcap/pub_img, headers={dict(bottle.request.headers)}")
             if not bottle.request.content_type.startswith('multipart/form-data'):
@@ -1209,6 +1336,8 @@ class Web(options.Options):
 
         @app.route('/annotation')
         def annotation():
+            if not check_signin():
+                return bottle.redirect(f'/signin/annotation')
             if self.anno_html_data is not None:
                 return self.anno_html_data
             res:bottle.HTTPResponse = bottle.static_file('annotation.html', root=static_root)
@@ -1217,6 +1346,8 @@ class Web(options.Options):
 
         @app.route('/annotation/get_img/<constr>')
         def anno_get_img(constr:str):
+            if not check_signin():
+                return bottle.redirect(f'/signin/annotation/get_img/{constr}')
             try:
                 host, port, svname, password, path, scope, img_thumbnail = convert.b64str2str(constr).split('\t')
                 data_dir = self.data if scope == 'client' else Path.cwd()
@@ -1236,6 +1367,8 @@ class Web(options.Options):
 
         @app.route('/annotation/archive/<constr>', method='POST')
         def anno_archive(constr:str):
+            if not check_signin():
+                return common.to_str(dict(warn=f'Please log in to retrieve session.'))
             try:
                 host, port, svname, password, output_path, scope, img_thumbnail = convert.b64str2str(constr).split('\t')
                 output_path = output_path[1:] if output_path.startswith('/') else output_path
@@ -1282,15 +1415,21 @@ class Web(options.Options):
 
         @app.route('/copyright')
         def copyright():
+            if not check_signin():
+                return common.to_str(dict(warn=f'Please log in to retrieve session.'))
             return self.copyright()
 
         @app.route('/versions_iinfer')
         def versions_iinfer():
+            if not check_signin():
+                return common.to_str(dict(warn=f'Please log in to retrieve session.'))
             bottle.response.content_type = 'application/json'
             return json.dumps(self.versions_iinfer())
 
         @app.route('/get_server_opt')
         def get_server_opt():
+            if not check_signin():
+                return common.to_str(dict(warn=f'Please log in to retrieve session.'))
             opt = dict(host=self.redis_host, port=self.redis_port, password=self.redis_password, svname=self.svname,
                        data=str(self.data), client_only=self.client_only)
             if self.logger.level == logging.DEBUG:
@@ -1300,12 +1439,14 @@ class Web(options.Options):
 
         @app.route('/versions_used')
         def versions_used():
+            if not check_signin():
+                return common.to_str(dict(warn=f'Please log in to retrieve session.'))
             bottle.response.content_type = 'application/json'
             return json.dumps(self.versions_used())
 
         self.is_running = True
         server = _WSGIServer(host=self.allow_host, port=self.listen_port, gui_mode=self.gui_mode)
-        th = RaiseThread(target=bottle.run, kwargs=dict(app=app, server=server))
+        th = RaiseThread(target=bottle.run, kwargs=dict(app=app_session, server=server))
         th.start()
         try:
             while self.is_running:
@@ -1363,6 +1504,12 @@ class Web(options.Options):
         self.logger.info(f" capture_fps={self.capture_fps}")
 
         app = bottle.Bottle()
+        app_session = SessionMiddleware(app, {
+            'session.type': 'memory',
+            'session.cookie_expires': 300,
+            'session.auto': True
+        })
+        self.load_signin_file()
 
         @app.route('/webcap/pub_img', method='POST')
         def pub_img_webcap():
@@ -1420,7 +1567,7 @@ class Web(options.Options):
 
         self.is_running = True
         server = _WSGIServer(host=self.allow_host, port=self.listen_port, gui_mode=self.gui_mode, webcap=True)
-        th = RaiseThread(target=bottle.run, kwargs=dict(app=app, server=server, host=allow_host, port=listen_port))
+        th = RaiseThread(target=bottle.run, kwargs=dict(app=app_session, server=server, host=allow_host, port=listen_port))
         th.start()
         try:
             while self.is_running:

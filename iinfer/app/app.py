@@ -119,10 +119,10 @@ class IinferApp:
                     msg = {"warn":f"Please specify the --data option."}
                     common.print_format(msg, args.format, tm, args.output_json, args.output_json_append)
                     return 1, msg
-                #self.web = gui.Gui(logger, Path(args.data))
                 self.web = web.Web(logger, Path(args.data), redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname,
-                                   client_only=args.client_only, filer_html=args.filer_html, showimg_html=args.showimg_html, webcap_html=args.webcap_html,
-                                   anno_html=args.anno_html, assets=args.assets, gui_mode=True)
+                                   client_only=args.client_only, gui_html=args.gui_html, filer_html=args.filer_html, showimg_html=args.showimg_html,
+                                   webcap_html=args.webcap_html, anno_html=args.anno_html, assets=args.assets,
+                                   signin_html=args.signin_html, signin_file=args.signin_file, gui_mode=True)
                 self.web.start()
                 msg = {"success":"eel web complate."}
                 common.print_format(msg, args.format, tm, args.output_json, args.output_json_append)
@@ -140,8 +140,9 @@ class IinferApp:
                     return 1, msg
                 try:
                     self.web = web.Web(logger, Path(args.data), redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname,
-                                    client_only=args.client_only, filer_html=args.filer_html, showimg_html=args.showimg_html, webcap_html=args.webcap_html,
-                                    anno_html=args.anno_html, assets=args.assets)
+                                    client_only=args.client_only, gui_html=args.gui_html, filer_html=args.filer_html, showimg_html=args.showimg_html,
+                                    webcap_html=args.webcap_html, anno_html=args.anno_html, assets=args.assets,
+                                    signin_html=args.signin_html, signin_file=args.signin_file)
                     self.web.start(args.allow_host, args.listen_port, outputs_key=args.outputs_key)
                     msg = {"success":"web complate."}
                     common.print_format(msg, args.format, tm, args.output_json, args.output_json_append)
@@ -157,7 +158,7 @@ class IinferApp:
                 common.print_format(msg, args.format, tm, args.output_json, args.output_json_append)
                 return 0, msg
             elif args.cmd == 'webcap':
-                self.web = web.Web(logger, Path(args.data))
+                self.web = web.Web(logger, Path(args.data), signin_file=args.signin_file)
                 try:
                     self.web.webcap(args.allow_host, args.listen_port, image_type=args.image_type, outputs_key=args.outputs_key,
                                     capture_frame_width=args.capture_frame_width, capture_frame_height=args.capture_frame_height,
@@ -309,7 +310,7 @@ class IinferApp:
 
             elif args.cmd == 'file_list':
                 client_data = Path(args.client_data.replace('"','')) if args.client_data is not None else None
-                ret = self.cl.file_list(args.svpath.replace('"',''), scope=args.scope, client_data=client_data,
+                ret = self.cl.file_list(args.svpath.replace('"',''), recursive=args.recursive, scope=args.scope, client_data=client_data,
                                         retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
                 common.print_format(ret, args.format, tm, args.output_json, args.output_json_append)
                 if 'success' not in ret:
@@ -372,6 +373,12 @@ class IinferApp:
                 ret = self.cl.file_move(args.from_path.replace('"',''), args.to_path.replace('"',''),
                                         scope=args.scope, client_data=client_data,
                                         retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
+                common.print_format(ret, args.format, tm, args.output_json, args.output_json_append)
+                if 'success' not in ret:
+                    return 1, ret
+            
+            elif args.cmd == 'server_info':
+                ret = self.cl.server_info(retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
                 common.print_format(ret, args.format, tm, args.output_json, args.output_json_append)
                 if 'success' not in ret:
                     return 1, ret

@@ -71,6 +71,33 @@ iinfer.copyright = async () => {
   $('.copyright').text(await res.text());
 };
 /**
+ * サインアウト
+ * @param {string} sitepath - サイトパス
+ **/
+iinfer.singout = (sitepath) => {
+  if (confirm('Sign out ok ?')) {
+    const rand = iinfer.randam_string(8);
+    location.href = `signout/${sitepath}?r=${rand}`;
+  }
+};
+$(()=>{
+  // サインアウトメニューを表示
+  fetch('usesignout', {method: 'GET'}).then(async res => {
+    try {
+      const json = await res.json();
+      const usesignout = json['success']['usesignout'];
+      if (!usesignout) return;
+      const about_menu = $('.about-menu');
+      if (!about_menu.find('.signout-menu-item').length) {
+        const parts = location.pathname.split('/');
+        const sitepath = parts[parts.length-1];
+        const signout_item = $(`<li><a class="dropdown-item signout-menu-item" href="#" onclick="iinfer.singout('${sitepath}');">Sign out</a></li>`);
+        about_menu.append(signout_item);
+      }
+    } catch (e) {}
+  });
+});
+/**
  * バージョンモーダルを初期化
  */
 iinfer.init_version_modal = () => {
@@ -399,16 +426,18 @@ iinfer.deploy_list = (target, error_func=undefined) => {
  * ファイルリスト取得
  * @param {$} target - 接続先情報のhidden要素を含む祖先要素
  * @param {string} svpath - サーバーパス
+ * @param {bool} recursive - 再帰的に取得するかどうか
  * @param {function} error_func - エラー時のコールバック関数
  * @param {function} exec_cmd - サーバーAPI実行関数
  * @returns {Promise} - レスポンス
  **/
-iinfer.file_list = (target, svpath, error_func=undefined, exec_cmd=undefined) => {
+iinfer.file_list = (target, svpath, recursive=false, error_func=undefined, exec_cmd=undefined) => {
   const opt = iinfer.get_server_opt(false, target);
   opt['mode'] = 'client';
   opt['cmd'] = 'file_list';
   opt['capture_stdout'] = true;
   opt['svpath'] = svpath;
+  opt['recursive'] = recursive ? true : false;
   iinfer.show_loading();
   const exec = exec_cmd ? exec_cmd : iinfer.sv_exec_cmd;
   return exec(opt).then(res => {

@@ -507,13 +507,14 @@ class Client(object):
             performance.append(dict(key="cl_pred", val=f"{epredtime-spredtime:.3f}s"))
         return res_json
     
-    def file_list(self, svpath:str, scope:str="client", client_data:Path = None,
+    def file_list(self, svpath:str, recursive:bool, scope:str="client", client_data:Path = None,
                   retry_count:int=3, retry_interval:int=5, timeout:int = 60):
         """
         サーバー上のファイルリストを取得する
 
         Args:
             svpath (Path): サーバー上のファイルパス
+            recursive (bool): 再帰的に取得するかどうか
             scope (str, optional): 参照先のスコープ. Defaults to "client".
             client_data (Path, optional): ローカルを参照させる場合のデータフォルダ. Defaults to None.
             retry_count (int, optional): リトライ回数. Defaults to 3.
@@ -526,17 +527,17 @@ class Client(object):
         if scope == "client":
             if client_data is not None:
                 f = filer.Filer(client_data, self.logger)
-                _, res_json = f.file_list(svpath)
+                _, res_json = f.file_list(svpath, recursive)
                 return res_json
             else:
                 self.logger.warning(f"client_data is empty.")
                 return {"error": f"client_data is empty."}
         elif scope == "current":
             f = filer.Filer(Path.cwd(), self.logger)
-            _, res_json = f.file_list(svpath)
+            _, res_json = f.file_list(svpath, recursive)
             return res_json
         elif scope == "server":
-            res_json = self.redis_cli.send_cmd('file_list', [convert.str2b64str(str(svpath))],
+            res_json = self.redis_cli.send_cmd('file_list', [convert.str2b64str(str(svpath)), str(recursive)],
                                             retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
             return res_json
         else:
@@ -829,6 +830,21 @@ class Client(object):
         else:
             self.logger.warning(f"scope is invalid. {scope}")
             return {"error": f"scope is invalid. {scope}"}
+
+    def server_info(self, retry_count:int=3, retry_interval:int=5, timeout:int = 60):
+        """
+        サーバーの情報を取得する
+
+        Args:
+            retry_count (int, optional): リトライ回数. Defaults to 3.
+            retry_interval (int, optional): リトライ間隔. Defaults to 5.
+            timeout (int, optional): タイムアウト時間. Defaults to 60.
+
+        Returns:
+            dict: Redisサーバーからの応答
+        """
+        res_json = self.redis_cli.send_cmd('server_info', [], retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
+        return res_json
 
     def read_dir(self, glob_str:str, read_input_type:str='jpeg', image_type:str='capture', root_dir:Path=Path('.'), include_hidden=True,
                  moveto:Path=None, polling:bool=False, polling_count:int=10, polling_interval:int=1):

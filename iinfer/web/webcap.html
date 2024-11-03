@@ -18,7 +18,7 @@
 </head>
 <body lang="ja" class="overflow-hidden p-2">
     <!-- ナビゲーションバー -->
-    <nav class="navbar navbar-expand-sm navbar-dark bg-dark fixed-top p-0">
+    <nav class="navbar navbar-expand-sm fixed-top p-0">
         <div class="container-fluid">
             <a id="navi_title" class="navbar-brand" href="#">WebCap</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,6 +48,15 @@
                         </a>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="#" onclick="iinfer.change_dark_mode();">Change Dark Mode</a></li>
+                        </ul>
+                    </li>
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="aboutMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            About
+                        </a>
+                        <ul class="dropdown-menu about-menu" aria-labelledby="aboutMenuLink">
+                            <li><a class="dropdown-item" href="#" onclick="$(`#versions_modal`).modal(`show`);">Versions</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -91,6 +100,54 @@
             </div>
         </div>
     </div>
+    <!-- versionsモーダル -->
+    <div id="versions_modal" class="modal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <form id="console_form" class="modal-content novalidate">
+                <div class="modal-header">
+                    <h5 class="modal-title">Versions</h5>
+                    <button type="button" class="btn btn_window_stack">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-window-stack" viewBox="0 0 16 16">
+                            <path d="M4.5 6a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1ZM6 6a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1Zm2-.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0Z"/>
+                            <path d="M12 1a2 2 0 0 1 2 2 2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2 2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h10ZM2 12V5a2 2 0 0 1 2-2h9a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1Zm1-4v5a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V8H3Zm12-1V5a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v2h12Z"/>
+                        </svg>
+                    </button>
+                    <button type="button" class="btn btn_window">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-window" viewBox="0 0 16 16">
+                            <path d="M2.5 4a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1zm2-.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zm1 .5a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>
+                            <path d="M2 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2H2zm13 2v2H1V3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1zM2 14a1 1 0 0 1-1-1V6h14v7a1 1 0 0 1-1 1H2z"/>
+                        </svg>
+                    </button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="margin-left: 0px;"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="versions_iinfer-tab" data-bs-toggle="tab" data-bs-target="#versions_iinfer" type="button" role="tab" aria-controls="versions_iinfer" aria-selected="true">
+                                iinfer
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="versions_used-tab" data-bs-toggle="tab" data-bs-target="#versions_used" type="button" role="tab" aria-controls="versions_used" aria-selected="false">
+                                Used software
+                            </button>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="versions_iinfer" role="tabpanel" aria-labelledby="versions_iinfer-tab">
+                            versions_iinfer
+                        </div>
+                        <div class="tab-pane fade" id="versions_used" role="tabpanel" aria-labelledby="versions_used-tab">
+                            versions_used
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
     <!-- ローディングマスク -->
     <div id="loading" class="position-absolute top-0 start-0 w-100 h-100 d-none" style="background:rgba(0, 0, 0, 0.3);z-index:10000;">
         <div class="text-center position-absolute top-50 start-50 w-100 translate-middle">
@@ -103,7 +160,7 @@
         </div>
     </div>
     <!-- フッター -->
-    <footer class="bg-dark fixed-bottom text-center text-white p-0 copyright"></footer>
+    <footer class="fixed-bottom text-center p-0 copyright"></footer>
 </body>
 <link rel="stylesheet" href="assets/bootstrap/bootstrap.min.5.3.0.css">
 <link rel="stylesheet" href="assets/split-pane/split-pane.css">

@@ -49,12 +49,13 @@ class Filer(object):
             return False, abspath, {"warn": f"Path {abspath} exist. param={current_path}"}
         return True, abspath, {"success": f"Path {abspath} exists."}
 
-    def file_list(self, current_path:str) -> Tuple[int, Dict[str, Any]]:
+    def file_list(self, current_path:str, recursive:bool=False) -> Tuple[int, Dict[str, Any]]:
         """
         ファイルリストを取得する
 
         Args:
             path (str): ファイルパス
+            recursive (bool, optional): 再帰的に取得するかどうか, by default False
 
         Returns:
             int: レスポンスコード
@@ -73,12 +74,11 @@ class Filer(object):
         current_path_parts = ['.'] + current_path_parts if current_path_parts[0] not in ['','.'] else current_path_parts
         path_tree = {}
         data_dir_len = len(str(self.data_dir))
-        for i, cpart in enumerate(current_path_parts):
-            cpath = '/'.join(current_path_parts[1:i+1])
-            file_list:Path = self.data_dir / cpath
+
+        def _path_tree(file_list:Path, cpart:str, i, recursive:bool=False):
             children = dict()
             if not file_list.is_dir():
-                continue
+                return None, dict()
             for f in sorted(list(file_list.iterdir())):
                 parts = str(f)[data_dir_len:].replace("\\","/").split("/")
                 path = "/".join(parts[0:i+2])
@@ -87,6 +87,10 @@ class Filer(object):
                 if key in children:
                     continue
                 mime_type, encoding = mimetypes.guess_type(str(f))
+                if recursive and f.is_dir():
+                    _, path_tree = _path_tree(f, f.name, i+1, recursive)
+                    children[key] = path_tree
+                    continue
                 children[key] = dict(name=f.name,
                                     is_dir=f.is_dir(),
                                     path=path,
@@ -95,18 +99,26 @@ class Filer(object):
                                     last=_ts2str(f.stat().st_mtime),
                                     depth=len(parts))
 
-            tpath = '/'.join(current_path_parts[:i+1])
+            tparts = str(file_list)[data_dir_len:].replace("\\","/").split("/")
+            tpath = "/".join(tparts[0:i+1])
+            tpath = f'.{tpath}' if current_path_parts[0] == '.' else tpath
+            #tpath = '/'.join(current_path_parts[:i+1])
             tpath = '/' if tpath=='' else tpath
             tpath_key = common.safe_fname(tpath)
             cpart = '/' if cpart=='' else cpart
-            path_tree[tpath_key] = dict(name=cpart,
-                                        is_dir=True,
-                                        path=tpath,
-                                        children=children,
-                                        size=0,
-                                        last="",
-                                        depth=len(current_path_parts[:i+1]))
-
+            return tpath_key, dict(name=cpart,
+                                   is_dir=True,
+                                   path=tpath,
+                                   children=children,
+                                   size=0,
+                                   last="",
+                                   depth=len(tparts))
+    
+        for i, cpart in enumerate(current_path_parts):
+            cpath = '/'.join(current_path_parts[1:i+1])
+            file_list:Path = self.data_dir / cpath
+            tpath_key, pt = _path_tree(file_list, cpart, i, recursive if i+1==len(current_path_parts) else False)
+            path_tree[tpath_key] = pt
         return self.RESP_SCCESS, {"success": path_tree}
     
     def file_mkdir(self, current_path:str) -> Tuple[int, Dict[str, Any]]:

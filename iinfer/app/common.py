@@ -150,7 +150,8 @@ def loadopt(opt_path:str) -> dict:
     if opt_path is None or not Path(opt_path).exists():
         return dict()
     with open(opt_path) as f:
-        return json.load(f)
+        opt = json.load(f)
+        return opt
 
 def getopt(opt:dict, key:str, preval=None, defval=None, withset=False) -> any:
     """

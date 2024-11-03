@@ -98,17 +98,33 @@ fsapi.filer = (svpath, is_local) => {
       return;
     }
     iinfer.show_loading();
-    const formData = new FormData();
-    const opt = iinfer.get_server_opt(false, fsapi.right);
-    Object.keys(opt).map((key) => {
-      formData.append(key, opt[key]);
-    });
-    formData.append('current_path', event.originalEvent.dataTransfer.getData('path'));
-    fetch('gui/list_downloads', {method: 'POST', body: formData}).then(async res => {
-      const list_downloads = await res.json();
+    iinfer.file_list(fsapi.right, event.originalEvent.dataTransfer.getData('path'), true).then((res) => {
+      if(!res) {
+        iinfer.hide_loading();
+        return;
+      }
+      delete res.performance;
+      const file_list = Object.entries(res).sort();
+      const get_list = (path) => {
+        const list_downloads = [];
+        for (let [key, node] of Object.entries(path['children'])) {
+          if(node['is_dir']) {
+            const nl = get_list(node);
+            list_downloads.splice(list_downloads.length, 0, ...nl);
+          } else {
+            let rpath = node['path'].replace(fsapi.right.find('.filer_address').val(), '');
+            rpath = rpath.startsWith('/') ? rpath.substring(1) : rpath;
+            list_downloads.push({'svpath':node['path'],'rpath':rpath});
+          }
+        }
+        return list_downloads;
+      };
+      const path = file_list.pop()
+      const list_downloads = (!path[1] || !path[1]['children']) ? [] : get_list(path[1]);
       const jobs = [];
       fsapi.download_now = 0;
       iinfer.progress(0, list_downloads.length, fsapi.download_now, '', true, false)
+      const opt = iinfer.get_server_opt(false, fsapi.right);
       list_downloads.forEach(async path => {
         opt['mode'] = 'client';
         opt['cmd'] = 'file_download';
@@ -212,7 +228,6 @@ fsapi.filer = (svpath, is_local) => {
       fsapi.left.find('.drop-area').removeClass('dragover');
       const from = event.originalEvent.dataTransfer.getData('from');
       if (from=="server") {
-        console.log(event);
         download(event);
       }
     }

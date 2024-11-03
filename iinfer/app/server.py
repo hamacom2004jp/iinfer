@@ -295,7 +295,8 @@ class Server(filer.Filer):
                     break
                 elif msg[0] == 'file_list':
                     svpath = convert.b64str2str(msg[2])
-                    st = self.file_list(msg[1], svpath)
+                    recursive = True if msg[3] == 'True' else False
+                    st = self.file_list(msg[1], svpath, recursive)
                 elif msg[0] == 'file_mkdir':
                     if to_cluster:
                         _publish(msg_str)
@@ -346,6 +347,8 @@ class Server(filer.Filer):
                     from_path = convert.b64str2str(msg[2])
                     to_path = convert.b64str2str(msg[3])
                     st = self.file_move(msg[1], from_path, to_path)
+                elif msg[0] == 'server_info':
+                    st = self.server_info(msg[1])
                 else:
                     self.logger.warning(f"Unknown command {msg}")
                     st = self.RESP_WARN
@@ -963,19 +966,20 @@ class Server(filer.Filer):
             self.redis_cli.rpush(reskey, {"warn": f"Failed to run inference: {e}"})
             return self.RESP_WARN
 
-    def file_list(self, reskey:str, current_path:str) -> int:
+    def file_list(self, reskey:str, current_path:str, recursive:bool) -> int:
         """
         ファイルリストを取得する
 
         Args:
             reskey (str): レスポンスキー
             path (str): ファイルパス
+            recursive (bool): 再帰的に取得するかどうか
 
         Returns:
             int: レスポンスコード
         """
         try:
-            rescode, msg = super().file_list(current_path)
+            rescode, msg = super().file_list(current_path, recursive)
             self.redis_cli.rpush(reskey, msg)
             return rescode
         except Exception as e:
@@ -1129,3 +1133,26 @@ class Server(filer.Filer):
             self.logger.warning(f"Failed to move file: {e}", exc_info=True)
             self.redis_cli.rpush(reskey, {"warn": f"Failed to move file: {e}"})
             return self.RESP_WARN
+
+    def server_info(self, reskey:str) -> int:
+        """
+        サーバー情報を取得する
+
+        Args:
+            reskey (str): レスポンスキー
+
+        Returns:
+            int: レスポンスコード
+        """
+        try:
+            server_info = dict(svname=self.svname, redis_host=self.redis_host, redis_port=self.redis_port, redis_password=self.redis_password,
+                            is_running=self.is_running, retry_count=self.retry_count, retry_interval=self.retry_interval,
+                            cleaning_interval=self.cleaning_interval, data_dir=self.data_dir)
+            msg = {"success": server_info}
+            self.redis_cli.rpush(reskey, msg)
+            return self.RESP_SCCESS
+        except Exception as e:
+            self.logger.warning(f"Failed to get server info: {e}", exc_info=True)
+            self.redis_cli.rpush(reskey, {"warn": f"Failed to get server info: {e}"})
+            return self.RESP_WARN
+

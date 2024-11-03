@@ -17,6 +17,7 @@ PYTHON_REQUIRES = '>=3.8'
 INSTALL_REQUIRES = [
     'argcomplete',
     'async_timeout',
+    'beaker',
     'bottle',
     'bottle_websocket',
     'motpy',

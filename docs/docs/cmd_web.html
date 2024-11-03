@@ -1,24 +1,22 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="jp" data-content_root="../">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>コマンドリファレンス（webモード） &mdash; iinfer 2024/10/26 documentation</title>
+  <title>コマンドリファレンス（webモード） &mdash; iinfer 2024/11/03 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
 
   
-  <!--[if lt IE 9]>
-    <script src="../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=5f3de491"></script>
-        <script src="../_static/doctools.js?v=9a2dae69"></script>
-        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=dc6de6bd"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -153,13 +151,21 @@
 <td></td>
 <td><p>省略した時は <cite>8081</cite> を使用します。</p></td>
 </tr>
-<tr class="row-odd"><td><p>--client_only</p></td>
+<tr class="row-odd"><td><p>--signin_file &lt;ユーザーリストファイル&gt;</p></td>
+<td></td>
+<td><p>ログイン可能なユーザーとパスワードを記載したファイルを指定します。省略した時は認証を要求しません。ログインファイルは、各行が1ユーザーを示し、ユーザーID、パスワード、ハッシュアルゴリズム名の順で、「 : 」で区切って記載します。ハッシュアルゴリズム名は「plain」「md5」「sha1」「sha256」が指定できます。</p></td>
+</tr>
+<tr class="row-even"><td><p>--client_only</p></td>
 <td></td>
 <td><p>iinferサーバーへの接続を行わないようにします。</p></td>
 </tr>
-<tr class="row-even"><td><p>--outputs_key &lt;表示項目&gt;</p></td>
+<tr class="row-odd"><td><p>--outputs_key &lt;表示項目&gt;</p></td>
 <td></td>
 <td><p>showimg及びwebcap画面で表示する項目を指定します。省略した場合は全ての項目を表示します。</p></td>
+</tr>
+<tr class="row-even"><td><p>--gui_html &lt;gui.htmlファイルのパス&gt;</p></td>
+<td></td>
+<td><p><cite>gui.html</cite> を指定します。省略時はiinfer内蔵のHTMLファイルを使用します。</p></td>
 </tr>
 <tr class="row-odd"><td><p>--filer_html &lt;filer.htmlファイルのパス&gt;</p></td>
 <td></td>
@@ -176,6 +182,10 @@
 <tr class="row-even"><td><p>--assets &lt;jsやcssファイルのパス&gt;</p></td>
 <td></td>
 <td><p>htmlファイルを使用する場合に必要なアセットファイルを指定します。</p></td>
+</tr>
+<tr class="row-odd"><td><p>--signin_html &lt;signin.htmlファイルのパス&gt;</p></td>
+<td></td>
+<td><p><cite>signin.html</cite> を指定します。省略時はiinfer内蔵のHTMLファイルを使用します。</p></td>
 </tr>
 </tbody>
 </table>
@@ -225,31 +235,35 @@
 <td></td>
 <td><p>省略した時は <cite>8082</cite> を使用します。</p></td>
 </tr>
-<tr class="row-even"><td><p>--image_type &lt;出力する画像タイプ&gt;</p></td>
+<tr class="row-even"><td><p>--signin_file &lt;ユーザーリストファイル&gt;</p></td>
+<td></td>
+<td><p>ログイン可能なユーザーとパスワードを記載したファイルを指定します。省略した時は認証を要求しません。ログインファイルは、各行が1ユーザーを示し、ユーザーID、パスワード、ハッシュアルゴリズム名の順で、「 : 」で区切って記載します。ハッシュアルゴリズム名は「plain」「md5」「sha1」「sha256」が指定できます。</p></td>
+</tr>
+<tr class="row-odd"><td><p>--image_type &lt;出力する画像タイプ&gt;</p></td>
 <td></td>
 <td><p>出力する画像のタイプを指定する。指定可能な画像タイプは <cite>bmp</cite> , <cite>png</cite> , <cite>jpeg</cite> , <cite>capture</cite></p></td>
 </tr>
-<tr class="row-odd"><td><p>--outputs_key &lt;表示項目&gt;</p></td>
+<tr class="row-even"><td><p>--outputs_key &lt;表示項目&gt;</p></td>
 <td></td>
 <td><p>webcap画面で表示する項目を指定します。省略した場合は全ての項目を表示します。</p></td>
 </tr>
-<tr class="row-even"><td><p>--capture_frame_width &lt;キャプチャーサイズ(横px)&gt;</p></td>
+<tr class="row-odd"><td><p>--capture_frame_width &lt;キャプチャーサイズ(横px)&gt;</p></td>
 <td></td>
 <td><p>キャプチャーする画像の横px。受信した画像をリサイズする。</p></td>
 </tr>
-<tr class="row-odd"><td><p>--capture_frame_height &lt;キャプチャーサイズ(縦px)&gt;</p></td>
+<tr class="row-even"><td><p>--capture_frame_height &lt;キャプチャーサイズ(縦px)&gt;</p></td>
 <td></td>
 <td><p>キャプチャーする画像の縦px。受信した画像をリサイズする。</p></td>
 </tr>
-<tr class="row-even"><td><p>--capture_fps &lt;キャプチャーFPS&gt;</p></td>
+<tr class="row-odd"><td><p>--capture_fps &lt;キャプチャーFPS&gt;</p></td>
 <td></td>
 <td><p>キャプチャーする画像のFPS。webcap画面側がこの間隔で送信する。</p></td>
 </tr>
-<tr class="row-odd"><td><p>--capture_count &lt;キャプチャー回数&gt;</p></td>
+<tr class="row-even"><td><p>--capture_count &lt;キャプチャー回数&gt;</p></td>
 <td></td>
 <td><p>キャプチャーする回数。指定した回数受信したら終了する。</p></td>
 </tr>
-<tr class="row-even"><td><p>--access_url &lt;webcapのURL&gt;</p></td>
+<tr class="row-odd"><td><p>--access_url &lt;webcapのURL&gt;</p></td>
 <td></td>
 <td><p>クライアントからアクセスするときのURL。省略した時は <cite>webcap/pub_img</cite> を使用します。例えば <cite>http://localhost:&lt;listen_port&gt;/webcap/pub_img</cite> を指定します。</p></td>
 </tr>

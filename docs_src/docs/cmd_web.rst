@@ -21,12 +21,15 @@ Webサービス起動 : `iinfer -m web -c start <Option>`
     "--data <データフォルダ>","","省略した時は `$HONE/.iinfer` を使用します。"
     "--allow_host <接続許可するIP>","","省略した時は `0.0.0.0` を使用します。"
     "--listen_port <サービスポート>","","省略した時は `8081` を使用します。"
+    "--signin_file <ユーザーリストファイル>","","ログイン可能なユーザーとパスワードを記載したファイルを指定します。省略した時は認証を要求しません。ログインファイルは、各行が1ユーザーを示し、ユーザーID、パスワード、ハッシュアルゴリズム名の順で、「 : 」で区切って記載します。ハッシュアルゴリズム名は「plain」「md5」「sha1」「sha256」が指定できます。"
     "--client_only","","iinferサーバーへの接続を行わないようにします。"
     "--outputs_key <表示項目>","","showimg及びwebcap画面で表示する項目を指定します。省略した場合は全ての項目を表示します。"
+    "--gui_html <gui.htmlファイルのパス>","","`gui.html` を指定します。省略時はiinfer内蔵のHTMLファイルを使用します。"
     "--filer_html <filer.htmlファイルのパス>","","`filer.html` を指定します。省略時はiinfer内蔵のHTMLファイルを使用します。"
     "--showimg_html <showimg.htmlファイルのパス>","","`showimg.html` を指定します。省略時はiinfer内蔵のHTMLファイルを使用します。"
     "--webcap_html <webcap.htmlファイルのパス>","","`webcap.html` を指定します。省略時はiinfer内蔵のHTMLファイルを使用します。"
     "--assets <jsやcssファイルのパス>","","htmlファイルを使用する場合に必要なアセットファイルを指定します。"
+    "--signin_html <signin.htmlファイルのパス>","","`signin.html` を指定します。省略時はiinfer内蔵のHTMLファイルを使用します。"
 
 
 Webサービス停止 : `iinfer -m web -c stop <Option>`
@@ -50,6 +53,7 @@ Webcap起動 : `iinfer -m web -c webcap <Option>`
     "Option","Required","Description"
     "--allow_host <接続許可するIP>","","省略した時は `0.0.0.0` を使用します。"
     "--listen_port <サービスポート>","","省略した時は `8082` を使用します。"
+    "--signin_file <ユーザーリストファイル>","","ログイン可能なユーザーとパスワードを記載したファイルを指定します。省略した時は認証を要求しません。ログインファイルは、各行が1ユーザーを示し、ユーザーID、パスワード、ハッシュアルゴリズム名の順で、「 : 」で区切って記載します。ハッシュアルゴリズム名は「plain」「md5」「sha1」「sha256」が指定できます。"
     "--image_type <出力する画像タイプ>","","出力する画像のタイプを指定する。指定可能な画像タイプは `bmp` , `png` , `jpeg` , `capture` "
     "--outputs_key <表示項目>","","webcap画面で表示する項目を指定します。省略した場合は全ての項目を表示します。"
     "--capture_frame_width <キャプチャーサイズ(横px)>","","キャプチャーする画像の横px。受信した画像をリサイズする。"
