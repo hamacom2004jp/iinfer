@@ -1,23 +1,21 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="jp" data-content_root="../../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>iinfer.app.web &mdash; iinfer 2024/11/03 documentation</title>
+  <title>iinfer.app.web &mdash; iinfer 2024/11/04 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
 
   
-  <!--[if lt IE 9]>
-    <script src="../../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=dc6de6bd"></script>
-        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
-        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=17e47670"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -950,7 +948,7 @@
             <span class="k">except</span> <span class="n">queue</span><span class="o">.</span><span class="n">Empty</span><span class="p">:</span>
                 <span class="n">gevent</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.001</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;web.gui_callback: websocket error. </span><span class="si">{e}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;web.gui_callback: websocket error. </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
                 <span class="n">bottle</span><span class="o">.</span><span class="n">abort</span><span class="p">(</span><span class="mi">400</span><span class="p">,</span> <span class="s1">&#39;Expected WebSocket request.&#39;</span><span class="p">)</span>
                 <span class="k">return</span></div>
 
@@ -995,8 +993,10 @@
         <span class="n">app</span> <span class="o">=</span> <span class="n">bottle</span><span class="o">.</span><span class="n">Bottle</span><span class="p">()</span>
         <span class="n">app_session</span> <span class="o">=</span> <span class="n">SessionMiddleware</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="p">{</span>
             <span class="s1">&#39;session.type&#39;</span><span class="p">:</span> <span class="s1">&#39;memory&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;session.cookie_expires&#39;</span><span class="p">:</span> <span class="mi">300</span><span class="p">,</span>
-            <span class="s1">&#39;session.auto&#39;</span><span class="p">:</span> <span class="kc">True</span>
+            <span class="s1">&#39;session.cookie_expires&#39;</span><span class="p">:</span> <span class="mi">600</span><span class="p">,</span>
+            <span class="s1">&#39;session.timeout&#39;</span><span class="p">:</span> <span class="mi">600</span><span class="p">,</span>
+            <span class="s1">&#39;session.auto&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s1">&#39;session.renew&#39;</span><span class="p">:</span> <span class="kc">True</span>
         <span class="p">})</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">gui_html</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">gui_html</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
@@ -1061,6 +1061,7 @@
                 <span class="n">userid</span> <span class="o">=</span> <span class="n">session</span><span class="p">[</span><span class="s1">&#39;signin&#39;</span><span class="p">][</span><span class="s1">&#39;userid&#39;</span><span class="p">]</span>
                 <span class="n">passwd</span> <span class="o">=</span> <span class="n">session</span><span class="p">[</span><span class="s1">&#39;signin&#39;</span><span class="p">][</span><span class="s1">&#39;password&#39;</span><span class="p">]</span>
                 <span class="k">if</span> <span class="n">userid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">signin_file_data</span> <span class="ow">and</span> <span class="n">passwd</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">signin_file_data</span><span class="p">[</span><span class="n">userid</span><span class="p">][</span><span class="s1">&#39;password&#39;</span><span class="p">]:</span>
+                    <span class="n">session</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
                     <span class="k">return</span> <span class="kc">True</span>
             <span class="k">return</span> <span class="kc">False</span>
 
@@ -1484,6 +1485,9 @@
 
         <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/webcap/pub_img/&lt;port:int&gt;&#39;</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;POST&#39;</span><span class="p">)</span>
         <span class="k">def</span> <span class="nf">pub_img_proxy</span><span class="p">(</span><span class="n">port</span><span class="p">:</span><span class="nb">int</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            webcap画面から送信されてくる画像を、webcapプロセスに送信(プロキシ)する</span>
+<span class="sd">            &quot;&quot;&quot;</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">check_signin</span><span class="p">():</span>
                 <span class="k">return</span> <span class="n">common</span><span class="o">.</span><span class="n">to_str</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;Please log in to retrieve session.&#39;</span><span class="p">))</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
@@ -1686,13 +1690,18 @@
         <span class="n">app</span> <span class="o">=</span> <span class="n">bottle</span><span class="o">.</span><span class="n">Bottle</span><span class="p">()</span>
         <span class="n">app_session</span> <span class="o">=</span> <span class="n">SessionMiddleware</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="p">{</span>
             <span class="s1">&#39;session.type&#39;</span><span class="p">:</span> <span class="s1">&#39;memory&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;session.cookie_expires&#39;</span><span class="p">:</span> <span class="mi">300</span><span class="p">,</span>
-            <span class="s1">&#39;session.auto&#39;</span><span class="p">:</span> <span class="kc">True</span>
+            <span class="s1">&#39;session.cookie_expires&#39;</span><span class="p">:</span> <span class="mi">600</span><span class="p">,</span>
+            <span class="s1">&#39;session.timeout&#39;</span><span class="p">:</span> <span class="mi">600</span><span class="p">,</span>
+            <span class="s1">&#39;session.auto&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s1">&#39;session.renew&#39;</span><span class="p">:</span> <span class="kc">True</span>
         <span class="p">})</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">load_signin_file</span><span class="p">()</span>
 
         <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/webcap/pub_img&#39;</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;POST&#39;</span><span class="p">)</span>
         <span class="k">def</span> <span class="nf">pub_img_webcap</span><span class="p">():</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            webcap(プロキシ)から送信されてきた画像を、指定された画像タイプに変換して標準出力する</span>
+<span class="sd">            &quot;&quot;&quot;</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;web.pub_img_webcap: headers=</span><span class="si">{</span><span class="nb">dict</span><span class="p">(</span><span class="n">bottle</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">bottle</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">content_type</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;multipart/form-data&#39;</span><span class="p">):</span>
@@ -1750,7 +1759,11 @@
         <span class="n">th</span> <span class="o">=</span> <span class="n">RaiseThread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">bottle</span><span class="o">.</span><span class="n">run</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">app</span><span class="o">=</span><span class="n">app_session</span><span class="p">,</span> <span class="n">server</span><span class="o">=</span><span class="n">server</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="n">allow_host</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">listen_port</span><span class="p">))</span>
         <span class="n">th</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
         <span class="k">try</span><span class="p">:</span>
+            <span class="n">tm</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
             <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_running</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">tm</span> <span class="o">&gt;</span> <span class="mi">15</span><span class="p">:</span>
+                    <span class="n">tm</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+                    <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;webcap running. count=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">count</span><span class="si">}</span><span class="s2">, capture_count=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">capture_count</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
                 <span class="n">gevent</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
             <span class="n">th</span><span class="o">.</span><span class="n">raise_exception</span><span class="p">()</span>
         <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>

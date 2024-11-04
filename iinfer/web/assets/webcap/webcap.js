@@ -252,9 +252,13 @@ webcap.callback = () => {
       const table_body = $('<tbody></tbody>');
       table.append(table_body);
       elem.append(table);
-      const filter_outputs = {},  dst_outputs = {}
+      let filter_outputs = {},  dst_outputs = {}
       filter_output(outputs, outputs_key, filter_outputs);
-      filter_output(filter_outputs, webcap.pipeline.outputs_key_str.split(','), dst_outputs);
+      if (webcap.pipeline.outputs_key_str) {
+        filter_output(filter_outputs, webcap.pipeline.outputs_key_str.split(','), dst_outputs);
+      } else {
+        dst_outputs = filter_outputs;
+      }
       Object.keys(dst_outputs).forEach((key) => {
         const val = dst_outputs[key];
         if (!val) return;

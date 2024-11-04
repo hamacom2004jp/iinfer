@@ -128,7 +128,7 @@ const list_cmd_func_then = () => {
                     let mk_func = (row, next_elem) => {
                         // row, next_elemの値を残すためにクロージャーにする
                         return () => {
-                            r = {...row};
+                            const r = {...row};
                             r.hide = next_elem.is(':hidden');
                             add_form_func(0, r, next_elem);
                         }
@@ -183,7 +183,6 @@ const list_cmd_func_then = () => {
             cmd_modal.find('[name="cmd"]').val(py_load_cmd.cmd);
             await cmd_change();
             Object.entries(py_load_cmd).forEach(([key, val]) => {
-            //$.each(py_load_cmd, (key, val) => {
                 if (typeof val === 'boolean') {
                     val = val.toString();
                 }

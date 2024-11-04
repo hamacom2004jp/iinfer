@@ -782,7 +782,7 @@ class Web(options.Options):
             except queue.Empty:
                 gevent.sleep(0.001)
             except Exception as e:
-                self.logger.warning('web.gui_callback: websocket error. {e}')
+                self.logger.warning(f'web.gui_callback: websocket error. {e}')
                 bottle.abort(400, 'Expected WebSocket request.')
                 return
 
@@ -821,8 +821,10 @@ class Web(options.Options):
         app = bottle.Bottle()
         app_session = SessionMiddleware(app, {
             'session.type': 'memory',
-            'session.cookie_expires': 300,
-            'session.auto': True
+            'session.cookie_expires': 600,
+            'session.timeout': 600,
+            'session.auto': True,
+            'session.renew': True
         })
         if self.gui_html is not None:
             if not self.gui_html.is_file():
@@ -887,6 +889,7 @@ class Web(options.Options):
                 userid = session['signin']['userid']
                 passwd = session['signin']['password']
                 if userid in self.signin_file_data and passwd == self.signin_file_data[userid]['password']:
+                    session.save()
                     return True
             return False
 
@@ -1310,6 +1313,9 @@ class Web(options.Options):
 
         @app.route('/webcap/pub_img/<port:int>', method='POST')
         def pub_img_proxy(port:int):
+            """
+            webcap画面から送信されてくる画像を、webcapプロセスに送信(プロキシ)する
+            """
             if not check_signin():
                 return common.to_str(dict(warn=f'Please log in to retrieve session.'))
             if self.logger.level == logging.DEBUG:
@@ -1506,13 +1512,18 @@ class Web(options.Options):
         app = bottle.Bottle()
         app_session = SessionMiddleware(app, {
             'session.type': 'memory',
-            'session.cookie_expires': 300,
-            'session.auto': True
+            'session.cookie_expires': 600,
+            'session.timeout': 600,
+            'session.auto': True,
+            'session.renew': True
         })
         self.load_signin_file()
 
         @app.route('/webcap/pub_img', method='POST')
         def pub_img_webcap():
+            """
+            webcap(プロキシ)から送信されてきた画像を、指定された画像タイプに変換して標準出力する
+            """
             if self.logger.level == logging.DEBUG:
                 self.logger.debug(f"web.pub_img_webcap: headers={dict(bottle.request.headers)}")
             if not bottle.request.content_type.startswith('multipart/form-data'):
@@ -1570,7 +1581,11 @@ class Web(options.Options):
         th = RaiseThread(target=bottle.run, kwargs=dict(app=app_session, server=server, host=allow_host, port=listen_port))
         th.start()
         try:
+            tm = time.time()
             while self.is_running:
+                if time.time() - tm > 15:
+                    tm = time.time()
+                    sys.stderr.write(f"webcap running. count={self.count}, capture_count={self.capture_count}\n")
                 gevent.sleep(1)
             th.raise_exception()
         except KeyboardInterrupt:

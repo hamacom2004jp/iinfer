@@ -77,7 +77,7 @@ class IinferApp:
         common.copy_sample(args.data)
         common.copy_sample(Path.cwd())
 
-        logger, _ = common.load_config(args.mode, debug=args.debug, data=args.data, webcall=webcall)
+        logger, _ = common.load_config(args.mode, debug=args.debug, data=args.data, webcall=webcall if args.cmd != 'webcap' else True)
         if logger.level == logging.DEBUG:
             logger.debug(f"app.main: args.mode={args.mode}, args.cmd={args.cmd}")
         if args.mode == 'server':
