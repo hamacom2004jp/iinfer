@@ -1455,6 +1455,8 @@ class Web(options.Options):
         th = RaiseThread(target=bottle.run, kwargs=dict(app=app_session, server=server))
         th.start()
         try:
+            with open("iinfer_web.pid", mode="w", encoding="utf-8") as f:
+                f.write(str(os.getpid()))
             while self.is_running:
                 gevent.sleep(1)
             th.raise_exception()
@@ -1469,11 +1471,17 @@ class Web(options.Options):
         """
         Webサーバを停止する
         """
-        with open("iinfer_web.pid", mode="r", encoding="utf-8") as f:
-            pid = f.read()
-            os.kill(int(pid), signal.CTRL_C_EVENT)
-            self.logger.info(f"Stop bottle web. allow_host={self.allow_host} listen_port={self.listen_port}")
-        Path("iinfer_web.pid").unlink(missing_ok=True)
+        try:
+            with open("iinfer_web.pid", mode="r", encoding="utf-8") as f:
+                pid = f.read()
+                if pid != "":
+                    os.kill(int(pid), signal.CTRL_C_EVENT)
+                    self.logger.info(f"Stop bottle web. allow_host={self.allow_host} listen_port={self.listen_port}")
+                else:
+                    self.logger.warning(f"pid is empty.")
+            Path("iinfer_web.pid").unlink(missing_ok=True)
+        except:
+            traceback.print_exc()
 
     def webcap(self, allow_host:str="0.0.0.0", listen_port:int=8082,
                image_type:str='capture', outputs_key:List[str]=None, capture_frame_width:int=None, capture_frame_height:int=None,

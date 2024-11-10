@@ -1,3 +1,4 @@
+from iinfer.app import feature
 from pathlib import Path
 from PIL import Image, ImageDraw
 from pkg_resources import resource_string
@@ -122,6 +123,8 @@ def default_json_enc(o) -> Any:
         return str(o)
     if isinstance(o, datetime.datetime):
         return o.strftime('%Y-%m-%dT%H:%M:%S')
+    if isinstance(o, feature.Feature):
+        return 'object'
     raise TypeError(f"Type {type(o)} not serializable")
 
 def saveopt(opt:dict, opt_path:Path) -> None:

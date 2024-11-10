@@ -129,7 +129,7 @@ const list_cmd_func_then = () => {
                         // row, next_elemの値を残すためにクロージャーにする
                         return () => {
                             const r = {...row};
-                            r.hide = next_elem.is(':hidden');
+                            //r.hide = next_elem.is(':hidden');
                             add_form_func(0, r, next_elem);
                         }
                     }

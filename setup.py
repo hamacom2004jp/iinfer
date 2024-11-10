@@ -35,6 +35,7 @@ PACKAGES = [
     'iinfer',
     'iinfer.app',
     'iinfer.app.commons',
+    'iinfer.app.features',
     'iinfer.app.injections',
     'iinfer.app.postprocesses',
     'iinfer.app.predicts',

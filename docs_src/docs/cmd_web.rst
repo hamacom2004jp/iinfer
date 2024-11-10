@@ -52,7 +52,7 @@ Webcap起動 : `iinfer -m web -c webcap <Option>`
 
     "Option","Required","Description"
     "--allow_host <接続許可するIP>","","省略した時は `0.0.0.0` を使用します。"
-    "--listen_port <サービスポート>","","省略した時は `8082` を使用します。"
+    "--listen_webcap_port <サービスポート>","","省略した時は `8082` を使用します。"
     "--signin_file <ユーザーリストファイル>","","ログイン可能なユーザーとパスワードを記載したファイルを指定します。省略した時は認証を要求しません。ログインファイルは、各行が1ユーザーを示し、ユーザーID、パスワード、ハッシュアルゴリズム名の順で、「 : 」で区切って記載します。ハッシュアルゴリズム名は「plain」「md5」「sha1」「sha256」が指定できます。"
     "--image_type <出力する画像タイプ>","","出力する画像のタイプを指定する。指定可能な画像タイプは `bmp` , `png` , `jpeg` , `capture` "
     "--outputs_key <表示項目>","","webcap画面で表示する項目を指定します。省略した場合は全ての項目を表示します。"
@@ -60,4 +60,4 @@ Webcap起動 : `iinfer -m web -c webcap <Option>`
     "--capture_frame_height <キャプチャーサイズ(縦px)>","","キャプチャーする画像の縦px。受信した画像をリサイズする。"
     "--capture_fps <キャプチャーFPS>","","キャプチャーする画像のFPS。webcap画面側がこの間隔で送信する。"
     "--capture_count <キャプチャー回数>","","キャプチャーする回数。指定した回数受信したら終了する。"
-    "--access_url <webcapのURL>","","クライアントからアクセスするときのURL。省略した時は `webcap/pub_img` を使用します。例えば `http://localhost:<listen_port>/webcap/pub_img` を指定します。"
+    "--access_url <webcapのURL>","","クライアントからアクセスするときのURL。省略した時は `webcap/pub_img` を使用します。例えば `http://localhost:<listen_webcap_port>/webcap/pub_img` を指定します。"

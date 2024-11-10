@@ -1,4 +1,4 @@
-from iinfer.app import common, predict, train, injection
+from iinfer.app import common, feature, predict, train, injection
 from pathlib import Path
 from typing import List, Dict, Any, Tuple
 import importlib.util
@@ -255,6 +255,33 @@ def get_module_list(package_name) -> List[str]:
     """
     package = __import__(package_name, fromlist=[''])
     return [name for _, name, _ in pkgutil.iter_modules(package.__path__)]
+
+def load_features(package_name:str) -> Dict[str, Any]:
+    """
+    フィーチャーを読み込みます。
+
+    Args:
+        package_name (str): パッケージ名
+    Returns:
+        Dict[str, Any]: フィーチャーのリスト
+    """
+    features = dict()
+    package = __import__(package_name, fromlist=[''])
+    for finder, name, ispkg in pkgutil.iter_modules(package.__path__):
+        if name.startswith('iinfer_'):
+            mod = importlib.import_module(f"{package_name}.{name}")
+            members = inspect.getmembers(mod, inspect.isclass)
+            for name, cls in members:
+                if cls is feature.Feature or not issubclass(cls, feature.Feature):
+                    continue
+                fobj = cls()
+                mode = fobj.get_mode()
+                cmd = fobj.get_cmd()
+                if mode not in features:
+                    features[mode] = dict()
+                features[mode][cmd] = fobj.get_option()
+                features[mode][cmd]['feature'] = fobj
+    return features
 
 for mod in get_module_list('iinfer.app.predicts'):
     if mod.startswith('__'):
