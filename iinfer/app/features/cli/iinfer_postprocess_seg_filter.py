@@ -1,12 +1,12 @@
 from iinfer.app import common
-from iinfer.app.features import postprocess_feature
-from iinfer.app.postprocesses import det_jadge
+from iinfer.app.features.cli import postprocess_feature
+from iinfer.app.postprocesses import seg_filter
 from typing import Dict, Any, Tuple
 import argparse
 import logging
 
 
-class PostprocessDetJadge(postprocess_feature.PostprocessFeature):
+class PostprocessSegFilter(postprocess_feature.PostprocessFeature):
     def __init__(self):
         pass
 
@@ -26,7 +26,7 @@ class PostprocessDetJadge(postprocess_feature.PostprocessFeature):
         Returns:
             str: コマンド
         """
-        return 'det_jadge'
+        return 'seg_filter'
     
     def get_option(self):
         """
@@ -37,8 +37,8 @@ class PostprocessDetJadge(postprocess_feature.PostprocessFeature):
         """
         return dict(
             type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_FALSE,
-            discription_ja="ObjectDetectionで検知した個所を使用して判定を行います。",
-            discription_en="Perform judgment using the detected area in ObjectDetection.",
+            discription_ja="SemanticSegmentationで検知した個所をフィルタリングします。",
+            discription_en="Filter the detected area in SemanticSegmentation.",
             choise=[
                 dict(short="i", opt="input_file", type="file", default="", required=False, multi=False, hide=False, choise=None, fileio="in",
                         discription_ja="後処理させる推論結果をファイルで指定します。",
@@ -46,36 +46,24 @@ class PostprocessDetJadge(postprocess_feature.PostprocessFeature):
                 dict(opt="stdin", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False],
                         discription_ja="後処理させる推論結果を標準入力から読み込みます。",
                         discription_en="Read the inference result to be post-processed from standard input."),
-                dict(opt="ok_score_th", type="float", default=None, required=False, multi=False, hide=False, choise=None,
-                        discription_ja="クラススコアがこの値以上のものはok判定されます。",
-                        discription_en="Class scores greater than this value are judged as ok."),
-                dict(opt="ok_classes", type="str", default="", required=False, multi=True, hide=False, choise=None,
-                        discription_ja="okクラスに含めるクラスindexを指定します。複数指定できます。",
-                        discription_en="Specify the class index to include in the ok class. Multiple specifications are possible."),
-                dict(opt="ok_labels", type="str", default="", required=False, multi=True, hide=False, choise=None,
-                        discription_ja="okクラスに含めるクラスラベルを指定します。複数指定できます。",
-                        discription_en="Specify the class label to include in the ok class. Multiple specifications are possible."),
-                dict(opt="ng_score_th", type="float", default=None, required=False, multi=False, hide=False, choise=None,
-                        discription_ja="クラススコアがこの値以上のものはng判定されます。",
-                        discription_en="Class scores greater than this value are judged as ng."),
-                dict(opt="ng_classes", type="str", default="", required=False, multi=True, hide=False, choise=None,
-                        discription_ja="ngクラスに含めるクラスindexを指定します。複数指定できます。",
-                        discription_en="Specify the class index to include in the ng class. Multiple specifications are possible."),
-                dict(opt="ng_labels", type="str", default="", required=False, multi=True, hide=False, choise=None,
-                        discription_ja="ngクラスに含めるクラスラベルを指定します。複数指定できます。",
-                        discription_en="Specify the class label to include in the ng class. Multiple specifications are possible."),
-                dict(opt="ext_score_th", type="float", default=None, required=False, multi=False, hide=False, choise=None,
-                        discription_ja="クラススコアがこの値以上のものはgray判定されます。",
-                        discription_en="Class scores greater than this value are judged as gray."),
-                dict(opt="ext_classes", type="str", default="", required=False, multi=True, hide=False, choise=None,
-                        discription_ja="grayクラスに含めるクラスindexを指定します。複数指定できます。",
-                        discription_en="Specify the class index to include in the gray class. Multiple specifications are possible."),
-                dict(opt="ext_labels", type="str", default="", required=False, multi=True, hide=False, choise=None,
-                        discription_ja="grayクラスに含めるクラスラベルを指定します。複数指定できます。",
-                        discription_en="Specify the class label to include in the gray class. Multiple specifications are possible."),
+                dict(opt="del_segments", type="bool", default=True, required=False, multi=False, hide=False, choise=[True, False],
+                        discription_ja="セグメンテーションマスクを結果から削除します。結果容量削減に効果があります。",
+                        discription_en="Remove the segmentation mask from the result. This reduces the result capacity."),
+                dict(opt="logits_th", type="float", default="-100.0", required=False, multi=False, hide=False, choise=None,
+                        discription_ja="ピクセルごとのクラススコアがこの値以下のものは除去されます。",
+                        discription_en="Pixels with class scores less than this value are removed."),
+                dict(opt="classes", type="int", default="", required=False, multi=True, hide=True, choise=None,
+                        discription_ja="このクラス以外のマスクは除去します。複数指定できます。",
+                        discription_en="Remove areas other than this class. Multiple specifications are possible."),
+                dict(opt="labels", type="str", default="", required=False, multi=True, hide=False, choise=None,
+                        discription_ja="このラベル以外のマスクは除去します。複数指定できます。",
+                        discription_en="Remove areas other than this label. Multiple specifications are possible."),
                 dict(opt="nodraw", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False],
-                        discription_ja="推論結果画像にbbox等の描き込みを行いません。",
-                        discription_en="Do not draw bboxes, etc. on the inference result image."),
+                        discription_ja="推論結果画像にマスクの描き込みを行いません。",
+                        discription_en="Do not draw masks on the inference result image."),
+                dict(opt="del_logits", type="bool", default=True, required=False, multi=False, hide=False, choise=[True, False],
+                        discription_ja="セグメンテーションスコアを結果から削除します。結果容量削減に効果があります。",
+                        discription_en="Remove the segmentation score from the result. This reduces the result capacity."),
                 dict(short="P", opt="output_preview", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False],
                         discription_ja="判定結果画像を`cv2.imshow`で表示します。",
                         discription_en="Display the judgment result image with `cv2.imshow`."),
@@ -114,10 +102,8 @@ class PostprocessDetJadge(postprocess_feature.PostprocessFeature):
         """
         proc = None
         try:
-            proc = det_jadge.DetJadge(logger, ok_score_th=args.ok_score_th, ok_classes=args.ok_classes, ok_labels=args.ok_labels,
-                                      ng_score_th=args.ng_score_th, ng_classes=args.ng_classes, ng_labels=args.ng_labels,
-                                      ext_score_th=args.ext_score_th, ext_classes=args.ext_classes, ext_labels=args.ext_labels,
-                                      nodraw=args.nodraw, output_preview=args.output_preview)
+            proc = seg_filter.SegFilter(logger, logits_th=args.logits_th, classes=args.classes, labels=args.labels,
+                                        nodraw=args.nodraw, del_logits=args.del_logits)
         except Exception as e:
             msg = {"warn":f"Failed to initialize. {e}"}
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append)

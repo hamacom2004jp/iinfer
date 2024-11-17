@@ -283,6 +283,28 @@ def load_features(package_name:str) -> Dict[str, Any]:
                 features[mode][cmd]['feature'] = fobj
     return features
 
+def load_webfeatures(package_name:str) -> List[feature.WebFeature]:
+    """
+    Webフィーチャーを読み込みます。
+
+    Args:
+        package_name (str): パッケージ名
+    Returns:
+        Dict[feature.WebFeature]: Webフィーチャーのリスト
+    """
+    webfeatures = list()
+    package = __import__(package_name, fromlist=[''])
+    for finder, name, ispkg in pkgutil.iter_modules(package.__path__):
+        if name.startswith('iinfer_web_'):
+            mod = importlib.import_module(f"{package_name}.{name}")
+            members = inspect.getmembers(mod, inspect.isclass)
+            for name, cls in members:
+                if cls is feature.WebFeature or not issubclass(cls, feature.WebFeature):
+                    continue
+                fobj = cls()
+                webfeatures.append(fobj)
+    return webfeatures
+    
 for mod in get_module_list('iinfer.app.predicts'):
     if mod.startswith('__'):
         continue

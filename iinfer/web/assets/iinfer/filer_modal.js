@@ -68,7 +68,7 @@ fmodal.filer_modal_func = async (target_id, modal_title, current_path, select_di
                         return () => {
                             $(`[id="${target_id}"]`).val(current_path);
                             filer_modal.modal('hide');
-                            if(call_back_func) call_back_func(current_path, iinfer.get_server_opt(false, fsapi.right));
+                            if(call_back_func) call_back_func(current_path, iinfer.get_server_opt(false, fmodal.left));
                         }
                     }
                     // 右側ペインのフォルダを選択した時の処理
@@ -91,7 +91,7 @@ fmodal.filer_modal_func = async (target_id, modal_title, current_path, select_di
                         return () => {
                             $(`[id="${target_id}"]`).val(current_path);
                             filer_modal.modal('hide');
-                            if(call_back_func) call_back_func(current_path, iinfer.get_server_opt(false, fsapi.right));
+                            if(call_back_func) call_back_func(current_path, iinfer.get_server_opt(false, fmodal.left));
                         }
                     }
                     Object.entries(node['children']).forEach(([k, n]) => {

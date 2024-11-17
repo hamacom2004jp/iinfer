@@ -1,6 +1,5 @@
 from typing import List, Dict, Any 
-from iinfer import version
-from iinfer.app import common, feature
+from iinfer.app import feature
 from iinfer.app.commons import module
 import locale
 import os
@@ -222,7 +221,7 @@ class Options:
             choise=[])
         # プラグイン読込み
         self._options["svcmd"] = dict()
-        for mode, f in module.load_features('iinfer.app.features').items():
+        for mode, f in module.load_features('iinfer.app.features.cli').items():
             if mode not in self._options["cmd"]:
                 self._options["cmd"][mode] = dict()
             for cmd, opt in f.items():

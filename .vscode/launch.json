@@ -39,7 +39,7 @@
             "name": "Python: iinfer web",
             "type": "python",
             "request": "launch",
-            "args": ["-m","web","-c","start","-f"],//, "--signin_file",".samples/user_list.txt","--client_only", "--filer_html", "filer2.html", "--assets", "README.md", "--assets", "setup.py"
+            "args": ["-m","web","-c","start", "--signin_file",".samples/user_list.txt","-f"],//,"--client_only", "--filer_html", "filer2.html", "--assets", "README.md", "--assets", "setup.py"
             //"args": ["--version"],
             "module": "iinfer",
             "console": "integratedTerminal",

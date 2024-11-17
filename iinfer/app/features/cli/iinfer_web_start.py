@@ -63,12 +63,15 @@ class WebStart(Feature):
                         discription_ja="省略した時は `8081` を使用します。",
                         discription_en="If omitted, `8081` is used."),
                 dict(opt="signin_file", type="file", default=None, required=False, multi=False, hide=True, choise=None,
-                        discription_ja="ログイン可能なユーザーとパスワードを記載したファイルを指定します。省略した時は認証を要求しません。"
-                                    +"ログインファイルは、各行が1ユーザーを示し、ユーザーID、パスワード、ハッシュアルゴリズム名の順で、「 : 」で区切って記載します。"
+                        discription_ja="サインイン可能なユーザーとパスワードを記載したファイルを指定します。省略した時は認証を要求しません。"
+                                    +"サインインファイルは、各行が1ユーザーを示し、ユーザーID、パスワード、ハッシュアルゴリズム名の順で、「 : 」で区切って記載します。"
                                     +"ハッシュアルゴリズム名は「plain」「md5」「sha1」「sha256」が指定できます。",
-                        discription_en="Specify a file containing users and passwords with which they can log in. If omitted, no authentication is required."
+                        discription_en="Specify a file containing users and passwords with which they can signin. If omitted, no authentication is required."
                                     +"In the signin file, each line represents one user, in the order of user ID, password, and hash algorithm name, separated by ' :'."
                                     +"The hash algorithm name can be “plain”, “md5”, “sha1”, or “sha256”."),
+                dict(opt="session_timeout", type="int", default="600", required=False, multi=False, hide=True, choise=None,
+                        discription_ja="サインインしたユーザーのセッションタイムアウトの時間を秒で指定します。",
+                        discription_en="Specify the session timeout in seconds for signed-in users."),
                 dict(opt="client_only", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False],
                         discription_ja="iinferサーバーへの接続を行わないようにします。",
                         discription_en="Do not make connections to the iinfer server."),
@@ -127,7 +130,7 @@ class WebStart(Feature):
                             client_only=args.client_only, gui_html=args.gui_html, filer_html=args.filer_html, showimg_html=args.showimg_html,
                             webcap_html=args.webcap_html, anno_html=args.anno_html, assets=args.assets,
                             signin_html=args.signin_html, signin_file=args.signin_file)
-            w.start(args.allow_host, args.listen_port, outputs_key=args.outputs_key)
+            w.start(args.allow_host, args.listen_port, session_timeout=args.session_timeout, outputs_key=args.outputs_key)
             msg = {"success":"web complate."}
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append)
             return 0, msg, w

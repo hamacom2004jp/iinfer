@@ -95,6 +95,7 @@ anno.load_label = (svpath) => {
     });
   }).finally(() => {
     anno.canvas_container.find('#tags_labels .dropdown-item:first').click();
+    iinfer.hide_loading();
   });
 };
 /**
@@ -188,6 +189,7 @@ anno.load_color = (svpath) => {
     anno.reflesh_svg();
   }).finally(() => {
     anno.canvas_container.find('#tags_labels .dropdown-item:first').click();
+    iinfer.hide_loading();
   });
 };
 /**

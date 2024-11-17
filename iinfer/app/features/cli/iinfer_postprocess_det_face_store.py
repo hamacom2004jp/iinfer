@@ -1,5 +1,5 @@
 from iinfer.app import common
-from iinfer.app.features import postprocess_feature
+from iinfer.app.features.cli import postprocess_feature
 from iinfer.app.postprocesses import det_face_store
 from typing import Dict, Any, Tuple
 import argparse

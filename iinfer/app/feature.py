@@ -3,6 +3,7 @@ from iinfer.app.commons import redis_client
 from pathlib import Path
 from typing import Dict, Any, Tuple, List
 import argparse
+import bottle
 import logging
 import os
 
@@ -94,5 +95,23 @@ class Feature:
         
         Returns:
             int: 終了コード
+        """
+        raise NotImplementedError
+
+class WebFeature(object):
+    USE_REDIS_FALSE:int = Feature.USE_REDIS_FALSE
+    USE_REDIS_MEIGHT:int = Feature.USE_REDIS_MEIGHT
+    USE_REDIS_TRUE:int = Feature.USE_REDIS_TRUE
+
+    def __init__(self):
+        super().__init__()
+
+    def route(self, web, app:bottle.Bottle) -> None:
+        """
+        webモードのルーティングを設定します
+
+        Args:
+            web (web.Web): Webオブジェクト
+            app (bottle.Bottle): Bottleオブジェクト
         """
         raise NotImplementedError

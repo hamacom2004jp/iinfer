@@ -3,6 +3,7 @@ async_timeout
 beaker
 bottle
 bottle_websocket
+cryptography
 collectlicense
 motpy
 opencv-python

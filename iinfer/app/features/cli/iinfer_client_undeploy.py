@@ -170,7 +170,7 @@ class ClientUndeploy(Feature):
             logger.warning(f"Name is empty.")
             redis_cli.rpush(reskey, {"warn": f"Name is empty."})
             return self.RESP_WARN
-        if name in self.sessions:
+        if name in sessions:
             logger.warning(f"{name} has already started a session.")
             redis_cli.rpush(reskey, {"warn": f"{name} has already started a session."})
             return self.RESP_WARN

@@ -16,29 +16,21 @@ def fixture_server():
     python = Path(iinfer.__file__).parent.parent / '.venv' / 'Scripts' / 'python.exe'
     cmd = f"{python} -m iinfer -m server -c start --svname server".split(' ')
     proc1 = subprocess.Popen(cmd)
-    #cmd = f"{python} -m iinfer -m server -c start --svname server1".split(' ')
-    #proc2 = subprocess.Popen(cmd)
-    #cmd = f"{python} -m iinfer -m server -c start --svname server2".split(' ')
-    #proc3 = subprocess.Popen(cmd)
     shutil.rmtree("mmdetection", ignore_errors=True)
     shutil.rmtree("mmpretrain", ignore_errors=True)
     shutil.rmtree("mmsegmentation", ignore_errors=True)
     time.sleep(15)
     yield
-    #cmd = f"{python} -m iinfer -m server -c stop --svname server2 --timeout 15".split(' ')
-    #subprocess.run(cmd)
-    #cmd = f"{python} -m iinfer -m server -c stop --svname server1 --timeout 15".split(' ')
-    #subprocess.run(cmd)
     cmd = f"{python} -m iinfer -m server -c stop --svname server --timeout 15".split(' ')
     subprocess.run(cmd)
 
 
 @pytest.mark.run(order=0)
-def test_0_install_mmdet_win(capfd):
+def test_0_install_insightface_win(capfd):
     cmd = ["-m",
            "install",
            "-c",
-           "mmdet",
+           "insightface",
            "--install_use_gpu",
            "--debug"]
 
@@ -49,11 +41,11 @@ def test_0_install_mmdet_win(capfd):
 
 
 @pytest.mark.run(order=1)
-def test_1_install_mmseg_win(capfd):
+def test_1_install_mmdet_win(capfd):
     cmd = ["-m",
            "install",
            "-c",
-           "mmseg",
+           "mmdet",
            "--install_use_gpu",
            "--debug"]
 
@@ -79,11 +71,11 @@ def test_2_install_mmpretrain_win(capfd):
 
 
 @pytest.mark.run(order=3)
-def test_3_install_insightface_win(capfd):
+def test_3_install_mmseg_win(capfd):
     cmd = ["-m",
            "install",
            "-c",
-           "insightface",
+           "mmseg",
            "--install_use_gpu",
            "--debug"]
 

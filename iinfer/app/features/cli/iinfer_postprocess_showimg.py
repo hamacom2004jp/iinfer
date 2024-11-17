@@ -1,12 +1,12 @@
 from iinfer.app import common
-from iinfer.app.features import postprocess_feature
-from iinfer.app.postprocesses import httpreq
+from iinfer.app.features.cli import postprocess_feature
+from iinfer.app.postprocesses import showimg
 from typing import Dict, Any, Tuple
 import argparse
 import logging
 
 
-class PostprocessHttpreq(postprocess_feature.PostprocessFeature):
+class PostprocessShowimg(postprocess_feature.PostprocessFeature):
     def __init__(self):
         pass
 
@@ -26,7 +26,7 @@ class PostprocessHttpreq(postprocess_feature.PostprocessFeature):
         Returns:
             str: コマンド
         """
-        return 'httpreq'
+        return 'showimg'
     
     def get_option(self):
         """
@@ -37,8 +37,8 @@ class PostprocessHttpreq(postprocess_feature.PostprocessFeature):
         """
         return dict(
             type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_FALSE,
-            discription_ja="推論結果を指定したHTTPサーバーに送信します。",
-            discription_en="Send the inference result to the specified HTTP server.",
+            discription_ja="推論結果をshowimg.htmlに転送します。",
+            discription_en="Forward the inference results to showimg.html.",
             choise=[
                 dict(short="i", opt="input_file", type="file", default="", required=False, multi=False, hide=False, choise=None, fileio="in",
                         discription_ja="後処理させる推論結果をファイルで指定します。",
@@ -46,24 +46,21 @@ class PostprocessHttpreq(postprocess_feature.PostprocessFeature):
                 dict(opt="stdin", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False],
                         discription_ja="後処理させる推論結果を標準入力から読み込みます。",
                         discription_en="Read the inference result to be post-processed from standard input."),
-                dict(opt="json_without_img", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False],
-                        discription_ja="JSONの送信時に画像を含めず送信します。",
-                        discription_en="Send JSON without including images when sending JSON."),
-                dict(opt="fileup_name", type="str", default="file", required=True, multi=False, hide=False, choise=None,
-                        discription_ja="推論結果の画像をPOSTするときのパラメータ名を指定します。省略すると `file` が使用されます。",
-                        discription_en="Specify the parameter name when posting the image of the inference result. If omitted, `file` is used."),
-                dict(opt="outputs_url", type="str", default=None, required=True, multi=False, hide=False, choise=None,
-                        discription_ja="推論結果のJSONをPOSTするURLを指定します。",
-                        discription_en="Specify the URL to POST the JSON of the inference result."),
-                dict(opt="output_image_url", type="str", default=None, required=False, multi=False, hide=False, choise=None,
-                        discription_ja="推論結果の画像をPOSTするURLを指定します。",
-                        discription_en="Specify the URL to POST the image of the inference result."),
-                dict(opt="output_image_ext", type="str", default='jpeg', required=False, multi=False, hide=False, choise=['bmp', 'png', 'jpeg'],
-                        discription_ja="推論結果の画像をフォーマットを指定します。 `bmp` , `png` , `jpeg` が指定できます。",
-                        discription_en="Specifies the format of the image of the inference result.You can specify `bmp` , `png`, or `jpeg`."),
-                dict(opt="output_image_prefix", type="str", default='output_', required=False, multi=False, hide=False, choise=None,
-                        discription_ja="推論結果の画像の接頭語を指定します。省略すると `output_` が使用されます。",
-                        discription_en="Specifies the prefix of the inferred result image. If omitted, `output_` is used."),
+                dict(opt="host", type="str", default=self.default_host, required=False, multi=False, hide=True, choise=None,
+                        discription_ja="Redisサーバーのサービスホストを指定します。",
+                        discription_en="Specify the service host of the Redis server."),
+                dict(opt="port", type="int", default=self.default_port, required=False, multi=False, hide=True, choise=None,
+                        discription_ja="Redisサーバーのサービスポートを指定します。",
+                        discription_en="Specify the service port of the Redis server."),
+                dict(opt="password", type="str", default=self.default_pass, required=False, multi=False, hide=True, choise=None,
+                        discription_ja="Redisサーバーのアクセスパスワード(任意)を指定します。省略時は `password` を使用します。",
+                        discription_en="Specify the access password of the Redis server (optional). If omitted, `password` is used."),
+                dict(opt="svname", type="str", default="server", required=False, multi=False, hide=True, choise=None,
+                        discription_ja="推論サーバーのサービス名を指定します。省略時は `server` を使用します。",
+                        discription_en="Specify the service name of the inference server. If omitted, `server` is used."),
+                dict(opt="maxrecsize", type="int", default=1000, required=False, multi=False, hide=True, choise=None,
+                        discription_ja="Redisサーバーに保存する推論結果の最大レコードサイズを指定します。",
+                        discription_en="Specifies the maximum record size of inference results to be stored on the Redis server."),
                 dict(opt="stdout_log", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False],
                         discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をConsole logに出力します。",
                         discription_en="Available only in GUI mode. Outputs standard output during command execution to Console log."),
@@ -90,15 +87,13 @@ class PostprocessHttpreq(postprocess_feature.PostprocessFeature):
         """
         proc = None
         try:
-            proc = httpreq.Httpreq(logger, fileup_name=args.fileup_name, outputs_url=args.outputs_url, output_image_url=args.output_image_url,
-                                   output_image_ext=args.output_image_ext, output_image_prefix=args.output_image_prefix,
-                                   json_without_img=args.json_without_img)
+            proc = showimg.Showimg(logger, host=args.host, port=args.port, password=args.password, svname=args.svname, maxrecsize=args.maxrecsize)
         except Exception as e:
             msg = {"warn":f"Failed to initialize. {e}"}
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append)
             return 1, msg, proc
         code, ret = self._exec_proc(args.input_file, args.stdin, proc, args.timeout, args.format, tm,
-                                    None, False, output_image_file=None)
+                                    None, None, output_image_file=None)
         if code != 0:
             return code, ret
         return 0, ret, proc

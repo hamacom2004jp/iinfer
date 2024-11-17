@@ -303,7 +303,7 @@ class Filer(object):
             self.logger.warning(f"Path {from_abspath} is not file or directory.")
             return self.RESP_WARN, {"warn": f"Path {from_abspath} is not file or directory."}
 
-        return self.RESP_SCCESS, {"success": {"path":f"{to_path}",
+        return self.RESP_SCCESS, {"success": {"path":f"{Path(to_path).parent}",
                                               "to_path":f"{to_path}",
                                               "from_path":f"{from_path}",
                                               "ret_path":f"{ret_path}",
@@ -331,7 +331,7 @@ class Filer(object):
 
         ret_path = shutil.move(from_abspath, to_abspath)
 
-        return self.RESP_SCCESS, {"success": {"path":f"{to_path}",
+        return self.RESP_SCCESS, {"success": {"path":f"{Path(to_path).parent}",
                                               "to_path":f"{to_path}",
                                               "from_path":f"{from_path}",
                                               "ret_path":f"{ret_path}",

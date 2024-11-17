@@ -1,12 +1,12 @@
 from iinfer.app import common
-from iinfer.app.features import postprocess_feature
-from iinfer.app.postprocesses import seg_filter
+from iinfer.app.features.cli import postprocess_feature
+from iinfer.app.postprocesses import det_filter
 from typing import Dict, Any, Tuple
 import argparse
 import logging
 
 
-class PostprocessSegFilter(postprocess_feature.PostprocessFeature):
+class PostprocessDetFilter(postprocess_feature.PostprocessFeature):
     def __init__(self):
         pass
 
@@ -26,7 +26,7 @@ class PostprocessSegFilter(postprocess_feature.PostprocessFeature):
         Returns:
             str: コマンド
         """
-        return 'seg_filter'
+        return 'det_filter'
     
     def get_option(self):
         """
@@ -37,8 +37,8 @@ class PostprocessSegFilter(postprocess_feature.PostprocessFeature):
         """
         return dict(
             type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_FALSE,
-            discription_ja="SemanticSegmentationで検知した個所をフィルタリングします。",
-            discription_en="Filter the detected area in SemanticSegmentation.",
+            discription_ja="ObjectDetectionで検知した個所をフィルタリングします。",
+            discription_en="Filter the detected area in ObjectDetection.",
             choise=[
                 dict(short="i", opt="input_file", type="file", default="", required=False, multi=False, hide=False, choise=None, fileio="in",
                         discription_ja="後処理させる推論結果をファイルで指定します。",
@@ -46,24 +46,24 @@ class PostprocessSegFilter(postprocess_feature.PostprocessFeature):
                 dict(opt="stdin", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False],
                         discription_ja="後処理させる推論結果を標準入力から読み込みます。",
                         discription_en="Read the inference result to be post-processed from standard input."),
-                dict(opt="del_segments", type="bool", default=True, required=False, multi=False, hide=False, choise=[True, False],
-                        discription_ja="セグメンテーションマスクを結果から削除します。結果容量削減に効果があります。",
-                        discription_en="Remove the segmentation mask from the result. This reduces the result capacity."),
-                dict(opt="logits_th", type="float", default="-100.0", required=False, multi=False, hide=False, choise=None,
-                        discription_ja="ピクセルごとのクラススコアがこの値以下のものは除去されます。",
-                        discription_en="Pixels with class scores less than this value are removed."),
-                dict(opt="classes", type="int", default="", required=False, multi=True, hide=True, choise=None,
-                        discription_ja="このクラス以外のマスクは除去します。複数指定できます。",
-                        discription_en="Remove areas other than this class. Multiple specifications are possible."),
+                dict(opt="score_th", type="float", default="0.0", required=False, multi=False, hide=False, choise=None,
+                        discription_ja="bboxのクラススコアがこの値以下のものは除去します。",
+                        discription_en="Remove bboxes with class scores less"),
+                dict(opt="width_th", type="int", default="0", required=False, multi=False, hide=False, choise=None,
+                        discription_ja="bboxの横幅がこの長さ以下のものは除去します。",
+                        discription_en="Remove bboxes with a width less than this length."),
+                dict(opt="height_th", type="int", default="0", required=False, multi=False, hide=False, choise=None,
+                        discription_ja="bboxの縦幅がこの長さ以下のものは除去します。",
+                        discription_en="Remove bboxes with a height less than this length."),
+                dict(opt="classes", type="str", default="", required=False, multi=True, hide=False, choise=None,
+                        discription_ja="このクラス以外のbboxは除去します。複数指定できます。",
+                        discription_en="Remove bboxes other than this class. Multiple specifications are possible."),
                 dict(opt="labels", type="str", default="", required=False, multi=True, hide=False, choise=None,
-                        discription_ja="このラベル以外のマスクは除去します。複数指定できます。",
-                        discription_en="Remove areas other than this label. Multiple specifications are possible."),
+                        discription_ja="このラベル以外のbboxは除去します。複数指定できます。",
+                        discription_en="Remove bboxes other than this label. Multiple specifications are possible."),
                 dict(opt="nodraw", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False],
-                        discription_ja="推論結果画像にマスクの描き込みを行いません。",
-                        discription_en="Do not draw masks on the inference result image."),
-                dict(opt="del_logits", type="bool", default=True, required=False, multi=False, hide=False, choise=[True, False],
-                        discription_ja="セグメンテーションスコアを結果から削除します。結果容量削減に効果があります。",
-                        discription_en="Remove the segmentation score from the result. This reduces the result capacity."),
+                        discription_ja="推論結果画像にbbox等の描き込みを行いません。",
+                        discription_en="Do not draw bboxes, etc. on the inference result image."),
                 dict(short="P", opt="output_preview", type="bool", default=False, required=False, multi=False, hide=False, choise=[True, False],
                         discription_ja="判定結果画像を`cv2.imshow`で表示します。",
                         discription_en="Display the judgment result image with `cv2.imshow`."),
@@ -102,8 +102,8 @@ class PostprocessSegFilter(postprocess_feature.PostprocessFeature):
         """
         proc = None
         try:
-            proc = seg_filter.SegFilter(logger, logits_th=args.logits_th, classes=args.classes, labels=args.labels,
-                                        nodraw=args.nodraw, del_logits=args.del_logits)
+            proc = det_filter.DetFilter(logger, score_th=args.score_th, width_th=args.width_th, height_th=args.height_th,
+                                        classes=args.classes, labels=args.labels, nodraw=args.nodraw, output_preview=args.output_preview)
         except Exception as e:
             msg = {"warn":f"Failed to initialize. {e}"}
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append)
