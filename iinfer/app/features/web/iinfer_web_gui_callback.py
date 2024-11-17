@@ -43,6 +43,6 @@ class GuiCallback(feature.WebFeature):
             except queue.Empty:
                 gevent.sleep(0.001)
             except Exception as e:
-                self.logger.warning(f'web.gui_callback: websocket error. {e}')
+                web.logger.warning(f'web.gui_callback: websocket error. {e}')
                 bottle.abort(400, 'Expected WebSocket request.')
                 return

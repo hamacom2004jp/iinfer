@@ -1,7 +1,7 @@
 import datetime
 
 
-dt_now = datetime.datetime(2024, 11, 11)
+dt_now = datetime.datetime(2024, 11, 17)
 __title__ = 'iinfer (Image Inference Application)'
 __version__ = '0.9.0'
 __copyright__ = f'Copyright © 2023-{dt_now.strftime("%Y")} hamacom2004jp'

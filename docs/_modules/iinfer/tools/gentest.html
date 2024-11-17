@@ -1,23 +1,21 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="jp" data-content_root="../../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>iinfer.tools.gentest &mdash; iinfer 2024/09/22 documentation</title>
+  <title>iinfer.tools.gentest &mdash; iinfer 2024/11/17 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
 
   
-  <!--[if lt IE 9]>
-    <script src="../../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=dacb1dba"></script>
-        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
-        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=44d32c5e"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -275,19 +273,11 @@
 <span class="s2">    python = Path(iinfer.__file__).parent.parent / &#39;.venv&#39; / &#39;Scripts&#39; / &#39;python.exe&#39;</span>
 <span class="s2">    cmd = f&quot;</span><span class="si">{python}</span><span class="s2"> -m iinfer -m server -c start --svname server&quot;.split(&#39; &#39;)</span>
 <span class="s2">    proc1 = subprocess.Popen(cmd)</span>
-<span class="s2">    #cmd = f&quot;</span><span class="si">{python}</span><span class="s2"> -m iinfer -m server -c start --svname server1&quot;.split(&#39; &#39;)</span>
-<span class="s2">    #proc2 = subprocess.Popen(cmd)</span>
-<span class="s2">    #cmd = f&quot;</span><span class="si">{python}</span><span class="s2"> -m iinfer -m server -c start --svname server2&quot;.split(&#39; &#39;)</span>
-<span class="s2">    #proc3 = subprocess.Popen(cmd)</span>
 <span class="s2">    shutil.rmtree(&quot;mmdetection&quot;, ignore_errors=True)</span>
 <span class="s2">    shutil.rmtree(&quot;mmpretrain&quot;, ignore_errors=True)</span>
 <span class="s2">    shutil.rmtree(&quot;mmsegmentation&quot;, ignore_errors=True)</span>
 <span class="s2">    time.sleep(15)</span>
 <span class="s2">    yield</span>
-<span class="s2">    #cmd = f&quot;</span><span class="si">{python}</span><span class="s2"> -m iinfer -m server -c stop --svname server2 --timeout 15&quot;.split(&#39; &#39;)</span>
-<span class="s2">    #subprocess.run(cmd)</span>
-<span class="s2">    #cmd = f&quot;</span><span class="si">{python}</span><span class="s2"> -m iinfer -m server -c stop --svname server1 --timeout 15&quot;.split(&#39; &#39;)</span>
-<span class="s2">    #subprocess.run(cmd)</span>
 <span class="s2">    cmd = f&quot;</span><span class="si">{python}</span><span class="s2"> -m iinfer -m server -c stop --svname server --timeout 15&quot;.split(&#39; &#39;)</span>
 <span class="s2">    subprocess.run(cmd)</span>
 

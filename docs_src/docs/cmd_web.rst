@@ -61,3 +61,17 @@ Webcap起動 : `iinfer -m web -c webcap <Option>`
     "--capture_fps <キャプチャーFPS>","","キャプチャーする画像のFPS。webcap画面側がこの間隔で送信する。"
     "--capture_count <キャプチャー回数>","","キャプチャーする回数。指定した回数受信したら終了する。"
     "--access_url <webcapのURL>","","クライアントからアクセスするときのURL。省略した時は `webcap/pub_img` を使用します。例えば `http://localhost:<listen_webcap_port>/webcap/pub_img` を指定します。"
+
+
+自己署名サーバー証明書生成 : `iinfer -m web -c gencert <Option>`
+==============================================================================
+
+.. csv-table::
+    :widths: 20, 10, 70
+    :header-rows: 1
+
+    "Option","Required","Description"
+    "--webhost <サーバー名>","","自己署名証明書のCN(Common Name)に指定するホスト名を指定します。"
+    "--output_cert <保存先>","","出力する自己署名証明書のファイルを指定します。省略した場合は `webhostオプションに指定したホスト名` .crt に出力されます。"
+    "--output_key <保存先>","","出力する自己署名証明書の秘密鍵ファイルを指定します。省略した場合は `webhostオプションに指定したホスト名` .key に出力されます。"
+    "--overwrite","","出力する自己署名証明書のファイルが存在する場合に上書きします。"

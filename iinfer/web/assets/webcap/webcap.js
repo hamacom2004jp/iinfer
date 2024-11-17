@@ -10,7 +10,7 @@ webcap.init = () => {
       const webcap_cmd = await load_cmd(pipe.pipe_cmd[0]);
       const outputs_key_str = webcap_cmd.outputs_key ? webcap_cmd.outputs_key.join(',') : "";
       if (!webcap_cmd || webcap_cmd.mode != 'web' || webcap_cmd.cmd != 'webcap') continue;
-      url = `webcap/pub_img/${webcap_cmd.listen_port}`
+      url = `webcap/pub_img/${webcap_cmd.listen_webcap_port}`
       if (webcap_cmd.access_url) url = webcap_cmd.access_url;
       // pipe_cmdの最後の要素にshowimgコマンドがあるか確認
       const showimg_cmd = await load_cmd(pipe.pipe_cmd[pipe.pipe_cmd.length - 1]);

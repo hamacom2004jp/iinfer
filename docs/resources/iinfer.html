@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>iinfer package &mdash; iinfer 2024/11/04 documentation</title>
+  <title>iinfer package &mdash; iinfer 2024/11/17 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=17e47670"></script>
+      <script src="../_static/documentation_options.js?v=44d32c5e"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -215,6 +215,7 @@
 <li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.options.Options.get_cmds"><code class="docutils literal notranslate"><span class="pre">Options.get_cmds()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.options.Options.get_mode_keys"><code class="docutils literal notranslate"><span class="pre">Options.get_mode_keys()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.options.Options.get_modes"><code class="docutils literal notranslate"><span class="pre">Options.get_modes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.options.Options.get_svcmd_feature"><code class="docutils literal notranslate"><span class="pre">Options.get_svcmd_feature()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.options.Options.init_options"><code class="docutils literal notranslate"><span class="pre">Options.init_options()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.options.Options.list_options"><code class="docutils literal notranslate"><span class="pre">Options.list_options()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.options.Options.mk_opt_list"><code class="docutils literal notranslate"><span class="pre">Options.mk_opt_list()</span></code></a></li>
@@ -258,25 +259,9 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="iinfer.app.html#module-iinfer.app.server">iinfer.app.server module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="iinfer.app.html#iinfer.app.server.Server"><code class="docutils literal notranslate"><span class="pre">Server</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.server.Server.deploy"><code class="docutils literal notranslate"><span class="pre">Server.deploy()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.server.Server.deploy_list"><code class="docutils literal notranslate"><span class="pre">Server.deploy_list()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.server.Server.file_copy"><code class="docutils literal notranslate"><span class="pre">Server.file_copy()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.server.Server.file_download"><code class="docutils literal notranslate"><span class="pre">Server.file_download()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.server.Server.file_list"><code class="docutils literal notranslate"><span class="pre">Server.file_list()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.server.Server.file_mkdir"><code class="docutils literal notranslate"><span class="pre">Server.file_mkdir()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.server.Server.file_move"><code class="docutils literal notranslate"><span class="pre">Server.file_move()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.server.Server.file_remove"><code class="docutils literal notranslate"><span class="pre">Server.file_remove()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.server.Server.file_rmdir"><code class="docutils literal notranslate"><span class="pre">Server.file_rmdir()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.server.Server.file_upload"><code class="docutils literal notranslate"><span class="pre">Server.file_upload()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.server.Server.list_server"><code class="docutils literal notranslate"><span class="pre">Server.list_server()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.server.Server.predict"><code class="docutils literal notranslate"><span class="pre">Server.predict()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.server.Server.server_info"><code class="docutils literal notranslate"><span class="pre">Server.server_info()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.server.Server.start"><code class="docutils literal notranslate"><span class="pre">Server.start()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.server.Server.start_server"><code class="docutils literal notranslate"><span class="pre">Server.start_server()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.server.Server.stop"><code class="docutils literal notranslate"><span class="pre">Server.stop()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.server.Server.terminate_server"><code class="docutils literal notranslate"><span class="pre">Server.terminate_server()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.server.Server.train"><code class="docutils literal notranslate"><span class="pre">Server.train()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.server.Server.undeploy"><code class="docutils literal notranslate"><span class="pre">Server.undeploy()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -289,35 +274,10 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="iinfer.app.html#iinfer.app.web.Web"><code class="docutils literal notranslate"><span class="pre">Web</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.web.Web.bbforce_cmd"><code class="docutils literal notranslate"><span class="pre">Web.bbforce_cmd()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.web.Web.callback_console_modal_log_func"><code class="docutils literal notranslate"><span class="pre">Web.callback_console_modal_log_func()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.web.Web.callback_return_cmd_exec_func"><code class="docutils literal notranslate"><span class="pre">Web.callback_return_cmd_exec_func()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.web.Web.callback_return_pipe_exec_func"><code class="docutils literal notranslate"><span class="pre">Web.callback_return_pipe_exec_func()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.web.Web.callback_return_stream_log_func"><code class="docutils literal notranslate"><span class="pre">Web.callback_return_stream_log_func()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.web.Web.chk_client_only"><code class="docutils literal notranslate"><span class="pre">Web.chk_client_only()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.web.Web.copyright"><code class="docutils literal notranslate"><span class="pre">Web.copyright()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.web.Web.del_cmd"><code class="docutils literal notranslate"><span class="pre">Web.del_cmd()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.web.Web.del_pipe"><code class="docutils literal notranslate"><span class="pre">Web.del_pipe()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.web.Web.exec_cmd"><code class="docutils literal notranslate"><span class="pre">Web.exec_cmd()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.web.Web.exec_pipe"><code class="docutils literal notranslate"><span class="pre">Web.exec_pipe()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.web.Web.filer_upload"><code class="docutils literal notranslate"><span class="pre">Web.filer_upload()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.web.Web.gui_callback"><code class="docutils literal notranslate"><span class="pre">Web.gui_callback()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.web.Web.list_cmd"><code class="docutils literal notranslate"><span class="pre">Web.list_cmd()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.web.Web.list_pipe"><code class="docutils literal notranslate"><span class="pre">Web.list_pipe()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.web.Web.load_capture"><code class="docutils literal notranslate"><span class="pre">Web.load_capture()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.web.Web.load_cmd"><code class="docutils literal notranslate"><span class="pre">Web.load_cmd()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.web.Web.load_pipe"><code class="docutils literal notranslate"><span class="pre">Web.load_pipe()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.web.Web.load_result"><code class="docutils literal notranslate"><span class="pre">Web.load_result()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.web.Web.check_signin"><code class="docutils literal notranslate"><span class="pre">Web.check_signin()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.web.Web.load_signin_file"><code class="docutils literal notranslate"><span class="pre">Web.load_signin_file()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.web.Web.mk_curl_fileup"><code class="docutils literal notranslate"><span class="pre">Web.mk_curl_fileup()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.web.Web.raw_cmd"><code class="docutils literal notranslate"><span class="pre">Web.raw_cmd()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.web.Web.raw_pipe"><code class="docutils literal notranslate"><span class="pre">Web.raw_pipe()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.web.Web.save_cmd"><code class="docutils literal notranslate"><span class="pre">Web.save_cmd()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.web.Web.save_pipe"><code class="docutils literal notranslate"><span class="pre">Web.save_pipe()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.web.Web.start"><code class="docutils literal notranslate"><span class="pre">Web.start()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.web.Web.stop"><code class="docutils literal notranslate"><span class="pre">Web.stop()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.web.Web.versions_iinfer"><code class="docutils literal notranslate"><span class="pre">Web.versions_iinfer()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.web.Web.versions_used"><code class="docutils literal notranslate"><span class="pre">Web.versions_used()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="iinfer.app.html#iinfer.app.web.Web.webcap"><code class="docutils literal notranslate"><span class="pre">Web.webcap()</span></code></a></li>
 </ul>
 </li>
