@@ -1,5 +1,5 @@
 from iinfer import version
-from iinfer.app import common, client, options, server, web
+from iinfer.app import common, options
 from pathlib import Path
 import argparse
 import argcomplete
@@ -13,9 +13,6 @@ def main(args_list:list=None):
 
 class IinferApp:
     def __init__(self):
-        self.sv = None
-        self.cl = None
-        self.web = None
         self.options = options.Options()
 
     def main(self, args_list:list=None, file_dict:dict=dict(), webcall:bool=False):
@@ -55,19 +52,19 @@ class IinferApp:
             if args.useopt is None:
                 msg = {"warn":f"Please specify the --useopt option."}
                 common.print_format(msg, args.format, tm, args.output_json, args.output_json_append)
-                return 1, msg
+                return 1, msg, None
             common.saveopt(opt, args.useopt)
             ret = {"success":f"Save options file. {args.useopt}"}
 
         if args.version:
             v = version.__logo__ + '\n' + version.__description__
             common.print_format(v, False, tm, None, False)
-            return 0, v
+            return 0, v, None
 
         if args.mode is None:
             msg = {"warn":f"mode is None. Please specify the --help option."}
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append)
-            return 1, msg
+            return 1, msg, None
 
         common.mklogdir(args.data)
         common.copy_sample(args.data)
@@ -80,13 +77,7 @@ class IinferApp:
         feature = self.options.get_cmd_attr(args.mode, args.cmd, 'feature')
         if feature is not None:
             status, ret, obj = feature.apprun(logger, args, tm)
-            if isinstance(obj, server.Server):
-                self.sv = obj
-            elif isinstance(obj, client.Client):
-                self.cl = obj
-            elif isinstance(obj, web.Web):
-                self.web = obj
-            return status, ret
+            return status, ret, obj
         else:
             msg = {"warn":f"Unkown mode or cmd. mode={args.mode}, cmd={args.cmd}"}
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append)

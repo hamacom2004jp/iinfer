@@ -1,4 +1,4 @@
-from iinfer.app import app, common, web as _web, options
+from iinfer.app import app, common, client, server, web as _web, options
 from iinfer.app.commons import convert
 from iinfer.app.features.web import iinfer_web_load_cmd
 from typing import Dict, Any, List
@@ -76,7 +76,10 @@ class ExecCmd(iinfer_web_load_cmd.LoadCmd):
         Returns:
             list: コマンド実行結果
         """
-        web.container['iinfer_app'] = app.IinferApp()
+        web.container['iinfer_app'] = ap = app.IinferApp()
+        ap.sv = None
+        ap.cl = None
+        ap.web = None
         def _exec_cmd(iinfer_app:app.IinferApp, title, opt, nothread=False):
             web.logger.info(f"exec_cmd: title={title}, opt={opt}")
             ret, output = self.chk_client_only(web, opt)
@@ -96,7 +99,14 @@ class ExecCmd(iinfer_web_load_cmd.LoadCmd):
             if 'capture_stdout' in opt and opt['capture_stdout']:
                 sys.stdout = captured_output = io.StringIO()
             try:
-                iinfer_app.main(args_list=opt_list, file_dict=file_dict, webcall=True)
+                status, ret, obj = iinfer_app.main(args_list=opt_list, file_dict=file_dict, webcall=True)
+                if isinstance(obj, server.Server):
+                    iinfer_app.sv = obj
+                elif isinstance(obj, client.Client):
+                    iinfer_app.cl = obj
+                elif isinstance(obj, web.Web):
+                    iinfer_app.web = obj
+
                 web.logger.disabled = False # ログ出力を有効にする
                 capture_maxsize = opt['capture_maxsize'] if 'capture_maxsize' in opt else options.Options.DEFAULT_CAPTURE_MAXSIZE
                 if 'capture_stdout' in opt and opt['capture_stdout']:
@@ -146,8 +156,8 @@ class ExecCmd(iinfer_web_load_cmd.LoadCmd):
                     return output
                 self.callback_return_cmd_exec_func(web, title, output)
         if nothread:
-            return _exec_cmd(web.container['iinfer_app'], title, opt, True)
-        th = _web.RaiseThread(target=_exec_cmd, args=(web.container['iinfer_app'], title, opt, False))
+            return _exec_cmd(ap, title, opt, True)
+        th = _web.RaiseThread(target=_exec_cmd, args=(ap, title, opt, False))
         th.start()
         return [dict(warn='start_cmd')]
 

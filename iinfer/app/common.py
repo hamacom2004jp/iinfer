@@ -379,34 +379,6 @@ def cmd(cmd:str, logger:logging.Logger, slise:int=100):
 
     return proc.returncode, output
 
-def draw_segment(img_npy:np.ndarray, segment:np.ndarray, colors:List[Tuple[int]], nodraw:bool=False) -> np.ndarray:
-    """
-    画像にマスクを描画します。
-
-    Args:
-        img_npy (np.ndarray): 元画像
-        segment (np.ndarray): セグメンテーションのクラスマップ
-        colors (List[Tuple[int]]): クラスごとの色のリスト
-        nodraw (bool, optional): 描画しない場合はTrue. Defaults to False.
-
-    Returns:
-        Image: マスクが描画された画像
-    """
-    img_npy = cv2.cvtColor(img_npy, cv2.COLOR_RGB2BGR)
-    masked_image = np.zeros_like(img_npy)
-
-    for c in np.unique(segment):
-        color = colors[int(c)] if colors is not None else make_color(str(int(c)))
-        m = segment == c
-        r = np.where(m, color[0], 0).astype(np.uint8)
-        g = np.where(m, color[1], 0).astype(np.uint8)
-        b = np.where(m, color[2], 0).astype(np.uint8)
-        mask = cv2.merge([r, g, b])
-        masked_image = cv2.addWeighted(masked_image, 1, mask[0], 1, 0)
-    img_npy = cv2.addWeighted(img_npy, 0.5, masked_image, 0.5, 0)
-    img_npy = cv2.cvtColor(img_npy, cv2.COLOR_BGR2RGB)
-    return img_npy
-
 def draw_boxes(image:Image.Image, boxes:List[List[float]], scores:List[float], classes:List[int], ids:List[str]=None,
                labels:List[str]=None, colors:List[Tuple[int]]=None, tracks:List[int]=None,
                nodraw:bool=False, nolookup:bool=False) -> Tuple[Image.Image, List[str]]:

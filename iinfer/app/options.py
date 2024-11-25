@@ -2,13 +2,9 @@ from typing import List, Dict, Any
 from iinfer.app import feature
 from iinfer.app.commons import module
 import locale
-import os
+
 
 class Options:
-    USE_REDIS_FALSE = -1
-    USE_REDIS_MEIGHT = 0
-    USE_REDIS_TRUE = 1
-    DEFAULT_CAPTURE_MAXSIZE = 1024 * 1024 * 10
     def __init__(self):
         self._options = dict()
         self.init_options()

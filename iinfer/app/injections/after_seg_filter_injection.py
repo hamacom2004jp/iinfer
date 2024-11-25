@@ -1,8 +1,9 @@
 from iinfer.app import common, injection
 from iinfer.app.commons import convert
 from PIL import Image
-from typing import Tuple, Dict, Any
+from typing import Tuple, Dict, Any, List
 import numpy as np
+import cv2
 
 
 class AfterSegFilterInjection(injection.AfterInjection):
@@ -158,7 +159,36 @@ class AfterSegFilterInjection(injection.AfterInjection):
             output_palette = data['output_palette']
 
             img_npy = convert.img2npy(output_image)
-            img_npy = common.draw_segment(img_npy, segment, output_palette, nodraw)
+            img_npy = draw_segment(img_npy, segment, output_palette, nodraw)
             output_image = convert.npy2img(img_npy)
 
         return output_image
+
+
+def draw_segment(img_npy:np.ndarray, segment:np.ndarray, colors:List[Tuple[int]], nodraw:bool=False) -> np.ndarray:
+    """
+    画像にマスクを描画します。
+
+    Args:
+        img_npy (np.ndarray): 元画像
+        segment (np.ndarray): セグメンテーションのクラスマップ
+        colors (List[Tuple[int]]): クラスごとの色のリスト
+        nodraw (bool, optional): 描画しない場合はTrue. Defaults to False.
+
+    Returns:
+        Image: マスクが描画された画像
+    """
+    img_npy = cv2.cvtColor(img_npy, cv2.COLOR_RGB2BGR)
+    masked_image = np.zeros_like(img_npy)
+
+    for c in np.unique(segment):
+        color = colors[int(c)] if colors is not None else common.make_color(str(int(c)))
+        m = segment == c
+        r = np.where(m, color[0], 0).astype(np.uint8)
+        g = np.where(m, color[1], 0).astype(np.uint8)
+        b = np.where(m, color[2], 0).astype(np.uint8)
+        mask = cv2.merge([r, g, b])
+        masked_image = cv2.addWeighted(masked_image, 1, mask[0], 1, 0)
+    img_npy = cv2.addWeighted(img_npy, 0.5, masked_image, 0.5, 0)
+    img_npy = cv2.cvtColor(img_npy, cv2.COLOR_BGR2RGB)
+    return img_npy
