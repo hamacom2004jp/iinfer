@@ -1,7 +1,7 @@
+from cmdbox.app import common
 from pathlib import Path
 from PIL import Image
 from typing import List, Tuple, Union, Any
-from iinfer.app import common
 from iinfer.app.predicts import onnx_det_YoloV3
 import logging
 import numpy as np

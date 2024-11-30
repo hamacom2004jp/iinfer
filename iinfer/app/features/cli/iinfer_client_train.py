@@ -1,6 +1,8 @@
-from iinfer.app import common, client
-from iinfer.app.commons import module, redis_client
-from iinfer.app.feature import Feature
+from cmdbox.app import common, feature
+from cmdbox.app.commons import redis_client
+from iinfer import version
+from iinfer.app import client
+from iinfer.app.commons import module
 from pathlib import Path
 from typing import Dict, Any, Tuple, List
 import argparse
@@ -10,8 +12,9 @@ import os
 import threading
 
 
-class ClientTrain(Feature):
-    def __init__(self):
+class ClientTrain(feature.Feature):
+    def __init__(self, ver=version):
+        super().__init__(ver=ver)
         self.train_thread = None
 
     def get_mode(self):

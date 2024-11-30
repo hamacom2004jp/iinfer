@@ -1,18 +1,57 @@
-from iinfer.app import web, feature
-import bottle
+from cmdbox.app import feature
+from iinfer import version
+from iinfer.app.web import Web
+from fastapi import FastAPI, Request, Response
+from fastapi.responses import HTMLResponse, RedirectResponse
+from typing import Dict, Any
 
 
 class Annotation(feature.WebFeature):
-    def __init__(self):
-        super().__init__()
-    
-    def route(self, web:web.Web, app:bottle.Bottle) -> None:
-        @app.route('/annotation')
-        def annotation():
-            if not web.check_signin():
-                return bottle.redirect(f'/signin/annotation')
-            if web.anno_html_data is not None:
-                return web.anno_html_data
-            res:bottle.HTTPResponse = bottle.static_file('annotation.html', root=web.static_root)
+    def __init__(self, ver=version):
+        super().__init__(ver=ver)
+
+    def route(self, web:Web, app:FastAPI) -> None:
+        """
+        webモードのルーティングを設定します
+
+        Args:
+            web (Web): Webオブジェクト
+            app (FastAPI): FastAPIオブジェクト
+        """
+        if web.anno_html is not None:
+            if not web.anno_html.is_file():
+                raise FileNotFoundError(f'anno_html is not found. ({web.anno_html})')
+            with open(web.anno_html, 'r', encoding='utf-8') as f:
+                web.anno_html_data = f.read()
+
+        @app.get('/annotation', response_class=HTMLResponse)
+        @app.post('/annotation', response_class=HTMLResponse)
+        async def annotation(req:Request, res:Response):
+            signin = web.check_signin(req, res)
+            if signin is not None:
+                return RedirectResponse(url=f'/signin/annotation')
             res.headers['Access-Control-Allow-Origin'] = '*'
-            return res
+            return web.anno_html_data
+
+    def toolmenu(self, web:Web) -> Dict[str, Any]:
+        """
+        ツールメニューの情報を返します
+
+        Args:
+            web (Web): Webオブジェクト
+        
+        Returns:
+            Dict[str, Any]: ツールメニュー情報
+        
+        Sample:
+            {
+                'filer': {
+                    'html': 'Filer',
+                    'href': 'filer',
+                    'target': '_blank',
+                    'css_class': 'dropdown-item'
+                    'onclick': 'alert("filer")'
+                }
+            }
+        """
+        return dict(annotation=dict(html='Annotation', href='annotation', target='_blank', css_class='dropdown-item'))

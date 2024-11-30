@@ -1,10 +1,11 @@
-from iinfer.app import common, postprocess
-from iinfer.app.commons import convert
+from cmdbox.app.commons import convert
+from iinfer.app import postprocess
 from iinfer.app.injections import after_seg_filter_injection
 from PIL import Image
 from typing import Dict, Tuple, Any, List
 import cv2
 import logging
+
 
 class SegFilter(postprocess.Postprocess):
     def __init__(self, logger:logging.Logger, logits_th:float=-100.0, classes:List[int]=None, labels:List[str]=None, nodraw:bool=False, del_logits:bool=True):

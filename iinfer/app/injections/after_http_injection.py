@@ -1,5 +1,5 @@
+from cmdbox.app.commons import convert
 from iinfer.app import injection
-from iinfer.app.commons import convert
 from PIL import Image
 from typing import Tuple, Dict, Any
 import datetime

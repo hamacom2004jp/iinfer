@@ -28,22 +28,22 @@ webcap.init = () => {
       pipeline_elem.append(elem);
       webcap.change_pipeline(null, null, "", 10, 640, 480);
     }
-    iinfer.hide_loading();
+    cmdbox.hide_loading();
   });
   $('#rec_error').off('click').on('click', () => {
-    iinfer.message('Please select pipeline and Camera.');
+    cmdbox.message('Please select pipeline and Camera.');
   });
   /** 使用可能なカメラ一覧の読込み */
   const camera_selection = async () => {
     if (!('mediaDevices' in navigator && 'getUserMedia' in navigator.mediaDevices)) {
-      iinfer.message('No camera found.');
+      cmdbox.message('No camera found.');
       return;
     }
     try {
       await navigator.mediaDevices.getUserMedia({video: true});
     }
     catch (e) {
-      iinfer.message('No camera found.');
+      cmdbox.message('No camera found.');
       return;
     }
     const devices = await navigator.mediaDevices.enumerateDevices();
@@ -91,7 +91,7 @@ webcap.get_camera_const = async () => {
   try {
     await navigator.mediaDevices.getUserMedia(constraints);
   } catch (e) {
-    iinfer.message(`Error: ${e}\nCould not connect to camera.`);
+    cmdbox.message(`Error: ${e}\nCould not connect to camera.`);
   }
   return constraints;
 };
@@ -153,20 +153,20 @@ webcap.change_pipeline = (title, url, outputs_key_str, capture_fps, capture_fram
 /** カメラ映像をwebcapに送信開始 */
 webcap.rec_start = () => {
   if (!webcap.pipeline || webcap.pipeline.length <= 0) {
-    iinfer.message('Please select pipeline.');
+    cmdbox.message('Please select pipeline.');
     return;
   }
   if (webcap.pipeline.is_rec) return;
   $('#rec').hide();
   $('#pause').show();
   webcap.pipeline.is_rec = true;
-  iinfer.show_loading();
+  cmdbox.show_loading();
 };
 /** カメラ映像をwebcapに送信停止 */
 webcap.rec_stop = () => {
   $('#rec').show();
   $('#pause').hide();
-  iinfer.hide_loading();
+  cmdbox.hide_loading();
   webcap.pipeline.is_rec = false;
 };
 /** アスペクト比計算 */
@@ -212,20 +212,28 @@ webcap.rec = () => {
   const blob = new Blob([capimg], {type:"application/octet-stream"});
   formData.append('files', blob);
   fetch(webcap.pipeline.url, {method: "POST", mode:'cors', body: formData}).then((res) => {
-    iinfer.hide_loading();
+    cmdbox.hide_loading();
     if (!res.ok) {
-      iinfer.message(`Error: ${res.status} ${res.statusText}\nCould not connect to webcap process.`);
+      cmdbox.message(`Error: ${res.status} ${res.statusText}\nCould not connect to webcap process.`);
       webcap.rec_stop();
     }
   }).catch((e) => {
-    iinfer.message(`Error: ${e} ${webcap.pipeline.url}`);
+    cmdbox.message(`Error: ${e} ${webcap.pipeline.url}`);
     webcap.rec_stop();
   }).finally(() => {
     window.setTimeout(webcap.rec, 1000 / webcap.pipeline.capture_fps);
   });
 };
 /** callbackを表示 */
-webcap.callback = () => {
+webcap.callback_reconnectInterval_handler = null;
+webcap.callback_ping_handler = null;
+webcap.callback = async () => {
+  if (webcap.callback_reconnectInterval_handler) {
+    clearInterval(webcap.callback_reconnectInterval_handler);
+  }
+  if (webcap.callback_ping_handler) {
+    clearInterval(webcap.callback_ping_handler);
+  }
   const protocol = window.location.protocol.endsWith('s:') ? 'wss:' : 'ws:';
   const host = window.location.hostname;
   const port = window.location.port;
@@ -267,6 +275,21 @@ webcap.callback = () => {
       table_body.find('tr:first').addClass('fs-1').removeClass('fs-5');
     }
   };
+  ws.onopen = () => {
+    const ping = () => {ws.send('ping');};
+    const timout = webcap.pipeline && webcap.pipeline.capture_fps ? 1000 / webcap.pipeline.capture_fps : 1000;
+    webcap.callback_ping_handler = setInterval(() => {ping();}, timout);
+  };
+  ws.onerror = (e) => {
+    console.error(`Websocket error: ${e}`);
+    clearInterval(webcap.callback_ping_handler);
+  };
+  ws.onclose = () => {
+    clearInterval(cmdbox.gui_callback_ping_handler);
+    webcap.callback_reconnectInterval_handler = setInterval(() => {
+      webcap.callback();
+    }, 3000);
+  };
   const filter_output = (src, keys, dst) => {
     for (const key of keys) {
       if (src[key]) {
@@ -282,15 +305,15 @@ webcap.callback = () => {
   }
 }
 $(() => {
-  iinfer.show_loading();
+  cmdbox.show_loading();
   // ダークモード対応
-  iinfer.change_dark_mode(window.matchMedia('(prefers-color-scheme: dark)').matches);
+  cmdbox.change_dark_mode(window.matchMedia('(prefers-color-scheme: dark)').matches);
   // copyright表示
-  iinfer.copyright();
+  cmdbox.copyright();
   // バージョン情報モーダル初期化
-  iinfer.init_version_modal();
+  cmdbox.init_version_modal();
   // モーダルボタン初期化
-  iinfer.init_modal_button();
+  cmdbox.init_modal_button();
   // webcapモード初期化
   webcap.init();
   // 推論結果受信

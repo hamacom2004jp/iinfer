@@ -1,19 +1,31 @@
-from iinfer.app import common, web, feature
-from iinfer.app.commons import convert
-from iinfer.app.features.web import iinfer_web_exec_cmd
+from cmdbox.app import common
+from cmdbox.app.commons import convert
+from cmdbox.app.features.web import cmdbox_web_exec_cmd
+from iinfer import version
+from iinfer.app.web import Web
+from fastapi import FastAPI, Request, Response, HTTPException
+from fastapi.responses import StreamingResponse
 from pathlib import Path
-import bottle
+import io
 
 
-class AnnoGetImg(iinfer_web_exec_cmd.ExecCmd):
-    def __init__(self):
-        super().__init__()
-    
-    def route(self, web:web.Web, app:bottle.Bottle) -> None:
-        @app.route('/annotation/get_img/<constr>')
-        def anno_get_img(constr:str):
-            if not web.check_signin():
-                return bottle.redirect(f'/signin/annotation/get_img/{constr}')
+class AnnoGetImg(cmdbox_web_exec_cmd.ExecCmd):
+    def __init__(self, ver=version):
+        super().__init__(ver=ver)
+
+    def route(self, web:Web, app:FastAPI) -> None:
+        """
+        webモードのルーティングを設定します
+
+        Args:
+            web (Web): Webオブジェクト
+            app (FastAPI): FastAPIオブジェクト
+        """
+        @app.get('/annotation/get_img/{constr}')
+        async def anno_get_img(req:Request, res:Response, constr:str):
+            signin = web.check_signin(req, res)
+            if signin is not None:
+                return dict(warn=f'Please log in to retrieve session.')
             try:
                 host, port, svname, password, path, scope, img_thumbnail = convert.b64str2str(constr).split('\t')
                 data_dir = web.data if scope == 'client' else Path.cwd()
@@ -23,10 +35,9 @@ class AnnoGetImg(iinfer_web_exec_cmd.ExecCmd):
                 ret = self.exec_cmd(web, 'file_download', opt, nothread)
                 if len(ret) == 0 or 'success' not in ret[0] or 'data' not in ret[0]['success']:
                     return common.to_str(ret)
-                bottle.response.content_type = ret[0]['success']['mime_type']
-                bottle.response.headers['Cache-Control'] = f'no-cache'
-                return convert.b64str2bytes(ret[0]['success']['data'])
+                mime = ret[0]['success']['mime_type']
+                return StreamingResponse(io.BytesIO(convert.b64str2bytes(ret[0]['success']['data'])),
+                                         headers={'Cache-Control':'no-cache'},
+                                         media_type=mime)
             except Exception as e:
-                web.logger.warning(f'Missing specified file or not an image {e}')
-                bottle.abort(404, 'Missing specified file or not an image.')
-                return
+                raise HTTPException(status_code=404, detail='Missing specified file or not an image.') from e

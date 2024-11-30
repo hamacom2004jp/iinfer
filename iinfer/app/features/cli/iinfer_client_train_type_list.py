@@ -1,13 +1,14 @@
-from iinfer.app import common
-from iinfer.app.feature import Feature
+from cmdbox.app import common, feature
+from iinfer import version
+from iinfer.app import common as cmn
 from typing import Dict, Any, Tuple
 import argparse
 import logging
 
 
-class ClientTrainTypeList(Feature):
-    def __init__(self):
-        pass
+class ClientTrainTypeList(feature.Feature):
+    def __init__(self, ver=version):
+        super().__init__(ver=ver)
 
     def get_mode(self):
         """
@@ -71,7 +72,7 @@ class ClientTrainTypeList(Feature):
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
         type_list = [dict(train_type=key, site=val['site'],
-                            model_type=f"{val['model_type'].__module__}.{val['model_type'].__name__}") for key,val in common.BASE_TRAIN_MODELS.items()]
+                            model_type=f"{val['model_type'].__module__}.{val['model_type'].__name__}") for key,val in cmn.BASE_TRAIN_MODELS.items()]
         type_list.append(dict(train_type='Custom', site='Custom'))
         ret = dict(success=type_list)
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append)

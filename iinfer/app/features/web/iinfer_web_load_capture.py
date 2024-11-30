@@ -1,32 +1,41 @@
-from iinfer.app import common, web, feature
-from iinfer.app.commons import convert
+from cmdbox.app import feature
+from cmdbox.app.commons import convert
+from cmdbox.app.web import Web
+from iinfer import version
+from fastapi import FastAPI, Request, Response
 from typing import List, Dict, Any
 from pathlib import Path
-import bottle
-import json
 import logging
 
 
 class LoadCapture(feature.WebFeature):
-    def __init__(self):
-        super().__init__()
-    
-    def route(self, web:web.Web, app:bottle.Bottle) -> None:
-        @app.route('/gui/load_capture', method='POST')
-        def load_capture():
-            if not web.check_signin():
-                return common.to_str(dict(warn=f'Please log in to retrieve session.'))
-            current_path = bottle.request.forms.get('current_path')
-            ret = self.load_capture(web, current_path)
-            bottle.response.content_type = 'application/json'
-            return json.dumps(ret, default=common.default_json_enc)
+    def __init__(self, ver=version):
+        super().__init__(ver=ver)
 
-    def load_capture(self, web:web.Web, current_path:str) -> List[Dict[str, Any]]:
+    def route(self, web:Web, app:FastAPI) -> None:
+        """
+        webモードのルーティングを設定します
+
+        Args:
+            web (Web): Webオブジェクト
+            app (FastAPI): FastAPIオブジェクト
+        """
+        @app.post('/gui/load_capture')
+        async def load_capture(req:Request, res:Response):
+            signin = web.check_signin(req, res)
+            if signin is not None:
+                return dict(warn=f'Please log in to retrieve session.')
+            form = await req.form()
+            current_path = form.get('current_path')
+            ret = self.load_capture(web, current_path)
+            return ret
+
+    def load_capture(self, web:Web, current_path:str) -> List[Dict[str, Any]]:
         """
         キャプチャファイルを読み込む
 
         Args:
-            web (web.Web): Webオブジェクト
+            web (Web): Webオブジェクト
             current_path (str): カレントパス
 
         Returns:
@@ -34,7 +43,7 @@ class LoadCapture(feature.WebFeature):
         """
         if web.logger.level == logging.DEBUG:
             web.logger.debug(f"web.load_capture: current_path={current_path}")
-        current_path = Path(current_path)
+        current_path:Path = Path(current_path)
         if not current_path.is_file():
             return {'warn': f'A non-file was selected.: {current_path}'}
         try:
@@ -56,4 +65,28 @@ class LoadCapture(feature.WebFeature):
                 return ret
         except:
             return {'warn': f'An error occurred while reading the file.: {current_path}'}
-    
+
+    def filemenu(self, web:Web) -> Dict[str, Any]:
+        """
+        ファイルメニューの情報を返します
+
+        Args:
+            web (Web): Webオブジェクト
+        
+        Returns:
+            Dict[str, Any]: fileメニュー情報
+        
+        Sample:
+            {
+                'filer': {
+                    'html': 'Filer',
+                    'href': 'filer',
+                    'target': '_blank',
+                    'css_class': 'dropdown-item'
+                    'onclick': 'alert("filer")'
+                }
+            }
+        """
+        return dict(open_capture=dict(html='Open capture<input type="hidden" id="open_capture_path" value=""/>',
+                                      href='#', target='', css_class='dropdown-item',
+                                      onclick='open_capture_func(`open_capture_path`)'))

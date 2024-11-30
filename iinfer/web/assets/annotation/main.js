@@ -1,15 +1,15 @@
 
 $(() => {
   // ダークモード対応
-  iinfer.change_dark_mode(window.matchMedia('(prefers-color-scheme: dark)').matches);
+  cmdbox.change_dark_mode(window.matchMedia('(prefers-color-scheme: dark)').matches);
   // スプリッター初期化
   $('.split-pane').splitPane();
   // copyright表示
-  iinfer.copyright();
+  cmdbox.copyright();
   // バージョン情報モーダル初期化
-  iinfer.init_version_modal();
+  cmdbox.init_version_modal();
   // モーダルボタン初期化
-  iinfer.init_modal_button();
+  cmdbox.init_modal_button();
   // アノテーション画面初期化
   anno.onload();
 });

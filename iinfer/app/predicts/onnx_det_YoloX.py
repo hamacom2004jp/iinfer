@@ -1,7 +1,8 @@
+from cmdbox.app import common
+from cmdbox.app.commons import convert
 from pathlib import Path
 from PIL import Image
-from iinfer.app import common, predict
-from iinfer.app.commons import convert
+from iinfer.app import predict
 from typing import List, Tuple, Union
 import cv2
 import logging

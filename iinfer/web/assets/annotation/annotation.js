@@ -6,7 +6,7 @@ anno.canvas_container = $('#canvas_container');
  **/
 anno.deploy_list = () => {
   // deploy_listの取得
-  iinfer.deploy_list(anno.left_container).then(res => {
+  cmdbox.deploy_list(anno.left_container).then(res => {
     if (!res) return;
     const deploy_names_elem = anno.left_container.find('.deploy_names');
     res['data'].forEach(data => {
@@ -19,7 +19,7 @@ anno.deploy_list = () => {
     });
     deploy_names_elem.change();
   }).catch((e) => {
-    iinfer.hide_loading();
+    cmdbox.hide_loading();
     console.log(e);
   });
 };
@@ -44,11 +44,11 @@ anno.clear_labels = () => {
  **/
 anno.load_conf = (svpath) => {
   if (!svpath) {
-    iinfer.message('No deployments include train datasets.');
+    cmdbox.message('No deployments include train datasets.');
     return;
   }
   // conf.jsonの取得
-  iinfer.file_download(anno.left_container, `${svpath}/conf.json`).then(res => {
+  cmdbox.file_download(anno.left_container, `${svpath}/conf.json`).then(res => {
     if (!res) return;
     anno.clear_canvas();
     anno.clear_labels();
@@ -74,7 +74,7 @@ anno.load_conf = (svpath) => {
       if (!label || !color) return;
       anno.add_label(label, color, tags_labels_elem);
       tags_labels_elem.find('.new_label').val('');
-      tags_labels_elem.find('.new_label_color').attr('value', `#${iinfer.randam_color()}`);
+      tags_labels_elem.find('.new_label_color').attr('value', `#${cmdbox.randam_color()}`);
       event.stopPropagation();
     });
   });
@@ -84,18 +84,18 @@ anno.load_conf = (svpath) => {
  * @param {string} svpath label.txtのパス
  */
 anno.load_label = (svpath) => {
-  iinfer.file_download(anno.left_container, svpath).then(res => {
+  cmdbox.file_download(anno.left_container, svpath).then(res => {
     if (!res) return
     const labels = atob(res['data']).split(/\r?\n/);
     const tags_labels_elem = anno.canvas_container.find('#tags_labels');
     tags_labels_elem.children('.dropdown-labels').remove();
     labels.forEach((label, i) => {
-      const color = iinfer.randam_color();
+      const color = cmdbox.randam_color();
       anno.add_label(label, color, tags_labels_elem);
     });
   }).finally(() => {
     anno.canvas_container.find('#tags_labels .dropdown-item:first').click();
-    iinfer.hide_loading();
+    cmdbox.hide_loading();
   });
 };
 /**
@@ -127,7 +127,7 @@ anno.add_label = (label, color, tags_labels_elem) => {
     anno.tool.label = f_a_elem.attr('data-label');
     anno.tool.color = f_a_elem.attr('data-color');
     anno.tool.label = anno.tool.label ? anno.tool.label : '';
-    anno.tool.color = anno.tool.color ? anno.tool.color : iinfer.randam_color();
+    anno.tool.color = anno.tool.color ? anno.tool.color : cmdbox.randam_color();
     anno.canvas_container.find('.tag_label').text(anno.tool.label);
     anno.canvas_container.find('.tag_label_color').attr('value', `#${anno.tool.color}`);
     anno.reflesh_svg();
@@ -163,7 +163,7 @@ anno.get_tool_labels = () => {
  * @param {string} svpath color.txtのパス
  **/
 anno.load_color = (svpath) => {
-  iinfer.file_download(anno.left_container, svpath).then(res => {
+  cmdbox.file_download(anno.left_container, svpath).then(res => {
     if (!res) return;
     const colors = atob(res['data']).split(/\r?\n/);
     const set_colors = (colors) => {
@@ -179,7 +179,7 @@ anno.load_color = (svpath) => {
             return c.toString(16).padStart(2, '0');
           }).join('');
         } else {
-          color = iinfer.randam_color();
+          color = cmdbox.randam_color();
         }
         $(ak).attr('data-color', color).find('input').attr('value', `#${color}`);
       });
@@ -189,7 +189,7 @@ anno.load_color = (svpath) => {
     anno.reflesh_svg();
   }).finally(() => {
     anno.canvas_container.find('#tags_labels .dropdown-item:first').click();
-    iinfer.hide_loading();
+    cmdbox.hide_loading();
   });
 };
 /**
@@ -210,10 +210,10 @@ anno.get_tool_colors = () => {
 anno.save_label_color = (svpath) => {
   const conf = anno.tool.conf;
   if (!conf['deploy_dir']) {
-    iinfer.message('deploy_dir is not set');
+    cmdbox.message('deploy_dir is not set');
     return;
   }
-  iinfer.show_loading();
+  cmdbox.show_loading();
   anno.blur_comp();
   let label_file = null;
   let color_file = null;
@@ -236,11 +236,11 @@ anno.save_label_color = (svpath) => {
   formData.append('files', new Blob([labels.join('\n')], {type:"text/plain"}), label_file);
   formData.append('files', new Blob([colors.join('\n')], {type:"text/plain"}), color_file);
   formData.append('files', new Blob([JSON.stringify(conf,null,4)], {type:"text/plain"}), '/conf.json');
-  iinfer.file_upload(anno.left_container, svpath, formData, orverwrite=true, progress_func=(e) => {}, success_func=(target, svpath, data) => {
-    iinfer.hide_loading();
-    iinfer.message(`Saved in. label_file=${svpath}${label_file}, color_file=${svpath}${color_file}`);
+  cmdbox.file_upload(anno.left_container, svpath, formData, orverwrite=true, progress_func=(e) => {}, success_func=(target, svpath, data) => {
+    cmdbox.hide_loading();
+    cmdbox.message(`Saved in. label_file=${svpath}${label_file}, color_file=${svpath}${color_file}`);
   }, error_func=(target, svpath, data) => {
-    iinfer.hide_loading();
+    cmdbox.hide_loading();
   });
 };
 /**
@@ -250,14 +250,14 @@ anno.save_label_color = (svpath) => {
  * @param {function} notfound_func アノテーションファイルが見つからなかったときのコールバック関数
  **/
 anno.load_anno = (image_path, exists_func, notfound_func) => {
-  iinfer.file_download(anno.left_container, `${image_path}.svg`, error_func=notfound_func).then(res => {
+  cmdbox.file_download(anno.left_container, `${image_path}.svg`, error_func=notfound_func).then(res => {
     if (!res) {
-      iinfer.hide_loading();
+      cmdbox.hide_loading();
       return;
     }
     const svg_str = atob(res['data']);
     exists_func(svg_str);
-    iinfer.hide_loading();
+    cmdbox.hide_loading();
   });
 };
 /**
@@ -269,33 +269,33 @@ anno.load_anno = (image_path, exists_func, notfound_func) => {
  * @return {void}
  **/
 anno.save_anno = (svpath, image_path, svg_elem, nomsg=false, success_func=undefined) => {
-  iinfer.show_loading();
+  cmdbox.show_loading();
   anno.blur_comp(svg_elem);
   const svg_str = svg_elem.prop('outerHTML');
   const formData = new FormData();
   image_path = image_path.replace(svpath, '');
   formData.append('files', new Blob([svg_str], {type:"image/svg+xml"}), `${image_path}.svg`);
-  iinfer.file_upload(anno.left_container, svpath, formData, orverwrite=true, (e) => {}, (target, svpath, data) => {
+  cmdbox.file_upload(anno.left_container, svpath, formData, orverwrite=true, (e) => {}, (target, svpath, data) => {
     const fl_svg_elem = anno.left_container.find(`.file-list [data-path='${svpath}${image_path}.svg']`);
     const fl_img_elem = anno.left_container.find(`.file-list [data-path='${svpath}${image_path}']`);
     const svg_src = fl_svg_elem.attr('src');
     const img_src = fl_img_elem.attr('src');
     if (svg_src) {
       // アノテーション画像がすでに存在している場合はリロード
-      fl_svg_elem.attr('src', `${svg_src.split('?')[0]}?r=${iinfer.randam_string(8)}`);
+      fl_svg_elem.attr('src', `${svg_src.split('?')[0]}?r=${cmdbox.randam_string(8)}`);
     } else if (img_src) {
       // アノテーション画像が無く元画像が存在している場合はSVGを追加
       const conary = atob(img_src.split('?')[0].split('/').slice(-1)[0]).split('\t');
       const constr = "annotation/get_img/" + btoa(`${conary.slice(0, 4).join('\t')}\t${svpath}${image_path}.svg\t${conary.slice(5, 6)}\t${conary.slice(6, 7)}`);
-      const svg_elem = $(`<img src="${constr}?r=${iinfer.randam_string(8)}" data-path="${svpath}${image_path}.svg" style="position: absolute; left: 0px; top: 0px;"/>`);
+      const svg_elem = $(`<img src="${constr}?r=${cmdbox.randam_string(8)}" data-path="${svpath}${image_path}.svg" style="position: absolute; left: 0px; top: 0px;"/>`);
       svg_elem.attr('width', fl_img_elem.attr('width')).attr('height', fl_img_elem.attr('height'));
       fl_img_elem.parent().append(svg_elem);
     }
-    iinfer.hide_loading();
-    if (!nomsg) iinfer.message(`Saved in. image_path=${svpath}${image_path}.svg`);
+    cmdbox.hide_loading();
+    if (!nomsg) cmdbox.message(`Saved in. image_path=${svpath}${image_path}.svg`);
     if (success_func) success_func(`${svpath}${image_path}.svg`);
   }, error_func=(target, svpath, data) => {
-    iinfer.hide_loading();
+    cmdbox.hide_loading();
   });
 };
 /**
@@ -386,13 +386,13 @@ anno.load_filelist = (basepath, svpath, current_ul_elem) => {
       });
     }
   }
-  iinfer.file_list(anno.left_container, svpath).then(res => {
+  cmdbox.file_list(anno.left_container, svpath).then(res => {
     current_ul_elem.html('');
     if(!res) {
-      iinfer.hide_loading();
+      cmdbox.hide_loading();
       return;
     }
-    const opt = iinfer.get_server_opt(false, anno.left_container);
+    const opt = cmdbox.get_server_opt(false, anno.left_container);
     const file_list = Object.entries(res).sort();
     // 上側ペイン
     file_list.forEach(([key, node]) => {
@@ -446,7 +446,7 @@ anno.load_filelist = (basepath, svpath, current_ul_elem) => {
         const thum_size = 100;
         const img_name = n['path'].split('/').slice(-1)[0];
         const constr = btoa(`${opt['host']}\t${opt['port']}\t${opt['svname']}\t${opt['password']}\t${n['path']}\t${opt['scope']}\t${thum_size}`);
-        const img_elem = $(`<img src="annotation/get_img/${constr}?r=${iinfer.randam_string(8)}" data-path="${n['path']}" alt="${img_name}"/>`);
+        const img_elem = $(`<img src="annotation/get_img/${constr}?r=${cmdbox.randam_string(8)}" data-path="${n['path']}" alt="${img_name}"/>`);
         let card_elem = undefined;
         // SVGファイルの場合は元画像があるかどうかを確認
         if(n['path'].endsWith('.svg')) {
@@ -480,7 +480,7 @@ anno.load_filelist = (basepath, svpath, current_ul_elem) => {
   }).catch((e) => {
     console.log(e);
   }).finally(() => {
-    iinfer.hide_loading();
+    cmdbox.hide_loading();
   });
 };
 /**
@@ -555,7 +555,7 @@ anno.load_image = (node, opt) => {
       const svg_elem = $(svg_str);
       svg_elem.css('position','absolute').css('left',`4px`).css('top',`4px`).css('width','').css('height','');
       svg_elem.children().each((i, comp) => {
-        $(comp).attr('id', iinfer.randam_string(16));
+        $(comp).attr('id', cmdbox.randam_string(16));
       });
       anno.disable_contextmenu(svg_elem); // 右クリックメニューを無効化
       card_elem.find('.card-body').append(svg_elem);
@@ -903,7 +903,7 @@ anno.make_rect_dom = (x1, y1, x2, y2, stroke, fill, stroke_width, label) => {
   const h = Math.abs(y2-y1);
   if (w <= 0 || h <= 0) return null;
   const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-  rect.setAttribute('id', iinfer.randam_string(16));
+  rect.setAttribute('id', cmdbox.randam_string(16));
   rect.setAttribute('x', Math.min(x1, x2));
   rect.setAttribute('y', Math.min(y1, y2));
   rect.setAttribute('width', w);
@@ -927,7 +927,7 @@ anno.make_rect_dom = (x1, y1, x2, y2, stroke, fill, stroke_width, label) => {
  **/
 anno.make_polylines_dom = (points_str, stroke, fill, stroke_width, label) => {
   const polyline = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
-  polyline.setAttribute('id', iinfer.randam_string(16));
+  polyline.setAttribute('id', cmdbox.randam_string(16));
   polyline.setAttribute('points', points_str);
   polyline.setAttribute('fill', `${fill}`);
   polyline.setAttribute('stroke', `${stroke}`);
@@ -949,7 +949,7 @@ anno.make_polylines_dom = (points_str, stroke, fill, stroke_width, label) => {
  **/
 anno.make_polygon_dom = (points_str, stroke, fill, stroke_width, label, lastcomp=undefined) => {
   const polygon = !lastcomp ? document.createElementNS("http://www.w3.org/2000/svg", "polygon") : lastcomp;
-  if (!lastcomp) polygon.setAttribute('id', iinfer.randam_string(16));
+  if (!lastcomp) polygon.setAttribute('id', cmdbox.randam_string(16));
   polygon.setAttribute('points', points_str);
   polygon.setAttribute('fill', `${fill}`);
   polygon.setAttribute('stroke', `${stroke}`);
@@ -1071,7 +1071,7 @@ anno.load_annoall_coco = (menu_elem) => {
   const load_path = menu_elem.attr('data-load-path');
   const load_input_path = menu_elem.attr('data-load-input-path');
   if (!load_type || !load_path || !load_input_path || !conf) {
-    iinfer.message('Annotation import error.');
+    cmdbox.message('Annotation import error.');
     return;
   }
   if (!window.confirm('Caution!!: Please check the following points.\n'
@@ -1079,11 +1079,11 @@ anno.load_annoall_coco = (menu_elem) => {
     +'The SVG file records the result of annotating the image.\n'
     +'If an SVG file with the same name already exists, it will be overwritten.\n'
     +'\nShall we continue?')) return;
-  iinfer.show_loading();
-  iinfer.progress(0, 1, 0, `Loading “${load_path}” file.`, true, true);
-  iinfer.file_download(anno.left_container, load_path).then(async res => {
+  cmdbox.show_loading();
+  cmdbox.progress(0, 1, 0, `Loading “${load_path}” file.`, true, true);
+  cmdbox.file_download(anno.left_container, load_path).then(async res => {
     if (!res) {
-      iinfer.hide_loading();
+      cmdbox.hide_loading();
       return;
     }
     const anno_json = JSON.parse(atob(res['data']));
@@ -1096,19 +1096,19 @@ anno.load_annoall_coco = (menu_elem) => {
     const tags_labels_elem = anno.canvas_container.find('#tags_labels');
     tags_labels_elem.children('.dropdown-labels').remove();
     for (let i=0; i<labels.length; i++) {
-      if (i >= colors.length) colors.push(iinfer.randam_color());
+      if (i >= colors.length) colors.push(cmdbox.randam_color());
       anno.add_label(labels[i]['name'], colors[i], tags_labels_elem);
     }
     anno.canvas_container.find('#tags_labels').find('.dropdown-item:first').click();
     // 画像ファイルの存在チェック
     for(let i=0; i<images.length; i++) {
       const img = images[i];
-      iinfer.show_loading();
-      iinfer.progress(0, images.length, i, `Check image “${img['file_name']}” file.`, true, false);
-      const res = await iinfer.file_list(anno.left_container, `${load_input_path}/${img['file_name']}`);
+      cmdbox.show_loading();
+      cmdbox.progress(0, images.length, i, `Check image “${img['file_name']}” file.`, true, false);
+      const res = await cmdbox.file_list(anno.left_container, `${load_input_path}/${img['file_name']}`);
       if (!res) return;
     }
-    iinfer.show_loading();
+    cmdbox.show_loading();
     // アノテーションファイル内に定義されている画像単位で処理
     let cnt = 0;
     for(const img of images) {
@@ -1138,12 +1138,12 @@ anno.load_annoall_coco = (menu_elem) => {
           svg_elem.append($(comp));
         }
       }
-      iinfer.show_loading();
+      cmdbox.show_loading();
       anno.save_anno(deploy_dir, `${load_input_path}/${img['file_name']}`, svg_elem, true, (svg_path) => {
-        iinfer.progress(0, images.length, ++cnt, `Generate and save svg file. “${svg_path}”.`, true, false);
+        cmdbox.progress(0, images.length, ++cnt, `Generate and save svg file. “${svg_path}”.`, true, false);
         if(cnt >= images.length) {
-          iinfer.hide_loading();
-          iinfer.message(`Import complate. load_path=${load_path}, last_save_svg=${svg_path}`);
+          cmdbox.hide_loading();
+          cmdbox.message(`Import complate. load_path=${load_path}, last_save_svg=${svg_path}`);
           const current_ul_elem = anno.left_container.find('.tree-menu');
           anno.clear_canvas();
           anno.load_filelist(load_input_path, load_src, current_ul_elem);
@@ -1162,13 +1162,13 @@ anno.save_annoall_coco = (menu_elem) => {
   const deploy_dir = anno.left_container.find('.deploy_names').val();
   const conf = anno.tool.conf;
   if (!save_type || !save_src || !conf) {
-    iinfer.message('Annotation export error.');
+    cmdbox.message('Annotation export error.');
     return;
   }
   const save_path = menu_elem.attr('data-save-path').replace(deploy_dir, '');
   const labels = anno.get_tool_labels();
   if (labels.length <= 0) {
-    iinfer.message('The label is not set.');
+    cmdbox.message('The label is not set.');
     return;
   }
   if (!window.confirm('Caution!!: Please check the following points.\n'
@@ -1176,13 +1176,13 @@ anno.save_annoall_coco = (menu_elem) => {
                     +'2.Save the annotation before performing this operation.\n'
                     +'3.If an annotation file has already been saved, it will be overwritten.\n'
                     +'\nShall we continue?')) return;
-  iinfer.progress(0, 1, 0, 'Loading file list..', true, true);
-  iinfer.file_list(anno.left_container, save_src).then(res => {
+  cmdbox.progress(0, 1, 0, 'Loading file list..', true, true);
+  cmdbox.file_list(anno.left_container, save_src).then(res => {
     if(!res) {
-      iinfer.hide_loading();
+      cmdbox.hide_loading();
       return;
     }
-    const opt = iinfer.get_server_opt(false, anno.left_container);
+    const opt = cmdbox.get_server_opt(false, anno.left_container);
     const file_list = Object.entries(res).sort();
     file_list.forEach(async ([key, node]) => {
       if(!node['path']) return;
@@ -1195,7 +1195,7 @@ anno.save_annoall_coco = (menu_elem) => {
         "version": "1.0",
         "year": new Date().getFullYear(),
         "contributor": `${$('.copyright').text()}`,
-        "date_created": iinfer.toDateStr(new Date()),
+        "date_created": cmdbox.toDateStr(new Date()),
       };
       coco['licenses'] = [{
         "id": 0,
@@ -1215,22 +1215,22 @@ anno.save_annoall_coco = (menu_elem) => {
       // 選択中のディレクトリ内のファイル一覧からSVGファイルを取得
       const children = Object.entries(node['children']);
       if (children.length <= 0) {
-        iinfer.hide_loading();
-        iinfer.message('Not found SVG files.');
+        cmdbox.hide_loading();
+        cmdbox.message('Not found SVG files.');
         return;
       }
       let progress_max = children.length;
       let progress_count = 0;
       const progress_text = `Loading SVG files..`;
-      iinfer.progress(0, progress_max, progress_count, progress_text, true, false);
+      cmdbox.progress(0, progress_max, progress_count, progress_text, true, false);
       for (const [k, n] of children) {
         progress_count++;
-        iinfer.progress(0, progress_max, progress_count, progress_text, true, false);
+        cmdbox.progress(0, progress_max, progress_count, progress_text, true, false);
         if(n['is_dir']) return;
         if(!n['path'].endsWith('.svg')) continue;
         // SVGファイルの読込
         const constr = btoa(`${opt['host']}\t${opt['port']}\t${opt['svname']}\t${opt['password']}\t${n['path']}\t${opt['scope']}\t0.0`);
-        const svg_str = await (await fetch(`annotation/get_img/${constr}?r=${iinfer.randam_string(8)}`)).text();
+        const svg_str = await (await fetch(`annotation/get_img/${constr}?r=${cmdbox.randam_string(8)}`)).text();
         const svg_elem = $(svg_str);
         // 画像情報を取得
         const img_id = coco['images'].length;
@@ -1287,19 +1287,19 @@ anno.save_annoall_coco = (menu_elem) => {
         svg_elem.remove();
       }
       if (coco['annotations'].length > 0) {
-        iinfer.progress(0, 1, 0, `Writing annotation file. ${save_path}`, true, true);
+        cmdbox.progress(0, 1, 0, `Writing annotation file. ${save_path}`, true, true);
         // cocoファイルの保存
         const formData = new FormData();
         formData.append('files', new Blob([JSON.stringify(coco)], {type:"application/json"}), save_path);
-        iinfer.file_upload(anno.left_container, deploy_dir, formData, orverwrite=true, progress_func=(e) => {}, success_func=(target, svpath, data) => {
-          iinfer.hide_loading();
-          iinfer.message(`Saved in. save_path=${deploy_dir}${save_path}`);
+        cmdbox.file_upload(anno.left_container, deploy_dir, formData, orverwrite=true, progress_func=(e) => {}, success_func=(target, svpath, data) => {
+          cmdbox.hide_loading();
+          cmdbox.message(`Saved in. save_path=${deploy_dir}${save_path}`);
         }, error_func=(target, svpath, data) => {
-          iinfer.hide_loading();
+          cmdbox.hide_loading();
         });
       } else {
-        iinfer.hide_loading();
-        iinfer.message('Not found annotation data.');
+        cmdbox.hide_loading();
+        cmdbox.message('Not found annotation data.');
       }
     });
   });
@@ -1315,12 +1315,12 @@ anno.save_annoall_cityscapes = (menu_elem) => {
   const deploy_dir = anno.left_container.find('.deploy_names').val();
   const conf = anno.tool.conf;
   if (!save_type || !save_src || !conf) {
-    iinfer.message('Annotation save error.');
+    cmdbox.message('Annotation save error.');
     return;
   }
   const labels = anno.get_tool_labels();
   if (labels.length <= 0) {
-    iinfer.message('The label is not set.');
+    cmdbox.message('The label is not set.');
     return;
   }
   if (!window.confirm('Caution:\n'
@@ -1329,17 +1329,17 @@ anno.save_annoall_cityscapes = (menu_elem) => {
                     +'3.If an annotation file has already been saved, it will be overwritten.\n'
                     +'\nShall we continue?')) return;
 
-  iinfer.show_loading();
-  iinfer.progress(0, 1, 0, 'Cleaning workdir..', true, true);
+  cmdbox.show_loading();
+  cmdbox.progress(0, 1, 0, 'Cleaning workdir..', true, true);
   // 既存の作業ディレクトリを削除
-  iinfer.file_rmdir(anno.left_container, save_path.replace(/\.zip$/, ''), (res) => {}).then(res => {
-    iinfer.progress(0, 1, 0, 'Loading file list..', true, true);
-    iinfer.file_list(anno.left_container, save_src).then(res => {
+  cmdbox.file_rmdir(anno.left_container, save_path.replace(/\.zip$/, ''), (res) => {}).then(res => {
+    cmdbox.progress(0, 1, 0, 'Loading file list..', true, true);
+    cmdbox.file_list(anno.left_container, save_src).then(res => {
       return Object.entries(res).sort();
     }).then(file_list => {
       //const sleep = (time) => new Promise((resolve) => setTimeout(resolve, time));
       //anno.promises.push(sleep(15*1000));
-      const opt = iinfer.get_server_opt(false, anno.left_container);
+      const opt = cmdbox.get_server_opt(false, anno.left_container);
       const promises = [];
       const archive_file_list = [];
       file_list.forEach(([key, node]) => {
@@ -1351,16 +1351,16 @@ anno.save_annoall_cityscapes = (menu_elem) => {
         let progress_count = 0;
         children.forEach(([k, n]) => {
           progress_count++;
-          iinfer.progress(0, progress_max, progress_count, 'Loading SVG files..', true, false);
+          cmdbox.progress(0, progress_max, progress_count, 'Loading SVG files..', true, false);
           if(!n['is_dir']) return;
           const subset = n['name'];
           // 二階層目（train, val, test）のディレクトリ内を取得
-          const prom = iinfer.file_list(anno.left_container, n['path']).then(async res => {
+          const prom = cmdbox.file_list(anno.left_container, n['path']).then(async res => {
             const file_list = Object.entries(res).sort();
             progress_max += file_list.length;
             for (const [key, node] of file_list) {
               progress_count++;
-              iinfer.progress(0, progress_max, progress_count, 'Loading SVG files..', true, false);
+              cmdbox.progress(0, progress_max, progress_count, 'Loading SVG files..', true, false);
               if(!node['path']) continue;
               if(!node['path'].startsWith(save_src)) continue;
               if(!node['children']) continue;
@@ -1370,22 +1370,22 @@ anno.save_annoall_cityscapes = (menu_elem) => {
               progress_max += children.length;
               for (const [k, n] of children) {
                 progress_count++;
-                iinfer.progress(0, progress_max, progress_count, 'Generating mask images..', true, false);
+                cmdbox.progress(0, progress_max, progress_count, 'Generating mask images..', true, false);
                 if(n['is_dir']) continue;
                 if(!n['mime_type'].startsWith('image')) continue;
                 if(!n['path'].endsWith('.svg')) {
                   // SVG以外の画像ファイルの場合はコピー
                   const to_ext = n['name'].split('.').pop();
                   const to_path = save_path.replace(/\.zip$/, `/images/${subset}/${subset}_${n['name'].replace(/\.[^\.]+$/, '_leftImg8bit')}.${to_ext}`);
-                  iinfer.progress(0, progress_max, progress_count, 'Copy work image..', true, false);
-                  await iinfer.file_copy(anno.left_container, n['path'], to_path, orverwrite=true);
+                  cmdbox.progress(0, progress_max, progress_count, 'Copy work image..', true, false);
+                  await cmdbox.file_copy(anno.left_container, n['path'], to_path, orverwrite=true);
                   archive_file_list.push(to_path);
                   continue;
                 }
                 // SVGファイルの読込
                 const constr = btoa(`${opt['host']}\t${opt['port']}\t${opt['svname']}\t${opt['password']}\t${n['path']}\t${opt['scope']}\t0.0`);
-                iinfer.progress(0, progress_max, progress_count, 'Loading SVG files..', true, false);
-                const res = await fetch(`annotation/get_img/${constr}?r=${iinfer.randam_string(8)}`);
+                cmdbox.progress(0, progress_max, progress_count, 'Loading SVG files..', true, false);
+                const res = await fetch(`annotation/get_img/${constr}?r=${cmdbox.randam_string(8)}`);
                 const svg_str = await res.text();
                 const svg_elem = $(svg_str);
                 // SVGからPNGを生成
@@ -1394,7 +1394,7 @@ anno.save_annoall_cityscapes = (menu_elem) => {
                 svg_elem.children().each((i, comp) => {
                   const comp_elem = $(comp);
                   const index = labels.indexOf(comp_elem.attr('data-anno-label'));
-                  const color = iinfer.make_color4id(index); // ラベルに対応する色を取得
+                  const color = cmdbox.make_color4id(index); // ラベルに対応する色を取得
                   comp_elem.attr('stroke', `#${color}`);
                   comp_elem.attr('stroke-width', `2.0`);
                   comp_elem.attr('fill', `#${color}`);
@@ -1405,8 +1405,8 @@ anno.save_annoall_cityscapes = (menu_elem) => {
                 canvas.width = parseInt(svg_elem.attr('width'));
                 canvas.height = parseInt(svg_elem.attr('height'));
                 // SVGを同期的に読込む
-                iinfer.progress(0, progress_max, progress_count, 'Generating mask images..', true, false);
-                const img = await iinfer.load_img_sync('data:image/svg+xml;charset=utf-8;base64,' + btoa(svg_elem.prop('outerHTML')));
+                cmdbox.progress(0, progress_max, progress_count, 'Generating mask images..', true, false);
+                const img = await cmdbox.load_img_sync('data:image/svg+xml;charset=utf-8;base64,' + btoa(svg_elem.prop('outerHTML')));
                 svg_elem.remove();
                 context.drawImage(img, 0, 0, canvas.width, canvas.height);
                 // canvasからblobを生成
@@ -1416,8 +1416,8 @@ anno.save_annoall_cityscapes = (menu_elem) => {
                   formData.append('files', blob, upload_path.replace(save_src, ''));
                   archive_file_list.push(upload_path);
                   // 生成したpng画像をアップロード
-                  iinfer.progress(0, progress_max, progress_count, 'Writing mask images..', true, false);
-                  iinfer.file_upload(anno.left_container, save_src, formData, orverwrite=true, progress_func=(e) => {
+                  cmdbox.progress(0, progress_max, progress_count, 'Writing mask images..', true, false);
+                  cmdbox.file_upload(anno.left_container, save_src, formData, orverwrite=true, progress_func=(e) => {
                   }, success_func=(target, svpath, data) => {
                     $(canvas).remove();
                   }, error_func=(target, svpath, data) => {
@@ -1431,24 +1431,24 @@ anno.save_annoall_cityscapes = (menu_elem) => {
         });
       });
       Promise.all(promises).then(() => {
-        const opt = iinfer.get_server_opt(false, anno.left_container);
+        const opt = cmdbox.get_server_opt(false, anno.left_container);
         const thum_size = 0.0;
         const constr = btoa(`${opt['host']}\t${opt['port']}\t${opt['svname']}\t${opt['password']}\t${save_path}\t${opt['scope']}\t${thum_size}`);
-        iinfer.progress(0, 1, 0, 'Archiving mask images..', true, true);
+        cmdbox.progress(0, 1, 0, 'Archiving mask images..', true, true);
         fetch(`annotation/archive/${constr}`, {
           method:"POST",
           body:JSON.stringify(archive_file_list),
           headers:{"Content-Type":"application/json"}
         }).then(res => {
-          iinfer.progress(0, 1, 0, 'Cleaning mask images..', true, true);
+          cmdbox.progress(0, 1, 0, 'Cleaning mask images..', true, true);
           const rmdir_path = save_path.replace(/\.zip$/, '');
-          iinfer.file_rmdir(anno.left_container, rmdir_path, (res) => {
-            //iinfer.message(`Failed remove mask images. ${rmdir_path}`);
+          cmdbox.file_rmdir(anno.left_container, rmdir_path, (res) => {
+            //cmdbox.message(`Failed remove mask images. ${rmdir_path}`);
           }).then(res => {
-            iinfer.hide_loading();
-            iinfer.message(`Saved complate. ${save_path}`);
+            cmdbox.hide_loading();
+            cmdbox.message(`Saved complate. ${save_path}`);
           }).finally(() => {
-            iinfer.hide_loading();
+            cmdbox.hide_loading();
           });
         });
       });
@@ -1570,9 +1570,9 @@ anno.init_tool_button = () => {
  * ページ読み込み時の処理
  */
 anno.onload = () => {
-  iinfer.show_loading();
-  iinfer.get_server_opt(true, anno.left_container).then((opt) => {
-    iinfer.load_server_list(anno.left_container, (opt) => anno.deploy_list(), true, false);
+  cmdbox.show_loading();
+  cmdbox.get_server_opt(true, anno.left_container).then((opt) => {
+    cmdbox.load_server_list(anno.left_container, (opt) => anno.deploy_list(), true, false);
   });
   anno.init_tool_button();
 };

@@ -1,14 +1,15 @@
+from cmdbox.app import common, feature
 from iinfer import version
-from iinfer.app import common, install
-from iinfer.app.feature import Feature
+from iinfer.app import install
 from pathlib import Path
 from typing import Dict, Any, Tuple
 import argparse
 import logging
 
-class InstallServer(Feature):
-    def __init__(self):
-        pass
+
+class InstallServer(feature.Feature):
+    def __init__(self, ver=version):
+        super().__init__(ver=ver)
 
     def get_mode(self):
         """
@@ -44,8 +45,8 @@ class InstallServer(Feature):
                         discription_ja="省略した時は `$HONE/.iinfer` を使用します。",
                         discription_en="When omitted, `$HONE/.iinfer` is used."),
                 dict(opt="install_iinfer", type="str", default='iinfer', required=False, multi=False, hide=True, choise=None,
-                        discription_ja=f"省略した時は `iinfer` を使用します。 `iinfer=={version.__version__}` といった指定も可能です。",
-                        discription_en=f"When omitted, `iinfer` is used. You can also specify `iinfer=={version.__version__}`.",
+                        discription_ja=f"省略した時は `iinfer` を使用します。 `iinfer=={self.ver.__version__}` といった指定も可能です。",
+                        discription_en=f"When omitted, `iinfer` is used. You can also specify `iinfer=={self.ver.__version__}`.",
                         test_false={"win":"iinfer"}),
                 dict(opt="install_onnx", type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False],
                         discription_ja="dockerイメージ内に `onnxruntime` をインストールします。",

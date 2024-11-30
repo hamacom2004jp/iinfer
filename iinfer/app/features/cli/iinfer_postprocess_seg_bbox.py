@@ -1,4 +1,5 @@
-from iinfer.app import common
+from cmdbox.app import common
+from iinfer import version
 from iinfer.app.features.cli import postprocess_feature
 from iinfer.app.postprocesses import seg_bbox
 from typing import Dict, Any, Tuple
@@ -7,8 +8,8 @@ import logging
 
 
 class PostprocessSegBbox(postprocess_feature.PostprocessFeature):
-    def __init__(self):
-        pass
+    def __init__(self, ver=version):
+        super().__init__(ver=ver)
 
     def get_mode(self):
         """

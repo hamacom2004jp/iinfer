@@ -1,6 +1,7 @@
-from iinfer.app import common, client, filer
-from iinfer.app.commons import convert, redis_client
-from iinfer.app.feature import Feature
+from cmdbox.app import common, feature
+from cmdbox.app.commons import redis_client
+from iinfer import version
+from iinfer.app import client
 from pathlib import Path
 from typing import Dict, Any, Tuple, List
 import argparse
@@ -8,9 +9,9 @@ import logging
 import json
 
 
-class ClientDeployList(Feature):
-    def __init__(self):
-        pass
+class ClientDeployList(feature.Feature):
+    def __init__(self, ver=version):
+        super().__init__(ver=ver)
 
     def get_mode(self):
         """
@@ -149,7 +150,6 @@ class ClientDeployList(Feature):
         """
         st = self.deploy_list(msg[1], data_dir, logger, redis_cli, sessions)
         return st
-
 
     def deploy_list(self, reskey:str,
                     data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, sessions:Dict[str, Dict[str, Any]]) -> int:

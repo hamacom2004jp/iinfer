@@ -8,6 +8,7 @@ import requests
 import urllib3
 urllib3.disable_warnings(InsecureRequestWarning)
 
+
 class Httpreq(postprocess.Postprocess):
     def __init__(self, logger:logging.Logger, fileup_name:str='file', outputs_url:str=None, output_image_url:str=None,
                  output_image_ext:str='jpeg', output_image_prefix:str='output_', json_without_img:bool=False):

@@ -1,13 +1,14 @@
-from iinfer.app import common
-from iinfer.app.feature import Feature
+from cmdbox.app import common, feature
+from iinfer import version
+from iinfer.app import common as cmn
 from typing import Dict, Any, Tuple
 import argparse
 import logging
 
 
-class ClientPredictTypeList(Feature):
-    def __init__(self):
-        pass
+class ClientPredictTypeList(feature.Feature):
+    def __init__(self, ver=version):
+        super().__init__(ver=ver)
 
     def get_mode(self):
         """
@@ -72,7 +73,7 @@ class ClientPredictTypeList(Feature):
         """
         type_list = [dict(predict_type=key, site=val['site'], image_width=val['image_width'], image_height=val['image_height'],
                         required_model_conf=val['required_model_conf'], required_model_weight=val['required_model_weight'],
-                        model_type=f"{val['model_type'].__module__}.{val['model_type'].__name__}") for key,val in common.BASE_MODELS.items()]
+                        model_type=f"{val['model_type'].__module__}.{val['model_type'].__name__}") for key,val in cmn.BASE_MODELS.items()]
         type_list.append(dict(predict_type='Custom', site='Custom', image_width=None, image_height=None,
                                 required_model_conf=None, required_model_weight=None))
         ret = dict(success=type_list)

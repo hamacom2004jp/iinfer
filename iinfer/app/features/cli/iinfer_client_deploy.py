@@ -1,6 +1,8 @@
-from iinfer.app import common, client, server
-from iinfer.app.commons import module, redis_client
-from iinfer.app.feature import Feature
+from cmdbox.app import common, feature
+from cmdbox.app.commons import redis_client
+from iinfer import version
+from iinfer.app import client, common as cmn
+from iinfer.app.commons import module
 from pathlib import Path
 from typing import Dict, Any, Tuple, List
 import argparse
@@ -10,9 +12,9 @@ import json
 import shutil
 import urllib
 
-class ClientDeploy(Feature):
-    def __init__(self):
-        pass
+class ClientDeploy(feature.Feature):
+    def __init__(self, ver=version):
+        super().__init__(ver=ver)
 
     def get_mode(self):
         """
@@ -129,7 +131,7 @@ class ClientDeploy(Feature):
                                 "effnet":224,
                                 "custom":640}),
                 dict(opt="predict_type", type="str", default="", required=False, multi=False, hide=False,
-                        choise=['','Custom']+[key for key in common.BASE_MODELS.keys()],
+                        choise=['','Custom']+[key for key in cmn.BASE_MODELS.keys()],
                         discription_ja="AIモデルの推論タイプを指定します。",
                         discription_en="Specify the inference type of the AI model.",
                         test_true={"yolox":"mmdet_det_YoloX",
@@ -163,7 +165,7 @@ class ClientDeploy(Feature):
                         discription_ja="推論結果の可視化画像の色ファイルを指定。改行区切りで色(行indexがクラスと一致する)を指定したファイル。",
                         discription_en="Specify the color file of the visualization image of the inference result. A file specifying the color (the row index matches the class) separated by line breaks.",
                         test_true={"yolox":None}),
-                dict(opt="before_injection_type", type="str", default="", required=False, multi=True, hide=True, choise=['']+[key for key in common.BASE_BREFORE_INJECTIONS.keys()],
+                dict(opt="before_injection_type", type="str", default="", required=False, multi=True, hide=True, choise=['']+[key for key in cmn.BASE_BREFORE_INJECTIONS.keys()],
                         discription_ja="前処理を実行させるときに指定。",
                         discription_en="Specify when you want to execute preprocessing.",
                         test_true={"yolox":[None, "before_grayimg_injection"]},
@@ -180,7 +182,7 @@ class ClientDeploy(Feature):
                                 "custom":"iinfer/tools/datas/injections/before_grayimg_injection2.py"},
                         test_false={"yolox":None,
                                     "custom":"iinfer/tools/datas/injections/before_grayimg_injection2.XXX"}),
-                dict(opt="after_injection_type", type="str", default="", required=False, multi=True, hide=True, choise=['']+[key for key in common.BASE_AFTER_INJECTIONS.keys()],
+                dict(opt="after_injection_type", type="str", default="", required=False, multi=True, hide=True, choise=['']+[key for key in cmn.BASE_AFTER_INJECTIONS.keys()],
                         discription_ja="後処理を作成させるときに指定。",
                         discription_en="Specify when you want to create post-processing.",
                         test_true={"yolox":["after_det_filter_injection","after_det_jadge_injection"],
@@ -224,7 +226,7 @@ class ClientDeploy(Feature):
                                 "yolo3":False,
                                 "effnet":False}),
                 dict(opt="train_type", type="str", default="", required=False, multi=False, hide=True,
-                        choise=['','Custom']+[key for key in common.BASE_TRAIN_MODELS.keys()],
+                        choise=['','Custom']+[key for key in cmn.BASE_TRAIN_MODELS.keys()],
                         discription_ja="AIモデルの学習タイプを指定します。",
                         discription_en="Specify the train type of the AI model.",
                         test_true={"yolox":"mmdet_det_YoloX",
@@ -503,11 +505,11 @@ class ClientDeploy(Feature):
             return self.RESP_WARN
 
         if predict_type != "Custom":
-            if predict_type not in common.BASE_MODELS:
+            if predict_type not in cmn.BASE_MODELS:
                 logger.warning(f"Incorrect predict_type. '{predict_type}'")
                 redis_cli.rpush(reskey, {"warn": f"Incorrect predict_type. '{predict_type}'"})
                 return self.RESP_WARN
-            if common.BASE_MODELS[predict_type]['required_model_conf']==True and model_conf_file is None:
+            if cmn.BASE_MODELS[predict_type]['required_model_conf']==True and model_conf_file is None:
                 logger.warning(f"model_conf_file is None.")
                 redis_cli.rpush(reskey, {"warn": f"model_conf_file is None."})
                 return self.RESP_WARN

@@ -1,14 +1,15 @@
-from iinfer.app import common, postprocess
-from iinfer.app.feature import Feature
+from cmdbox.app import common, feature
+from iinfer import version
+from iinfer.app import postprocess
 import cv2
 import logging
 import time
 import sys
 
 
-class PostprocessFeature(Feature):
-    def __init__(self):
-        pass
+class PostprocessFeature(feature.Feature):
+    def __init__(self, ver=version):
+        super().__init__(ver=ver)
 
     def _to_proc(self, f, proc:postprocess.Postprocess, timeout, format, tm,
                     output_json, output_json_append, output_image_file=None, output_csv=None):

@@ -1,4 +1,4 @@
-from iinfer.app import common
+from cmdbox.app import common
 import platform
 import logging
 

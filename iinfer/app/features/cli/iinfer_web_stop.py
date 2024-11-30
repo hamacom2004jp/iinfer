@@ -1,15 +1,15 @@
-from iinfer.app import common, web
-from iinfer.app.commons import redis_client
-from iinfer.app.feature import Feature
+from cmdbox.app import common, feature
+from iinfer import version
+from iinfer.app import web
 from pathlib import Path
-from typing import Dict, Any, Tuple, List
+from typing import Dict, Any, Tuple
 import argparse
 import logging
-import traceback
 
-class WebStop(Feature):
-    def __init__(self):
-        pass
+
+class WebStop(feature.Feature):
+    def __init__(self, ver=version):
+        super().__init__(ver=ver)
 
     def get_mode(self):
         """

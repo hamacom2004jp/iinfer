@@ -1,18 +1,57 @@
-from iinfer.app import web, feature
-import bottle
+from cmdbox.app import feature
+from iinfer import version
+from iinfer.app.web import Web
+from fastapi import FastAPI, Request, Response
+from fastapi.responses import HTMLResponse, RedirectResponse
+from typing import Dict, Any
 
 
 class Webcap(feature.WebFeature):
-    def __init__(self):
-        super().__init__()
-    
-    def route(self, web:web.Web, app:bottle.Bottle) -> None:
-        @app.route('/webcap')
-        def webcap():
-            if not web.check_signin():
-                return bottle.redirect(f'/signin/webcap')
-            if web.webcap_html_data is not None:
-                return web.webcap_html_data
-            res:bottle.HTTPResponse = bottle.static_file('webcap.html', root=web.static_root)
+    def __init__(self, ver=version):
+        super().__init__(ver=ver)
+
+    def route(self, web:Web, app:FastAPI) -> None:
+        """
+        webモードのルーティングを設定します
+
+        Args:
+            web (Web): Webオブジェクト
+            app (FastAPI): FastAPIオブジェクト
+        """
+        if web.webcap_html is not None:
+            if not web.webcap_html.is_file():
+                raise FileNotFoundError(f'webcap_html is not found. ({web.webcap_html})')
+            with open(web.webcap_html, 'r', encoding='utf-8') as f:
+                web.webcap_html_data = f.read()
+
+        @app.get('/webcap', response_class=HTMLResponse)
+        @app.post('/webcap', response_class=HTMLResponse)
+        async def webcap(req:Request, res:Response):
+            signin = web.check_signin(req, res)
+            if signin is not None:
+                return RedirectResponse(url=f'/signin/webcap')
             res.headers['Access-Control-Allow-Origin'] = '*'
-            return res
+            return web.webcap_html_data
+
+    def toolmenu(self, web:Web) -> Dict[str, Any]:
+        """
+        ツールメニューの情報を返します
+
+        Args:
+            web (Web): Webオブジェクト
+        
+        Returns:
+            Dict[str, Any]: ツールメニュー情報
+        
+        Sample:
+            {
+                'filer': {
+                    'html': 'Filer',
+                    'href': 'filer',
+                    'target': '_blank',
+                    'css_class': 'dropdown-item'
+                    'onclick': 'alert("filer")'
+                }
+            }
+        """
+        return dict(webcap=dict(html='Webcap', href='webcap', target='_blank', css_class='dropdown-item'))

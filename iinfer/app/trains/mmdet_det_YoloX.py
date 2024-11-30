@@ -1,8 +1,6 @@
 from pathlib import Path
-from PIL import Image
-from iinfer.app import common, train
-from iinfer.app.commons import convert
-from typing import Dict, Tuple, Union, Any
+from iinfer.app import train
+from typing import Dict, Any
 import logging
 
 

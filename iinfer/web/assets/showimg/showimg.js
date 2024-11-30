@@ -1,12 +1,12 @@
 $(() => {
   // ダークモード対応
-  iinfer.change_dark_mode(window.matchMedia('(prefers-color-scheme: dark)').matches);
+  cmdbox.change_dark_mode(window.matchMedia('(prefers-color-scheme: dark)').matches);
   // copyright表示
-  iinfer.copyright();
+  cmdbox.copyright();
   // バージョン情報モーダル初期化
-  iinfer.init_version_modal();
+  cmdbox.init_version_modal();
   // モーダルボタン初期化
-  iinfer.init_modal_button();
+  cmdbox.init_modal_button();
 
   const sub_img = () => {
     const protocol = window.location.protocol.endsWith('s:') ? 'wss:' : 'ws:';

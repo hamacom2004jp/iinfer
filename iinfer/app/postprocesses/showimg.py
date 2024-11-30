@@ -4,9 +4,9 @@ from PIL import Image
 from typing import Dict, Tuple, Any
 from urllib3.exceptions import InsecureRequestWarning
 import logging
-import requests
 import urllib3
 urllib3.disable_warnings(InsecureRequestWarning)
+
 
 class Showimg(postprocess.Postprocess):
     def __init__(self, logger:logging.Logger, host:str='localhost', port:int=6379, password:str='password', svname:str='server', maxrecsize:int=1000):

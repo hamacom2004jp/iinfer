@@ -1,10 +1,11 @@
+from cmdbox.app.commons import convert
 from iinfer.app import postprocess
-from iinfer.app.commons import convert
 from iinfer.app.injections import after_seg_bbox_injection
 from PIL import Image
 from typing import Dict, Tuple, Any
 import cv2
 import logging
+
 
 class SegBBox(postprocess.Postprocess):
     def __init__(self, logger:logging.Logger, del_segments:bool=True, nodraw:bool=False, nodraw_bbox:bool=False, nodraw_rbbox:bool=False,

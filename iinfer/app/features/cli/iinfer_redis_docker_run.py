@@ -1,12 +1,14 @@
-from iinfer.app import common, feature, redis
+from cmdbox.app import common, feature
+from iinfer import version
+from iinfer.app import redis
 from typing import Dict, Any, Tuple
 import argparse
 import logging
 
 
 class RedisDockerRun(feature.Feature):
-    def __init__(self):
-        pass
+    def __init__(self, ver=version):
+        super().__init__(ver=ver)
 
     def get_mode(self):
         """

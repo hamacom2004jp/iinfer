@@ -1,14 +1,14 @@
+from cmdbox.app import common, feature
 from iinfer import version
-from iinfer.app import common, install
-from iinfer.app.feature import Feature
-from pathlib import Path
+from iinfer.app import install
 from typing import Dict, Any, Tuple
 import argparse
 import logging
 
-class InstallRedis(Feature):
-    def __init__(self):
-        pass
+
+class InstallRedis(feature.Feature):
+    def __init__(self, ver=version):
+        super().__init__(ver=ver)
 
     def get_mode(self):
         """

@@ -1,4 +1,5 @@
-from iinfer.app import common, injection
+from cmdbox.app import common
+from iinfer.app import injection
 from PIL import Image
 from typing import Tuple, Dict, Any
 

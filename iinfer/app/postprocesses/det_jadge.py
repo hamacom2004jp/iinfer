@@ -1,10 +1,11 @@
+from cmdbox.app.commons import convert
 from iinfer.app import postprocess
-from iinfer.app.commons import convert
 from iinfer.app.injections import after_det_jadge_injection
 from PIL import Image
 from typing import Dict, Any, Tuple, List
 import cv2
 import logging
+
 
 class DetJadge(postprocess.Postprocess):
     def __init__(self, logger:logging.Logger,

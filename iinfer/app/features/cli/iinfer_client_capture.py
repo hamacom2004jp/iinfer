@@ -1,5 +1,6 @@
-from iinfer.app import common, client
-from iinfer.app.feature import Feature
+from cmdbox.app import common, feature
+from iinfer import version
+from iinfer.app import client
 from typing import Dict, Any, Tuple
 import cv2
 import argparse
@@ -7,9 +8,9 @@ import logging
 import time
 
 
-class ClientCapture(Feature):
-    def __init__(self):
-        pass
+class ClientCapture(feature.Feature):
+    def __init__(self, ver=version):
+        super().__init__(ver=ver)
 
     def get_mode(self):
         """

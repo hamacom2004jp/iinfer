@@ -1,5 +1,4 @@
-from iinfer.app.commons import convert
-from iinfer.app import injection
+from cmdbox.app.commons import convert
 from pathlib import Path
 from PIL import Image
 from typing import Dict, Tuple, Any

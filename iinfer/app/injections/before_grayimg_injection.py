@@ -3,6 +3,7 @@ from PIL import Image
 from typing import Dict, Any
 import logging
 
+
 class BeforeGrayimgInjection(injection.BeforeInjection):
     """
     このクラスは推論を実行する前処理のインジェクションクラスです。

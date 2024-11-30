@@ -1,5 +1,6 @@
-from iinfer.app import common, injection
-from iinfer.app.commons import convert
+from cmdbox.app import common
+from cmdbox.app.commons import convert
+from iinfer.app import injection
 from PIL import Image
 from typing import Tuple, Dict, Any, List
 import numpy as np

@@ -1,42 +1,49 @@
-from iinfer.app import common, web, feature
-from iinfer.app.commons import convert, redis_client
-import bottle
+from cmdbox.app import common, feature
+from cmdbox.app.commons import convert, redis_client
+from iinfer import version
+from iinfer.app.web import Web
+from fastapi import FastAPI, HTTPException, WebSocket
+from starlette.websockets import WebSocketDisconnect
 import gevent
 import logging
 import json
 import queue
-import time
-import traceback
 
 
 class SubImg(feature.WebFeature):
-    def __init__(self):
-        super().__init__()
-    
-    def route(self, web:web.Web, app:bottle.Bottle) -> None:
+    def __init__(self, ver=version):
+        super().__init__(ver=ver)
+
+    def route(self, web:Web, app:FastAPI) -> None:
+        """
+        webモードのルーティングを設定します
+
+        Args:
+            web (Web): Webオブジェクト
+            app (FastAPI): FastAPIオブジェクト
+        """
         redis_cli = None
         if not web.client_only:
             redis_cli = redis_client.RedisClient(web.logger, host=web.redis_host, port=web.redis_port, password=web.redis_password, svname=web.svname)
-        @app.route('/webcap/sub_img')
-        @app.route('/showimg/sub_img')
-        def sub_img():
-            if not web.check_signin():
-                return common.to_str(dict(warn=f'Please log in to retrieve session.'))
-            wsock = bottle.request.environ.get('wsgi.websocket') # type: ignore
+        @app.websocket('/webcap/sub_img')
+        @app.websocket('/showimg/sub_img')
+        async def sub_img(wsock: WebSocket):
+            await wsock.accept()
             if web.logger.level == logging.DEBUG:
                 web.logger.debug(f"web.sub_img: connected")
             if not wsock:
-                bottle.abort(400, 'Expected WebSocket request.')
+                raise HTTPException(status_code=400, detail='Expected WebSocket request.')
             while True:
                 outputs:dict = None
                 try:
                     try:
+                        await wsock.receive_text() # これを行わねば非同期処理にならない。。
                         outputs = web.img_queue.get(block=True, timeout=0.001)
                     except queue.Empty:
                         if redis_cli is not None:
                             cmd, outputs = redis_cli.receive_showimg()
                     if outputs is None:
-                        gevent.sleep(0.1)
+                        gevent.sleep(0.001)
                         continue
                     outputs['outputs_key'] = web.outputs_key
                     if outputs['outputs_key'] is None or len(outputs['outputs_key']) <= 0:
@@ -67,9 +74,11 @@ class SubImg(feature.WebFeature):
                         outputs['img_url'] = jpg_url
                         outputs['img_id'] = fn
                     wsock.send(json.dumps(outputs, default=common.default_json_enc))
+                except WebSocketDisconnect:
+                    web.logger.warning('web.sub_img: websocket disconnected.')
+                    raise HTTPException(status_code=400, detail='web.sub_img: websocket disconnected.')
                 except:
                     if outputs is not None:
                         web.img_queue.put(outputs) # エラーが発生した場合はキューに戻す
                     web.logger.warning('web.start.sub_img:websocket error', exc_info=True)
-                    bottle.abort(400, 'Expected WebSocket request.')
-                    return
+                    raise HTTPException(status_code=400, detail='Expected WebSocket request.')

@@ -1,12 +1,10 @@
-from iinfer.app import common, feature, predict, train, injection
+from cmdbox.app.commons import module
+from iinfer.app import common as cmn, predict, train, injection
 from pathlib import Path
 from typing import List, Dict, Any, Tuple
 import importlib.util
 import inspect
-import iinfer
 import logging
-import pkgutil
-import iinfer
 
 
 def load_custom_predict(custom_predict_py:Path, logger:logging.Logger) -> predict.Predict:
@@ -73,10 +71,10 @@ def build_predict(predict_type:str, custom_predict_py:str, logger:logging.Logger
     if predict_type == 'Custom':
         custom_predict_py = Path(custom_predict_py) if custom_predict_py is not None else None
         if custom_predict_py is None:
-            logger.warn(f"predict_type is Custom but custom_predict_py is None.")
+            logger.warning(f"predict_type is Custom but custom_predict_py is None.")
             return False, {"warn": f"predict_type is Custom but custom_predict_py is None."}
         if not custom_predict_py.exists():
-            logger.warn(f"custom_predict_py path {str(custom_predict_py)} does not exist")
+            logger.warning(f"custom_predict_py path {str(custom_predict_py)} does not exist")
             return False, {"warn": f"custom_predict_py path {str(custom_predict_py)} does not exist"}
         predict_obj = load_custom_predict(custom_predict_py, logger)
     else:
@@ -98,10 +96,10 @@ def build_train(train_type:str, custom_train_py:str, logger:logging.Logger) -> T
     if train_type == 'Custom':
         custom_train_py = Path(custom_train_py) if custom_train_py is not None else None
         if custom_train_py is None:
-            logger.warn(f"train_type is Custom but custom_train_py is None.")
+            logger.warning(f"train_type is Custom but custom_train_py is None.")
             return False, {"warn": f"train_type is Custom but custom_train_py is None."}
         if not custom_train_py.exists():
-            logger.warn(f"custom_train_py path {str(custom_train_py)} does not exist")
+            logger.warning(f"custom_train_py path {str(custom_train_py)} does not exist")
             return False, {"warn": f"custom_train_py path {str(custom_train_py)} does not exist"}
         train_obj = load_custom_train(custom_train_py, logger)
     else:
@@ -243,82 +241,21 @@ def load_after_injections(after_injection_py:List[Path], config:Dict[str,Any], l
                 injections.append(obj(config, logger))
     return injections
 
-def get_module_list(package_name) -> List[str]:
-    """
-    パッケージ内のモジュール名のリストを取得します。
 
-    Args:
-        package_name (str): パッケージ名
-
-    Returns:
-        List[str]: モジュール名のリスト
-    """
-    package = __import__(package_name, fromlist=[''])
-    return [name for _, name, _ in pkgutil.iter_modules(package.__path__)]
-
-def load_features(package_name:str) -> Dict[str, Any]:
-    """
-    フィーチャーを読み込みます。
-
-    Args:
-        package_name (str): パッケージ名
-    Returns:
-        Dict[str, Any]: フィーチャーのリスト
-    """
-    features = dict()
-    package = __import__(package_name, fromlist=[''])
-    for finder, name, ispkg in pkgutil.iter_modules(package.__path__):
-        if name.startswith('iinfer_'):
-            mod = importlib.import_module(f"{package_name}.{name}")
-            members = inspect.getmembers(mod, inspect.isclass)
-            for name, cls in members:
-                if cls is feature.Feature or not issubclass(cls, feature.Feature):
-                    continue
-                fobj = cls()
-                mode = fobj.get_mode()
-                cmd = fobj.get_cmd()
-                if mode not in features:
-                    features[mode] = dict()
-                features[mode][cmd] = fobj.get_option()
-                features[mode][cmd]['feature'] = fobj
-    return features
-
-def load_webfeatures(package_name:str) -> List[feature.WebFeature]:
-    """
-    Webフィーチャーを読み込みます。
-
-    Args:
-        package_name (str): パッケージ名
-    Returns:
-        Dict[feature.WebFeature]: Webフィーチャーのリスト
-    """
-    webfeatures = list()
-    package = __import__(package_name, fromlist=[''])
-    for finder, name, ispkg in pkgutil.iter_modules(package.__path__):
-        if name.startswith('iinfer_web_'):
-            mod = importlib.import_module(f"{package_name}.{name}")
-            members = inspect.getmembers(mod, inspect.isclass)
-            for name, cls in members:
-                if cls is feature.WebFeature or not issubclass(cls, feature.WebFeature):
-                    continue
-                fobj = cls()
-                webfeatures.append(fobj)
-    return webfeatures
-    
-for mod in get_module_list('iinfer.app.predicts'):
+for mod in module.get_module_list('iinfer.app.predicts'):
     if mod.startswith('__'):
         continue
     m = importlib.import_module("iinfer.app.predicts." + mod)
     site = None
     width = None
     height = None
-    model_type = iinfer.app.predict.Predict
+    model_type = predict.Predict
     required_model_conf = False
     required_model_weight = False
     for f in dir(m):
         members = inspect.getmembers(m, inspect.isclass)
         for name, cls in members:
-            if issubclass(cls, iinfer.app.predict.Predict):
+            if issubclass(cls, predict.Predict):
                 model_type = cls
                 break
         if f == 'SITE': site = getattr(m, f)
@@ -327,34 +264,34 @@ for mod in get_module_list('iinfer.app.predicts'):
         elif f == 'MODEL_TYPE': model_type = getattr(m, f)
         elif f == 'REQUIREd_MODEL_CONF': required_model_conf = getattr(m, f)
         elif f == 'REQUIREd_MODEL_WEIGHT': required_model_weight = getattr(m, f)
-    common.BASE_MODELS[mod] = dict(site=site, image_width=width, image_height=height, model_type=model_type,
+    cmn.BASE_MODELS[mod] = dict(site=site, image_width=width, image_height=height, model_type=model_type,
                                    required_model_conf=required_model_conf, required_model_weight=required_model_weight)
 
-for mod in get_module_list('iinfer.app.trains'):
+for mod in module.get_module_list('iinfer.app.trains'):
     if mod.startswith('__'):
         continue
     m = importlib.import_module("iinfer.app.trains." + mod)
     site = None
-    model_type = iinfer.app.train.Train
+    model_type = train.Train
     for f in dir(m):
         members = inspect.getmembers(m, inspect.isclass)
         for name, cls in members:
-            if issubclass(cls, iinfer.app.train.Train):
+            if issubclass(cls, train.Train):
                 model_type = cls
                 break
         if f == 'SITE': site = getattr(m, f)
-    common.BASE_TRAIN_MODELS[mod] = dict(site=site, model_type=model_type)
+    cmn.BASE_TRAIN_MODELS[mod] = dict(site=site, model_type=model_type)
 
-for mod in get_module_list('iinfer.app.injections'):
+for mod in module.get_module_list('iinfer.app.injections'):
     if mod.startswith('__'):
         continue
     try:
         load_before_injection_type([mod], dict(), None)
-        common.BASE_BREFORE_INJECTIONS[mod] = dict()
+        cmn.BASE_BREFORE_INJECTIONS[mod] = dict()
     except:
         pass
     try:
         load_after_injection_type([mod], dict(), None)
-        common.BASE_AFTER_INJECTIONS[mod] = dict()
+        cmn.BASE_AFTER_INJECTIONS[mod] = dict()
     except:
         pass

@@ -1,16 +1,19 @@
+from cmdbox.app import common, feature
+from cmdbox.app.commons import redis_client
 from motpy import MultiObjectTracker
-from iinfer.app import common, client
-from iinfer.app.commons import module, redis_client
-from iinfer.app.feature import Feature
+from iinfer import version
+from iinfer.app import client, common as cmn
+from iinfer.app.commons import module
 from pathlib import Path
 from typing import Dict, Any, Tuple, List
 import argparse
 import logging
 import json
 
-class ClientStart(Feature):
-    def __init__(self):
-        pass
+
+class ClientStart(feature.Feature):
+    def __init__(self, ver=version):
+        super().__init__(ver=ver)
 
     def get_mode(self):
         """
@@ -214,7 +217,7 @@ class ClientStart(Feature):
             return self.RESP_WARN
         with open(conf_path, "r") as cf:
             conf = json.load(cf)
-            if conf['predict_type'] != 'Custom' and common.BASE_MODELS[conf['predict_type']]['required_model_weight']:
+            if conf['predict_type'] != 'Custom' and cmn.BASE_MODELS[conf['predict_type']]['required_model_weight']:
                 model_path = Path(conf["model_file"])
             else:
                 model_path = conf["model_file"]

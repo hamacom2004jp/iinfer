@@ -1,5 +1,6 @@
-from iinfer.app import options, injection
-from iinfer.app.commons import convert, redis_client
+from cmdbox.app import options
+from cmdbox.app.commons import convert, redis_client
+from iinfer.app import injection
 from PIL import Image
 from typing import Tuple, Dict, Any
 import logging
@@ -7,7 +8,7 @@ import logging
 class AfterShowimgInjection(injection.AfterInjection):
     def __init__(self, config:Dict[str,Any], logger:logging.Logger):
         super().__init__(config, logger)
-        opts = options.Options()
+        opts = options.Options.getInstance()
         self.default_host = opts.get_cmd_opt('server', 'start', 'host')['default']
         self.default_port = opts.get_cmd_opt('server', 'start', 'port')['default']
         self.default_password = opts.get_cmd_opt('server', 'start', 'password')['default']

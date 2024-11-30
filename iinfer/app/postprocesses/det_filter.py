@@ -1,10 +1,11 @@
+from cmdbox.app.commons import convert
 from iinfer.app import postprocess
-from iinfer.app.commons import convert
 from iinfer.app.injections import after_det_filter_injection
 from PIL import Image
 from typing import Dict, Any, Tuple, List
 import cv2
 import logging
+
 
 class DetFilter(postprocess.Postprocess):
     def __init__(self, logger:logging.Logger, score_th:float=0.0, width_th:int=0, height_th:int=0, classes:List[int]=None, labels:List[str]=None,

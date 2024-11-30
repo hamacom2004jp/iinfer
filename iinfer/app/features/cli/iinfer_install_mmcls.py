@@ -1,13 +1,14 @@
-from iinfer.app import common, install
-from iinfer.app.feature import Feature
+from cmdbox.app import common, feature
+from iinfer import version
+from iinfer.app import install
 from pathlib import Path
 from typing import Dict, Any, Tuple
 import argparse
 import logging
 
-class InstallMmcls(Feature):
-    def __init__(self):
-        pass
+class InstallMmcls(feature.Feature):
+    def __init__(self, ver=version):
+        super().__init__(ver=ver)
 
     def get_mode(self):
         """

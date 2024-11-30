@@ -1,5 +1,5 @@
+from cmdbox.app import common
 from iinfer import version
-from iinfer.app import common
 from pathlib import Path
 import getpass
 import logging
@@ -7,6 +7,7 @@ import os
 import platform
 import shutil
 import yaml
+
 
 class Install(object):
     def __init__(self, logger: logging.Logger, wsl_name: str = None, wsl_user: str = None):
@@ -47,7 +48,7 @@ class Install(object):
         user = getpass.getuser()
         install_tag = f"_{install_tag}" if install_tag is not None else ''
         with open('Dockerfile', 'w', encoding='utf-8') as fp:
-            text = read_text(f'{common.APP_ID}.docker', 'Dockerfile')
+            text = read_text(f'iinfer.docker', 'Dockerfile')
             wheel = Path(install_iinfer_tgt)
             if wheel.exists() and wheel.suffix == '.whl':
                 shutil.copy(wheel, Path('.').resolve() / wheel.name)
@@ -85,7 +86,7 @@ class Install(object):
         docker_compose_path = Path('docker-compose.yml')
         if not docker_compose_path.exists():
             with open(docker_compose_path, 'w', encoding='utf-8') as fp:
-                text = read_text(f'{common.APP_ID}.docker', 'docker-compose.yml')
+                text = read_text(f'iinfer.docker', 'docker-compose.yml')
                 fp.write(text)
         with open(f'docker-compose.yml', 'r+', encoding='utf-8') as fp:
             comp = yaml.safe_load(fp)

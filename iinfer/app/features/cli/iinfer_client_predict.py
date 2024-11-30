@@ -1,7 +1,8 @@
+from cmdbox.app import common, feature
+from cmdbox.app.commons import convert, redis_client
 from motpy import Detection
-from iinfer.app import common, client, injection, predict
-from iinfer.app.commons import convert, redis_client
-from iinfer.app.feature import Feature
+from iinfer import version
+from iinfer.app import client, injection, predict
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 from PIL import Image
@@ -11,9 +12,10 @@ import logging
 import sys
 import time
 
-class ClientPredict(Feature):
-    def __init__(self):
-        pass
+
+class ClientPredict(feature.Feature):
+    def __init__(self, ver=version):
+        super().__init__(ver=ver)
 
     def get_mode(self):
         """

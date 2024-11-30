@@ -1,33 +1,42 @@
-from iinfer.app import common, web, feature
-from iinfer.app.commons import convert
-from pathlib import Path
+from cmdbox.app import feature
+from cmdbox.app.commons import convert
+from cmdbox.app.web import Web
+from iinfer import version
+from fastapi import FastAPI, Request, Response
 from typing import List, Dict, Any
-import bottle
-import json
+from pathlib import Path
 import logging
+import json
 
 
 class LoadResult(feature.WebFeature):
-    def __init__(self):
-        super().__init__()
-    
-    def route(self, web:web.Web, app:bottle.Bottle) -> None:
-        @app.route('/gui/load_result', method='POST')
-        def load_result():
-            if not web.check_signin():
-                return common.to_str(dict(warn=f'Please log in to retrieve session.'))
-            current_path = bottle.request.forms.get('current_path')
+    def __init__(self, ver=version):
+        super().__init__(ver=ver)
+
+    def route(self, web:Web, app:FastAPI) -> None:
+        """
+        webモードのルーティングを設定します
+
+        Args:
+            web (Web): Webオブジェクト
+            app (FastAPI): FastAPIオブジェクト
+        """
+        @app.post('/gui/load_result')
+        async def load_result(req:Request, res:Response):
+            signin = web.check_signin(req, res)
+            if signin is not None:
+                return dict(warn=f'Please log in to retrieve session.')
+            form = await req.form()
+            current_path = form.get('current_path')
             ret = self.load_result(web, current_path)
-            bottle.response.content_type = 'application/json'
-            return json.dumps(ret, default=common.default_json_enc)
+            return ret
 
-
-    def load_result(self, web:web.Web, current_path:str) -> List[Dict[str, Any]]:
+    def load_result(self, web:Web, current_path:str) -> List[Dict[str, Any]]:
         """
         結果ファイルを読み込む
 
         Args:
-            web (web.Web): Webオブジェクト
+            web (Web): Webオブジェクト
             current_path (str): カレントパス
         
         Returns:
@@ -51,3 +60,29 @@ class LoadResult(feature.WebFeature):
                 return ret
         except:
             return {'warn': f'An error occurred while reading the file.: {current_path}'}
+
+
+    def filemenu(self, web:Web) -> Dict[str, Any]:
+        """
+        ファイルメニューの情報を返します
+
+        Args:
+            web (Web): Webオブジェクト
+        
+        Returns:
+            Dict[str, Any]: fileメニュー情報
+        
+        Sample:
+            {
+                'filer': {
+                    'html': 'Filer',
+                    'href': 'filer',
+                    'target': '_blank',
+                    'css_class': 'dropdown-item'
+                    'onclick': 'alert("filer")'
+                }
+            }
+        """
+        return dict(open_output_json=dict(html='Open output_json<input type="hidden" id="open_output_json_path" value=""/>',
+                                          href='#', target='', css_class='dropdown-item',
+                                          onclick='open_output_json_func(`open_output_json_path`)'))

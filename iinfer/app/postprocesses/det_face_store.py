@@ -1,4 +1,4 @@
-from iinfer.app.commons import convert
+from cmdbox.app.commons import convert
 from iinfer.app.postprocesses import det_clip
 from PIL import Image
 from typing import Dict, Tuple, Any

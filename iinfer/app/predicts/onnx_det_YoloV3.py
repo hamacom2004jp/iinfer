@@ -1,6 +1,7 @@
+from cmdbox.app import common
 from pathlib import Path
 from PIL import Image
-from iinfer.app import common, predict
+from iinfer.app import predict
 from typing import List, Tuple, Union, Any
 import logging
 import numpy as np

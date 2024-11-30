@@ -144,7 +144,7 @@ TEMP_TEST = """
 def test_{index}_{mode_key}_{cmd_key}_{name}(capfd):
     cmd = ["{opt_list}"]
 
-    _, result = app.IinferApp().main(args_list=cmd)
+    _, result = app.IinferApp.getInstance().main(args_list=cmd)
     out, err = capfd.readouterr()
     print(out)
     {test_assert}
@@ -158,7 +158,7 @@ def test_{index}_{mode_key}_{cmd_key}_{name}(capfd, monkeypatch):
 
     with open('{stdin_file}', 'br') as f:
         sys.stdin = f.buffer = f
-        _, result = app.IinferApp().main(args_list=cmd)
+        _, result = app.IinferApp.getInstance().main(args_list=cmd)
         out, err = capfd.readouterr()
         print(out)
         {test_assert}
