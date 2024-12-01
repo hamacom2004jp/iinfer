@@ -1,5 +1,5 @@
 from pathlib import Path
-from iinfer.app import common, options
+from cmdbox.app import options, common
 import glob
 import io
 

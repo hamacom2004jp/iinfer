@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>iinfer.tools.gentest &mdash; iinfer 2024/11/17 documentation</title>
+  <title>iinfer.tools.gentest &mdash; iinfer 2024/12/01 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=44d32c5e"></script>
+      <script src="../../../_static/documentation_options.js?v=78a7ace0"></script>
       <script src="../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -86,7 +86,7 @@
              
   <h1>Source code for iinfer.tools.gentest</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">iinfer.app</span> <span class="kn">import</span> <span class="n">common</span><span class="p">,</span> <span class="n">options</span>
+<span class="kn">from</span> <span class="nn">cmdbox.app</span> <span class="kn">import</span> <span class="n">options</span><span class="p">,</span> <span class="n">common</span>
 <span class="kn">import</span> <span class="nn">glob</span>
 <span class="kn">import</span> <span class="nn">io</span>
 
@@ -234,7 +234,7 @@
 <span class="s2">def test_</span><span class="si">{index}</span><span class="s2">_</span><span class="si">{mode_key}</span><span class="s2">_</span><span class="si">{cmd_key}</span><span class="s2">_</span><span class="si">{name}</span><span class="s2">(capfd):</span>
 <span class="s2">    cmd = [&quot;</span><span class="si">{opt_list}</span><span class="s2">&quot;]</span>
 
-<span class="s2">    _, result = app.IinferApp().main(args_list=cmd)</span>
+<span class="s2">    _, result = app.IinferApp.getInstance().main(args_list=cmd)</span>
 <span class="s2">    out, err = capfd.readouterr()</span>
 <span class="s2">    print(out)</span>
 <span class="s2">    </span><span class="si">{test_assert}</span>
@@ -248,7 +248,7 @@
 
 <span class="s2">    with open(&#39;</span><span class="si">{stdin_file}</span><span class="s2">&#39;, &#39;br&#39;) as f:</span>
 <span class="s2">        sys.stdin = f.buffer = f</span>
-<span class="s2">        _, result = app.IinferApp().main(args_list=cmd)</span>
+<span class="s2">        _, result = app.IinferApp.getInstance().main(args_list=cmd)</span>
 <span class="s2">        out, err = capfd.readouterr()</span>
 <span class="s2">        print(out)</span>
 <span class="s2">        </span><span class="si">{test_assert}</span>

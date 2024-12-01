@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>iinfer.app.app &mdash; iinfer 2024/11/17 documentation</title>
+  <title>iinfer.app.app &mdash; iinfer 2024/12/01 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=44d32c5e"></script>
+      <script src="../../../_static/documentation_options.js?v=78a7ace0"></script>
       <script src="../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -85,107 +85,33 @@
            <div itemprop="articleBody">
              
   <h1>Source code for iinfer.app.app</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">iinfer</span> <span class="kn">import</span> <span class="n">version</span>
-<span class="kn">from</span> <span class="nn">iinfer.app</span> <span class="kn">import</span> <span class="n">common</span><span class="p">,</span> <span class="n">client</span><span class="p">,</span> <span class="n">options</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="n">web</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">import</span> <span class="nn">argparse</span>
-<span class="kn">import</span> <span class="nn">argcomplete</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">time</span>
+<span></span><span class="kn">from</span> <span class="nn">cmdbox.app.app</span> <span class="kn">import</span> <span class="n">CmdBoxApp</span>
+<span class="kn">from</span> <span class="nn">iinfer</span> <span class="kn">import</span> <span class="n">version</span>
 
 
 <div class="viewcode-block" id="main">
 <a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.app.main">[docs]</a>
 <span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">args_list</span><span class="p">:</span><span class="nb">list</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="n">app</span> <span class="o">=</span> <span class="n">IinferApp</span><span class="p">()</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">IinferApp</span><span class="o">.</span><span class="n">getInstance</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">app</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="n">args_list</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
 
 
 <div class="viewcode-block" id="IinferApp">
 <a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.app.IinferApp">[docs]</a>
-<span class="k">class</span> <span class="nc">IinferApp</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">IinferApp</span><span class="p">(</span><span class="n">CmdBoxApp</span><span class="p">):</span>
+    <span class="n">_instance</span> <span class="o">=</span> <span class="kc">None</span>
+<div class="viewcode-block" id="IinferApp.getInstance">
+<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.app.IinferApp.getInstance">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">getInstance</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">IinferApp</span><span class="o">.</span><span class="n">_instance</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">IinferApp</span><span class="o">.</span><span class="n">_instance</span> <span class="o">=</span> <span class="n">IinferApp</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">IinferApp</span><span class="o">.</span><span class="n">_instance</span></div>
+
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">sv</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">cl</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">web</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">Options</span><span class="p">()</span>
-
-<div class="viewcode-block" id="IinferApp.main">
-<a class="viewcode-back" href="../../../resources/iinfer.app.html#iinfer.app.app.IinferApp.main">[docs]</a>
-    <span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args_list</span><span class="p">:</span><span class="nb">list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">file_dict</span><span class="p">:</span><span class="nb">dict</span><span class="o">=</span><span class="nb">dict</span><span class="p">(),</span> <span class="n">webcall</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        コマンドライン引数を処理し、サーバーまたはクライアントを起動し、コマンドを実行する。</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">prog</span><span class="o">=</span><span class="s1">&#39;iinfer&#39;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;This application generates modules to set up the application system.&#39;</span><span class="p">)</span>
-        <span class="n">opts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">list_options</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">opt</span> <span class="ow">in</span> <span class="n">opts</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
-            <span class="n">default</span> <span class="o">=</span> <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span> <span class="k">else</span> <span class="kc">None</span>
-            <span class="k">if</span> <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;action&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="o">*</span><span class="n">opt</span><span class="p">[</span><span class="s2">&quot;opts&quot;</span><span class="p">],</span> <span class="n">help</span><span class="o">=</span><span class="n">opt</span><span class="p">[</span><span class="s2">&quot;help&quot;</span><span class="p">],</span> <span class="nb">type</span><span class="o">=</span><span class="n">opt</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">],</span> <span class="n">default</span><span class="o">=</span><span class="n">default</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="n">opt</span><span class="p">[</span><span class="s2">&quot;choices&quot;</span><span class="p">])</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="o">*</span><span class="n">opt</span><span class="p">[</span><span class="s2">&quot;opts&quot;</span><span class="p">],</span> <span class="n">help</span><span class="o">=</span><span class="n">opt</span><span class="p">[</span><span class="s2">&quot;help&quot;</span><span class="p">],</span> <span class="n">default</span><span class="o">=</span><span class="n">default</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="n">opt</span><span class="p">[</span><span class="s2">&quot;action&quot;</span><span class="p">])</span>
-
-        <span class="n">argcomplete</span><span class="o">.</span><span class="n">autocomplete</span><span class="p">(</span><span class="n">parser</span><span class="p">)</span>
-        <span class="c1"># mainメソッドの起動時引数がある場合は、その引数を解析する</span>
-        <span class="k">if</span> <span class="n">args_list</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="n">args_list</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
-        <span class="c1"># 起動時引数で指定されたオプションをファイルから読み込んだオプションで上書きする</span>
-        <span class="n">args_dict</span> <span class="o">=</span> <span class="nb">vars</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">file_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="n">args_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
-        <span class="c1"># useoptオプションで指定されたオプションファイルを読み込む</span>
-        <span class="n">opt</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">loadopt</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">useopt</span><span class="p">)</span>
-        <span class="c1"># 最終的に使用するオプションにマージする</span>
-        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">args_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="n">args_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">getopt</span><span class="p">(</span><span class="n">opt</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">preval</span><span class="o">=</span><span class="n">args_dict</span><span class="p">,</span> <span class="n">withset</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">args</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">Namespace</span><span class="p">(</span><span class="o">**</span><span class="n">args_dict</span><span class="p">)</span>
-
-        <span class="n">tm</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
-        <span class="n">ret</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;success&quot;</span><span class="p">:</span><span class="sa">f</span><span class="s2">&quot;Start command. </span><span class="si">{</span><span class="n">args</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">}</span>
-
-        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">saveopt</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">useopt</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">msg</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;warn&quot;</span><span class="p">:</span><span class="sa">f</span><span class="s2">&quot;Please specify the --useopt option.&quot;</span><span class="p">}</span>
-                <span class="n">common</span><span class="o">.</span><span class="n">print_format</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json_append</span><span class="p">)</span>
-                <span class="k">return</span> <span class="mi">1</span><span class="p">,</span> <span class="n">msg</span>
-            <span class="n">common</span><span class="o">.</span><span class="n">saveopt</span><span class="p">(</span><span class="n">opt</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">useopt</span><span class="p">)</span>
-            <span class="n">ret</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;success&quot;</span><span class="p">:</span><span class="sa">f</span><span class="s2">&quot;Save options file. </span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">useopt</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">}</span>
-
-        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">version</span><span class="p">:</span>
-            <span class="n">v</span> <span class="o">=</span> <span class="n">version</span><span class="o">.</span><span class="n">__logo__</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">version</span><span class="o">.</span><span class="n">__description__</span>
-            <span class="n">common</span><span class="o">.</span><span class="n">print_format</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
-            <span class="k">return</span> <span class="mi">0</span><span class="p">,</span> <span class="n">v</span>
-
-        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">mode</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;warn&quot;</span><span class="p">:</span><span class="sa">f</span><span class="s2">&quot;mode is None. Please specify the --help option.&quot;</span><span class="p">}</span>
-            <span class="n">common</span><span class="o">.</span><span class="n">print_format</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json_append</span><span class="p">)</span>
-            <span class="k">return</span> <span class="mi">1</span><span class="p">,</span> <span class="n">msg</span>
-
-        <span class="n">common</span><span class="o">.</span><span class="n">mklogdir</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
-        <span class="n">common</span><span class="o">.</span><span class="n">copy_sample</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
-        <span class="n">common</span><span class="o">.</span><span class="n">copy_sample</span><span class="p">(</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">())</span>
-
-        <span class="n">logger</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">load_config</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">mode</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">webcall</span><span class="o">=</span><span class="n">webcall</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">cmd</span> <span class="o">!=</span> <span class="s1">&#39;webcap&#39;</span> <span class="k">else</span> <span class="kc">True</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;app.main: args.mode=</span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">mode</span><span class="si">}</span><span class="s2">, args.cmd=</span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">cmd</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-        <span class="n">feature</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">get_cmd_attr</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">mode</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">cmd</span><span class="p">,</span> <span class="s1">&#39;feature&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">feature</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">status</span><span class="p">,</span> <span class="n">ret</span><span class="p">,</span> <span class="n">obj</span> <span class="o">=</span> <span class="n">feature</span><span class="o">.</span><span class="n">apprun</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">tm</span><span class="p">)</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">server</span><span class="o">.</span><span class="n">Server</span><span class="p">):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">sv</span> <span class="o">=</span> <span class="n">obj</span>
-            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">client</span><span class="o">.</span><span class="n">Client</span><span class="p">):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">cl</span> <span class="o">=</span> <span class="n">obj</span>
-            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">web</span><span class="o">.</span><span class="n">Web</span><span class="p">):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">web</span> <span class="o">=</span> <span class="n">obj</span>
-            <span class="k">return</span> <span class="n">status</span><span class="p">,</span> <span class="n">ret</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;warn&quot;</span><span class="p">:</span><span class="sa">f</span><span class="s2">&quot;Unkown mode or cmd. mode=</span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">mode</span><span class="si">}</span><span class="s2">, cmd=</span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">cmd</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">}</span>
-            <span class="n">common</span><span class="o">.</span><span class="n">print_format</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_json_append</span><span class="p">)</span>
-            <span class="k">return</span> <span class="mi">1</span><span class="p">,</span> <span class="n">msg</span></div>
-</div>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">ver</span><span class="o">=</span><span class="n">version</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;This application generates modules to set up the application system.&quot;</span><span class="p">,</span>
+                         <span class="n">cli_features_packages</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;iinfer.app.features.cli&#39;</span><span class="p">],</span> <span class="n">cli_features_prefix</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;iinfer_&#39;</span><span class="p">])</span></div>
 
 </pre></div>
 

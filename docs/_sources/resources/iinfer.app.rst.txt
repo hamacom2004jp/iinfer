@@ -52,14 +52,6 @@ iinfer.app.install module
    :undoc-members:
    :show-inheritance:
 
-iinfer.app.options module
--------------------------
-
-.. automodule:: iinfer.app.options
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 iinfer.app.postprocess module
 -----------------------------
 
@@ -84,10 +76,10 @@ iinfer.app.redis module
    :undoc-members:
    :show-inheritance:
 
-iinfer.app.server module
-------------------------
+iinfer.app.train module
+-----------------------
 
-.. automodule:: iinfer.app.server
+.. automodule:: iinfer.app.train
    :members:
    :undoc-members:
    :show-inheritance:

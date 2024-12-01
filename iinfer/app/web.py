@@ -183,6 +183,7 @@ class Web(web.Web):
                                 "handlers":["std"],
                                 "level":"NOTSET",
                                 "qualname":"uvicorn"}}}
+
         th = web.ThreadedUvicorn(config=Config(app=app, host=self.allow_host, port=self.listen_webcap_port, log_config=log_config))
         th.start()
         try:

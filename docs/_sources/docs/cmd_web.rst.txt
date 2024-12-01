@@ -60,7 +60,6 @@ Webcap起動 : `iinfer -m web -c webcap <Option>`
     "--capture_frame_height <キャプチャーサイズ(縦px)>","","キャプチャーする画像の縦px。受信した画像をリサイズする。"
     "--capture_fps <キャプチャーFPS>","","キャプチャーする画像のFPS。webcap画面側がこの間隔で送信する。"
     "--capture_count <キャプチャー回数>","","キャプチャーする回数。指定した回数受信したら終了する。"
-    "--access_url <webcapのURL>","","クライアントからアクセスするときのURL。省略した時は `webcap/pub_img` を使用します。例えば `http://localhost:<listen_webcap_port>/webcap/pub_img` を指定します。"
 
 
 自己署名サーバー証明書生成 : `iinfer -m web -c gencert <Option>`
