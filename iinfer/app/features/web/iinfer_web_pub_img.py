@@ -1,7 +1,8 @@
 from cmdbox.app import feature
 from iinfer import version
 from iinfer.app.web import Web
-from fastapi import FastAPI, Request, Response, HTTPException, UploadFile
+from fastapi import FastAPI, Request, Response, HTTPException
+from starlette.datastructures import UploadFile
 import logging
 import time
 import traceback
@@ -21,6 +22,14 @@ class PubImg(feature.WebFeature):
         """
         @app.post('/showimg/pub_img')
         async def pub_img(req:Request, res:Response):
+            """
+            showimg又はwebcap画面に画像をwebオブジェクトのimg_queueに登録します。
+            iinferの中ではafter_http_injection.pから転送されてくる想定です。
+
+            Args:
+                req (Request): リクエスト
+                res (Response): レスポンス
+            """
             signin = web.check_signin(req, res)
             if signin is not None:
                 return dict(warn=f'Please log in to retrieve session.')

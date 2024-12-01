@@ -28,6 +28,9 @@ class SubImg(feature.WebFeature):
         @app.websocket('/webcap/sub_img')
         @app.websocket('/showimg/sub_img')
         async def sub_img(wsock: WebSocket):
+            """
+            webcap画面又はshowimg画面に対して、web.img_queue又はredisのshowimgに格納された画像を送信する。
+            """
             await wsock.accept()
             if web.logger.level == logging.DEBUG:
                 web.logger.debug(f"web.sub_img: connected")
@@ -73,7 +76,7 @@ class SubImg(feature.WebFeature):
                         outputs = dict(output_image_name=fn)
                         outputs['img_url'] = jpg_url
                         outputs['img_id'] = fn
-                    wsock.send(json.dumps(outputs, default=common.default_json_enc))
+                    await wsock.send_text(json.dumps(outputs, default=common.default_json_enc))
                 except WebSocketDisconnect:
                     web.logger.warning('web.sub_img: websocket disconnected.')
                     raise HTTPException(status_code=400, detail='web.sub_img: websocket disconnected.')
