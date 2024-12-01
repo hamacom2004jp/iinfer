@@ -16,22 +16,16 @@ VERSION = version.__version__
 PYTHON_REQUIRES = '>=3.8'
 INSTALL_REQUIRES = [
     'argcomplete',
-    'async_timeout',
-    'beaker',
-    'bottle',
-    'bottle_websocket',
+    'cmdbox',
     'cryptography',
     'motpy',
     'opencv-python',
-    'numpy',
-    'Pillow',
-    'pyyaml',
-    'redis',
     'requests',
-    'tabulate',
     'urllib3',
     'wheel',
 ]
+
+
 PACKAGES = [
     'iinfer',
     'iinfer.app',

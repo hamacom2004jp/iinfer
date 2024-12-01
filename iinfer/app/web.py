@@ -167,7 +167,23 @@ class Web(web.Web):
             return ret
 
         self.is_running = True
-        th = web.ThreadedUvicorn(config=Config(app=app, host=self.allow_host, port=self.listen_webcap_port, log_level='critical'))
+        log_config = {"version":1,
+                      "formatters":{
+                            "fmt":{
+                                "format":'%(levelname)s[%(asctime)s] - %(message)s',
+                                "class":"logging.Formatter"}},
+                      "handlers":{
+                            "std":{
+                                "class":"cmdbox.app.commons.loghandler.ColorfulStreamHandler",
+                                "level":"NOTSET",
+                                "formatter":"fmt",
+                                "stream":"ext://sys.stdout"}},
+                      "loggers":{
+                            "uvicorn":{
+                                "handlers":["std"],
+                                "level":"NOTSET",
+                                "qualname":"uvicorn"}}}
+        th = web.ThreadedUvicorn(config=Config(app=app, host=self.allow_host, port=self.listen_webcap_port, log_config=log_config))
         th.start()
         try:
             tm = time.time()

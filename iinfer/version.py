@@ -1,7 +1,7 @@
 import datetime
 
 
-dt_now = datetime.datetime(2024, 11, 25)
+dt_now = datetime.datetime(2024, 12, 1)
 __appid__ = 'iinfer'
 __title__ = 'iinfer (Image Inference Application)'
 __version__ = '0.10.0'
