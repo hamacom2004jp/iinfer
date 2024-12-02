@@ -15,5 +15,5 @@ class IinferApp(CmdBoxApp):
         return IinferApp._instance
 
     def __init__(self):
-        super().__init__(ver=version, description="This application generates modules to set up the application system.",
+        super().__init__(ver=version,
                          cli_features_packages=['iinfer.app.features.cli'], cli_features_prefix=['iinfer_'])
