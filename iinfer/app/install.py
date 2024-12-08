@@ -23,18 +23,18 @@ class Install(object):
                 return {"warn":f"wsl_name option is required."}
             if self.wsl_user is None:
                 return {"warn":f"wsl_user option is required."}
-            returncode, _ = common.cmd(f"wsl -d {self.wsl_name} -u {self.wsl_user} {cmd}", self.logger, slise=-1)
+            returncode, _, _cmd = common.cmd(f"wsl -d {self.wsl_name} -u {self.wsl_user} {cmd}", self.logger, slise=-1)
             if returncode != 0:
-                self.logger.warning(f"Failed to install redis-server.")
-                return {"error": f"Failed to install redis-server."}
-            return {"success": f"Success to install redis-server."}
+                self.logger.warning(f"Failed to install redis-server. cmd:{_cmd}")
+                return {"error": f"Failed to install redis-server. cmd:{_cmd}"}
+            return {"success": f"Success to install redis-server. cmd:{_cmd}"}
 
         elif platform.system() == 'Linux':
-            returncode, _ = common.cmd(f"{cmd}", self.logger, slise=-1)
+            returncode, _, _cmd = common.cmd(f"{cmd}", self.logger, slise=-1)
             if returncode != 0:
-                self.logger.warning(f"Failed to install redis-server.")
-                return {"error": f"Failed to install redis-server."}
-            return {"success": f"Success to install redis-server."}
+                self.logger.warning(f"Failed to install redis-server. cmd:{_cmd}")
+                return {"error": f"Failed to install redis-server. cmd:{_cmd}"}
+            return {"success": f"Success to install redis-server. cmd:{_cmd}"}
 
         else:
             return {"warn":f"Unsupported platform."}
@@ -130,87 +130,87 @@ class Install(object):
         cmd = f'docker build -t hamacom/iinfer:{version.__version__}{install_tag} -f Dockerfile .'
 
         if platform.system() == 'Linux':
-            returncode, _ = common.cmd(f"{cmd}", self.logger, slise=-1)
+            returncode, _, _cmd = common.cmd(f"{cmd}", self.logger, slise=-1)
             #os.remove('Dockerfile')
             if returncode != 0:
-                self.logger.warning(f"Failed to install iinfer-server.")
-                return {"error": f"Failed to install iinfer-server."}
-            return {"success": f"Success to install iinfer-server. and docker-compose.yml is copied."}
+                self.logger.warning(f"Failed to install iinfer-server. cmd:{_cmd}")
+                return {"error": f"Failed to install iinfer-server. cmd:{_cmd}"}
+            return {"success": f"Success to install iinfer-server. and docker-compose.yml is copied. cmd:{_cmd}"}
 
         else:
             return {"warn":f"Unsupported platform."}
 
     def onnx(self, install_use_gpu:bool=False):
-        returncode, _ = common.cmd('pip install onnxruntime', logger=self.logger, slise=-1)
+        returncode, _, _cmd = common.cmd('pip install onnxruntime', logger=self.logger, slise=-1)
         if returncode != 0:
-            self.logger.warning(f"Failed to install onnxruntime.")
-            return {"error": f"Failed to install onnxruntime."}
+            self.logger.warning(f"Failed to install onnxruntime. cmd:{_cmd}")
+            return {"error": f"Failed to install onnxruntime. cmd:{_cmd}"}
         if install_use_gpu:
-            returncode, _ = common.cmd('pip install onnxruntime-gpu', logger=self.logger, slise=-1)
+            returncode, _, _cmd = common.cmd('pip install onnxruntime-gpu', logger=self.logger, slise=-1)
             if returncode != 0:
-                self.logger.warning(f"Failed to install onnxruntime-gpu.")
-                return {"error": f"Failed to install onnxruntime-gpu."}
+                self.logger.warning(f"Failed to install onnxruntime-gpu. cmd:{_cmd}")
+                return {"error": f"Failed to install onnxruntime-gpu. cmd:{_cmd}"}
         return {"success": f"Success to install onnxruntime."}
 
     def insightface(self, data_dir: Path, install_use_gpu:bool=False):
-        returncode, _ = common.cmd('pip install cython', logger=self.logger, slise=-1)
+        returncode, _, _cmd = common.cmd('pip install cython', logger=self.logger, slise=-1)
         if returncode != 0:
-            self.logger.warning(f"Failed to install cython.")
-            return {"error": f"Failed to install cython."}
+            self.logger.warning(f"Failed to install cython. cmd:{_cmd}")
+            return {"error": f"Failed to install cython. cmd:{_cmd}"}
         ret = self.onnx(install_use_gpu)
         if "error" in ret: return ret
-        returncode, _ = common.cmd('python -m pip install --upgrade pip setuptools', logger=self.logger, slise=-1)
+        returncode, _, _cmd = common.cmd('python -m pip install --upgrade pip setuptools', logger=self.logger, slise=-1)
         if returncode != 0:
-            self.logger.warning(f"Failed to install setuptools.")
-            return {"error": f"Failed to install setuptools."}
-        returncode, _ = common.cmd('pip install insightface', logger=self.logger, slise=-1)
+            self.logger.warning(f"Failed to install setuptools. cmd:{_cmd}")
+            return {"error": f"Failed to install setuptools. cmd:{_cmd}"}
+        returncode, _, _cmd = common.cmd('pip install insightface', logger=self.logger, slise=-1)
         if returncode != 0:
-            self.logger.warning(f"Failed to install insightface.")
-            return {"error": f"Failed to install insightface."}
+            self.logger.warning(f"Failed to install insightface. cmd:{_cmd}")
+            return {"error": f"Failed to install insightface. cmd:{_cmd}"}
         return {"success": f"Success to install insightface."}
 
     def _torch(self, install_use_gpu:bool=False):
         if install_use_gpu:
-            returncode, _ = common.cmd('pip install numpy==1.26.3 torch==2.1.0 torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118', logger=self.logger, slise=-1)
+            returncode, _, _cmd = common.cmd('pip install numpy==1.26.3 torch==2.1.0 torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118', logger=self.logger, slise=-1)
         else:
-            returncode, _ = common.cmd('pip install numpy==1.26.3 torch==2.1.0 torchvision torchaudio', logger=self.logger, slise=-1)
+            returncode, _, _cmd = common.cmd('pip install numpy==1.26.3 torch==2.1.0 torchvision torchaudio', logger=self.logger, slise=-1)
         if returncode != 0:
-            self.logger.warning(f"Failed to install torch torchvision torchaudio.")
-            return {"error": f"Failed to install torch torchvision torchaudio."}
-        return {"success": f"Success to install torch torchvision torchaudio."}
+            self.logger.warning(f"Failed to install torch torchvision torchaudio. cmd:{_cmd}")
+            return {"error": f"Failed to install torch torchvision torchaudio. cmd:{_cmd}"}
+        return {"success": f"Success to install torch torchvision torchaudio. cmd:{_cmd}"}
 
     def _openmin(self, install_use_gpu:bool=False):
-        returncode, _ = common.cmd('pip install openmim', logger=self.logger, slise=-1)
+        returncode, _, _cmd = common.cmd('pip install openmim', logger=self.logger, slise=-1)
         if returncode != 0:
-            self.logger.warning(f"Failed to install openmim.")
-            return {"error": f"Failed to install openmim."}
-        return {"success": f"Success to install openmim."}
+            self.logger.warning(f"Failed to install openmim. cmd:{_cmd}")
+            return {"error": f"Failed to install openmim. cmd:{_cmd}"}
+        return {"success": f"Success to install openmim. cmd:{_cmd}"}
 
     def _mmcv(self, install_use_gpu:bool=False):
         if install_use_gpu:
-            returncode, _ = common.cmd('pip install mmcv==2.1.0 -f https://download.openmmlab.com/mmcv/dist/cu118/torch2.1/index.html', logger=self.logger, slise=-1)
+            returncode, _, _cmd = common.cmd('pip install mmcv==2.1.0 -f https://download.openmmlab.com/mmcv/dist/cu118/torch2.1/index.html', logger=self.logger, slise=-1)
             if returncode != 0:
-                self.logger.warning(f"Failed to install mmcv.")
-                return {"error": f"Failed to install mmcv."}
+                self.logger.warning(f"Failed to install mmcv. cmd:{_cmd}")
+                return {"error": f"Failed to install mmcv. cmd:{_cmd}"}
         else:
-            returncode, _ = common.cmd('mim install mmcv>=2.0.0', logger=self.logger, slise=-1)
+            returncode, _, _cmd = common.cmd('mim install mmcv>=2.0.0', logger=self.logger, slise=-1)
         if returncode != 0:
-            self.logger.warning(f"Failed to install mmcv.")
-            return {"error": f"Failed to install mmcv."}
-        return {"success": f"Success to install mmcv."}
+            self.logger.warning(f"Failed to install mmcv. cmd:{_cmd}")
+            return {"error": f"Failed to install mmcv. cmd:{_cmd}"}
+        return {"success": f"Success to install mmcv. cmd:{_cmd}"}
 
     def _transformers(self, install_use_gpu:bool=False):
-        returncode, _ = common.cmd('pip install accelerate transformers bitsandbytes sentence-transformers', logger=self.logger, slise=-1)
+        returncode, _, _cmd = common.cmd('pip install accelerate transformers bitsandbytes sentence-transformers', logger=self.logger, slise=-1)
         if returncode != 0:
-            self.logger.warning(f"Failed to install accelerate transformers bitsandbytes sentence-transformers.")
-            return {"error": f"Failed to install accelerate transformers bitsandbytes sentence-transformers."}
-        return {"success": f"Success to install accelerate transformers bitsandbytes sentence-transformers."}
+            self.logger.warning(f"Failed to install accelerate transformers bitsandbytes sentence-transformers. cmd:{_cmd}")
+            return {"error": f"Failed to install accelerate transformers bitsandbytes sentence-transformers. cmd:{_cmd}"}
+        return {"success": f"Success to install accelerate transformers bitsandbytes sentence-transformers. cmd:{_cmd}"}
 
     def mmdet(self, data_dir:Path, install_use_gpu:bool=False):
-        returncode, _ = common.cmd(f'git clone https://github.com/open-mmlab/mmdetection.git', logger=self.logger, slise=-1)
+        returncode, _, _cmd = common.cmd(f'git clone https://github.com/open-mmlab/mmdetection.git', logger=self.logger, slise=-1)
         if returncode != 0:
-            self.logger.warning(f"Failed to git clone mmdetection. Delete mmdetection as it probably already exists.")
-            return {"error": f"Failed to git clone mmdetection. Delete mmdetection as it probably already exists."}
+            self.logger.warning(f"Failed to git clone mmdetection. Delete mmdetection as it probably already exists. cmd:{_cmd}")
+            return {"error": f"Failed to git clone mmdetection. Delete mmdetection as it probably already exists. cmd:{_cmd}"}
         srcdir = Path('.') / 'mmdetection'
         shutil.copytree(srcdir, data_dir / 'mmdetection', dirs_exist_ok=True, ignore=shutil.ignore_patterns('.git'))
         shutil.rmtree(srcdir, ignore_errors=True)
@@ -222,20 +222,20 @@ class Install(object):
         ret = self._mmcv(install_use_gpu)
         if "error" in ret: return ret
 
-        ret, _ = common.cmd('mim install mmengine mmdet', logger=self.logger, slise=-1)
+        ret, _, _cmd = common.cmd('mim install mmengine mmdet', logger=self.logger, slise=-1)
         if ret != 0:
-            self.logger.warning(f"Failed to install mmengine mmdet.")
-            return {"error": f"Failed to install mmengine mmdet."}
+            self.logger.warning(f"Failed to install mmengine mmdet. cmd:{_cmd}")
+            return {"error": f"Failed to install mmengine mmdet. cmd:{_cmd}"}
 
         if srcdir.exists():
-            return {"success": f"Please remove '{srcdir / 'mmdetection'}' manually."}
-        return {"success": f"Success to install mmdet."}
+            return {"success": f"Please remove '{srcdir / 'mmdetection'}' manually. cmd:{_cmd}"}
+        return {"success": f"Success to install mmdet. cmd:{_cmd}"}
 
     def mmseg(self, data_dir:Path, install_use_gpu:bool=False):
-        returncode, _ = common.cmd(f'git clone -b main https://github.com/open-mmlab/mmsegmentation.git', logger=self.logger, slise=-1)
+        returncode, _, _cmd = common.cmd(f'git clone -b main https://github.com/open-mmlab/mmsegmentation.git', logger=self.logger, slise=-1)
         if returncode != 0:
-            self.logger.warning(f"Failed to git clone mmsegmentation. Delete mmsegmentation as it probably already exists.")
-            return {"error": f"Failed to git clone mmsegmentation. Delete mmsegmentation as it probably already exists."}
+            self.logger.warning(f"Failed to git clone mmsegmentation. Delete mmsegmentation as it probably already exists. cmd:{_cmd}")
+            return {"error": f"Failed to git clone mmsegmentation. Delete mmsegmentation as it probably already exists. cmd:{_cmd}"}
         srcdir = Path('.') / 'mmsegmentation'
         shutil.copytree(srcdir, data_dir / 'mmsegmentation', dirs_exist_ok=True, ignore=shutil.ignore_patterns('.git'))
         shutil.rmtree(srcdir, ignore_errors=True)
@@ -247,20 +247,20 @@ class Install(object):
         ret = self._mmcv(install_use_gpu)
         if "error" in ret: return ret
 
-        ret, _ = common.cmd('mim install mmengine mmsegmentation', logger=self.logger, slise=-1)
+        ret, _, _cmd = common.cmd('mim install mmengine mmsegmentation', logger=self.logger, slise=-1)
         if ret != 0:
-            self.logger.warning(f"Failed to install mmengine mmsegmentation.")
-            return {"error": f"Failed to install mmengine mmsegmentation."}
+            self.logger.warning(f"Failed to install mmengine mmsegmentation. cmd:{_cmd}")
+            return {"error": f"Failed to install mmengine mmsegmentation. cmd:{_cmd}"}
 
-        ret, _ = common.cmd('pip install ftfy', logger=self.logger, slise=-1)
+        ret, _, _cmd = common.cmd('pip install ftfy', logger=self.logger, slise=-1)
         if ret != 0:
-            self.logger.warning(f"Failed to install ftfy.")
-            return {"error": f"Failed to install ftfy."}
+            self.logger.warning(f"Failed to install ftfy. cmd:{_cmd}")
+            return {"error": f"Failed to install ftfy. cmd:{_cmd}"}
 
-        ret, _ = common.cmd('pip install regex', logger=self.logger, slise=-1)
+        ret, _, _cmd = common.cmd('pip install regex', logger=self.logger, slise=-1)
         if ret != 0:
-            self.logger.warning(f"Failed to install regex.")
-            return {"error": f"Failed to install regex."}
+            self.logger.warning(f"Failed to install regex. cmd:{_cmd}")
+            return {"error": f"Failed to install regex. cmd:{_cmd}"}
 
         if srcdir.exists():
             return {"success": f"Please remove '{srcdir / 'mmsegmentation'}' manually."}
@@ -275,18 +275,18 @@ class Install(object):
         ret = self._mmcv(install_use_gpu)
         if "error" in ret: return ret
 
-        ret, _ = common.cmd('mim install mmengine mmcls', logger=self.logger, slise=-1)
+        ret, _, _cmd = common.cmd('mim install mmengine mmcls', logger=self.logger, slise=-1)
         if ret != 0:
-            self.logger.warning(f"Failed to install mmengine mmcls.")
-            return {"error": f"Failed to install mmengine mmcls."}
+            self.logger.warning(f"Failed to install mmengine mmcls. cmd:{_cmd}")
+            return {"error": f"Failed to install mmengine mmcls. cmd:{_cmd}"}
 
-        return {"success": f"Success to install mmcls."}
+        return {"success": f"Success to install mmcls. cmd:{_cmd}"}
 
     def mmpretrain(self, data_dir:Path, install_use_gpu:bool=False):
-        returncode, _ = common.cmd(f'git clone https://github.com/open-mmlab/mmpretrain.git', logger=self.logger, slise=-1)
+        returncode, _, _cmd = common.cmd(f'git clone https://github.com/open-mmlab/mmpretrain.git', logger=self.logger, slise=-1)
         if returncode != 0:
-            self.logger.warning(f"Failed to git clone mmpretrain. Delete mmpretrain as it probably already exists.")
-            return {"error": f"Failed to git clone mmpretrain. Delete mmpretrain as it probably already exists."}
+            self.logger.warning(f"Failed to git clone mmpretrain. Delete mmpretrain as it probably already exists. cmd:{_cmd}")
+            return {"error": f"Failed to git clone mmpretrain. Delete mmpretrain as it probably already exists. cmd:{_cmd}"}
         srcdir = Path('.') / 'mmpretrain'
         shutil.copytree(srcdir, data_dir / 'mmpretrain', dirs_exist_ok=True, ignore=shutil.ignore_patterns('.git'))
         shutil.rmtree(srcdir, ignore_errors=True)
@@ -298,11 +298,11 @@ class Install(object):
         ret = self._mmcv(install_use_gpu)
         if "error" in ret: return ret
 
-        ret, _ = common.cmd('mim install mmengine mmpretrain', logger=self.logger, slise=-1)
+        ret, _, _cmd = common.cmd('mim install mmengine mmpretrain', logger=self.logger, slise=-1)
         if ret != 0:
-            self.logger.warning(f"Failed to install mmpretrain.")
-            return {"error": f"Failed to install mmpretrain."}
+            self.logger.warning(f"Failed to install mmpretrain. cmd:{_cmd}")
+            return {"error": f"Failed to install mmpretrain. cmd:{_cmd}"}
 
         if srcdir.exists():
-            return {"success": f"Please remove '{srcdir}' manually."}
-        return {"success": f"Success to install mmpretrain."}
+            return {"success": f"Please remove '{srcdir}' manually. cmd:{_cmd}"}
+        return {"success": f"Success to install mmpretrain. cmd:{_cmd}"}

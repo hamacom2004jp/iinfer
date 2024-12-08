@@ -29,7 +29,7 @@ class Showimg(feature.WebFeature):
         def showimg(req:Request, res:Response):
             signin = web.check_signin(req, res)
             if signin is not None:
-                return RedirectResponse(url=f'/signin/showimg')
+                return signin
             res.headers['Access-Control-Allow-Origin'] = '*'
             return web.showimg_html_data
 

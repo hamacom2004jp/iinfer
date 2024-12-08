@@ -1,7 +1,7 @@
 from cmdbox.app import feature
 from cmdbox.app.web import Web
 from iinfer import version
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI, Request, Response, HTTPException
 from fastapi.responses import PlainTextResponse
 
 
@@ -32,7 +32,7 @@ class PubImgProxyChk(feature.WebFeature):
             """
             signin = web.check_signin(req, res)
             if signin is not None:
-                return dict(warn=f'Please log in to retrieve session.')
+                raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
             try:
                 # 事前に接続テストすることで、keepaliveを有効にしておく（画像送信時のTCP接続が高速化できる）
                 responce = web.webcap_client.get(f'http://localhost:{port}/webcap/pub_img')

@@ -2,7 +2,7 @@ from cmdbox.app.commons import convert
 from cmdbox.app.features.web import cmdbox_web_exec_cmd
 from iinfer import version
 from iinfer.app.web import Web
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI, Request, Response, HTTPException
 from pathlib import Path
 import tempfile
 import traceback
@@ -25,7 +25,7 @@ class AnnoArchive(cmdbox_web_exec_cmd.ExecCmd):
         async def anno_archive(req:Request, res:Response, constr:str):
             signin = web.check_signin(req, res)
             if signin is not None:
-                return dict(warn=f'Please log in to retrieve session.')
+                raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
             try:
                 host, port, svname, password, output_path, scope, img_thumbnail = convert.b64str2str(constr).split('\t')
                 output_path = output_path[1:] if output_path.startswith('/') else output_path

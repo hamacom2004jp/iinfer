@@ -32,7 +32,7 @@ class PubImg(feature.WebFeature):
             """
             signin = web.check_signin(req, res)
             if signin is not None:
-                return dict(warn=f'Please log in to retrieve session.')
+                raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
             if req.headers.get('content-type').startswith('multipart/form-data'):
                 raise HTTPException(status_code=400, detail='Expected multipart request.')
             try:

@@ -29,7 +29,7 @@ class Webcap(feature.WebFeature):
         async def webcap(req:Request, res:Response):
             signin = web.check_signin(req, res)
             if signin is not None:
-                return RedirectResponse(url=f'/signin/webcap')
+                return signin
             res.headers['Access-Control-Allow-Origin'] = '*'
             return web.webcap_html_data
 

@@ -26,10 +26,10 @@ class Redis(object):
                 return {"warn":f"wsl_name option is required."}
             if self.wsl_user is None:
                 return {"warn":f"wsl_user option is required."}
-            code, _ = common.cmd(f"wsl -d {self.wsl_name} -u {self.wsl_user} {docker_cmd}" ,self.logger)
+            code, _, _cmd = common.cmd(f"wsl -d {self.wsl_name} -u {self.wsl_user} {docker_cmd}" ,self.logger)
             return {"output":code}
         elif platform.system() == 'Linux':
-            code, _ = common.cmd(docker_cmd, self.logger)
+            code, _, _cmd = common.cmd(docker_cmd, self.logger)
             return {"output":code}
         else:
             return {"warn":f"Unsupported platform."}
@@ -40,12 +40,12 @@ class Redis(object):
                 return {"warn":f"wsl_name option is required."}
             if self.wsl_user is None:
                 return {"warn":f"wsl_user option is required."}
-            code, _ = common.cmd(f"wsl -d {self.wsl_name} -u {self.wsl_user} docker stop redis", self.logger)
-            code, _ = common.cmd(f"wsl -d {self.wsl_name} -u {self.wsl_user} docker rm redis", self.logger)
+            code, _, _cmd = common.cmd(f"wsl -d {self.wsl_name} -u {self.wsl_user} docker stop redis", self.logger)
+            code, _, _cmd = common.cmd(f"wsl -d {self.wsl_name} -u {self.wsl_user} docker rm redis", self.logger)
             common.cmd(f"wsl --shutdown", self.logger)
             return {"output":code}
         elif platform.system() == 'Linux':
-            code, _ = common.cmd(f"docker stop redis", self.logger)
+            code, _, _cmd = common.cmd(f"docker stop redis", self.logger)
             return {"output":code}
         else:
             return {"warn":f"Unsupported platform."}

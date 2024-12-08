@@ -601,28 +601,28 @@ class ClientDeploy(feature.Feature):
     def _gitpull(self, data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, reskey:str, deploy_dir:Path, predict_type:str):
         if predict_type.startswith('mmpretrain_'):
             if not (data_dir / "mmpretrain").exists():
-                returncode, _ = common.cmd(f'cd {data_dir} && git clone https://github.com/open-mmlab/mmpretrain.git', logger=logger)
+                returncode, _, _cmd = common.cmd(f'cd {data_dir} && git clone https://github.com/open-mmlab/mmpretrain.git', logger=logger)
                 if returncode != 0:
-                    logger.warning(f"Failed to git clone mmpretrain.")
-                    redis_cli.rpush(reskey, {"error": f"Failed to git clone mmpretrain."})
+                    logger.warning(f"Failed to git clone mmpretrain. cmd: {_cmd}")
+                    redis_cli.rpush(reskey, {"error": f"Failed to git clone mmpretrain. cmd: {_cmd}"})
                     return self.RESP_ERROR
             shutil.copytree(data_dir / "mmpretrain" / "configs", deploy_dir / "configs", dirs_exist_ok=True)
             logger.info(f"Copy mmpretrain configs to {str(deploy_dir / 'configs')}")
         elif predict_type.startswith('mmdet_'):
             if not (data_dir / "mmdetection").exists():
-                returncode, _ = common.cmd(f'cd {data_dir} && git clone https://github.com/open-mmlab/mmdetection.git', logger=logger)
+                returncode, _, _cmd = common.cmd(f'cd {data_dir} && git clone https://github.com/open-mmlab/mmdetection.git', logger=logger)
                 if returncode != 0:
-                    logger.warning(f"Failed to git clone mmdetection.")
-                    redis_cli.rpush(reskey, {"error": f"Failed to git clone mmdetection."})
+                    logger.warning(f"Failed to git clone mmdetection. cmd: {_cmd}")
+                    redis_cli.rpush(reskey, {"error": f"Failed to git clone mmdetection. cmd: {_cmd}"})
                     return self.RESP_ERROR
             shutil.copytree(data_dir / "mmdetection" / "configs", deploy_dir / "configs", dirs_exist_ok=True)
             logger.info(f"Copy mmdetection configs to {str(deploy_dir / 'configs')}")
         elif predict_type.startswith('mmseg_'):
             if not (data_dir / "mmsegmentation").exists():
-                returncode, _ = common.cmd(f'cd {data_dir} && git clone -b main https://github.com/open-mmlab/mmsegmentation.git', logger=logger)
+                returncode, _, _cmd = common.cmd(f'cd {data_dir} && git clone -b main https://github.com/open-mmlab/mmsegmentation.git', logger=logger)
                 if returncode != 0:
-                    logger.warning(f"Failed to git clone mmsegmentation.")
-                    redis_cli.rpush(reskey, {"error": f"Failed to git clone mmsegmentation."})
+                    logger.warning(f"Failed to git clone mmsegmentation. cmd: {_cmd}")
+                    redis_cli.rpush(reskey, {"error": f"Failed to git clone mmsegmentation. cmd: {_cmd}"})
                     return self.RESP_ERROR
             shutil.copytree(data_dir / "mmsegmentation" / "configs", deploy_dir / "configs", dirs_exist_ok=True)
             logger.info(f"Copy mmsegmentation configs to {str(deploy_dir / 'configs')}")

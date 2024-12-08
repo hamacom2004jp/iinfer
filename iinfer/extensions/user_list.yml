@@ -1,0 +1,89 @@
+users:
+  - uid: 1
+    name: admin
+    password: admin
+    hash: plain
+    groups: [admin]
+  - uid: 101
+    name: user01
+    password: b75705d7e35e7014521a46b532236ec3
+    hash: md5
+    groups: [user]
+  - uid: 102
+    name: user02
+    password: a7659675668c2b34f0a456dbaa508200340dc36c
+    hash: sha1
+    groups: [readonly]
+  - uid: 103
+    name: user03
+    password: d64243e8519cce2304fffb92d31acaca622585011b40439c97e9274fae146189
+    hash: sha256
+    groups: [editor]
+groups:
+  - gid: 1
+    name: admin
+  - gid: 101
+    name: user
+  - gid: 102
+    name: readonly
+    parent: user
+  - gid: 103
+    name: editor
+    parent: user
+cmdrule:
+  policy: deny # allow, deny
+  rules:
+    - groups: [admin]
+      rule: allow
+    - groups: [user]
+      mode: client
+      cmds: [file_download, file_list, server_info]
+      rule: allow
+    - groups: [user]
+      mode: client
+      cmds: [capture, deploy_list, predict_type_list, predict, read_dir, start, stop]
+      rule: allow
+    - groups: [user]
+      mode: server
+      cmds: [list]
+      rule: allow
+    - groups: [user]
+      mode: postprocess
+      cmds: [cls_jadge, csv, det_clip, det_filter, det_jadge, httpreq, seg_bbox, seg_filter, showimg]
+      rule: allow
+    - groups: [user]
+      mode: web
+      cmds: [webcap]
+      rule: allow
+    - groups: [editor]
+      mode: client
+      cmds: [file_copy, file_mkdir, file_move, file_remove, file_rmdir, file_upload]
+      rule: allow
+    - groups: [editor]
+      mode: client
+      cmds: [deploy, train_type_list, train, undeploy]
+      rule: allow
+    - groups: [editor]
+      mode: postprocess
+      cmds: [cmd, det_face_store]
+      rule: allow
+pathrule:
+  policy: deny # allow, deny
+  rules:
+    - groups: [admin]
+      paths: [/]
+      rule: allow
+    - groups: [user]
+      paths: [/signin, /assets, /bbforce_cmd, /copyright, /dosignin, /dosignout,
+              /exec_cmd, /exec_pipe, /filer, /gui, /get_server_opt, /usesignout, /versions_cmdbox, /versions_used]
+      rule: allow
+    - groups: [user]
+      paths: [/gui/load_capture, /gui/load_result, /webcap, /showimg, /versions_iinfer]
+      rule: allow
+    - groups: [editor]
+      paths: [/annotation]
+      rule: allow
+    - groups: [readonly]
+      paths: [/gui/del_cmd, /gui/del_pipe, /gui/save_cmd, /gui/save_pipe]
+      rule: deny
+

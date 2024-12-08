@@ -2,7 +2,7 @@ from cmdbox.app import feature
 from cmdbox.app.commons import convert
 from cmdbox.app.web import Web
 from iinfer import version
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI, Request, Response, HTTPException
 from typing import List, Dict, Any
 from pathlib import Path
 import logging
@@ -24,7 +24,7 @@ class LoadCapture(feature.WebFeature):
         async def load_capture(req:Request, res:Response):
             signin = web.check_signin(req, res)
             if signin is not None:
-                return dict(warn=f'Please log in to retrieve session.')
+                raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
             form = await req.form()
             current_path = form.get('current_path')
             ret = self.load_capture(web, current_path)

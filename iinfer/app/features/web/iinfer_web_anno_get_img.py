@@ -25,7 +25,7 @@ class AnnoGetImg(cmdbox_web_exec_cmd.ExecCmd):
         async def anno_get_img(req:Request, res:Response, constr:str):
             signin = web.check_signin(req, res)
             if signin is not None:
-                return dict(warn=f'Please log in to retrieve session.')
+                raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
             try:
                 host, port, svname, password, path, scope, img_thumbnail = convert.b64str2str(constr).split('\t')
                 data_dir = web.data if scope == 'client' else Path.cwd()

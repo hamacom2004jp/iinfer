@@ -29,7 +29,7 @@ class Annotation(feature.WebFeature):
         async def annotation(req:Request, res:Response):
             signin = web.check_signin(req, res)
             if signin is not None:
-                return RedirectResponse(url=f'/signin/annotation')
+                return signin
             res.headers['Access-Control-Allow-Origin'] = '*'
             return web.anno_html_data
 

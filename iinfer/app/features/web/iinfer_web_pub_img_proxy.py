@@ -35,10 +35,10 @@ class PubImgProxy(feature.WebFeature):
             """
             signin = web.check_signin(req, res)
             if signin is not None:
-                return dict(warn=f'Please log in to retrieve session.')
+                raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
+            if web.logger.level == logging.DEBUG:
+                web.logger.debug(f"web.pub_img_proxy: target=http://localhost:{port}/webcap/pub_img, header={req.headers}")
             if not req.headers.get('content-type').startswith('multipart/form-data'):
-                if web.logger.level == logging.DEBUG:
-                    web.logger.debug(f"web.pub_img_proxy: target=http://localhost:{port}/webcap/pub_img, res_status=400, header={req.headers}")
                 raise HTTPException(status_code=400, detail='Expected multipart request.')
             try:
                 tm = time.perf_counter()
