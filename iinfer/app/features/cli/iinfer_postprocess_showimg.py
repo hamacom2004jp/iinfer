@@ -1,22 +1,18 @@
 from cmdbox.app import common
-from iinfer import version
 from iinfer.app.features.cli import postprocess_feature
 from iinfer.app.postprocesses import showimg
-from typing import Dict, Any, Tuple
+from typing import Dict, Any, Tuple, Union, List
 import argparse
 import logging
 
 
 class PostprocessShowimg(postprocess_feature.PostprocessFeature):
-    def __init__(self, ver=version):
-        super().__init__(ver=ver)
-
-    def get_mode(self):
+    def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
 
         Returns:
-            str: モード
+            Union[str, List[str]]: モード
         """
         return 'postprocess'
 

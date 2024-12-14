@@ -1,10 +1,9 @@
 from cmdbox.app import common, feature
 from cmdbox.app.commons import redis_client
-from iinfer import version
 from iinfer.app import client, common as cmn
 from iinfer.app.commons import module
 from pathlib import Path
-from typing import Dict, Any, Tuple, List
+from typing import Dict, Any, Tuple, Union, List
 import argparse
 import base64
 import logging
@@ -13,15 +12,12 @@ import shutil
 import urllib
 
 class ClientDeploy(feature.Feature):
-    def __init__(self, ver=version):
-        super().__init__(ver=ver)
-
-    def get_mode(self):
+    def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
 
         Returns:
-            str: モード
+            Union[str, List[str]]: モード
         """
         return 'client'
 

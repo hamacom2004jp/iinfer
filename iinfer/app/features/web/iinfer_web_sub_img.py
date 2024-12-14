@@ -1,6 +1,5 @@
 from cmdbox.app import common, feature
 from cmdbox.app.commons import convert, redis_client
-from iinfer import version
 from iinfer.app.web import Web
 from fastapi import FastAPI, HTTPException, WebSocket
 from starlette.websockets import WebSocketDisconnect
@@ -11,9 +10,6 @@ import queue
 
 
 class SubImg(feature.WebFeature):
-    def __init__(self, ver=version):
-        super().__init__(ver=ver)
-
     def route(self, web:Web, app:FastAPI) -> None:
         """
         webモードのルーティングを設定します
@@ -40,7 +36,8 @@ class SubImg(feature.WebFeature):
                 outputs:dict = None
                 try:
                     try:
-                        await wsock.receive_text() # これを行わねば非同期処理にならない。。
+                        # これを行わねば非同期処理にならない。。
+                        await wsock.receive_text()
                         outputs = web.img_queue.get(block=True, timeout=0.001)
                     except queue.Empty:
                         if redis_cli is not None:
@@ -79,7 +76,7 @@ class SubImg(feature.WebFeature):
                     await wsock.send_text(json.dumps(outputs, default=common.default_json_enc))
                 except WebSocketDisconnect:
                     web.logger.warning('web.sub_img: websocket disconnected.')
-                    raise HTTPException(status_code=400, detail='web.sub_img: websocket disconnected.')
+                    break
                 except:
                     if outputs is not None:
                         web.img_queue.put(outputs) # エラーが発生した場合はキューに戻す

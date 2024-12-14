@@ -8,29 +8,11 @@
 - `iinfer` をインストールした直後にはAIフレームワークのインストールがされていない状態です。
 - 通常推論サーバー側にしかAIフレームワークが必要ないため、任意でインストールする必要があります。
 
-インストール(onnx) : `iinfer -m install -c onnx`
+
+インストール(insightface) : `iinfer -m install -c insightface`
 ==============================================================================
 
-`onnxruntime` をインストールします。オプションの指定はありません。
-
-
-インストール(mmdet) : `iinfer -m install -c mmdet`
-==============================================================================
-
-`mmdetection` をインストールします。オプションは以下の通りです。
-
-.. csv-table::
-    :widths: 20, 10, 70
-    :header-rows: 1
-
-    "Option","Required","Description"
-    "--install_use_gpu","","GPUを使用するモジュール構成でインストールします。"
-
-
-インストール(mmseg) : `iinfer -m install -c mmseg`
-==============================================================================
-
-`mmsegmentation` をインストールします。オプションは以下の通りです。
+`insightface` をインストールします。オプションは以下の通りです。
 
 .. csv-table::
     :widths: 20, 10, 70
@@ -53,6 +35,19 @@
     "--install_use_gpu","","GPUを使用するモジュール構成でインストールします。"
 
 
+インストール(mmdet) : `iinfer -m install -c mmdet`
+==============================================================================
+
+`mmdetection` をインストールします。オプションは以下の通りです。
+
+.. csv-table::
+    :widths: 20, 10, 70
+    :header-rows: 1
+
+    "Option","Required","Description"
+    "--install_use_gpu","","GPUを使用するモジュール構成でインストールします。"
+
+
 インストール(mmpretrain) : `iinfer -m install -c mmpretrain`
 ==============================================================================
 
@@ -66,10 +61,10 @@
     "--install_use_gpu","","GPUを使用するモジュール構成でインストールします。"
 
 
-インストール(insightface) : `iinfer -m install -c insightface`
+インストール(mmseg) : `iinfer -m install -c mmseg`
 ==============================================================================
 
-`insightface` をインストールします。オプションは以下の通りです。
+`mmsegmentation` をインストールします。オプションは以下の通りです。
 
 .. csv-table::
     :widths: 20, 10, 70
@@ -77,6 +72,12 @@
 
     "Option","Required","Description"
     "--install_use_gpu","","GPUを使用するモジュール構成でインストールします。"
+
+
+インストール(onnx) : `iinfer -m install -c onnx`
+==============================================================================
+
+`onnxruntime` をインストールします。オプションの指定はありません。
 
 
 インストール(redis) : `iinfer -m install -c redis <Option>`
@@ -91,6 +92,7 @@
     "Option","Required","Description"
     "--wsl_name <ディストリビューション名>","Windowsの場合は〇","Windowsの場合はWSLのディストリビューションの名前を指定します。"
     "--wsl_user <user名>","Windowsの場合は〇","Windowsの場合はWSL内のユーザー名を指定します。"
+
 
 インストール(server) : `iinfer -m install -c server <Option>`
 ==============================================================================

@@ -18,7 +18,8 @@ import uvicorn
 
 
 class Web(web.Web):
-    def __init__(self, logger:logging.Logger, data:Path, redis_host:str = "localhost", redis_port:int = 6379, redis_password:str = None, svname:str = 'server',
+    def __init__(self, logger:logging.Logger, data:Path, appcls=None, ver=None,
+                 redis_host:str = "localhost", redis_port:int = 6379, redis_password:str = None, svname:str = 'server',
                  client_only:bool=False, doc_root:Path=None, gui_html:str=None, filer_html:str=None,
                  assets:List[str]=None, signin_html:str=None, signin_file:str=None, gui_mode:bool=False,
                  web_features_packages:List[str]=["iinfer.app.features.web"], web_features_prefix:List[str]=["iinfer_web_"],
@@ -29,6 +30,8 @@ class Web(web.Web):
         Args:
             logger (logging): ロガー
             data (Path): コマンドやパイプラインの設定ファイルを保存するディレクトリ
+            appcls ([type], optional): アプリケーションクラス. Defaults to None.
+            ver ([type], optional): バージョン. Defaults to None.
             redis_host (str, optional): Redisサーバーのホスト名. Defaults to "localhost".
             redis_port (int, optional): Redisサーバーのポート番号. Defaults to 6379.
             redis_password (str, optional): Redisサーバーのパスワード. Defaults to None.
@@ -49,7 +52,8 @@ class Web(web.Web):
         """
         doc_root = doc_root if doc_root is not None else Path(__file__).parent.parent / 'web'
         assets = assets if assets is not None else [str(Path(__file__).parent.parent / 'web' / 'assets')]
-        super().__init__(logger=logger, data=data, redis_host=redis_host, redis_port=redis_port, redis_password=redis_password, svname=svname,
+        super().__init__(logger=logger, data=data, appcls=appcls, ver=ver,
+                         redis_host=redis_host, redis_port=redis_port, redis_password=redis_password, svname=svname,
                          client_only=client_only, doc_root=doc_root, gui_html=gui_html, filer_html=filer_html,
                          assets=assets, signin_html=signin_html, signin_file=signin_file, gui_mode=gui_mode,
                          web_features_packages=web_features_packages, web_features_prefix=web_features_prefix)

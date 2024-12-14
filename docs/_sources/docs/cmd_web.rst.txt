@@ -9,38 +9,16 @@
 Webサービス起動 : `iinfer -m web -c start <Option>`
 ==============================================================================
 
+- `cmdboxのwebモードのstartコマンドオプション <https://hamacom2004jp.github.io/iinfer/docs/cmd_web.html#web-iinfer-m-web-c-start-option/>`_ に加えて下記のオプションが指定できます。
+
 .. csv-table::
     :widths: 20, 10, 70
     :header-rows: 1
 
     "Option","Required","Description"
-    "--host <IPアドレス又はホスト名>","","Redisサーバーのサービスホストを指定します"
-    "--port <ポート番号>","","Redisサーバーのサービスポートを指定します"
-    "--password <パスワード>","","Redisサーバーのアクセスパスワード(任意)を指定します。省略時は `password` を使用します"
-    "--svname <推論サービス名>","","推論サーバーのサービス名を指定します。省略時は `server` を使用します"
-    "--data <データフォルダ>","","省略した時は `$HONE/.iinfer` を使用します。"
-    "--allow_host <接続許可するIP>","","省略した時は `0.0.0.0` を使用します。"
-    "--listen_port <サービスポート>","","省略した時は `8081` を使用します。"
-    "--signin_file <ユーザーリストファイル>","","ログイン可能なユーザーとパスワードを記載したファイルを指定します。省略した時は認証を要求しません。ログインファイルは、各行が1ユーザーを示し、ユーザーID、パスワード、ハッシュアルゴリズム名の順で、「 : 」で区切って記載します。ハッシュアルゴリズム名は「plain」「md5」「sha1」「sha256」が指定できます。"
-    "--client_only","","iinferサーバーへの接続を行わないようにします。"
-    "--outputs_key <表示項目>","","showimg及びwebcap画面で表示する項目を指定します。省略した場合は全ての項目を表示します。"
-    "--gui_html <gui.htmlファイルのパス>","","`gui.html` を指定します。省略時はiinfer内蔵のHTMLファイルを使用します。"
-    "--filer_html <filer.htmlファイルのパス>","","`filer.html` を指定します。省略時はiinfer内蔵のHTMLファイルを使用します。"
+    "--anno_html <annotation.htmlファイルのパス>","","`annotation.html` を指定します。省略時はiinfer内蔵のHTMLファイルを使用します。"
     "--showimg_html <showimg.htmlファイルのパス>","","`showimg.html` を指定します。省略時はiinfer内蔵のHTMLファイルを使用します。"
     "--webcap_html <webcap.htmlファイルのパス>","","`webcap.html` を指定します。省略時はiinfer内蔵のHTMLファイルを使用します。"
-    "--assets <jsやcssファイルのパス>","","htmlファイルを使用する場合に必要なアセットファイルを指定します。"
-    "--signin_html <signin.htmlファイルのパス>","","`signin.html` を指定します。省略時はiinfer内蔵のHTMLファイルを使用します。"
-
-
-Webサービス停止 : `iinfer -m web -c stop <Option>`
-==============================================================================
-
-.. csv-table::
-    :widths: 20, 10, 70
-    :header-rows: 1
-
-    "Option","Required","Description"
-    "--data <データフォルダ>","","省略した時は `$HONE/.iinfer` を使用します。"
 
 
 Webcap起動 : `iinfer -m web -c webcap <Option>`
@@ -53,7 +31,6 @@ Webcap起動 : `iinfer -m web -c webcap <Option>`
     "Option","Required","Description"
     "--allow_host <接続許可するIP>","","省略した時は `0.0.0.0` を使用します。"
     "--listen_webcap_port <サービスポート>","","省略した時は `8082` を使用します。"
-    "--signin_file <ユーザーリストファイル>","","ログイン可能なユーザーとパスワードを記載したファイルを指定します。省略した時は認証を要求しません。ログインファイルは、各行が1ユーザーを示し、ユーザーID、パスワード、ハッシュアルゴリズム名の順で、「 : 」で区切って記載します。ハッシュアルゴリズム名は「plain」「md5」「sha1」「sha256」が指定できます。"
     "--image_type <出力する画像タイプ>","","出力する画像のタイプを指定する。指定可能な画像タイプは `bmp` , `png` , `jpeg` , `capture` "
     "--outputs_key <表示項目>","","webcap画面で表示する項目を指定します。省略した場合は全ての項目を表示します。"
     "--capture_frame_width <キャプチャーサイズ(横px)>","","キャプチャーする画像の横px。受信した画像をリサイズする。"
@@ -61,16 +38,3 @@ Webcap起動 : `iinfer -m web -c webcap <Option>`
     "--capture_fps <キャプチャーFPS>","","キャプチャーする画像のFPS。webcap画面側がこの間隔で送信する。"
     "--capture_count <キャプチャー回数>","","キャプチャーする回数。指定した回数受信したら終了する。"
 
-
-自己署名サーバー証明書生成 : `iinfer -m web -c gencert <Option>`
-==============================================================================
-
-.. csv-table::
-    :widths: 20, 10, 70
-    :header-rows: 1
-
-    "Option","Required","Description"
-    "--webhost <サーバー名>","","自己署名証明書のCN(Common Name)に指定するホスト名を指定します。"
-    "--output_cert <保存先>","","出力する自己署名証明書のファイルを指定します。省略した場合は `webhostオプションに指定したホスト名` .crt に出力されます。"
-    "--output_key <保存先>","","出力する自己署名証明書の秘密鍵ファイルを指定します。省略した場合は `webhostオプションに指定したホスト名` .key に出力されます。"
-    "--overwrite","","出力する自己署名証明書のファイルが存在する場合に上書きします。"

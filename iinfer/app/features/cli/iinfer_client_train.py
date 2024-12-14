@@ -1,10 +1,9 @@
 from cmdbox.app import common, feature
 from cmdbox.app.commons import redis_client
-from iinfer import version
 from iinfer.app import client
 from iinfer.app.commons import module
 from pathlib import Path
-from typing import Dict, Any, Tuple, List
+from typing import Dict, Any, Tuple, Union, List
 import argparse
 import logging
 import json
@@ -13,16 +12,16 @@ import threading
 
 
 class ClientTrain(feature.Feature):
-    def __init__(self, ver=version):
-        super().__init__(ver=ver)
+    def __init__(self, appcls, ver):
+        super().__init__(appcls, ver)
         self.train_thread = None
 
-    def get_mode(self):
+    def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
 
         Returns:
-            str: モード
+            Union[str, List[str]]: モード
         """
         return 'client'
 

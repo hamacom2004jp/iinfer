@@ -1,21 +1,17 @@
 from cmdbox.app import common, feature
-from iinfer import version
 from iinfer.app import common as cmn
-from typing import Dict, Any, Tuple
+from typing import Dict, Any, Tuple, Union, List
 import argparse
 import logging
 
 
 class ClientTrainTypeList(feature.Feature):
-    def __init__(self, ver=version):
-        super().__init__(ver=ver)
-
-    def get_mode(self):
+    def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
 
         Returns:
-            str: モード
+            Union[str, List[str]]: モード
         """
         return 'client'
 

@@ -1,6 +1,5 @@
 from cmdbox.app import common, feature
 from cmdbox.app.web import Web
-from iinfer import version
 from fastapi import FastAPI, Request, Response, HTTPException
 from fastapi.responses import StreamingResponse
 from starlette.datastructures import UploadFile
@@ -10,9 +9,6 @@ import time
 
 
 class PubImgProxy(feature.WebFeature):
-    def __init__(self, ver=version):
-        super().__init__(ver=ver)
-
     def route(self, web:Web, app:FastAPI) -> None:
         """
         webモードのルーティングを設定します

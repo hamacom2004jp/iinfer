@@ -9,9 +9,6 @@ import logging
 
 
 class GuiStart(cmdbox_gui_start.GuiStart):
-    def __init__(self, ver=version):
-        super().__init__(ver=ver)
-
     def get_option(self):
         """
         この機能のオプションを返します

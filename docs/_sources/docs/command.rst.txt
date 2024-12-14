@@ -5,6 +5,7 @@
 ****************************************************
 
 各種コマンドで使用可能なオプションは以下を参照してください。
+また、cmdbox のコマンドも使用できますので、詳細は `cmdbox ドキュメント <https://hamacom2004jp.github.io/cmdbox/docs/command.html/>`_ を参照してください。
 
 .. toctree::
    :maxdepth: 2

@@ -86,4 +86,7 @@ pathrule:
     - groups: [readonly]
       paths: [/gui/del_cmd, /gui/del_pipe, /gui/save_cmd, /gui/save_pipe]
       rule: deny
+    - groups: [editor]
+      paths: [/gui/del_cmd, /gui/del_pipe, /gui/save_cmd, /gui/save_pipe]
+      rule: allow
 

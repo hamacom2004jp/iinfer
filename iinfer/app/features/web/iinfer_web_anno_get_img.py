@@ -1,7 +1,6 @@
 from cmdbox.app import common
 from cmdbox.app.commons import convert
 from cmdbox.app.features.web import cmdbox_web_exec_cmd
-from iinfer import version
 from iinfer.app.web import Web
 from fastapi import FastAPI, Request, Response, HTTPException
 from fastapi.responses import StreamingResponse
@@ -10,9 +9,6 @@ import io
 
 
 class AnnoGetImg(cmdbox_web_exec_cmd.ExecCmd):
-    def __init__(self, ver=version):
-        super().__init__(ver=ver)
-
     def route(self, web:Web, app:FastAPI) -> None:
         """
         webモードのルーティングを設定します
@@ -29,10 +25,11 @@ class AnnoGetImg(cmdbox_web_exec_cmd.ExecCmd):
             try:
                 host, port, svname, password, path, scope, img_thumbnail = convert.b64str2str(constr).split('\t')
                 data_dir = web.data if scope == 'client' else Path.cwd()
+                data_dir = None if scope == 'server' else data_dir
                 opt = dict(host=host, port=port, svname=svname, password=password, svpath=path, scope=scope,
                            img_thumbnail=img_thumbnail, mode='client', cmd='file_download', client_data=data_dir, stdout_log=False)
                 opt['capture_stdout'] = nothread = True
-                ret = self.exec_cmd(web, 'file_download', opt, nothread)
+                ret = self.exec_cmd(req, res, web, 'file_download', opt, nothread, self.appcls)
                 if len(ret) == 0 or 'success' not in ret[0] or 'data' not in ret[0]['success']:
                     return common.to_str(ret)
                 mime = ret[0]['success']['mime_type']

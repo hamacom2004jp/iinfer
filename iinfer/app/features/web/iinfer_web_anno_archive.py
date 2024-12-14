@@ -1,6 +1,5 @@
 from cmdbox.app.commons import convert
 from cmdbox.app.features.web import cmdbox_web_exec_cmd
-from iinfer import version
 from iinfer.app.web import Web
 from fastapi import FastAPI, Request, Response, HTTPException
 from pathlib import Path
@@ -10,9 +9,6 @@ import zipfile
 
 
 class AnnoArchive(cmdbox_web_exec_cmd.ExecCmd):
-    def __init__(self, ver=version):
-        super().__init__(ver=ver)
-
     def route(self, web:Web, app:FastAPI) -> None:
         """
         webモードのルーティングを設定します
@@ -39,7 +35,7 @@ class AnnoArchive(cmdbox_web_exec_cmd.ExecCmd):
                     tmpdir_path = Path(tmpdir)
                     for arc in archives:
                         opt['svpath'] = arc
-                        ret = self.exec_cmd(web, 'file_download', opt, nothread)
+                        ret = self.exec_cmd(req, res, web, 'file_download', opt, nothread, self.appcls)
                         if len(ret) == 0 or 'success' not in ret[0]:
                             return ret
                         arc = arc[1:] if arc.startswith('/') else arc
@@ -63,7 +59,7 @@ class AnnoArchive(cmdbox_web_exec_cmd.ExecCmd):
                     opt['svpath'] = output_path
                     opt['orverwrite'] = True
                     opt['upload_file'] = str(upload_file).replace('"','')
-                    ret = self.exec_cmd("file_upload", opt, nothread=True)
+                    ret = self.exec_cmd(req, res, "file_upload", opt, nothread=True, appcls=self.appcls)
                     if len(ret) == 0 or 'success' not in ret[0]:
                         return ret
                     return ret

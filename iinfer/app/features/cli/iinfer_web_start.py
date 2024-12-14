@@ -1,6 +1,5 @@
 from cmdbox.app import common
 from cmdbox.app.features.cli import cmdbox_web_start
-from iinfer import version
 from iinfer.app import web
 from pathlib import Path
 from typing import Dict, Any, Tuple
@@ -10,9 +9,6 @@ import traceback
 
 
 class WebStart(cmdbox_web_start.WebStart):
-    def __init__(self, ver=version):
-        super().__init__(ver=ver)
-
     def get_option(self):
         """
         この機能のオプションを返します
@@ -52,12 +48,15 @@ class WebStart(cmdbox_web_start.WebStart):
             return 1, msg
         w = None
         try:
-            w = web.Web(logger, Path(args.data), redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname,
-                        client_only=args.client_only, gui_html=args.gui_html, filer_html=args.filer_html, assets=args.assets,
+            w = web.Web(logger, Path(args.data), appcls=self.appcls, ver=self.ver,
+                        redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname,
+                        client_only=args.client_only, doc_root=args.doc_root, gui_html=args.gui_html, filer_html=args.filer_html, assets=args.assets,
                         signin_html=args.signin_html, signin_file=args.signin_file, gui_mode=False,
                         showimg_html=args.showimg_html, webcap_html=args.webcap_html, anno_html=args.anno_html)
 
-            w.start(args.allow_host, args.listen_port, session_timeout=args.session_timeout, outputs_key=args.outputs_key)
+            w.start(args.allow_host, args.listen_port,
+                    ssl_cert=args.ssl_cert, ssl_key=args.ssl_key, ssl_keypass=args.ssl_keypass, ssl_ca_certs=args.ssl_ca_certs,
+                    session_timeout=args.session_timeout, outputs_key=args.outputs_key)
             msg = {"success":"web complate."}
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append)
             return 0, msg, w

@@ -1,7 +1,6 @@
 from cmdbox.app import feature
 from cmdbox.app.commons import convert
 from cmdbox.app.web import Web
-from iinfer import version
 from fastapi import FastAPI, Request, Response, HTTPException
 from typing import List, Dict, Any
 from pathlib import Path
@@ -9,9 +8,6 @@ import logging
 
 
 class LoadCapture(feature.WebFeature):
-    def __init__(self, ver=version):
-        super().__init__(ver=ver)
-
     def route(self, web:Web, app:FastAPI) -> None:
         """
         webモードのルーティングを設定します

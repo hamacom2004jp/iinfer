@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>コマンドリファレンス &mdash; iinfer 2024/12/08 documentation</title>
+  <title>コマンドリファレンス &mdash; iinfer 2024/12/14 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=ff4c1bf6"></script>
+      <script src="../_static/documentation_options.js?v=4461e21a"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -99,7 +99,8 @@
              
   <section id="id1">
 <h1>コマンドリファレンス<a class="headerlink" href="#id1" title="Link to this heading"></a></h1>
-<p>各種コマンドで使用可能なオプションは以下を参照してください。</p>
+<p>各種コマンドで使用可能なオプションは以下を参照してください。
+また、cmdbox のコマンドも使用できますので、詳細は <a class="reference external" href="https://hamacom2004jp.github.io/cmdbox/docs/command.html/">cmdbox ドキュメント</a> を参照してください。</p>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="cmd_common.html">共通オプション</a><ul>
@@ -107,12 +108,12 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="cmd_install.html">インストール</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="cmd_install.html#onnx-iinfer-m-install-c-onnx">インストール(onnx) : <cite>iinfer -m install -c onnx</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_install.html#mmdet-iinfer-m-install-c-mmdet">インストール(mmdet) : <cite>iinfer -m install -c mmdet</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_install.html#mmseg-iinfer-m-install-c-mmseg">インストール(mmseg) : <cite>iinfer -m install -c mmseg</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_install.html#mmcls-iinfer-m-install-c-mmcls">インストール(mmcls) : <cite>iinfer -m install -c mmcls</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_install.html#mmpretrain-iinfer-m-install-c-mmpretrain">インストール(mmpretrain) : <cite>iinfer -m install -c mmpretrain</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_install.html#insightface-iinfer-m-install-c-insightface">インストール(insightface) : <cite>iinfer -m install -c insightface</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_install.html#mmcls-iinfer-m-install-c-mmcls">インストール(mmcls) : <cite>iinfer -m install -c mmcls</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_install.html#mmdet-iinfer-m-install-c-mmdet">インストール(mmdet) : <cite>iinfer -m install -c mmdet</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_install.html#mmpretrain-iinfer-m-install-c-mmpretrain">インストール(mmpretrain) : <cite>iinfer -m install -c mmpretrain</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_install.html#mmseg-iinfer-m-install-c-mmseg">インストール(mmseg) : <cite>iinfer -m install -c mmseg</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_install.html#onnx-iinfer-m-install-c-onnx">インストール(onnx) : <cite>iinfer -m install -c onnx</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_install.html#redis-iinfer-m-install-c-redis-option">インストール(redis) : <cite>iinfer -m install -c redis &lt;Option&gt;</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_install.html#server-iinfer-m-install-c-server-option">インストール(server) : <cite>iinfer -m install -c server &lt;Option&gt;</cite></a></li>
 </ul>
@@ -129,26 +130,17 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="cmd_client.html">クライアント</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="cmd_client.html#ai-iinfer-m-client-c-deploy-option">クライアント(AIモデルの配備) : <cite>iinfer -m client -c deploy &lt;Option&gt;</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_client.html#ai-iinfer-m-client-c-deploy-list-option">クライアント(AIモデルの配備一覧) : <cite>iinfer -m client -c deploy_list &lt;Option&gt;</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_client.html#ai-iinfer-m-client-c-undeploy-option">クライアント(AIモデルの配備解除) : <cite>iinfer -m client -c undeploy &lt;Option&gt;</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_client.html#ai-iinfer-m-client-c-start-option">クライアント(AIモデルの起動) : <cite>iinfer -m client -c start &lt;Option&gt;</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_client.html#iinfer-m-client-c-predict-type-list-option">クライアント(推論タイプ一覧) : <cite>iinfer -m client -c predict_type_list &lt;Option&gt;</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_client.html#ai-iinfer-m-client-c-stop-option">クライアント(AIモデルの停止) : <cite>iinfer -m client -c stop &lt;Option&gt;</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_client.html#iinfer-m-client-c-predict-option">クライアント(推論の実行) : <cite>iinfer -m client -c predict &lt;Option&gt;</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_client.html#iinfer-m-client-c-capture-option">クライアント(キャプチャーの実行) : <cite>iinfer -m client -c capture &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_client.html#ai-iinfer-m-client-c-deploy-list-option">クライアント(AIモデルの配備一覧) : <cite>iinfer -m client -c deploy_list &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_client.html#ai-iinfer-m-client-c-deploy-option">クライアント(AIモデルの配備) : <cite>iinfer -m client -c deploy &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_client.html#iinfer-m-client-c-predict-type-list-option">クライアント(推論タイプ一覧) : <cite>iinfer -m client -c predict_type_list &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_client.html#iinfer-m-client-c-predict-option">クライアント(推論の実行) : <cite>iinfer -m client -c predict &lt;Option&gt;</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_client.html#iinfer-m-client-c-read-dir-option">クライアント(ディレクトリ内の画像ファイルを取得) : <cite>iinfer -m client -c read_dir &lt;Option&gt;</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_client.html#iinfer-m-client-c-file-list-option">クライアント(サーバーファイルリスト) : <cite>iinfer -m client -c file_list &lt;Option&gt;</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_client.html#iinfer-m-client-c-file-mkdir-option">クライアント(サーバーファイルフォルダ作成) : <cite>iinfer -m client -c file_mkdir &lt;Option&gt;</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_client.html#iinfer-m-client-c-file-rmdir-option">クライアント(サーバーファイルフォルダ削除) : <cite>iinfer -m client -c file_rmdir &lt;Option&gt;</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_client.html#iinfer-m-client-c-file-download-option">クライアント(サーバーファイルダウンロード) : <cite>iinfer -m client -c file_download &lt;Option&gt;</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_client.html#iinfer-m-client-c-file-upload-option">クライアント(サーバーファイルアップロード) : <cite>iinfer -m client -c file_upload &lt;Option&gt;</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_client.html#iinfer-m-client-c-file-remove-option">クライアント(サーバーファイル削除) : <cite>iinfer -m client -c file_remove &lt;Option&gt;</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_client.html#iinfer-m-client-c-file-copy-option">クライアント(サーバーファイルコピー) : <cite>iinfer -m client -c file_copy &lt;Option&gt;</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_client.html#iinfer-m-client-c-file-move-option">クライアント(サーバーファイル移動) : <cite>iinfer -m client -c file_move &lt;Option&gt;</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_client.html#iinfer-m-client-c-server-info-option">クライアント(サーバー情報取得) : <cite>iinfer -m client -c server_info &lt;Option&gt;</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_client.html#ai-iinfer-m-client-c-train-option">クライアント(AIモデルの学習) : <cite>iinfer -m client -c train &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_client.html#ai-iinfer-m-client-c-start-option">クライアント(AIモデルの起動) : <cite>iinfer -m client -c start &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_client.html#ai-iinfer-m-client-c-stop-option">クライアント(AIモデルの停止) : <cite>iinfer -m client -c stop &lt;Option&gt;</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_client.html#iinfer-m-client-c-train-type-list-option">クライアント(学習タイプ一覧) : <cite>iinfer -m client -c train_type_list &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_client.html#ai-iinfer-m-client-c-train-option">クライアント(AIモデルの学習) : <cite>iinfer -m client -c train &lt;Option&gt;</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cmd_client.html#ai-iinfer-m-client-c-undeploy-option">クライアント(AIモデルの配備解除) : <cite>iinfer -m client -c undeploy &lt;Option&gt;</cite></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="cmd_gui.html">GUI</a><ul>
@@ -157,9 +149,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="cmd_web.html">Web</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="cmd_web.html#web-iinfer-m-web-c-start-option">Webサービス起動 : <cite>iinfer -m web -c start &lt;Option&gt;</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_web.html#web-iinfer-m-web-c-stop-option">Webサービス停止 : <cite>iinfer -m web -c stop &lt;Option&gt;</cite></a></li>
 <li class="toctree-l2"><a class="reference internal" href="cmd_web.html#webcap-iinfer-m-web-c-webcap-option">Webcap起動 : <cite>iinfer -m web -c webcap &lt;Option&gt;</cite></a></li>
-<li class="toctree-l2"><a class="reference internal" href="cmd_web.html#iinfer-m-web-c-gencert-option">自己署名サーバー証明書生成 : <cite>iinfer -m web -c gencert &lt;Option&gt;</cite></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="cmd_postprocess.html">後処理</a><ul>
