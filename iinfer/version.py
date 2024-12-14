@@ -4,7 +4,7 @@ import datetime
 dt_now = datetime.datetime(2024, 12, 14)
 __appid__ = 'iinfer'
 __title__ = 'iinfer (Image Inference Application)'
-__version__ = '0.10.1'
+__version__ = '0.10.2'
 __copyright__ = f'Copyright © 2023-{dt_now.strftime("%Y")} hamacom2004jp'
 __pypiurl__ = 'https://pypi.org/project/iinfer/'
 __srcurl__ = 'https://github.com/hamacom2004jp/iinfer'
