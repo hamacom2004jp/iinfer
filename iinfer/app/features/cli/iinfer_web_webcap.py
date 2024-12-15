@@ -89,7 +89,12 @@ class WebWebcap(feature.Feature):
             return 1, msg
         w = None
         try:
-            w = web.Web(logger, Path(args.data), signin_file=args.signin_file)
+            w = web.Web(logger, Path(args.data), appcls=self.appcls, ver=self.ver,
+                        redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname,
+                        client_only=args.client_only, doc_root=args.doc_root, gui_html=args.gui_html, filer_html=args.filer_html, assets=args.assets,
+                        signin_html=args.signin_html, signin_file=args.signin_file, gui_mode=False,
+                        showimg_html=args.showimg_html, webcap_html=args.webcap_html, anno_html=args.anno_html)
+
             w.webcap(args.allow_host, args.listen_webcap_port, image_type=args.image_type, outputs_key=args.outputs_key,
                      capture_frame_width=args.capture_frame_width, capture_frame_height=args.capture_frame_height,
                      capture_count=args.capture_count, capture_fps=args.capture_fps)

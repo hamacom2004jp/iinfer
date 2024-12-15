@@ -14,6 +14,11 @@ class AfterShowimgInjection(injection.AfterInjection):
         self.default_password = opts.get_cmd_opt('server', 'start', 'password')['default']
         self.default_svname = opts.get_cmd_opt('server', 'start', 'svname')['default']
 
+        host = self.get_config('host', self.default_host)
+        port = self.get_config('port', self.default_port)
+        password = self.get_config('password', self.default_password)
+        svname = self.get_config('svname', self.default_svname)
+        self.redis_cli = redis_client.RedisClient(self.logger, host=host, port=port, password=password, svname=svname)
 
     def action(self, reskey:str, name:str, outputs:Dict[str, Any], output_image:Image.Image, session:Dict[str, Any]) -> Tuple[Dict[str, Any], Image.Image]:
         """
@@ -39,12 +44,7 @@ class AfterShowimgInjection(injection.AfterInjection):
         Returns:
             Tuple[Dict[str, Any], Image.Image]: 後処理後の推論結果と画像データのタプル
         """
-        host = self.get_config('host', self.default_host)
-        port = self.get_config('port', self.default_port)
-        password = self.get_config('password', self.default_password)
-        svname = self.get_config('svname', self.default_svname)
         maxrecsize = self.get_config('maxrecsize', 200)
-        self.redis_cli = redis_client.RedisClient(self.logger, host=host, port=port, password=password, svname=svname)
 
         try:
             img_npy = convert.img2npy(output_image)

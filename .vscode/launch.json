@@ -69,6 +69,16 @@
             "justMyCode": false
         },
         {
+            "name": "Python: iinfer install",
+            "type": "python",
+            "request": "launch",
+            "args": ["-m","install","-c","mmdet","-f"],
+            "module": "iinfer",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "justMyCode": false
+        },
+        {
             "name": "Python: gentest",
             "type": "debugpy",
             "request": "launch",
