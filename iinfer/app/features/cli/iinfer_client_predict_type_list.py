@@ -35,27 +35,27 @@ class ClientPredictTypeList(feature.Feature):
             type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_TRUE,
             discription_ja="推論タイプ一覧を取得します。",
             discription_en="Get a list of inference types.",
-            choise=[
-                dict(opt="output_json", short="o" , type="file", default="", required=False, multi=False, hide=True, choise=None, fileio="out",
+            choice=[
+                dict(opt="output_json", short="o" , type="file", default="", required=False, multi=False, hide=True, choice=None, fileio="out",
                         discription_ja="処理結果jsonの保存先ファイルを指定。",
                         discription_en="Specify the destination file for saving the processing result json.",
                         test_true={"yolox":None}),
-                dict(opt="output_json_append", short="a" , type="bool", default=False, required=False, multi=False, hide=True, choise=[True, False],
+                dict(opt="output_json_append", short="a" , type="bool", default=False, required=False, multi=False, hide=True, choice=[True, False],
                         discription_ja="処理結果jsonファイルを追記保存します。",
                         discription_en="Save the processing result json file by appending."),
-                dict(opt="stdout_log", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False],
+                dict(opt="stdout_log", type="bool", default=True, required=False, multi=False, hide=True, choice=[True, False],
                         discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をConsole logに出力します。",
                         discription_en="Available only in GUI mode. Outputs standard output during command execution to Console log."),
-                dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choise=[True, False],
+                dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choice=[True, False],
                         discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
                         discription_en="Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."),
-                dict(opt="capture_maxsize", type="int", default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choise=None,
+                dict(opt="capture_maxsize", type="int", default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choice=None,
                         discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します。",
                         discription_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."),
             ]
         )
 
-    def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float) -> Tuple[int, Dict[str, Any], Any]:
+    def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
         """
         この機能の実行を行います
 
@@ -63,7 +63,8 @@ class ClientPredictTypeList(feature.Feature):
             logger (logging.Logger): ロガー
             args (argparse.Namespace): 引数
             tm (float): 実行開始時間
-        
+            pf (List[Dict[str, float]]): 呼出元のパフォーマンス情報
+
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
@@ -73,5 +74,5 @@ class ClientPredictTypeList(feature.Feature):
         type_list.append(dict(predict_type='Custom', site='Custom', image_width=None, image_height=None,
                                 required_model_conf=None, required_model_weight=None))
         ret = dict(success=type_list)
-        common.print_format(ret, args.format, tm, args.output_json, args.output_json_append)
+        common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
         return 0, ret, None

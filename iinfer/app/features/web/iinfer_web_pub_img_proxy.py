@@ -45,6 +45,7 @@ class PubImgProxy(feature.WebFeature):
                 if web.logger.level == logging.DEBUG:
                     output_str = common.to_str(content.decode("utf-8"), slise=100)
                     web.logger.debug(f"web.pub_img_proxy: targey=http://localhost:{port}/webcap/pub_img, res_status={responce.status_code}, tm={time.perf_counter()-tm:.3f}s")
+                responce.headers.pop('server', None)
                 return StreamingResponse(io.BytesIO(content), status_code=responce.status_code,
                                          headers=responce.headers, media_type=responce.headers.get('content-type'))
             except Exception as e:
