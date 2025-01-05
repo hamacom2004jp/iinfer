@@ -58,6 +58,10 @@ webcap.init = () => {
     camera_elem.find('.dropdown-submenu .dropdown-item:first').click();
   };
   camera_selection();
+  $('#rec_movie').hide();
+  $('#rec_image').hide();
+  webcap.recode_mode=='movie' && $('#rec_movie').show();
+  webcap.recode_mode=='image' && $('#rec_image').show();
   /** イベントハンドラの設定 */
   webcap.container_elem = $('#img_container');
   webcap.video_elem = $('#video');
@@ -68,7 +72,23 @@ webcap.init = () => {
   webcap.canvas_elem = $('#canvas');
   webcap.canvas = webcap.canvas_elem.get(0);
   webcap.canvas_2d = webcap.canvas.getContext('2d')
-  $('#rec').off('click').on('click', webcap.rec_start);
+  webcap.recode_mode = 'movie';
+  $('#dropdown_rec_mov').off('click').on('click', () => {
+    webcap.recode_mode = 'movie';
+    $('#dropdown_rec_mov').text('* Movie Mode');
+    $('#dropdown_rec_img').text('Image Mode');
+    $('#rec_movie').show();
+    $('#rec_image').hide();
+  });
+  $('#dropdown_rec_img').off('click').on('click', () => {
+    webcap.recode_mode = 'image';
+    $('#dropdown_rec_mov').text('Movie Mode');
+    $('#dropdown_rec_img').text('* Image Mode');
+    $('#rec_movie').hide();
+    $('#rec_image').show();
+  });
+  $('#rec_movie').off('click').on('click', webcap.rec_start);
+  $('#rec_image').off('click').on('click', webcap.rec_start);
   $('#pause').off('click').on('click', webcap.rec_stop);
   $(window).resize(async () => {
     await webcap.resize();
@@ -136,13 +156,16 @@ webcap.change_pipeline = (title, url, outputs_key_str, capture_fps, capture_fram
   webcap.pipeline.capture_frame_height = capture_frame_height;
   webcap.get_camera_const()
   if (!title) {
-    $('#rec').hide();
+    $('#rec_movie').hide();
+    $('#rec_image').hide();
     $('#pause').hide();
     $('#rec_error').show();
     $('#navi_title').text(`WebCap`);
     return;
   }
   $('#pause').hide();
+  webcap.recode_mode=='movie' && $('#rec_movie').show();
+  webcap.recode_mode=='image' && $('#rec_image').show();
   $('#rec_error').hide();
   $('#navi_title').text(`WebCap ( ${title} )`);
   const pipeline_elem = $('#pipeline');
@@ -157,14 +180,16 @@ webcap.rec_start = () => {
     return;
   }
   if (webcap.pipeline.is_rec) return;
-  $('#rec').hide();
+  $('#rec_movie').hide();
+  $('#rec_image').hide();
   $('#pause').show();
   webcap.pipeline.is_rec = true;
   cmdbox.show_loading();
 };
 /** カメラ映像をwebcapに送信停止 */
 webcap.rec_stop = () => {
-  $('#rec').show();
+  webcap.recode_mode=='movie' && $('#rec_movie').show();
+  webcap.recode_mode=='image' && $('#rec_image').show();
   $('#pause').hide();
   cmdbox.hide_loading();
   webcap.pipeline.is_rec = false;
@@ -221,6 +246,9 @@ webcap.rec = () => {
     cmdbox.message(`Error: ${e} ${webcap.pipeline.url}`);
     webcap.rec_stop();
   }).finally(() => {
+    if (webcap.recode_mode == 'image') {
+      webcap.rec_stop();
+    }
     window.setTimeout(webcap.rec, 1000 / webcap.pipeline.capture_fps);
   });
 };
