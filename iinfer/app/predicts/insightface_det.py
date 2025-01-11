@@ -2,7 +2,7 @@ from cmdbox.app import common
 from cmdbox.app.commons import convert
 from pathlib import Path
 from PIL import Image
-from iinfer.app import predict
+from iinfer.app import common as cmn, predict
 from typing import List, Tuple, Union, Any
 import json
 import logging
@@ -122,7 +122,7 @@ class InsightfaceDet(predict.OnnxPredict):
                 labels.append(face_store[store_index]['face_label'])
             else:
                 labels.append(None)
-        output_image, output_labels = common.draw_boxes(input_data, boxes, scores, clses, ids=ids, labels=labels, colors=colors, nodraw=nodraw)
+        output_image, output_labels = cmn.draw_boxes(input_data, boxes, scores, clses, ids=ids, labels=labels, colors=colors, nodraw=nodraw)
 
         return dict(output_ids=ids, output_scores=scores, output_classes=clses, output_labels=output_labels, output_boxes=boxes,
                     output_embeddings=embeddings, output_embedding_dtypes=embedding_dtypes, output_embedding_shapes=embedding_shapes), output_image

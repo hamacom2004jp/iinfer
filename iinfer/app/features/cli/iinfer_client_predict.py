@@ -1,7 +1,7 @@
 from cmdbox.app import common, feature
 from cmdbox.app.commons import convert, redis_client
 from motpy import Detection
-from iinfer.app import client, injection, predict
+from iinfer.app import common as cmn, client, injection, predict
 from pathlib import Path
 from typing import Dict, Any, Tuple, List, Union
 from PIL import Image
@@ -346,7 +346,7 @@ class ClientPredict(feature.Feature):
                     tracks = session['tracker'].active_tracks()
                     outputs['output_tracks'] = [t.id for t in tracks]
                     if output_image is not None and not nodraw:
-                        output_image, _ = common.draw_boxes(output_image, outputs['output_boxes'], outputs['output_scores'], outputs['output_classes'], ids=outputs['output_tracks'])
+                        output_image, _ = cmn.draw_boxes(output_image, outputs['output_boxes'], outputs['output_scores'], outputs['output_classes'], ids=outputs['output_tracks'])
             tracker_end = time.perf_counter()
 
             def _after_injection(reskey:str, name:str, output:dict, output_image:Image.Image, session:dict):

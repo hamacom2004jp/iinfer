@@ -2,6 +2,7 @@
 
 ARG MKUSER
 
+#{COPY_CMDBOX}
 #{COPY_IINFER}
 #{COPY_IINFER_START}
 
@@ -18,8 +19,8 @@ RUN apt-get update && \
     apt-get install -y libgl1-mesa-dev libglib2.0-0 git build-essential && \
     apt-get install -y iputils-ping net-tools
 RUN pip install --upgrade pip && \
-    pip install #{INSTALL_IINFER} && \
-    iinfer --version
+    pip install #{INSTALL_CMDBOX} && cmdbox --version && \
+    pip install #{INSTALL_IINFER} && iinfer --version
 
 #{INSTALL_ONNX}
 #{INSTALL_MMDET}

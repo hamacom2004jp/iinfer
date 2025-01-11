@@ -1,7 +1,6 @@
-from cmdbox.app import common
 from pathlib import Path
 from PIL import Image
-from iinfer.app import predict
+from iinfer.app import common as cmn, predict
 from typing import List, Tuple, Union, Any
 import logging
 import numpy as np
@@ -82,7 +81,7 @@ class OnnxDetYoloV3(predict.OnnxPredict):
             out_boxes.append(output_boxes[idx_1])
 
         ids = [i for i in range(len(out_boxes))]
-        output_image, output_labels = common.draw_boxes(image_obj, out_boxes, out_scores, out_classes, ids=ids, labels=labels, colors=colors, nodraw=nodraw)
+        output_image, output_labels = cmn.draw_boxes(image_obj, out_boxes, out_scores, out_classes, ids=ids, labels=labels, colors=colors, nodraw=nodraw)
 
         return dict(output_ids=ids, output_scores=out_scores, output_classes=out_classes, output_labels=output_labels, output_boxes=out_boxes), output_image
 

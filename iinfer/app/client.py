@@ -1,7 +1,8 @@
 from cmdbox.app import client
-from cmdbox.app.commons import convert, module
+from cmdbox.app.commons import convert
 from pathlib import Path
 from iinfer.app import common as cmn
+from iinfer.app.commons import module
 from typing import List
 import base64
 import cv2

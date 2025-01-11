@@ -1,4 +1,4 @@
-Copyright (c) 2005-2024, NumPy Developers.
+Copyright (c) 2005-2022, NumPy Developers.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -31,53 +31,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ----
 
-The NumPy repository and source distributions bundle several libraries that are
-compatibly licensed.  We list these here.
-
-Name: lapack-lite
-Files: numpy/linalg/lapack_lite/*
-License: BSD-3-Clause
-  For details, see numpy/linalg/lapack_lite/LICENSE.txt
-
-Name: dragon4
-Files: numpy/_core/src/multiarray/dragon4.c
-License: MIT
-  For license text, see numpy/_core/src/multiarray/dragon4.c
-
-Name: libdivide
-Files: numpy/_core/include/numpy/libdivide/*
-License: Zlib
-  For license text, see numpy/_core/include/numpy/libdivide/LICENSE.txt
-
-
-Note that the following files are vendored in the repository and sdist but not
-installed in built numpy packages:
-
-Name: Meson
-Files: vendored-meson/meson/*
-License: Apache 2.0
-  For license text, see vendored-meson/meson/COPYING
-
-Name: spin
-Files: .spin/cmds.py
-License: BSD-3
-  For license text, see .spin/LICENSE
-
-Name: tempita
-Files: numpy/_build_utils/tempita/*
-License: MIT
-  For details, see numpy/_build_utils/tempita/LICENCE.txt
-
-----
-
 This binary distribution of NumPy also bundles the following software:
 
 
 Name: OpenBLAS
-Files: numpy.libs\libscipy_openblas*.dll
+Files: extra-dll\libopenb*.dll
 Description: bundled as a dynamically linked library
-Availability: https://github.com/OpenMathLib/OpenBLAS/
-License: BSD-3-Clause
+Availability: https://github.com/xianyi/OpenBLAS/
+License: 3-clause BSD
   Copyright (c) 2011-2014, The OpenBLAS Project
   All rights reserved.
 
@@ -110,10 +71,10 @@ License: BSD-3-Clause
 
 
 Name: LAPACK
-Files: numpy.libs\libscipy_openblas*.dll
+Files: extra-dll\libopenb*.dll
 Description: bundled in OpenBLAS
-Availability: https://github.com/OpenMathLib/OpenBLAS/
-License: BSD-3-Clause-Attribution
+Availability: https://github.com/xianyi/OpenBLAS/
+License 3-clause BSD
   Copyright (c) 1992-2013 The University of Tennessee and The University
                           of Tennessee Research Foundation.  All rights
                           reserved.
@@ -165,10 +126,10 @@ License: BSD-3-Clause-Attribution
 
 
 Name: GCC runtime library
-Files: numpy.libs\libscipy_openblas*.dll
-Description: statically linked to files compiled with gcc
-Availability: https://gcc.gnu.org/git/?p=gcc.git;a=tree;f=libgfortran
-License: GPL-3.0-with-GCC-exception
+Files: extra-dll\*.dll
+Description: statically linked, in DLL files compiled with gfortran only
+Availability: https://gcc.gnu.org/viewcvs/gcc/
+License: GPLv3 + runtime exception
   Copyright (C) 2002-2017 Free Software Foundation, Inc.
 
   Libgfortran is free software; you can redistribute it and/or modify
@@ -189,6 +150,64 @@ License: GPL-3.0-with-GCC-exception
   a copy of the GCC Runtime Library Exception along with this program;
   see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
   <http://www.gnu.org/licenses/>.
+
+
+Name: Microsoft Visual C++ Runtime Files
+Files: extra-dll\msvcp140.dll
+License: MSVC
+  https://www.visualstudio.com/license-terms/distributable-code-microsoft-visual-studio-2015-rc-microsoft-visual-studio-2015-sdk-rc-includes-utilities-buildserver-files/#visual-c-runtime
+
+  Subject to the License Terms for the software, you may copy and
+  distribute with your program any of the files within the followng
+  folder and its subfolders except as noted below. You may not modify
+  these files.
+
+    C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\redist
+
+  You may not distribute the contents of the following folders:
+
+    C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\redist\debug_nonredist
+    C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\redist\onecore\debug_nonredist
+
+  Subject to the License Terms for the software, you may copy and
+  distribute the following files with your program in your program’s
+  application local folder or by deploying them into the Global
+  Assembly Cache (GAC):
+
+  VC\atlmfc\lib\mfcmifc80.dll
+  VC\atlmfc\lib\amd64\mfcmifc80.dll
+
+
+Name: Microsoft Visual C++ Runtime Files
+Files: extra-dll\msvc*90.dll, extra-dll\Microsoft.VC90.CRT.manifest
+License: MSVC
+  For your convenience, we have provided the following folders for
+  use when redistributing VC++ runtime files. Subject to the license
+  terms for the software, you may redistribute the folder
+  (unmodified) in the application local folder as a sub-folder with
+  no change to the folder name. You may also redistribute all the
+  files (*.dll and *.manifest) within a folder, listed below the
+  folder for your convenience, as an entire set.
+
+  \VC\redist\x86\Microsoft.VC90.ATL\
+   atl90.dll
+   Microsoft.VC90.ATL.manifest
+  \VC\redist\ia64\Microsoft.VC90.ATL\
+   atl90.dll
+   Microsoft.VC90.ATL.manifest
+  \VC\redist\amd64\Microsoft.VC90.ATL\
+   atl90.dll
+   Microsoft.VC90.ATL.manifest
+  \VC\redist\x86\Microsoft.VC90.CRT\
+   msvcm90.dll
+   msvcp90.dll
+   msvcr90.dll
+   Microsoft.VC90.CRT.manifest
+  \VC\redist\ia64\Microsoft.VC90.CRT\
+   msvcm90.dll
+   msvcp90.dll
+   msvcr90.dll
+   Microsoft.VC90.CRT.manifest
 
 ----
 
@@ -947,4 +966,3 @@ may consider it more useful to permit linking proprietary applications with
 the library.  If this is what you want to do, use the GNU Lesser General
 Public License instead of this License.  But first, please read
 <http://www.gnu.org/philosophy/why-not-lgpl.html>.
-

@@ -1,22 +1,22 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="jp" data-content_root="../">
+<html class="writer-html5" lang="jp">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>カスタマイズ &mdash; iinfer 2025/01/05 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+  <title>カスタマイズ &mdash; iinfer 2025/01/11 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
 
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=5ea9f5e1"></script>
-      <script src="../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=537f6169"></script>
+      <script src="../_static/doctools.js?v=888ff710"></script>
+      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -92,22 +92,22 @@
            <div itemprop="articleBody">
              
   <section id="id1">
-<h1>カスタマイズ<a class="headerlink" href="#id1" title="Link to this heading"></a></h1>
+<h1>カスタマイズ<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h1>
 <section id="id2">
-<h2>カスタム推論モジュールについて<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<h2>カスタム推論モジュールについて<a class="headerlink" href="#id2" title="Permalink to this heading"></a></h2>
 <ul>
 <li><p>AIモデルの配備 <cite>iinfer -m client -c deploy &lt;Option&gt;</cite> コマンドで <cite>--predict_type Custom</cite> 且つ <cite>--custom_predict_py &lt;カスタム推論pyファイル&gt;</cite> オプションを指定すると、カスタムモデルを配備できるようになります。</p></li>
 <li><p>カスタム推論pyファイルは <cite>iinfer.app.predict.Predict</cite> クラスを継承させたクラスを作成してください。</p></li>
 <li><p><cite>iinfer.app.predict.Predict</cite> クラスの定義は下記の通りで、継承したクラスは <cite>is_gpu_available</cite> 、 <cite>create_session</cite> 、 <cite>predict</cite> メソッドを定義してください。</p></li>
 <li><p>なお、 <cite>iinfer.app.predict.Predict</cite> クラスを拡張した <cite>iinfer.app.predict.OnnxPredict</cite> 及び <cite>iinfer.app.predict.TorchPredict</cite> があり、 <cite>is_gpu_available</cite> メソッドが実装されています。</p>
 <blockquote>
-<div><div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span>
-<span class="kn">import</span> <span class="nn">logging</span>
+<div><div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">PIL</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 
-<span class="k">class</span> <span class="nc">Predict</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Predict</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">      </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">      このクラスのインスタンスを初期化します。</span>
 <span class="sd">      継承時は、このコンストラクタを呼び出すようにしてください。</span>
@@ -117,7 +117,7 @@
 <span class="sd">      &quot;&quot;&quot;</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logger</span>
 
-<span class="k">def</span> <span class="nf">is_gpu_available</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gpu_id</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">is_gpu_available</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gpu_id</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">      </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">      GPUが利用可能かどうかを返す関数です。</span>
 <span class="sd">      戻り値がTrueの場合、GPUが利用可能です。</span>
@@ -130,7 +130,7 @@
 <span class="sd">      &quot;&quot;&quot;</span>
       <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
 
-<span class="k">def</span> <span class="nf">post_deploy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deploy_dir</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="n">conf</span><span class="p">:</span><span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">post_deploy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deploy_dir</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="n">conf</span><span class="p">:</span><span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">      </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">      デプロイ後の処理を行う関数です。</span>
 <span class="sd">      deployコマンド実行時に呼び出されます。</span>
@@ -142,7 +142,7 @@
 <span class="sd">      &quot;&quot;&quot;</span>
       <span class="k">pass</span>
 
-<span class="k">def</span> <span class="nf">create_session</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deploy_dir</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="n">model_path</span><span class="p">:</span><span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="o">|</span><span class="n">Any</span><span class="p">],</span> <span class="n">model_conf_path</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="n">model_provider</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">gpu_id</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_session</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deploy_dir</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="n">model_path</span><span class="p">:</span><span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="o">|</span><span class="n">Any</span><span class="p">],</span> <span class="n">model_conf_path</span><span class="p">:</span><span class="n">Path</span><span class="p">,</span> <span class="n">model_provider</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">gpu_id</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">      </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">      推論セッションを作成する関数です。</span>
 <span class="sd">      startコマンド実行時に呼び出されます。</span>
@@ -160,7 +160,7 @@
 <span class="sd">      &quot;&quot;&quot;</span>
       <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
 
-<span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">img_width</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">img_height</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">image</span><span class="p">:</span><span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">,</span> <span class="n">labels</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">colors</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nodraw</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">img_width</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">img_height</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">image</span><span class="p">:</span><span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">,</span> <span class="n">labels</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">colors</span><span class="p">:</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nodraw</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">]:</span>
 <span class="w">      </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">      予測を行う関数です。</span>
 <span class="sd">      predictコマンドやcaptureコマンド実行時に呼び出されます。</span>
@@ -191,7 +191,7 @@
 </ul>
 </section>
 <section id="id3">
-<h2>前処理、後処理モジュールについて<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
+<h2>前処理、後処理モジュールについて<a class="headerlink" href="#id3" title="Permalink to this heading"></a></h2>
 <ul>
 <li><p>AIモデルの配備 <cite>iinfer -m client -c deploy &lt;Option&gt;</cite> コマンドで <cite>--before_injection_py &lt;前処理pyファイル&gt;</cite> 及び <cite>--after_injection_py &lt;後処理pyファイル&gt;</cite> オプションを指定すると、サーバーサイドで実行する前処理及び後処理を配備できます。</p></li>
 <li><p>前処理pyファイルは <cite>iinfer.app.injection.BeforeInjection</cite> クラスを継承させたクラスを作成してください。</p></li>
@@ -201,11 +201,11 @@
 <li><p><cite>--before_injection_conf &lt;前処理py用設定ファイル&gt;</cite> を指定した場合、 <cite>iinfer.app.injection.BeforeInjection</cite> クラスのコンストラクタの <cite>config</cite> 引数にその設定値が渡されます。後処理も同様です。</p></li>
 <li><p>前処理pyファイル及び後処理pyファイルのサンプルコードは、iinferのインストールパッケージ内の <cite>extensions</cite> フォルダ内にありますので参考にしてください。</p>
 <blockquote>
-<div><div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">BeforeInjection</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div><div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">BeforeInjection</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">      </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">      このクラスは推論を実行する前処理のインジェクションクラスです。</span>
 <span class="sd">      &quot;&quot;&quot;</span>
-      <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="n">Any</span><span class="p">],</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">):</span>
+      <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="n">Any</span><span class="p">],</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">):</span>
 <span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            このクラスのインスタンスを初期化します。</span>
 <span class="sd">            継承時は、このコンストラクタを呼び出すようにしてください。</span>
@@ -217,7 +217,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logger</span>
 
-      <span class="k">def</span> <span class="nf">action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reskey</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">image</span><span class="p">:</span><span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">,</span> <span class="n">session</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">:</span>
+      <span class="k">def</span><span class="w"> </span><span class="nf">action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reskey</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">image</span><span class="p">:</span><span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">,</span> <span class="n">session</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">:</span>
 <span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            このメソッドは推論を実行する前処理を実行します。</span>
 <span class="sd">            Args:</span>
@@ -237,11 +237,11 @@
 <span class="sd">            &quot;&quot;&quot;</span>
             <span class="k">return</span> <span class="n">image</span>
 
-<span class="k">class</span> <span class="nc">AfterInjection</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">AfterInjection</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">      </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">      このクラスは推論実行後の後処理のインジェクションクラスです。</span>
 <span class="sd">      &quot;&quot;&quot;</span>
-      <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="n">Any</span><span class="p">],</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">):</span>
+      <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="n">Any</span><span class="p">],</span> <span class="n">logger</span><span class="p">:</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">):</span>
 <span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            このクラスのインスタンスを初期化します。</span>
 <span class="sd">            継承時は、このコンストラクタを呼び出すようにしてください。</span>
@@ -253,7 +253,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logger</span>
 
-      <span class="k">def</span> <span class="nf">action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reskey</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">outputs</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">output_image</span><span class="p">:</span><span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">,</span> <span class="n">session</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">]:</span>
+      <span class="k">def</span><span class="w"> </span><span class="nf">action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reskey</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">outputs</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">output_image</span><span class="p">:</span><span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">,</span> <span class="n">session</span><span class="p">:</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">]:</span>
 <span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            このメソッドは推論を実行した後の処理を実行します。</span>
 <span class="sd">            Args:</span>

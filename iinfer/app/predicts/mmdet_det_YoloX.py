@@ -1,8 +1,7 @@
-from cmdbox.app import common
 from cmdbox.app.commons import convert
 from pathlib import Path
 from PIL import Image
-from iinfer.app import predict
+from iinfer.app import common as cmn, predict
 from typing import List, Tuple, Union, Any
 import logging
 
@@ -74,5 +73,5 @@ class MMDetYoloX(predict.TorchPredict):
         ids = [i for i in range(len(boxes))]
         scores = result.pred_instances.scores.cpu().numpy().tolist()
         clses = result.pred_instances.labels.cpu().numpy().tolist()
-        output_image, output_labels = common.draw_boxes(input_data, boxes, scores, clses, ids=ids, labels=labels, colors=colors, nodraw=nodraw)
+        output_image, output_labels = cmn.draw_boxes(input_data, boxes, scores, clses, ids=ids, labels=labels, colors=colors, nodraw=nodraw)
         return dict(output_ids=ids, output_scores=scores, output_classes=clses, output_labels=output_labels, output_boxes=boxes), output_image

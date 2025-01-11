@@ -1,22 +1,22 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="jp" data-content_root="../">
+<html class="writer-html5" lang="jp">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>コマンドリファレンス（clientモード） &mdash; iinfer 2025/01/05 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+  <title>コマンドリファレンス（clientモード） &mdash; iinfer 2025/01/11 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
 
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=5ea9f5e1"></script>
-      <script src="../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=537f6169"></script>
+      <script src="../_static/doctools.js?v=888ff710"></script>
+      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -112,10 +112,10 @@
            <div itemprop="articleBody">
              
   <section id="client">
-<h1>コマンドリファレンス（clientモード）<a class="headerlink" href="#client" title="Link to this heading"></a></h1>
+<h1>コマンドリファレンス（clientモード）<a class="headerlink" href="#client" title="Permalink to this heading"></a></h1>
 <p>clientモードのコマンド一覧です。</p>
 <section id="iinfer-m-client-c-capture-option">
-<h2>クライアント(キャプチャーの実行) : <cite>iinfer -m client -c capture &lt;Option&gt;</cite><a class="headerlink" href="#iinfer-m-client-c-capture-option" title="Link to this heading"></a></h2>
+<h2>クライアント(キャプチャーの実行) : <cite>iinfer -m client -c capture &lt;Option&gt;</cite><a class="headerlink" href="#iinfer-m-client-c-capture-option" title="Permalink to this heading"></a></h2>
 <p>このコマンドは、パイプで接続して下記のように使用します。</p>
 <div class="highlight-bat notranslate"><div class="highlight"><pre><span></span>iinfer -m client -c capture <span class="p">&lt;</span>Option<span class="p">&gt;</span> | iinfer -m client -c predict --stdin --pred_image_type capture <span class="p">&lt;</span>Option&gt;
 </pre></div>
@@ -177,7 +177,7 @@
 </table>
 </section>
 <section id="ai-iinfer-m-client-c-deploy-list-option">
-<h2>クライアント(AIモデルの配備一覧) : <cite>iinfer -m client -c deploy_list &lt;Option&gt;</cite><a class="headerlink" href="#ai-iinfer-m-client-c-deploy-list-option" title="Link to this heading"></a></h2>
+<h2>クライアント(AIモデルの配備一覧) : <cite>iinfer -m client -c deploy_list &lt;Option&gt;</cite><a class="headerlink" href="#ai-iinfer-m-client-c-deploy-list-option" title="Permalink to this heading"></a></h2>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20.0%" />
@@ -223,7 +223,7 @@
 </table>
 </section>
 <section id="ai-iinfer-m-client-c-deploy-option">
-<h2>クライアント(AIモデルの配備) : <cite>iinfer -m client -c deploy &lt;Option&gt;</cite><a class="headerlink" href="#ai-iinfer-m-client-c-deploy-option" title="Link to this heading"></a></h2>
+<h2>クライアント(AIモデルの配備) : <cite>iinfer -m client -c deploy &lt;Option&gt;</cite><a class="headerlink" href="#ai-iinfer-m-client-c-deploy-option" title="Permalink to this heading"></a></h2>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20.0%" />
@@ -333,11 +333,11 @@
 </table>
 </section>
 <section id="iinfer-m-client-c-predict-type-list-option">
-<span id="predict-type-list"></span><h2>クライアント(推論タイプ一覧) : <cite>iinfer -m client -c predict_type_list &lt;Option&gt;</cite><a class="headerlink" href="#iinfer-m-client-c-predict-type-list-option" title="Link to this heading"></a></h2>
+<span id="predict-type-list"></span><h2>クライアント(推論タイプ一覧) : <cite>iinfer -m client -c predict_type_list &lt;Option&gt;</cite><a class="headerlink" href="#iinfer-m-client-c-predict-type-list-option" title="Permalink to this heading"></a></h2>
 <p>推論タイプ一覧を出力します。オプションの指定はありません。</p>
 </section>
 <section id="iinfer-m-client-c-predict-option">
-<h2>クライアント(推論の実行) : <cite>iinfer -m client -c predict &lt;Option&gt;</cite><a class="headerlink" href="#iinfer-m-client-c-predict-option" title="Link to this heading"></a></h2>
+<h2>クライアント(推論の実行) : <cite>iinfer -m client -c predict &lt;Option&gt;</cite><a class="headerlink" href="#iinfer-m-client-c-predict-option" title="Permalink to this heading"></a></h2>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20.0%" />
@@ -411,7 +411,7 @@
 </table>
 </section>
 <section id="iinfer-m-client-c-read-dir-option">
-<h2>クライアント(ディレクトリ内の画像ファイルを取得) : <cite>iinfer -m client -c read_dir &lt;Option&gt;</cite><a class="headerlink" href="#iinfer-m-client-c-read-dir-option" title="Link to this heading"></a></h2>
+<h2>クライアント(ディレクトリ内の画像ファイルを取得) : <cite>iinfer -m client -c read_dir &lt;Option&gt;</cite><a class="headerlink" href="#iinfer-m-client-c-read-dir-option" title="Permalink to this heading"></a></h2>
 <p>このコマンドは、パイプで接続して下記のように使用します。</p>
 <div class="highlight-bat notranslate"><div class="highlight"><pre><span></span>iinfer -m client -c read_dir <span class="p">&lt;</span>Option<span class="p">&gt;</span> | iinfer -m client -c predict --stdin --pred_image_type capture <span class="p">&lt;</span>Option&gt;
 </pre></div>
@@ -481,7 +481,7 @@
 </table>
 </section>
 <section id="ai-iinfer-m-client-c-start-option">
-<h2>クライアント(AIモデルの起動) : <cite>iinfer -m client -c start &lt;Option&gt;</cite><a class="headerlink" href="#ai-iinfer-m-client-c-start-option" title="Link to this heading"></a></h2>
+<h2>クライアント(AIモデルの起動) : <cite>iinfer -m client -c start &lt;Option&gt;</cite><a class="headerlink" href="#ai-iinfer-m-client-c-start-option" title="Permalink to this heading"></a></h2>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20.0%" />
@@ -543,7 +543,7 @@
 </table>
 </section>
 <section id="ai-iinfer-m-client-c-stop-option">
-<h2>クライアント(AIモデルの停止) : <cite>iinfer -m client -c stop &lt;Option&gt;</cite><a class="headerlink" href="#ai-iinfer-m-client-c-stop-option" title="Link to this heading"></a></h2>
+<h2>クライアント(AIモデルの停止) : <cite>iinfer -m client -c stop &lt;Option&gt;</cite><a class="headerlink" href="#ai-iinfer-m-client-c-stop-option" title="Permalink to this heading"></a></h2>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20.0%" />
@@ -593,11 +593,11 @@
 </table>
 </section>
 <section id="iinfer-m-client-c-train-type-list-option">
-<span id="train-type-list"></span><h2>クライアント(学習タイプ一覧) : <cite>iinfer -m client -c train_type_list &lt;Option&gt;</cite><a class="headerlink" href="#iinfer-m-client-c-train-type-list-option" title="Link to this heading"></a></h2>
+<span id="train-type-list"></span><h2>クライアント(学習タイプ一覧) : <cite>iinfer -m client -c train_type_list &lt;Option&gt;</cite><a class="headerlink" href="#iinfer-m-client-c-train-type-list-option" title="Permalink to this heading"></a></h2>
 <p>学習タイプ一覧を出力します。オプションの指定はありません。</p>
 </section>
 <section id="ai-iinfer-m-client-c-train-option">
-<h2>クライアント(AIモデルの学習) : <cite>iinfer -m client -c train &lt;Option&gt;</cite><a class="headerlink" href="#ai-iinfer-m-client-c-train-option" title="Link to this heading"></a></h2>
+<h2>クライアント(AIモデルの学習) : <cite>iinfer -m client -c train &lt;Option&gt;</cite><a class="headerlink" href="#ai-iinfer-m-client-c-train-option" title="Permalink to this heading"></a></h2>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20.0%" />
@@ -651,7 +651,7 @@
 </table>
 </section>
 <section id="ai-iinfer-m-client-c-undeploy-option">
-<h2>クライアント(AIモデルの配備解除) : <cite>iinfer -m client -c undeploy &lt;Option&gt;</cite><a class="headerlink" href="#ai-iinfer-m-client-c-undeploy-option" title="Link to this heading"></a></h2>
+<h2>クライアント(AIモデルの配備解除) : <cite>iinfer -m client -c undeploy &lt;Option&gt;</cite><a class="headerlink" href="#ai-iinfer-m-client-c-undeploy-option" title="Permalink to this heading"></a></h2>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20.0%" />

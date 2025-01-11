@@ -1,5 +1,4 @@
-from cmdbox.app import common
-from iinfer.app import injection
+from iinfer.app import common as cmn, injection
 from PIL import Image, ImageDraw
 from typing import Tuple, Dict, Any
 
@@ -147,7 +146,7 @@ class AfterDetJadgeInjection(injection.AfterInjection):
         jadge_score = output_jadge_score[output_jadge_score.index(max(output_jadge_score))]
         draw = ImageDraw.Draw(output_image)
 
-        color = common.make_color(str(jadge_score*1000))
+        color = cmn.make_color(str(jadge_score*1000))
         draw.rectangle(((0, 0), (output_image.width, 10)), outline=color, fill=color)
         draw.text((0, 0), f"{output_jadge}:{jadge_score}", tuple([int(255-c) for c in color]))
 

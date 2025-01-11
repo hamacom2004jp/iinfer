@@ -1,5 +1,5 @@
 collectlicense
-cmdbox
+cmdbox>=0.2.7.3
 motpy
 opencv-python
 pytest

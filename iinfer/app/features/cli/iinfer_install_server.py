@@ -1,3 +1,4 @@
+from cmdbox import version
 from cmdbox.app import common, feature
 from iinfer.app import install
 from pathlib import Path
@@ -40,6 +41,10 @@ class InstallServer(feature.Feature):
                 dict(opt="data", type="file", default=common.HOME_DIR / '.iinfer', required=False, multi=False, hide=False, choice=None,
                         discription_ja="省略した時は `$HONE/.iinfer` を使用します。",
                         discription_en="When omitted, `$HONE/.iinfer` is used."),
+                dict(opt="install_cmdbox", type="str", default='cmdbox', required=False, multi=False, hide=True, choice=None,
+                        discription_ja=f"省略した時は `cmdbox` を使用します。 `cmdbox=={version.__version__}` といった指定も可能です。",
+                        discription_en=f"When omitted, `cmdbox` is used. You can also specify `cmdbox=={version.__version__}`.",
+                        test_false={"win":"cmdbox"}),
                 dict(opt="install_iinfer", type="str", default='iinfer', required=False, multi=False, hide=True, choice=None,
                         discription_ja=f"省略した時は `iinfer` を使用します。 `iinfer=={self.ver.__version__}` といった指定も可能です。",
                         discription_en=f"When omitted, `iinfer` is used. You can also specify `iinfer=={self.ver.__version__}`.",
@@ -68,6 +73,9 @@ class InstallServer(feature.Feature):
                 dict(opt="install_no_python", type="bool", default=False, required=False, multi=False, hide=False, choice=[True, False],
                         discription_ja="pythonのインストールを行わないようにします。",
                         discription_en="Do not install python."),
+                dict(opt="install_compile_python", type="bool", default=False, required=False, multi=False, hide=False, choice=[True, False],
+                        discription_ja="python3をコンパイルしてインストールします。install_no_pythonが指定されるとそちらを優先します。",
+                        discription_en="Compile and install python3; if install_no_python is specified, it is preferred."),
                 dict(opt="install_tag", type="str", default="", required=False, multi=False, hide=False, choice=None,
                         discription_ja="指定すると作成するdockerイメージのタグ名に追記出来ます。",
                         discription_en="If specified, you can add to the tag name of the docker image to create."),
@@ -111,7 +119,9 @@ class InstallServer(feature.Feature):
             msg = {"warn":f"Please specify the --data option."}
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return 1, msg
-        ret = inst.server(Path(args.data), args.install_iinfer,
+        ret = inst.server(Path(args.data),
+                        install_cmdbox_tgt=args.install_cmdbox,
+                        install_iinfer_tgt=args.install_iinfer,
                         install_onnx=args.install_onnx,
                         install_mmdet=args.install_mmdet,
                         install_mmseg=args.install_mmseg,
@@ -120,6 +130,7 @@ class InstallServer(feature.Feature):
                         install_insightface=args.install_insightface,
                         install_from=args.install_from,
                         install_no_python=args.install_no_python,
+                        install_compile_python=args.install_compile_python,
                         install_tag=args.install_tag, install_use_gpu=args.install_use_gpu)
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
 

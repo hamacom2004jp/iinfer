@@ -1,5 +1,4 @@
-from cmdbox.app import common
-from iinfer.app import injection
+from iinfer.app import common as cmn, injection
 from PIL import Image
 from typing import Tuple, Dict, Any
 
@@ -135,7 +134,7 @@ class AfterDetFilterInjection(injection.AfterInjection):
         output_ids = data["output_ids"] if "output_ids" in data else None
         output_labels = data["output_labels"] if "output_labels" in data else None
         output_tracks = data["output_tracks"] if "output_tracks" in data else output_ids
-        image, output_labels = common.draw_boxes(output_image, data["output_boxes"], data["output_scores"], data["output_classes"],
+        image, output_labels = cmn.draw_boxes(output_image, data["output_boxes"], data["output_scores"], data["output_classes"],
                                                  ids=output_ids, labels=output_labels, tracks=output_tracks, nodraw=nodraw, nolookup=True)
 
         return image

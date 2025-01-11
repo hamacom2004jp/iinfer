@@ -13,10 +13,10 @@ URL = version.__srcurl__
 LICENSE = 'MIT'
 DOWNLOAD_URL = URL
 VERSION = version.__version__
-PYTHON_REQUIRES = '>=3.10'
+PYTHON_REQUIRES = '>=3.8'
 INSTALL_REQUIRES = [
     'argcomplete',
-    'cmdbox',
+    'cmdbox>=0.2.7.3',
     'cryptography',
     'motpy',
     'opencv-python',

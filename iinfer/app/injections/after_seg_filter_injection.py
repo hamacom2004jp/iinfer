@@ -1,6 +1,5 @@
-from cmdbox.app import common
 from cmdbox.app.commons import convert
-from iinfer.app import injection
+from iinfer.app import common as cmn, injection
 from PIL import Image
 from typing import Tuple, Dict, Any, List
 import numpy as np
@@ -183,7 +182,7 @@ def draw_segment(img_npy:np.ndarray, segment:np.ndarray, colors:List[Tuple[int]]
     masked_image = np.zeros_like(img_npy)
 
     for c in np.unique(segment):
-        color = colors[int(c)] if colors is not None else common.make_color(str(int(c)))
+        color = colors[int(c)] if colors is not None else cmn.make_color(str(int(c)))
         m = segment == c
         r = np.where(m, color[0], 0).astype(np.uint8)
         g = np.where(m, color[1], 0).astype(np.uint8)

@@ -1,22 +1,22 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="jp" data-content_root="../">
+<html class="writer-html5" lang="jp">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>インストール &mdash; iinfer 2025/01/05 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+  <title>インストール &mdash; iinfer 2025/01/11 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
 
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=5ea9f5e1"></script>
-      <script src="../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=537f6169"></script>
+      <script src="../_static/doctools.js?v=888ff710"></script>
+      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -106,7 +106,7 @@
            <div itemprop="articleBody">
              
   <section id="id1">
-<h1>インストール<a class="headerlink" href="#id1" title="Link to this heading"></a></h1>
+<h1>インストール<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h1>
 <ul class="simple">
 <li><p><cite>iinfer</cite> はクライアントとサーバーの両方の環境を構築する必要があります。</p></li>
 <li><dl class="simple">
@@ -144,14 +144,14 @@
 </tbody>
 </table>
 <section id="client-install">
-<span id="id2"></span><h2>クライアント環境構築<a class="headerlink" href="#client-install" title="Link to this heading"></a></h2>
+<span id="id2"></span><h2>クライアント環境構築<a class="headerlink" href="#client-install" title="Permalink to this heading"></a></h2>
 <ul class="simple">
 <li><p>まず最初に <cite>iinfer</cite> をインストールします。</p></li>
 <li><p><cite>iinfer</cite> はPython3.8以上で動作します。</p></li>
 <li><p>これがクライアントとして動作します。</p></li>
 </ul>
 <section id="iinfer">
-<h3>１．<cite>iinfer</cite> のインストール<a class="headerlink" href="#iinfer" title="Link to this heading"></a></h3>
+<h3>１．<cite>iinfer</cite> のインストール<a class="headerlink" href="#iinfer" title="Permalink to this heading"></a></h3>
 <ul>
 <li><p>Windowsの場合</p>
 <blockquote>
@@ -178,13 +178,13 @@ pip<span class="w"> </span>install<span class="w"> </span>iinfer
 </section>
 </section>
 <section id="ubuntu">
-<span id="server-ubuntu-install"></span><h2>サーバー（Ubuntu）環境構築する場合<a class="headerlink" href="#ubuntu" title="Link to this heading"></a></h2>
+<span id="server-ubuntu-install"></span><h2>サーバー（Ubuntu）環境構築する場合<a class="headerlink" href="#ubuntu" title="Permalink to this heading"></a></h2>
 <ul class="simple">
 <li><p><cite>iinfer</cite> を使用して各種AIフレームワークをインストールしたDockerイメージを構築することが出来ます。</p></li>
 <li><p>物体検知を実行するための手順を解説します。</p></li>
 </ul>
 <section id="docker">
-<h3>１．Dockerイメージを構築<a class="headerlink" href="#docker" title="Link to this heading"></a></h3>
+<h3>１．Dockerイメージを構築<a class="headerlink" href="#docker" title="Permalink to this heading"></a></h3>
 <ul>
 <li><dl>
 <dt><cite>iinfer -m install -c server &lt;Option&gt;</cite> コマンドで推論サーバーを構築できます。</dt><dd><ul class="simple">
@@ -269,7 +269,7 @@ Creating<span class="w"> </span>redis<span class="w">                    </span>
 </ul>
 </section>
 <section id="id3">
-<h3>２．推論サーバーに接続する<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<h3>２．推論サーバーに接続する<a class="headerlink" href="#id3" title="Permalink to this heading"></a></h3>
 <ul>
 <li><p><cite>iinfer -m client -c deploy_list &lt;Option&gt;</cite> コマンドで推論サーバー接続を試してみます。</p></li>
 <li><p><cite>--svname server_mmdet</cite> コマンドで推論サーバー名を指定しています。</p>
@@ -283,7 +283,7 @@ Creating<span class="w"> </span>redis<span class="w">                    </span>
 </section>
 </section>
 <section id="wsl2-docker">
-<span id="server-wsl2docker-install"></span><h2>サーバー（WSL2+Docker）環境構築する場合<a class="headerlink" href="#wsl2-docker" title="Link to this heading"></a></h2>
+<span id="server-wsl2docker-install"></span><h2>サーバー（WSL2+Docker）環境構築する場合<a class="headerlink" href="#wsl2-docker" title="Permalink to this heading"></a></h2>
 <ul class="simple">
 <li><p>Windows環境ではWSL2を使用してUbuntu環境を構築することが出来ます。</p></li>
 <li><p>以下の手順で推論サーバーを構築してみます。</p></li>
@@ -345,13 +345,13 @@ wsl --import Ubuntu_docker-20.04 Ubuntu_docker-20.04 Ubuntu_wsl2_docker-20.04.ta
 </ol>
 </section>
 <section id="gpu">
-<span id="server-gpu-install"></span><h2>サーバー（GPU）環境構築する場合<a class="headerlink" href="#gpu" title="Link to this heading"></a></h2>
+<span id="server-gpu-install"></span><h2>サーバー（GPU）環境構築する場合<a class="headerlink" href="#gpu" title="Permalink to this heading"></a></h2>
 <ul class="simple">
 <li><p>サーバー環境にGPUを搭載した場合、GPU環境を構築することが出来ます。</p></li>
 <li><p>なおこの手順はNVIDIA製のGPUを使用する場合の手順です。</p></li>
 </ul>
 <section id="cuda-cudnn">
-<h3>１．CUDA + cuDNNのインストール<a class="headerlink" href="#cuda-cudnn" title="Link to this heading"></a></h3>
+<h3>１．CUDA + cuDNNのインストール<a class="headerlink" href="#cuda-cudnn" title="Permalink to this heading"></a></h3>
 <ol class="arabic">
 <li><dl class="simple">
 <dt>Windowsの場合 <a class="reference external" href="https://visualstudio.microsoft.com/ja/visual-cpp-build-tools/">Build Tools for Visual Studio 2022</a> をインストールします。</dt><dd><ol class="arabic simple">
@@ -462,7 +462,7 @@ sudo<span class="w"> </span>nvidia-ctk<span class="w"> </span>runtime<span class
 </ol>
 </section>
 <section id="id4">
-<h3>２．GPU対応版のサーバーインストール<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<h3>２．GPU対応版のサーバーインストール<a class="headerlink" href="#id4" title="Permalink to this heading"></a></h3>
 <ul>
 <li><p>下記のコマンドでインストールできます。</p>
 <blockquote>
@@ -474,7 +474,7 @@ sudo<span class="w"> </span>nvidia-ctk<span class="w"> </span>runtime<span class
 </ul>
 </section>
 <section id="id5">
-<h3>３．GPU対応版のフレームワークインストール<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<h3>３．GPU対応版のフレームワークインストール<a class="headerlink" href="#id5" title="Permalink to this heading"></a></h3>
 <ul>
 <li><p>Dockerを使用せずに、GPU対応版のフレームワークをインストールする場合、下記のコマンドでインストールできます。</p>
 <blockquote>

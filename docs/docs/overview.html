@@ -1,22 +1,22 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="jp" data-content_root="../">
+<html class="writer-html5" lang="jp">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>iinferの概要 &mdash; iinfer 2025/01/05 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+  <title>iinferの概要 &mdash; iinfer 2025/01/11 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
 
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=5ea9f5e1"></script>
-      <script src="../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=537f6169"></script>
+      <script src="../_static/doctools.js?v=888ff710"></script>
+      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -94,7 +94,7 @@
            <div itemprop="articleBody">
              
   <section id="iinfer">
-<h1>iinferの概要<a class="headerlink" href="#iinfer" title="Link to this heading"></a></h1>
+<h1>iinferの概要<a class="headerlink" href="#iinfer" title="Permalink to this heading"></a></h1>
 <ul class="simple">
 <li><p>onnx又はmmlabフォーマットのAIモデルファイルを実行するアプリケーションです。</p></li>
 <li><p>iinferを使用することで、AIモデルを簡単に実行することが出来ます。</p></li>
@@ -104,7 +104,7 @@
 <li><p>GUIモードを使用することで、 <cite>iinfer</cite> コマンド操作を簡単に行うことが出来ます。</p></li>
 </ul>
 <section id="id1">
-<h2>iinferの動作イメージ<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<h2>iinferの動作イメージ<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h2>
 <img alt="'iinferの概要'" src="../_images/orverview.drawio.png" />
 <ol class="arabic simple">
 <li><p><strong>iinfer client</strong> は <strong>imageファイル</strong> や <strong>camera</strong> から画像を取得し、 <strong>推論結果 predict.json</strong> を出力します。</p></li>
@@ -115,11 +115,11 @@
 </ol>
 </section>
 <section id="id2">
-<h2>インストール方法<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<h2>インストール方法<a class="headerlink" href="#id2" title="Permalink to this heading"></a></h2>
 <p>インストール方法は <a class="reference internal" href="install.html"><span class="doc">インストール</span></a> を参照してください。</p>
 </section>
 <section id="id3">
-<h2>iinferの使用方法<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
+<h2>iinferの使用方法<a class="headerlink" href="#id3" title="Permalink to this heading"></a></h2>
 <p>iinferを使用するには、次のコマンドを実行します:</p>
 <ol class="arabic simple">
 <li><p>guiモードで利用する場合:</p></li>
@@ -197,7 +197,7 @@ iinfer<span class="w"> </span>-m<span class="w"> </span>client<span class="w"> <
 </div></blockquote>
 </section>
 <section id="id4">
-<h2>データの保存場所<a class="headerlink" href="#id4" title="Link to this heading"></a></h2>
+<h2>データの保存場所<a class="headerlink" href="#id4" title="Permalink to this heading"></a></h2>
 <blockquote>
 <div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">HOME_DIR</span><span class="p">)</span> <span class="o">/</span> <span class="s1">&#39;.iinfer&#39;</span>
 </pre></div>

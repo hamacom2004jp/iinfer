@@ -39,9 +39,32 @@ class Install(object):
         else:
             return {"warn":f"Unsupported platform."}
 
-    def server(self, data:Path, install_iinfer_tgt:str='iinfer', install_onnx:bool=True,
+    def server(self, data:Path, install_cmdbox_tgt:str='cmdbox', install_iinfer_tgt:str='iinfer', install_onnx:bool=True,
                install_mmdet:bool=True, install_mmseg:bool=True, install_mmcls:bool=False, install_mmpretrain:bool=True,
-               install_insightface=False, install_from:str=None, install_no_python:bool=False, install_tag:str=None, install_use_gpu:bool=False):
+               install_insightface=False, install_from:str=None, install_no_python:bool=False, install_compile_python:bool=False,
+               install_tag:str=None, install_use_gpu:bool=False):
+        """
+        iinferが含まれるdockerイメージをインストールします。
+
+        Args:
+            data (Path): iinfer-serverのデータディレクトリ
+            install_cmdbox_tgt (str): cmdboxのインストール元
+            install_iinfer_tgt (str): iinferのインストール元
+            install_onnx (bool): onnxをインストールするかどうか
+            install_mmdet (bool): mmdetをインストールするかどうか
+            install_mmseg (bool): mmsegをインストールするかどうか
+            install_mmcls (bool): mmclsをインストールするかどうか
+            install_mmpretrain (bool): mmpretrainをインストールするかどうか
+            install_insightface (bool): insightfaceをインストールするかどうか
+            install_from (str): インストール元dockerイメージ
+            install_no_python (bool): pythonをインストールしない
+            install_compile_python (bool): pythonをコンパイルしてインストール
+            install_tag (str): インストールタグ
+            install_use_gpu (bool): GPUを使用するモジュール構成でインストールします。
+
+        Returns:
+            dict: 処理結果
+        """
         if platform.system() == 'Windows':
             return {"warn": f"Build server command is Unsupported in windows platform."}
         from importlib.resources import read_text
@@ -49,17 +72,24 @@ class Install(object):
         install_tag = f"_{install_tag}" if install_tag is not None else ''
         with open('Dockerfile', 'w', encoding='utf-8') as fp:
             text = read_text(f'iinfer.docker', 'Dockerfile')
-            wheel = Path(install_iinfer_tgt)
-            if wheel.exists() and wheel.suffix == '.whl':
-                shutil.copy(wheel, Path('.').resolve() / wheel.name)
-                #install_iinfer = f'/home/{user}/{wheel.name}'
-                install_iinfer_tgt = f'/home/{user}/{wheel.name}'
-                text = text.replace('#{COPY_IINFER}', f'COPY {wheel.name} {install_iinfer_tgt}')
+            # cmdboxのインストール設定
+            wheel_cmdbox = Path(install_cmdbox_tgt)
+            if wheel_cmdbox.exists() and wheel_cmdbox.suffix == '.whl':
+                shutil.copy(wheel_cmdbox, Path('.').resolve() / wheel_cmdbox.name)
+                install_cmdbox_tgt = f'/home/{user}/{wheel_cmdbox.name}'
+                text = text.replace('#{COPY_CMDBOX}', f'COPY {wheel_cmdbox.name} {install_cmdbox_tgt}')
+            else:
+                text = text.replace('#{COPY_CMDBOX}', '')
+            # iinferのインストール設定
+            wheel_iinfer = Path(install_iinfer_tgt)
+            if wheel_iinfer.exists() and wheel_iinfer.suffix == '.whl':
+                shutil.copy(wheel_iinfer, Path('.').resolve() / wheel_iinfer.name)
+                install_iinfer_tgt = f'/home/{user}/{wheel_iinfer.name}'
+                text = text.replace('#{COPY_IINFER}', f'COPY {wheel_iinfer.name} {install_iinfer_tgt}')
             else:
                 text = text.replace('#{COPY_IINFER}', '')
 
             start_sh_src = Path(__file__).parent.parent / 'docker' / 'scripts'
-            #start_sh_tgt = f'/home/{user}/scripts'
             start_sh_tgt = f'scripts'
             shutil.copytree(start_sh_src, start_sh_tgt, dirs_exist_ok=True)
             text = text.replace('#{COPY_IINFER_START}', f'COPY {start_sh_tgt} {start_sh_tgt}')
@@ -73,8 +103,19 @@ class Install(object):
             text = text.replace('#{FROM}', f'FROM {base_image}')
             text = text.replace('${MKUSER}', user)
             #text = text.replace('#{INSTALL_PYTHON}', f'RUN apt-get update && apt-get install -y python3.8 python3.8-distutils python3-pip python-is-python3' if install_use_gpu else '')
-            text = text.replace('#{INSTALL_PYTHON}', f'RUN apt-get update && apt-get install -y python3.11 python3.11-distutils python3-pip python-is-python3' if not install_no_python else '')
+            if install_compile_python:
+                install_python = f'RUN apt-get update && apt-get install -y build-essential libbz2-dev libdb-dev libreadline-dev libffi-dev libgdbm-dev liblzma-dev ' + \
+                                 f'libncursesw5-dev libsqlite3-dev libssl-dev zlib1g-dev uuid-dev tk-dev wget\n' + \
+                                 f'RUN wget https://www.python.org/ftp/python/3.11.11/Python-3.11.11.tar.xz\n' + \
+                                 f'RUN tar xJf Python-3.11.11.tar.xz && cd Python-3.11.11 && ./configure && make && make install\n' + \
+                                 f'RUN update-alternatives --install /usr/bin/python python /usr/local/bin/python3.11 1'
+                text = text.replace('#{INSTALL_PYTHON}', install_python)
+            elif not install_no_python:
+                text = text.replace('#{INSTALL_PYTHON}', f'RUN apt-get update && apt-get install -y python3.11 python3.11-distutils python3-pip python-is-python3')
+            else:
+                text = text.replace('#{INSTALL_PYTHON}', '')
             text = text.replace('#{INSTALL_TAG}', install_tag)
+            text = text.replace('#{INSTALL_CMDBOX}', install_cmdbox_tgt)
             text = text.replace('#{INSTALL_IINFER}', install_iinfer_tgt)
             text = text.replace('#{INSTALL_ONNX}', f'RUN iinfer -m install -c onnx --data /home/{user}/.iinfer {install_use_gpu_opt}' if install_onnx else '')
             text = text.replace('#{INSTALL_MMDET}', f'RUN iinfer -m install -c mmdet --data /home/{user}/.iinfer {install_use_gpu_opt}' if install_mmdet else '')
