@@ -572,7 +572,7 @@ class ClientDeploy(feature.Feature):
         ret, custom_train_file = _save_s(logger, "custom_train.py", custom_train_py, ret_fn=True)
 
         with open(deploy_dir / "conf.json", "w") as f:
-            conf = dict(model_img_width=model_img_width, model_img_height=model_img_height, predict_type=predict_type,
+            conf = dict(appid=self.ver.__appid__, model_img_width=model_img_width, model_img_height=model_img_height, predict_type=predict_type,
                         model_file=model_file, model_conf_file=model_conf_file, custom_predict_py=(custom_predict_file if custom_predict_file is not None else None),
                         label_file=label_file, color_file=color_file, before_injection_conf=before_injection_conf, after_injection_conf=after_injection_conf,
                         before_injection_type=before_injection_type, after_injection_type=after_injection_type,

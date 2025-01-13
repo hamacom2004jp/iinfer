@@ -4,6 +4,7 @@ from iinfer.app import client
 from pathlib import Path
 from typing import Dict, Any, Tuple, Union, List
 import argparse
+import copy
 import logging
 import json
 
@@ -179,37 +180,13 @@ class ClientDeployList(feature.Feature):
                 continue
             with open(conf_path, "r") as cf:
                 conf = json.load(cf)
-                model_file = 'exists' if "model_file" in conf and conf["model_file"] is not None and Path(conf["model_file"]).exists() else None
-                model_conf_file = None
-                if "model_conf_file" in conf and conf["model_conf_file"] is not None and len(conf["model_conf_file"]) > 0 and Path(conf["model_conf_file"][0]).exists():
-                    model_conf_file = 'exists'
-                before_injection = None
-                if "before_injection_py" in conf and conf["before_injection_py"] is not None and len(conf["before_injection_py"]) > 0:
-                    if len([True for p in conf["before_injection_py"] if  Path(p).exists()]) > 0:
-                        before_injection = 'exists'
-                if "before_injection_type" in conf and conf["before_injection_type"] is not None and len(conf["before_injection_type"]) > 0:
-                    before_injection = 'enabled'
-                after_injection = None
-                if "after_injection_py" in conf and conf["after_injection_py"] is not None and len(conf["after_injection_py"]) > 0:
-                    if len([True for p in conf["after_injection_py"] if  Path(p).exists()]) > 0:
-                        after_injection = 'exists'
-                if "after_injection_type" in conf and conf["after_injection_type"] is not None and len(conf["after_injection_type"]) > 0:
-                    after_injection = 'enabled'
-                custom_predict_py = 'exists' if "custom_predict_py" in conf and conf["custom_predict_py"] is not None and Path(conf["custom_predict_py"]).exists() else None
-                label_file = 'exists' if "label_file" in conf and conf["label_file"] is not None and Path(conf["label_file"]).exists() else None
-                color_file = 'exists' if "color_file" in conf and conf["color_file"] is not None and Path(conf["color_file"]).exists() else None
-                train_dataset = 'exists' if "train_dataset" in conf and conf["train_dataset"] is not None and Path(conf["train_dataset"]).exists() else None
-                train_type = conf["train_type"] if "train_type" in conf else None
-                custom_train_py = 'exists' if "custom_train_py" in conf and conf["custom_train_py"] is not None and Path(conf["custom_train_py"]).exists() else None
-                row = dict(name=dir.name,
-                           input=(conf["model_img_width"], conf["model_img_height"]), model_file=model_file, model_conf_file=model_conf_file,
-                           predict_type=conf["predict_type"], custom_predict=custom_predict_py,
-                           label_file=label_file, color_file=color_file,
-                           session=dir.name in sessions,
-                           mot=dir.name in sessions and sessions[dir.name]['tracker'] is not None,
-                           before_injection_py=before_injection,
-                           after_injection_py=after_injection,
-                           train_dataset=train_dataset, train_type=train_type, custom_train=custom_train_py)
+                row = dict(name=dir.name, session=dir.name in sessions, **copy.deepcopy(conf))
+                for k in row.keys():
+                    if k.endswith("_file") or k.endswith("_conf") or k.endswith("_conf"):
+                        if type(row[k]) == str:
+                            row[k] = 'exists' if Path(row[k]).exists() else None
+                        elif type(row[k]) == list:
+                            row[k] = 'exists' if len([True for p in row[k] if  Path(p).exists()]) > 0 else None
                 deploy_list.append(row)
         redis_cli.rpush(reskey, {"success": deploy_list})
         return self.RESP_SCCESS
