@@ -22,7 +22,7 @@ class Web(web.Web):
                  redis_host:str = "localhost", redis_port:int = 6379, redis_password:str = None, svname:str = 'server',
                  client_only:bool=False, doc_root:Path=None, gui_html:str=None, filer_html:str=None,
                  assets:List[str]=None, signin_html:str=None, signin_file:str=None, gui_mode:bool=False,
-                 web_features_packages:List[str]=["iinfer.app.features.web"], web_features_prefix:List[str]=["iinfer_web_"],
+                 web_features_packages:List[str]=[], web_features_prefix:List[str]=[],
                  showimg_html:str=None, webcap_html:str=None, anno_html:str=None):
         """
         iinferクライアント側のwebapiサービス
