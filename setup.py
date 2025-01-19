@@ -16,7 +16,7 @@ VERSION = version.__version__
 PYTHON_REQUIRES = '>=3.8'
 INSTALL_REQUIRES = [
     'argcomplete',
-    'cmdbox>=0.2.7.3',
+    'cmdbox>=0.2.9',
     'cryptography',
     'motpy',
     'opencv-python',
@@ -24,8 +24,6 @@ INSTALL_REQUIRES = [
     'urllib3',
     'wheel',
 ]
-
-
 PACKAGES = [
     'iinfer',
     'iinfer.app',
