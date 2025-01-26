@@ -57,11 +57,7 @@ cmdrule:                       # A list of command rules, Specify a rule that de
     rule: allow
   - groups: [user]
     mode: web
-    cmds: [genpass]
-    rule: allow
-  - groups: [user]
-    mode: web
-    cmds: [webcap]
+    cmds: [genpass, webcap]
     rule: allow
   - groups: [editor]
     mode: client

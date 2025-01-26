@@ -59,6 +59,7 @@ class WebStart(cmdbox_web_start.WebStart):
                         showimg_html=args.showimg_html, webcap_html=args.webcap_html, anno_html=args.anno_html)
             w.start(args.allow_host, args.listen_port, ssl_listen_port=args.ssl_listen_port,
                     ssl_cert=ssl_cert, ssl_key=ssl_key, ssl_keypass=args.ssl_keypass, ssl_ca_certs=ssl_ca_certs,
+                    session_domain=args.session_domain, session_path=args.session_path, session_secure=args.session_secure,
                     session_timeout=args.session_timeout, outputs_key=args.outputs_key)
 
             msg = {"success":"web complate."}

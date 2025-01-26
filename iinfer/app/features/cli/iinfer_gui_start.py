@@ -57,6 +57,7 @@ class GuiStart(cmdbox_gui_start.GuiStart):
         ssl_ca_certs = None if args.ssl_ca_certs is None else Path(args.ssl_ca_certs)
         w.start(args.allow_host, args.listen_port, ssl_listen_port=args.ssl_listen_port,
                 ssl_cert=ssl_cert, ssl_key=ssl_key, ssl_keypass=args.ssl_keypass, ssl_ca_certs=ssl_ca_certs,
+                session_domain=args.session_domain, session_path=args.session_path, session_secure=args.session_secure,
                 session_timeout=args.session_timeout, outputs_key=args.outputs_key)
 
         msg = {"success":"gui complate."}
