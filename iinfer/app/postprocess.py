@@ -18,9 +18,16 @@ class Postprocess(object):
 
     def postprocess(self, res_str:str, output_image_file:str=None, timeout:int=60) -> Dict[str, Any]:
         outputs = json.loads(res_str)
+        outputs = outputs[0] if isinstance(outputs, list) else outputs
         output_image = None
-        if "output_image" in outputs and "output_image_shape" in outputs:
-            img_npy = convert.b64str2npy(outputs["output_image"], outputs["output_image_shape"])
+        if "output_image" in outputs and "output_image_shape" in outputs and "output_image_name" in outputs:
+            outputs["output_image_name"] = outputs["output_image_name"].strip()
+            if outputs["output_image_name"].endswith(".capture"):
+                img_npy = convert.b64str2npy(outputs["output_image"], shape=outputs["output_image_shape"])
+            else:
+                img_bytes = convert.b64str2bytes(outputs["output_image"])
+                img_npy = convert.imgbytes2npy(img_bytes)
+
             output_image = convert.npy2img(img_npy)
             del outputs["output_image"]
             del outputs["output_image_shape"]

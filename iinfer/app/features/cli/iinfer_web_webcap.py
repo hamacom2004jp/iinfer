@@ -7,7 +7,7 @@ import cv2
 import logging
 
 
-class WebWebcap(feature.Feature):
+class WebWebcap(feature.UnsupportEdgeFeature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します

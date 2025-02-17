@@ -77,6 +77,7 @@ class AfterHttpInjection(injection.AfterInjection):
             finename = f'{prefix}{datetime.datetime.now().strftime("%Y%m%d%H%M%S")}.{ext}'
 
         finename = finename if 'output_image_name' not in outputs else outputs['output_image_name']
+        finename = finename.strip() if finename is not None else finename
         img_bytes = convert.img2byte(output_image, format=ext)
         file = {'file': (finename, io.BytesIO(img_bytes))}
 

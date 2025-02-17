@@ -7,7 +7,7 @@ import argparse
 import logging
 
 
-class InstallServer(feature.Feature):
+class InstallServer(feature.UnsupportEdgeFeature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します

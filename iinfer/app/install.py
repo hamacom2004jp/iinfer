@@ -3,9 +3,9 @@ from iinfer import version
 from pathlib import Path
 import getpass
 import logging
-import os
 import platform
 import shutil
+import sys
 import yaml
 
 
@@ -212,9 +212,15 @@ class Install(object):
 
     def _torch(self, install_use_gpu:bool=False):
         if install_use_gpu:
-            returncode, _, _cmd = common.cmd('pip install numpy==1.26.3 torch==2.1.0 torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118', logger=self.logger, slise=-1)
+            if sys.version_info[0] >= 3 and sys.version_info[1] >= 11:
+                returncode, _, _cmd = common.cmd('pip install numpy==1.26.3 torch==2.1.0 torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118', logger=self.logger, slise=-1)
+            else:
+                returncode, _, _cmd = common.cmd('pip install numpy==1.24.1 torch==2.1.0 torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118', logger=self.logger, slise=-1)
         else:
-            returncode, _, _cmd = common.cmd('pip install numpy==1.26.3 torch==2.1.0 torchvision torchaudio', logger=self.logger, slise=-1)
+            if sys.version_info[0] >= 3 and sys.version_info[1] >= 11:
+                returncode, _, _cmd = common.cmd('pip install numpy==1.26.3 torch==2.1.0 torchvision torchaudio', logger=self.logger, slise=-1)
+            else:
+                returncode, _, _cmd = common.cmd('pip install numpy==1.24.1 torch==2.1.0 torchvision torchaudio', logger=self.logger, slise=-1)
         if returncode != 0:
             self.logger.warning(f"Failed to install torch torchvision torchaudio. cmd:{_cmd}")
             return {"error": f"Failed to install torch torchvision torchaudio. cmd:{_cmd}"}

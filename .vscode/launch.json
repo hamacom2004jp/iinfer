@@ -58,11 +58,20 @@
             "justMyCode": false
         },
         {
-            "name": "Python: iinfer read_dir",
+            "name": "Python: iinfer edge",
             "type": "python",
             "request": "launch",
-            "args": ["-m","client","-c","read_dir","-f", "--glob_str", "**/*.jpg", "--read_input_type", "jpeg", "--image_type", "capture",
-                     "--root_dir", "sample/input", "--polling_interval", "1", "--polling"],
+            "args": ["-m","edge","-c","start"],
+            "module": "iinfer",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "justMyCode": false
+        },
+        {
+            "name": "Python: iinfer edge config",
+            "type": "python",
+            "request": "launch",
+            "args": ["-m","edge","-c","config"],
             "module": "iinfer",
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
@@ -72,7 +81,7 @@
             "name": "Python: iinfer install",
             "type": "python",
             "request": "launch",
-            "args": ["-m","install","-c","mmdet","-f"],
+            "args": ["-m","install","-c","server","-f"],
             "module": "iinfer",
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",

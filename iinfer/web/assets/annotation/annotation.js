@@ -89,9 +89,17 @@ anno.load_label = (svpath) => {
     const labels = atob(res['data']).split(/\r?\n/);
     const tags_labels_elem = anno.canvas_container.find('#tags_labels');
     tags_labels_elem.children('.dropdown-labels').remove();
+    const anno_list_elem = anno.canvas_container.find('.anno-list');
+    const svg_elem = anno.canvas_container.find('svg');
     labels.forEach((label, i) => {
       const color = cmdbox.randam_color();
       anno.add_label(label, color, tags_labels_elem);
+      svg_elem.find(`[data-anno-label="${label}"]`).attr('stroke', `#${color}`);
+      anno_list_elem.each((i, elem) => {
+        const a_elem = $(elem).find(`[data-anno-label="${label}"]`);
+        const color_elem = a_elem.find('input[type="color"]');
+        color_elem.val(`#${color}`);
+      });
     });
   }).finally(() => {
     anno.canvas_container.find('#tags_labels .dropdown-item:first').click();
@@ -116,6 +124,13 @@ anno.add_label = (label, color, tags_labels_elem) => {
     anno.tool.label = a_elem.attr('data-label');
     anno.tool.color = a_elem.attr('data-color');
     anno.reflesh_svg();
+    anno.canvas_container.find('.tag_label_color').attr('value', `#${anno.tool.color}`);
+    const anno_list_elem = anno.canvas_container.find('.anno-list');
+    anno_list_elem.each((i, elem) => {
+      const a_elem = $(elem).find(`[data-anno-label="${anno.tool.label}"]`);
+      const color_elem = a_elem.find('input[type="color"]');
+      color_elem.val(`#${anno.tool.color}`);
+    });
   });
   const del_elem = $(`<button class="btn ms-auto p-0"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3" viewBox="0 0 16 16">`
     + `<path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5ZM11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0H11Zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5h9.916Zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5Z"></path></svg>`);
@@ -182,6 +197,13 @@ anno.load_color = (svpath) => {
           color = cmdbox.randam_color();
         }
         $(ak).attr('data-color', color).find('input').attr('value', `#${color}`);
+        const label = $(ak).attr('data-label');
+        const anno_list_elem = anno.canvas_container.find('.anno-list');
+        anno_list_elem.each((i, elem) => {
+          const a_elem = $(elem).find(`[data-anno-label="${label}"]`);
+          const color_elem = a_elem.find('input[type="color"]');
+          color_elem.val(`#${color}`);
+        });
       });
       ref_elem.find('.dropdown-item:first').click();
     }
@@ -604,6 +626,7 @@ anno.load_annolist = (svg_elem) => {
     const a_elem = $(anno.canvas_container.find('#anno_item_temp').prop('outerHTML'));
     a_elem.find('input').attr('value', color);
     a_elem.attr('data-anno-id', comp_elem.attr('id'));
+    a_elem.attr('data-anno-label', label);
     a_elem.attr('id', null);
     // アノテーションリストをクリックしたときにアノテーションを選択
     a_elem.off('click').on('click', (event) => {

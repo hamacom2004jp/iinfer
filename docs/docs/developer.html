@@ -1,12 +1,12 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="jp">
+<html class="writer-html5" lang="jp" data-content_root="../">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>開発者向け情報 &mdash; iinfer 2025/01/26 documentation</title>
+  <title>開発者向け情報 &mdash; iinfer 2025/02/17 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,9 +14,9 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=35a68168"></script>
-      <script src="../_static/doctools.js?v=888ff710"></script>
-      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="../_static/documentation_options.js?v=9eac6ff8"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -97,10 +97,10 @@
            <div itemprop="articleBody">
              
   <section id="id1">
-<h1>開発者向け情報<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h1>
+<h1>開発者向け情報<a class="headerlink" href="#id1" title="Link to this heading"></a></h1>
 <p>iinferの開発環境を構築するための手順を説明します。</p>
 <section id="id2">
-<h2>プロジェクトのインストール方法<a class="headerlink" href="#id2" title="Permalink to this heading"></a></h2>
+<h2>プロジェクトのインストール方法<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
 <p>プロジェクトをインストールするには、次の手順を実行します:</p>
 <ol class="arabic">
 <li><p>プロジェクトをクローンします:</p>
@@ -147,7 +147,7 @@ python setup.py bdist_wheel
 </ol>
 </section>
 <section id="id3">
-<h2>モジュールのコミット方法<a class="headerlink" href="#id3" title="Permalink to this heading"></a></h2>
+<h2>モジュールのコミット方法<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
 <p>開発を協力いただける方は、以下のガイドラインに従ってください:</p>
 <ol class="arabic">
 <li><p>新しいブランチを作成してください:</p>
@@ -175,7 +175,7 @@ python setup.py bdist_wheel
 </ol>
 </section>
 <section id="pypl">
-<h2>【参考】pyplにアップするための手順<a class="headerlink" href="#pypl" title="Permalink to this heading"></a></h2>
+<h2>【参考】pyplにアップするための手順<a class="headerlink" href="#pypl" title="Link to this heading"></a></h2>
 <ol class="arabic">
 <li><p>pypiのユーザー登録</p>
 <ul class="simple">
@@ -237,7 +237,7 @@ python setup.py bdist_wheel
 </ol>
 </section>
 <section id="wsl2-ubuntu20-04-docker">
-<h2>【参考】WSL2-Ubuntu20.04-docker環境を構築する手順<a class="headerlink" href="#wsl2-ubuntu20-04-docker" title="Permalink to this heading"></a></h2>
+<h2>【参考】WSL2-Ubuntu20.04-docker環境を構築する手順<a class="headerlink" href="#wsl2-ubuntu20-04-docker" title="Link to this heading"></a></h2>
 <ol class="arabic">
 <li><p>WSL2のインストール</p>
 <blockquote>
@@ -305,7 +305,7 @@ wsl --unregister Ubuntu-22.04
 </ol>
 </section>
 <section id="wslusb">
-<h2>【参考】WSL環境でUSBディバイスを使用する方法<a class="headerlink" href="#wslusb" title="Permalink to this heading"></a></h2>
+<h2>【参考】WSL環境でUSBディバイスを使用する方法<a class="headerlink" href="#wslusb" title="Link to this heading"></a></h2>
 <ul>
 <li><p>WSL2のUbuntuでUSBデバイスを使用するためには、以下の手順を実行します。 <a class="reference external" href="https://learn.microsoft.com/ja-jp/windows/wsl/connect-usb">元記事</a></p>
 <blockquote>
@@ -346,7 +346,7 @@ wsl --unregister Ubuntu-22.04
 </ul>
 </section>
 <section id="rediswindows">
-<h2>【参考】RedisをWindows環境を構築する手順<a class="headerlink" href="#rediswindows" title="Permalink to this heading"></a></h2>
+<h2>【参考】RedisをWindows環境を構築する手順<a class="headerlink" href="#rediswindows" title="Link to this heading"></a></h2>
 <ul>
 <li><p><cite>iinfer</cite> はRedisを使用しています。</p></li>
 <li><p><cite>iinfer -m install -c redis</cite> コマンドはWSL2内のUbuntuに対するRedisインストールになりますので、Windows環境にインストールする場合は下記の手順を実行します。</p>
@@ -369,7 +369,7 @@ wsl --unregister Ubuntu-22.04
 </ul>
 </section>
 <section id="sitemap-xml">
-<h2>【参考】sitemap.xmlの作成手順<a class="headerlink" href="#sitemap-xml" title="Permalink to this heading"></a></h2>
+<h2>【参考】sitemap.xmlの作成手順<a class="headerlink" href="#sitemap-xml" title="Link to this heading"></a></h2>
 <ol class="arabic">
 <li><p><a class="reference external" href="https://www.xml-sitemaps.com/">xml-sitemaps</a> でsitemap.xmlを作成します。:</p></li>
 <li><p>作成したsitemap.xmlをダウンロードします。</p></li>

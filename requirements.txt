@@ -1,5 +1,6 @@
 collectlicense
-cmdbox>=0.2.7.3
+cmdbox>=0.4.4
+cryptography
 motpy
 opencv-python
 pytest
@@ -13,3 +14,5 @@ sphinx-rtd-theme
 sphinx_fontawesome
 sphinx-intl
 sphinx-sitemap
+urllib3
+wheel

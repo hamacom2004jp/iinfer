@@ -1,12 +1,12 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="jp">
+<html class="writer-html5" lang="jp" data-content_root="../">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>コマンドリファレンス（postprocessモード） &mdash; iinfer 2025/01/26 documentation</title>
+  <title>コマンドリファレンス（postprocessモード） &mdash; iinfer 2025/02/17 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,9 +14,9 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=35a68168"></script>
-      <script src="../_static/doctools.js?v=888ff710"></script>
-      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="../_static/documentation_options.js?v=9eac6ff8"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -112,12 +112,12 @@
            <div itemprop="articleBody">
              
   <section id="postprocess">
-<h1>コマンドリファレンス（postprocessモード）<a class="headerlink" href="#postprocess" title="Permalink to this heading"></a></h1>
+<h1>コマンドリファレンス（postprocessモード）<a class="headerlink" href="#postprocess" title="Link to this heading"></a></h1>
 <ul class="simple">
 <li><p>postprocessモードのコマンド一覧です。</p></li>
 </ul>
 <section id="iinfer-m-postprocess-c-cls-jadge-option">
-<h2>後処理(画像分類判定) : <cite>iinfer -m postprocess -c cls_jadge &lt;Option&gt;</cite><a class="headerlink" href="#iinfer-m-postprocess-c-cls-jadge-option" title="Permalink to this heading"></a></h2>
+<h2>後処理(画像分類判定) : <cite>iinfer -m postprocess -c cls_jadge &lt;Option&gt;</cite><a class="headerlink" href="#iinfer-m-postprocess-c-cls-jadge-option" title="Link to this heading"></a></h2>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20.0%" />
@@ -191,7 +191,7 @@
 </table>
 </section>
 <section id="iinfer-m-postprocess-c-cmd-option">
-<h2>後処理(コマンド実行) : <cite>iinfer -m postprocess -c cmd &lt;Option&gt;</cite><a class="headerlink" href="#iinfer-m-postprocess-c-cmd-option" title="Permalink to this heading"></a></h2>
+<h2>後処理(コマンド実行) : <cite>iinfer -m postprocess -c cmd &lt;Option&gt;</cite><a class="headerlink" href="#iinfer-m-postprocess-c-cmd-option" title="Link to this heading"></a></h2>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20.0%" />
@@ -237,7 +237,7 @@
 </table>
 </section>
 <section id="csv-iinfer-m-postprocess-c-csv-option">
-<h2>後処理(CSV出力) : <cite>iinfer -m postprocess -c csv &lt;Option&gt;</cite><a class="headerlink" href="#csv-iinfer-m-postprocess-c-csv-option" title="Permalink to this heading"></a></h2>
+<h2>後処理(CSV出力) : <cite>iinfer -m postprocess -c csv &lt;Option&gt;</cite><a class="headerlink" href="#csv-iinfer-m-postprocess-c-csv-option" title="Link to this heading"></a></h2>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20.0%" />
@@ -287,7 +287,7 @@
 </table>
 </section>
 <section id="iinfer-m-postprocess-c-det-clip-option">
-<h2>後処理(物体検知個所切り出し) : <cite>iinfer -m postprocess -c det_clip &lt;Option&gt;</cite><a class="headerlink" href="#iinfer-m-postprocess-c-det-clip-option" title="Permalink to this heading"></a></h2>
+<h2>後処理(物体検知個所切り出し) : <cite>iinfer -m postprocess -c det_clip &lt;Option&gt;</cite><a class="headerlink" href="#iinfer-m-postprocess-c-det-clip-option" title="Link to this heading"></a></h2>
 <p>ObjectDetectionで検知した個所を切り出し、caprute形式のcsvで出力します。</p>
 <table class="docutils align-default">
 <colgroup>
@@ -338,7 +338,7 @@
 </table>
 </section>
 <section id="iinfer-m-postprocess-c-det-face-store-option">
-<h2>後処理(顔認識用ストアファイル生成) : <cite>iinfer -m postprocess -c det_face_store &lt;Option&gt;</cite><a class="headerlink" href="#iinfer-m-postprocess-c-det-face-store-option" title="Permalink to this heading"></a></h2>
+<h2>後処理(顔認識用ストアファイル生成) : <cite>iinfer -m postprocess -c det_face_store &lt;Option&gt;</cite><a class="headerlink" href="#iinfer-m-postprocess-c-det-face-store-option" title="Link to this heading"></a></h2>
 <p>Face Detection and Recognitionで検知した顔特徴データを個所を切り出し、顔認識ストアファイルを生成します。顔認識ストアファイルの使用方法は以下のとおりです。
 1. 生成したファイルをテキストエディタで開き、face_label項目に名前を入力します。
 2. 生成したファイルを <cite>client</cite> モードの <cite>deploy</cite> コマンドの <cite>--model_conf_file</cite> オプションに指定し、上書きデプロイします。
@@ -385,7 +385,7 @@
 </ul>
 </section>
 <section id="iinfer-m-postprocess-c-det-filter-option">
-<h2>後処理(物体検知フィルター) : <cite>iinfer -m postprocess -c det_filter &lt;Option&gt;</cite><a class="headerlink" href="#iinfer-m-postprocess-c-det-filter-option" title="Permalink to this heading"></a></h2>
+<h2>後処理(物体検知フィルター) : <cite>iinfer -m postprocess -c det_filter &lt;Option&gt;</cite><a class="headerlink" href="#iinfer-m-postprocess-c-det-filter-option" title="Link to this heading"></a></h2>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20.0%" />
@@ -443,7 +443,7 @@
 </table>
 </section>
 <section id="iinfer-m-postprocess-c-det-jadge-option">
-<h2>後処理(物体検知判定) : <cite>iinfer -m postprocess -c det_jadge &lt;Option&gt;</cite><a class="headerlink" href="#iinfer-m-postprocess-c-det-jadge-option" title="Permalink to this heading"></a></h2>
+<h2>後処理(物体検知判定) : <cite>iinfer -m postprocess -c det_jadge &lt;Option&gt;</cite><a class="headerlink" href="#iinfer-m-postprocess-c-det-jadge-option" title="Link to this heading"></a></h2>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20.0%" />
@@ -517,7 +517,7 @@
 </table>
 </section>
 <section id="http-iinfer-m-postprocess-c-httpreq-option">
-<h2>後処理(HTTPリクエストの実行) : <cite>iinfer -m postprocess -c httpreq &lt;Option&gt;</cite><a class="headerlink" href="#http-iinfer-m-postprocess-c-httpreq-option" title="Permalink to this heading"></a></h2>
+<h2>後処理(HTTPリクエストの実行) : <cite>iinfer -m postprocess -c httpreq &lt;Option&gt;</cite><a class="headerlink" href="#http-iinfer-m-postprocess-c-httpreq-option" title="Link to this heading"></a></h2>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20.0%" />
@@ -575,7 +575,7 @@
 </table>
 </section>
 <section id="iinfer-m-postprocess-c-seg-bbox-option">
-<h2>後処理(領域ボックス検知) : <cite>iinfer -m postprocess -c seg_bbox &lt;Option&gt;</cite><a class="headerlink" href="#iinfer-m-postprocess-c-seg-bbox-option" title="Permalink to this heading"></a></h2>
+<h2>後処理(領域ボックス検知) : <cite>iinfer -m postprocess -c seg_bbox &lt;Option&gt;</cite><a class="headerlink" href="#iinfer-m-postprocess-c-seg-bbox-option" title="Link to this heading"></a></h2>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20.0%" />
@@ -625,7 +625,7 @@
 </table>
 </section>
 <section id="iinfer-m-postprocess-c-seg-filter-option">
-<h2>後処理(領域検知フィルター) : <cite>iinfer -m postprocess -c seg_filter &lt;Option&gt;</cite><a class="headerlink" href="#iinfer-m-postprocess-c-seg-filter-option" title="Permalink to this heading"></a></h2>
+<h2>後処理(領域検知フィルター) : <cite>iinfer -m postprocess -c seg_filter &lt;Option&gt;</cite><a class="headerlink" href="#iinfer-m-postprocess-c-seg-filter-option" title="Link to this heading"></a></h2>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20.0%" />
@@ -679,7 +679,7 @@
 </table>
 </section>
 <section id="showimg-iinfer-m-postprocess-c-showimg-option">
-<h2>後処理(showimg転送) : <cite>iinfer -m postprocess -c showimg &lt;Option&gt;</cite><a class="headerlink" href="#showimg-iinfer-m-postprocess-c-showimg-option" title="Permalink to this heading"></a></h2>
+<h2>後処理(showimg転送) : <cite>iinfer -m postprocess -c showimg &lt;Option&gt;</cite><a class="headerlink" href="#showimg-iinfer-m-postprocess-c-showimg-option" title="Link to this heading"></a></h2>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20.0%" />

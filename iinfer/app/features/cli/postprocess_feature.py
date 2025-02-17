@@ -29,6 +29,8 @@ class PostprocessFeature(feature.Feature):
                     else: common.print_format(ret, format, tm, output_json, output_json_append, pf=pf)
                 except Exception as e:
                     msg = {"warn":f"Invalid input. {e}"}
+                    line_str = common.to_str(line, slise=100)
+                    proc.logger.error(f"Invalid input.: args.mode={self.get_mode()}, args.cmd={self.get_cmd()}, proc={proc}, line={line_str}", exc_info=True)
                     common.print_format(msg, format, tm, output_json, output_json_append, pf=pf)
                     ret = msg
                 tm = time.perf_counter()

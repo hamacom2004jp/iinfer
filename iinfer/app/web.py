@@ -160,7 +160,7 @@ class Web(web.Web):
                     self.count += 1
                 if self.capture_count > 0 and self.count >= self.capture_count:
                     self.is_running = False
-                    gevent.sleep(10)
+                    #gevent.sleep(3)
                     self.logger.info(f"Exit webcap. allow_host={self.allow_host} listen_webcap_port={self.listen_webcap_port}")
 
             except Exception as e:

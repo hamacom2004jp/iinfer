@@ -1,21 +1,21 @@
-Copyright (c) 2005-2022, NumPy Developers.
+Copyright (c) 2001-2002 Enthought, Inc. 2003-2024, SciPy Developers.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are
-met:
+modification, are permitted provided that the following conditions
+are met:
 
-    * Redistributions of source code must retain the above copyright
-       notice, this list of conditions and the following disclaimer.
+1. Redistributions of source code must retain the above copyright
+   notice, this list of conditions and the following disclaimer.
 
-    * Redistributions in binary form must reproduce the above
-       copyright notice, this list of conditions and the following
-       disclaimer in the documentation and/or other materials provided
-       with the distribution.
+2. Redistributions in binary form must reproduce the above
+   copyright notice, this list of conditions and the following
+   disclaimer in the documentation and/or other materials provided
+   with the distribution.
 
-    * Neither the name of the NumPy Developers nor the names of any
-       contributors may be used to endorse or promote products derived
-       from this software without specific prior written permission.
+3. Neither the name of the copyright holder nor the names of its
+   contributors may be used to endorse or promote products derived
+   from this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -31,33 +31,34 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ----
 
-This binary distribution of NumPy also bundles the following software:
+This binary distribution of SciPy can also bundle the following software
+(depending on the build):
 
 
 Name: OpenBLAS
-Files: extra-dll\libopenb*.dll
+Files: scipy.libs\libscipy_openblas*.dll
 Description: bundled as a dynamically linked library
-Availability: https://github.com/xianyi/OpenBLAS/
-License: 3-clause BSD
+Availability: https://github.com/OpenMathLib/OpenBLAS/
+License: BSD-3-Clause-Attribution
   Copyright (c) 2011-2014, The OpenBLAS Project
   All rights reserved.
-
+  
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions are
   met:
-
+  
      1. Redistributions of source code must retain the above copyright
         notice, this list of conditions and the following disclaimer.
-
+  
      2. Redistributions in binary form must reproduce the above copyright
         notice, this list of conditions and the following disclaimer in
         the documentation and/or other materials provided with the
         distribution.
-     3. Neither the name of the OpenBLAS project nor the names of
-        its contributors may be used to endorse or promote products
-        derived from this software without specific prior written
+     3. Neither the name of the OpenBLAS project nor the names of 
+        its contributors may be used to endorse or promote products 
+        derived from this software without specific prior written 
         permission.
-
+  
   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -71,10 +72,10 @@ License: 3-clause BSD
 
 
 Name: LAPACK
-Files: extra-dll\libopenb*.dll
+Files: scipy.libs\libscipy_openblas*.dll
 Description: bundled in OpenBLAS
-Availability: https://github.com/xianyi/OpenBLAS/
-License 3-clause BSD
+Availability: https://github.com/OpenMathLib/OpenBLAS/
+License: BSD-3-Clause-Attribution
   Copyright (c) 1992-2013 The University of Tennessee and The University
                           of Tennessee Research Foundation.  All rights
                           reserved.
@@ -82,36 +83,36 @@ License 3-clause BSD
                           rights reserved.
   Copyright (c) 2006-2013 The University of Colorado Denver.  All rights
                           reserved.
-
+  
   $COPYRIGHT$
-
+  
   Additional copyrights may follow
-
+  
   $HEADER$
-
+  
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions are
   met:
-
+  
   - Redistributions of source code must retain the above copyright
     notice, this list of conditions and the following disclaimer.
-
+  
   - Redistributions in binary form must reproduce the above copyright
     notice, this list of conditions and the following disclaimer listed
     in this license in the documentation and/or other materials
     provided with the distribution.
-
+  
   - Neither the name of the copyright holders nor the names of its
     contributors may be used to endorse or promote products derived from
     this software without specific prior written permission.
-
+  
   The copyright holders provide no reassurances that the source code
   provided does not infringe any patent, copyright, or any other
   intellectual property rights of third parties.  The copyright holders
   disclaim any liability to any recipient for claims brought against
   recipient by any third party for infringement of that parties
   intellectual property rights.
-
+  
   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
   "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -126,88 +127,31 @@ License 3-clause BSD
 
 
 Name: GCC runtime library
-Files: extra-dll\*.dll
-Description: statically linked, in DLL files compiled with gfortran only
-Availability: https://gcc.gnu.org/viewcvs/gcc/
-License: GPLv3 + runtime exception
+Files: scipy.libs\libscipy_openblas*.dll
+Description: statically linked to files compiled with gcc
+Availability: https://gcc.gnu.org/git/?p=gcc.git;a=tree;f=libgfortran
+License: GPL-3.0-with-GCC-exception
   Copyright (C) 2002-2017 Free Software Foundation, Inc.
-
+  
   Libgfortran is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation; either version 3, or (at your option)
   any later version.
-
+  
   Libgfortran is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
-
+  
   Under Section 7 of GPL version 3, you are granted additional
   permissions described in the GCC Runtime Library Exception, version
   3.1, as published by the Free Software Foundation.
-
+  
   You should have received a copy of the GNU General Public License and
   a copy of the GCC Runtime Library Exception along with this program;
   see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
   <http://www.gnu.org/licenses/>.
 
-
-Name: Microsoft Visual C++ Runtime Files
-Files: extra-dll\msvcp140.dll
-License: MSVC
-  https://www.visualstudio.com/license-terms/distributable-code-microsoft-visual-studio-2015-rc-microsoft-visual-studio-2015-sdk-rc-includes-utilities-buildserver-files/#visual-c-runtime
-
-  Subject to the License Terms for the software, you may copy and
-  distribute with your program any of the files within the followng
-  folder and its subfolders except as noted below. You may not modify
-  these files.
-
-    C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\redist
-
-  You may not distribute the contents of the following folders:
-
-    C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\redist\debug_nonredist
-    C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\redist\onecore\debug_nonredist
-
-  Subject to the License Terms for the software, you may copy and
-  distribute the following files with your program in your program’s
-  application local folder or by deploying them into the Global
-  Assembly Cache (GAC):
-
-  VC\atlmfc\lib\mfcmifc80.dll
-  VC\atlmfc\lib\amd64\mfcmifc80.dll
-
-
-Name: Microsoft Visual C++ Runtime Files
-Files: extra-dll\msvc*90.dll, extra-dll\Microsoft.VC90.CRT.manifest
-License: MSVC
-  For your convenience, we have provided the following folders for
-  use when redistributing VC++ runtime files. Subject to the license
-  terms for the software, you may redistribute the folder
-  (unmodified) in the application local folder as a sub-folder with
-  no change to the folder name. You may also redistribute all the
-  files (*.dll and *.manifest) within a folder, listed below the
-  folder for your convenience, as an entire set.
-
-  \VC\redist\x86\Microsoft.VC90.ATL\
-   atl90.dll
-   Microsoft.VC90.ATL.manifest
-  \VC\redist\ia64\Microsoft.VC90.ATL\
-   atl90.dll
-   Microsoft.VC90.ATL.manifest
-  \VC\redist\amd64\Microsoft.VC90.ATL\
-   atl90.dll
-   Microsoft.VC90.ATL.manifest
-  \VC\redist\x86\Microsoft.VC90.CRT\
-   msvcm90.dll
-   msvcp90.dll
-   msvcr90.dll
-   Microsoft.VC90.CRT.manifest
-  \VC\redist\ia64\Microsoft.VC90.CRT\
-   msvcm90.dll
-   msvcp90.dll
-   msvcr90.dll
-   Microsoft.VC90.CRT.manifest
 
 ----
 

@@ -420,7 +420,7 @@ class Client(client.Client):
                             self.logger.warn(f"image_file data is invalid. Not found output_image or output_image_shape or output_image_name key.")
                             continue
                         img_npy = convert.b64str2npy(res_json["output_image"], shape=res_json["output_image_shape"])
-                        res_json = self.predict(name, image=img_npy, image_file=Path(res_json['output_image_name']), image_file_enable=False,
+                        res_json = self.predict(name, image=img_npy, image_file=Path(res_json['output_image_name'].strip()), image_file_enable=False,
                                                 output_image_file=output_image_file, output_preview=output_preview, nodraw=nodraw,
                                                 retry_count=retry_count, retry_interval=retry_interval, timeout=timeout)
                         res_list.append(res_json)
@@ -440,6 +440,7 @@ class Client(client.Client):
                 if image_file is None: image_file = f'{datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")}.capture'
                 image_file_enable = False
             elif pred_input_type == 'capture':
+                image = image.decode(encoding="utf-8") if type(image) is bytes else image
                 capture_data = image.split(',')
                 if len(capture_data) < 6:
                     self.logger.warning(f"capture data is invalid. {image}.")
@@ -460,7 +461,11 @@ class Client(client.Client):
                 if not ("output_image" in res_json and "output_image_shape" in res_json and "output_image_name" in res_json):
                     self.logger.warning(f"image_file data is invalid. Not found output_image or output_image_shape or output_image_name key.")
                     return {"error": f"image_file data is invalid. Not found output_image or output_image_shape or output_image_name key."}
-                img_npy = convert.b64str2npy(res_json["output_image"], shape=res_json["output_image_shape"])
+                if res_json["output_image_name"].endswith(".capture"):
+                    img_npy = convert.b64str2npy(res_json["output_image"], shape=res_json["output_image_shape"])
+                else:
+                    img_bytes = convert.b64str2bytes(res_json["output_image"])
+                    img_npy = convert.imgbytes2npy(img_bytes)
                 if image_file is None: image_file = res_json["output_image_name"]
                 image_file_enable = False
             elif pred_input_type == 'jpeg' or pred_input_type == 'png' or pred_input_type == 'bmp':

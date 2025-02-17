@@ -1,12 +1,12 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="jp">
+<html class="writer-html5" lang="jp" data-content_root="../">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Webモード &mdash; iinfer 2025/01/26 documentation</title>
+  <title>Webモード &mdash; iinfer 2025/02/17 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,9 +14,9 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=35a68168"></script>
-      <script src="../_static/doctools.js?v=888ff710"></script>
-      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="../_static/documentation_options.js?v=9eac6ff8"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -94,14 +94,14 @@
            <div itemprop="articleBody">
              
   <section id="web">
-<h1>Webモード<a class="headerlink" href="#web" title="Permalink to this heading"></a></h1>
+<h1>Webモード<a class="headerlink" href="#web" title="Link to this heading"></a></h1>
 <ul class="simple">
 <li><p>iinferのWebモードを使用することで、GUIモードで作成したコマンドやパイプラインをWebAPI経由で実行することが出来ます。</p></li>
 <li><p>Webモードは <cite>iinfer -m web -c start</cite> コマンドで起動出来ます。</p></li>
 <li><p>Webモードを起動させると、下記のHTTPリクエストを受け付けられるようになります。</p></li>
 </ul>
 <section id="http-exec-cmd-title">
-<h2>コマンド実行 : <cite>http://&lt;ホスト&gt;:&lt;ポート&gt;/exec_cmd/&lt;title&gt;</cite><a class="headerlink" href="#http-exec-cmd-title" title="Permalink to this heading"></a></h2>
+<h2>コマンド実行 : <cite>http://&lt;ホスト&gt;:&lt;ポート&gt;/exec_cmd/&lt;title&gt;</cite><a class="headerlink" href="#http-exec-cmd-title" title="Link to this heading"></a></h2>
 <ul>
 <li><p><strong>&lt;ホスト&gt;</strong> には、Webモードを起動したホスト名またはIPアドレスを指定します。</p></li>
 <li><p><strong>&lt;ポート&gt;</strong> には、Webモードを起動したポート番号を指定します。 <cite>--listen_port</cite> オプションで指定したポート番号です。</p></li>
@@ -131,7 +131,7 @@
 <img alt="../_images/00244_cmd_predict.jpg" src="../_images/00244_cmd_predict.jpg" />
 </section>
 <section id="http-exec-pipe-title">
-<h2>パイプライン実行 : <cite>http://&lt;ホスト&gt;:&lt;ポート&gt;/exec_pipe/&lt;title&gt;</cite><a class="headerlink" href="#http-exec-pipe-title" title="Permalink to this heading"></a></h2>
+<h2>パイプライン実行 : <cite>http://&lt;ホスト&gt;:&lt;ポート&gt;/exec_pipe/&lt;title&gt;</cite><a class="headerlink" href="#http-exec-pipe-title" title="Link to this heading"></a></h2>
 <ul>
 <li><p><strong>&lt;ホスト&gt;</strong> には、Webモードを起動したホスト名またはIPアドレスを指定します。</p></li>
 <li><p><strong>&lt;ポート&gt;</strong> には、Webモードを起動したポート番号を指定します。 <cite>--listen_port</cite> オプションで指定したポート番号です。</p></li>
@@ -149,7 +149,7 @@
 <img alt="../_images/00312_pipe.jpg" src="../_images/00312_pipe.jpg" />
 </section>
 <section id="http-filer">
-<h2>ファイラー表示 : <cite>http://&lt;ホスト&gt;:&lt;ポート&gt;/filer</cite><a class="headerlink" href="#http-filer" title="Permalink to this heading"></a></h2>
+<h2>ファイラー表示 : <cite>http://&lt;ホスト&gt;:&lt;ポート&gt;/filer</cite><a class="headerlink" href="#http-filer" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>ブラウザでこのURLにアクセスすると、ファイル転送用のファイラーが表示されます。</p></li>
 <li><p>ファイラーを使用することで、ローカル(ブラウザ側)とサーバー(iinfer client 又は iinfer server)間で、ファイルをアップロード/ダウンロードすることが出来ます。</p></li>
@@ -160,7 +160,7 @@
 <img alt="../_images/00401_web.jpg" src="../_images/00401_web.jpg" />
 </section>
 <section id="http-showimg">
-<h2>推論結果表示 : <cite>http://&lt;ホスト&gt;:&lt;ポート&gt;/showimg</cite><a class="headerlink" href="#http-showimg" title="Permalink to this heading"></a></h2>
+<h2>推論結果表示 : <cite>http://&lt;ホスト&gt;:&lt;ポート&gt;/showimg</cite><a class="headerlink" href="#http-showimg" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>ブラウザでこのURLにアクセスすると、推論結果を表示する画面が表示されます。</p></li>
 <li><p>推論結果画面に推論結果を表示するには、 <strong>client</strong> モードの <strong>deploy</strong> コマンドの <cite>--after_injection_type &lt;後処理タイプ&gt;</cite> で <cite>after_showimg_injection</cite> を指定する必要があります。</p></li>
