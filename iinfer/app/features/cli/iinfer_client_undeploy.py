@@ -7,7 +7,7 @@ import argparse
 import logging
 
 
-class ClientUndeploy(feature.EdgeNotifyFeature):
+class ClientUndeploy(feature.OneshotNotifyEdgeFeature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します

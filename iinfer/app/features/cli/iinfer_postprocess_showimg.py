@@ -1,4 +1,4 @@
-from cmdbox.app import common
+from cmdbox.app import common, feature
 from iinfer.app.features.cli import postprocess_feature
 from iinfer.app.postprocesses import showimg
 from typing import Dict, Any, Tuple, Union, List
@@ -6,7 +6,7 @@ import argparse
 import logging
 
 
-class PostprocessShowimg(postprocess_feature.PostprocessFeature):
+class PostprocessShowimg(postprocess_feature.PostprocessFeature, feature.ResultEdgeFeature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します

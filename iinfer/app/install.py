@@ -212,12 +212,12 @@ class Install(object):
 
     def _torch(self, install_use_gpu:bool=False):
         if install_use_gpu:
-            if sys.version_info[0] >= 3 and sys.version_info[1] >= 11:
+            if sys.version_info[0] >= 3 and sys.version_info[1] >= 10:
                 returncode, _, _cmd = common.cmd('pip install numpy==1.26.3 torch==2.1.0 torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118', logger=self.logger, slise=-1)
             else:
                 returncode, _, _cmd = common.cmd('pip install numpy==1.24.1 torch==2.1.0 torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118', logger=self.logger, slise=-1)
         else:
-            if sys.version_info[0] >= 3 and sys.version_info[1] >= 11:
+            if sys.version_info[0] >= 3 and sys.version_info[1] >= 10:
                 returncode, _, _cmd = common.cmd('pip install numpy==1.26.3 torch==2.1.0 torchvision torchaudio', logger=self.logger, slise=-1)
             else:
                 returncode, _, _cmd = common.cmd('pip install numpy==1.24.1 torch==2.1.0 torchvision torchaudio', logger=self.logger, slise=-1)

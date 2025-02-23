@@ -11,7 +11,7 @@ import os
 import threading
 
 
-class ClientTrain(feature.EdgeNotifyFeature):
+class ClientTrain(feature.OneshotNotifyEdgeFeature):
     def __init__(self, appcls, ver):
         super().__init__(appcls, ver)
         self.train_thread = None

@@ -11,7 +11,7 @@ import json
 import shutil
 import urllib
 
-class ClientDeploy(feature.EdgeNotifyFeature):
+class ClientDeploy(feature.OneshotNotifyEdgeFeature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します

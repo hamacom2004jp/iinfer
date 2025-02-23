@@ -9,7 +9,7 @@ import logging
 import json
 
 
-class ClientDeployList(feature.EdgeNotifyFeature):
+class ClientDeployList(feature.OneshotResultEdgeFeature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
