@@ -109,7 +109,8 @@
 
     "Option","Required","Description"
     "--data <データフォルダ>","","省略した時は `$HONE/.iinfer` を使用します。"
-    "--install_iinfer <iinferモジュール名>","","省略した時は `iinfer` を使用します。 `iinfer==0.7.2` といった指定も可能です。"
+    "--install_iinfer <iinferモジュール名>","","省略した時は `iinfer` を使用します。 `iinfer==0.10.7` といった指定も可能です。"
+    "--install_cmdbox <cmdboxモジュール名>","","省略した時は `cmdbox` を使用します。 `cmdbox==0.4.5` といった指定も可能です。"
     "--install_onnx","","dockerイメージ内に `onnxruntime` をインストールします。"
     "--install_mmdet","","dockerイメージ内に `mmdetection` をインストールします。"
     "--install_mmseg","","dockerイメージ内に `mmsegmentation` をインストールします。"

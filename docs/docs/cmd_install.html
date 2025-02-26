@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>コマンドリファレンス（installモード） &mdash; iinfer 2025/02/23 documentation</title>
+  <title>コマンドリファレンス（installモード） &mdash; iinfer 2025/02/26 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=cf8d0593"></script>
+      <script src="../_static/documentation_options.js?v=97849b2d"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -289,45 +289,49 @@
 </tr>
 <tr class="row-odd"><td><p>--install_iinfer &lt;iinferモジュール名&gt;</p></td>
 <td></td>
-<td><p>省略した時は <cite>iinfer</cite> を使用します。 <cite>iinfer==0.7.2</cite> といった指定も可能です。</p></td>
+<td><p>省略した時は <cite>iinfer</cite> を使用します。 <cite>iinfer==0.10.7</cite> といった指定も可能です。</p></td>
 </tr>
-<tr class="row-even"><td><p>--install_onnx</p></td>
+<tr class="row-even"><td><p>--install_cmdbox &lt;cmdboxモジュール名&gt;</p></td>
+<td></td>
+<td><p>省略した時は <cite>cmdbox</cite> を使用します。 <cite>cmdbox==0.4.5</cite> といった指定も可能です。</p></td>
+</tr>
+<tr class="row-odd"><td><p>--install_onnx</p></td>
 <td></td>
 <td><p>dockerイメージ内に <cite>onnxruntime</cite> をインストールします。</p></td>
 </tr>
-<tr class="row-odd"><td><p>--install_mmdet</p></td>
+<tr class="row-even"><td><p>--install_mmdet</p></td>
 <td></td>
 <td><p>dockerイメージ内に <cite>mmdetection</cite> をインストールします。</p></td>
 </tr>
-<tr class="row-even"><td><p>--install_mmseg</p></td>
+<tr class="row-odd"><td><p>--install_mmseg</p></td>
 <td></td>
 <td><p>dockerイメージ内に <cite>mmsegmentation</cite> をインストールします。</p></td>
 </tr>
-<tr class="row-odd"><td><p>--install_mmcls</p></td>
+<tr class="row-even"><td><p>--install_mmcls</p></td>
 <td></td>
 <td><p>dockerイメージ内に <cite>mmclassification</cite> をインストールします。※1</p></td>
 </tr>
-<tr class="row-even"><td><p>--install_mmpretrain</p></td>
+<tr class="row-odd"><td><p>--install_mmpretrain</p></td>
 <td></td>
 <td><p>dockerイメージ内に <cite>mmpretrain</cite> をインストールします。</p></td>
 </tr>
-<tr class="row-odd"><td><p>--install_insightface</p></td>
+<tr class="row-even"><td><p>--install_insightface</p></td>
 <td></td>
 <td><p>dockerイメージ内に <cite>insightface</cite> をインストールします。</p></td>
 </tr>
-<tr class="row-even"><td><p>--install_no_python</p></td>
+<tr class="row-odd"><td><p>--install_no_python</p></td>
 <td></td>
 <td><p>dockerイメージ内に <cite>python</cite> をインストールしません。</p></td>
 </tr>
-<tr class="row-odd"><td><p>--install_from &lt;イメージ名&gt;</p></td>
+<tr class="row-even"><td><p>--install_from &lt;イメージ名&gt;</p></td>
 <td></td>
 <td><p>作成するdockerイメージの元となるFROMイメージを指定します。</p></td>
 </tr>
-<tr class="row-even"><td><p>--install_tag &lt;追加のタグ名&gt;</p></td>
+<tr class="row-odd"><td><p>--install_tag &lt;追加のタグ名&gt;</p></td>
 <td></td>
 <td><p>指定すると作成するdockerイメージのタグ名に追記出来ます。</p></td>
 </tr>
-<tr class="row-odd"><td><p>--install_use_gpu</p></td>
+<tr class="row-even"><td><p>--install_use_gpu</p></td>
 <td></td>
 <td><p>GPUを使用するモジュール構成でインストールします。</p></td>
 </tr>
