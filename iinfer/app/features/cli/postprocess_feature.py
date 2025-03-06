@@ -1,4 +1,5 @@
 from cmdbox.app import common, feature
+from cmdbox.app.options import Options
 from iinfer.app import postprocess
 from typing import Dict, Any, Tuple, Union, List
 import cv2

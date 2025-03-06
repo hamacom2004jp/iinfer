@@ -1,4 +1,5 @@
 from cmdbox.app import common
+from cmdbox.app.options import Options
 from iinfer.app.features.cli import postprocess_feature
 from iinfer.app.postprocesses import csv
 from typing import Dict, Any, Tuple, Union, List
@@ -33,32 +34,32 @@ class PostprocessCsv(postprocess_feature.PostprocessFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_FALSE,
+            type=Options.T_STR, default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_FALSE,
             discription_ja="推論結果をCSVファイルに変換します。",
             discription_en="Convert the inference result to a CSV file.",
             choice=[
-                dict(short="i", opt="input_file", type="file", default="", required=False, multi=False, hide=False, choice=None, fileio="in",
+                dict(short="i", opt="input_file", type=Options.T_FILE, default=None, required=False, multi=False, hide=False, choice=None, fileio="in",
                      discription_ja="後処理させる推論結果をファイルで指定します。",
                      discription_en="Specify the inference result to be post-processed by file."),
-                dict(opt="stdin", type="bool", default=False, required=False, multi=False, hide=False, choice=[True, False],
+                dict(opt="stdin", type=Options.T_BOOL, default=False, required=False, multi=False, hide=False, choice=[True, False],
                      discription_ja="後処理させる推論結果を標準入力から読み込みます。",
                      discription_en="Read the inference result to be post-processed from standard input."),
-                dict(opt="out_headers", type="str", default="", required=False, multi=True, hide=False, choice=None,
+                dict(opt="out_headers", type=Options.T_STR, default=None, required=False, multi=True, hide=False, choice=None,
                      discription_ja="出力するヘッダーを指定します。複数指定できます。",
                      discription_en="Specify the headers to output. Multiple specifications are possible."),
-                dict(opt="noheader", type="bool", default=False, required=False, multi=False, hide=False, choice=[True, False],
+                dict(opt="noheader", type=Options.T_BOOL, default=False, required=False, multi=False, hide=False, choice=[True, False],
                      discription_ja="ヘッダー行の出力を行いません。",
                      discription_en="Do not output the header row."),
-                dict(opt="output_csv", type="file", default="", required=False, multi=False, hide=True, choice=None, fileio="out",
+                dict(opt="output_csv", type=Options.T_FILE, default=None, required=False, multi=False, hide=True, choice=None, fileio="out",
                      discription_ja="内容をcsvで保存する。これを指定した場合、標準出力は行いません。",
                      discription_en="Save the contents in csv. If this is specified, no standard output will be performed."),
-                dict(opt="stdout_log", type="bool", default=True, required=False, multi=False, hide=True, choice=[True, False],
+                dict(opt="stdout_log", type=Options.T_BOOL, default=True, required=False, multi=False, hide=True, choice=[True, False],
                      discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をConsole logに出力します。",
                      discription_en="Available only in GUI mode. Outputs standard output during command execution to Console log."),
-                dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choice=[True, False],
+                dict(opt="capture_stdout", type=Options.T_BOOL, default=True, required=False, multi=False, hide=True, choice=[True, False],
                      discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
                      discription_en="Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."),
-                dict(opt="capture_maxsize", type="int", default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choice=None,
+                dict(opt="capture_maxsize", type=Options.T_INT, default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choice=None,
                      discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します。",
                      discription_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."),
             ]

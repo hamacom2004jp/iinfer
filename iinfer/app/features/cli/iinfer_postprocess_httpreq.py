@@ -1,4 +1,5 @@
 from cmdbox.app import common
+from cmdbox.app.options import Options
 from iinfer.app.features.cli import postprocess_feature
 from iinfer.app.postprocesses import httpreq
 from typing import Dict, Any, Tuple, Union, List
@@ -33,41 +34,41 @@ class PostprocessHttpreq(postprocess_feature.PostprocessFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            type="str", default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_FALSE,
+            type=Options.T_STR, default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_FALSE,
             discription_ja="推論結果を指定したHTTPサーバーに送信します。",
             discription_en="Send the inference result to the specified HTTP server.",
             choice=[
-                dict(short="i", opt="input_file", type="file", default="", required=False, multi=False, hide=False, choice=None, fileio="in",
+                dict(short="i", opt="input_file", type=Options.T_FILE, default=None, required=False, multi=False, hide=False, choice=None, fileio="in",
                      discription_ja="後処理させる推論結果をファイルで指定します。",
                      discription_en="Specify the inference result to be post-processed by file."),
-                dict(opt="stdin", type="bool", default=False, required=False, multi=False, hide=False, choice=[True, False],
+                dict(opt="stdin", type=Options.T_BOOL, default=False, required=False, multi=False, hide=False, choice=[True, False],
                      discription_ja="後処理させる推論結果を標準入力から読み込みます。",
                      discription_en="Read the inference result to be post-processed from standard input."),
-                dict(opt="json_without_img", type="bool", default=False, required=False, multi=False, hide=True, choice=[True, False],
+                dict(opt="json_without_img", type=Options.T_BOOL, default=False, required=False, multi=False, hide=True, choice=[True, False],
                      discription_ja="JSONの送信時に画像を含めず送信します。",
                      discription_en="Send JSON without including images when sending JSON."),
-                dict(opt="fileup_name", type="str", default="file", required=True, multi=False, hide=False, choice=None,
+                dict(opt="fileup_name", type=Options.T_STR, default="file", required=True, multi=False, hide=False, choice=None,
                      discription_ja="推論結果の画像をPOSTするときのパラメータ名を指定します。省略すると `file` が使用されます。",
                      discription_en="Specify the parameter name when posting the image of the inference result. If omitted, `file` is used."),
-                dict(opt="outputs_url", type="str", default=None, required=True, multi=False, hide=False, choice=None,
+                dict(opt="outputs_url", type=Options.T_STR, default=None, required=True, multi=False, hide=False, choice=None,
                      discription_ja="推論結果のJSONをPOSTするURLを指定します。",
                      discription_en="Specify the URL to POST the JSON of the inference result."),
-                dict(opt="output_image_url", type="str", default=None, required=False, multi=False, hide=False, choice=None,
+                dict(opt="output_image_url", type=Options.T_STR, default=None, required=False, multi=False, hide=False, choice=None,
                      discription_ja="推論結果の画像をPOSTするURLを指定します。",
                      discription_en="Specify the URL to POST the image of the inference result."),
-                dict(opt="output_image_ext", type="str", default='jpeg', required=False, multi=False, hide=False, choice=['bmp', 'png', 'jpeg'],
+                dict(opt="output_image_ext", type=Options.T_STR, default='jpeg', required=False, multi=False, hide=False, choice=['bmp', 'png', 'jpeg'],
                      discription_ja="推論結果の画像をフォーマットを指定します。 `bmp` , `png` , `jpeg` が指定できます。",
                      discription_en="Specifies the format of the image of the inference result.You can specify `bmp` , `png`, or `jpeg`."),
-                dict(opt="output_image_prefix", type="str", default='output_', required=False, multi=False, hide=False, choice=None,
+                dict(opt="output_image_prefix", type=Options.T_STR, default='output_', required=False, multi=False, hide=False, choice=None,
                      discription_ja="推論結果の画像の接頭語を指定します。省略すると `output_` が使用されます。",
                      discription_en="Specifies the prefix of the inferred result image. If omitted, `output_` is used."),
-                dict(opt="stdout_log", type="bool", default=True, required=False, multi=False, hide=True, choice=[True, False],
+                dict(opt="stdout_log", type=Options.T_BOOL, default=True, required=False, multi=False, hide=True, choice=[True, False],
                      discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をConsole logに出力します。",
                      discription_en="Available only in GUI mode. Outputs standard output during command execution to Console log."),
-                dict(opt="capture_stdout", type="bool", default=True, required=False, multi=False, hide=True, choice=[True, False],
+                dict(opt="capture_stdout", type=Options.T_BOOL, default=True, required=False, multi=False, hide=True, choice=[True, False],
                      discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
                      discription_en="Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."),
-                dict(opt="capture_maxsize", type="int", default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choice=None,
+                dict(opt="capture_maxsize", type=Options.T_INT, default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choice=None,
                      discription_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します。",
                      discription_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."),
             ]
