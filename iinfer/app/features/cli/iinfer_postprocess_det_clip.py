@@ -34,7 +34,7 @@ class PostprocessDetClip(postprocess_feature.PostprocessFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            type=Options.T_STR, default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_FALSE,
+            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False,
             discription_ja="ObjectDetectionで検知した個所を切り出し、caprute形式のcsvで出力します。",
             discription_en="Cut out the detected area in ObjectDetection and output it in caprute format csv.",
             choice=[

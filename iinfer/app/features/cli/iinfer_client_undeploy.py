@@ -35,7 +35,7 @@ class ClientUndeploy(feature.OneshotNotifyEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            type=Options.T_STR, default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_TRUE,
+            use_redis=self.USE_REDIS_TRUE, nouse_webmode=False,
             discription_ja="サーバーに配備されているAIモデルを削除します。",
             discription_en="Delete AI models deployed on the server.",
             choice=[

@@ -34,7 +34,7 @@ class PostprocessDetFaceStore(postprocess_feature.PostprocessFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            type=Options.T_STR, default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_FALSE,
+            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False,
             discription_ja="Face Detection and Recognitionで検知した顔特徴データを個所を切り出し、顔認識ストアファイルを生成します。",
             discription_en="Cut out the face feature data detected by Face Detection and Recognition and generate a face recognition store file.",
             choice=[

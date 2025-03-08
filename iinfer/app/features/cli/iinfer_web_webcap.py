@@ -35,7 +35,7 @@ class WebWebcap(feature.UnsupportEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            type=Options.T_STR, default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_MEIGHT,
+            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False,
             discription_ja="webcapモードを起動します。",
             discription_en="Start webcap mode.",
             choice=[

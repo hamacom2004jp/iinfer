@@ -33,7 +33,7 @@ class RedisDockerRun(feature.UnsupportEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            type=Options.T_STR, default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_FALSE,
+            use_redis=self.USE_REDIS_FALSE, nouse_webmode=True,
             discription_ja="installモードで `iinfer -m install -c server` を実行している場合は、 `docker-compose up -d` を使用してください。",
             discription_en="If you are running `iinfer -m install -c server` in install mode, use `docker-compose up -d`.",
             choice=[

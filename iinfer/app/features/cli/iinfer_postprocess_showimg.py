@@ -34,7 +34,7 @@ class PostprocessShowimg(postprocess_feature.PostprocessFeature, feature.ResultE
             Dict[str, Any]: オプション
         """
         return dict(
-            type=Options.T_STR, default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_FALSE,
+            use_redis=self.USE_REDIS_TRUE, nouse_webmode=False,
             discription_ja="推論結果をshowimg.htmlに転送します。",
             discription_en="Forward the inference results to showimg.html.",
             choice=[

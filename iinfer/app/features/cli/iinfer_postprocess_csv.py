@@ -34,7 +34,7 @@ class PostprocessCsv(postprocess_feature.PostprocessFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            type=Options.T_STR, default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_FALSE,
+            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False,
             discription_ja="推論結果をCSVファイルに変換します。",
             discription_en="Convert the inference result to a CSV file.",
             choice=[

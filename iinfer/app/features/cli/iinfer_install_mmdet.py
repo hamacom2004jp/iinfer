@@ -34,7 +34,7 @@ class InstallMmdet(feature.UnsupportEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            type=Options.T_STR, default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_FALSE,
+            use_redis=self.USE_REDIS_FALSE, nouse_webmode=True,
             discription_ja="`mmdetection` をインストールします。",
             discription_en="Install `mmdetection`.",
             choice=[

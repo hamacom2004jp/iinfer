@@ -34,7 +34,7 @@ class ClientReadDir(feature.Feature):
             Dict[str, Any]: オプション
         """
         return dict(
-            type=Options.T_STR, default=None, required=False, multi=False, hide=False, use_redis=self.USE_REDIS_FALSE,
+            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False,
             discription_ja="クライアント側でディレクトリ内の画像ファイルを取得します。",
             discription_en="Get image files in the directory on the client side.",
             test_assert="assert result != ''",
