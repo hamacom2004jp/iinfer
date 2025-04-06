@@ -19,7 +19,7 @@ class AnnoArchive(cmdbox_web_exec_cmd.ExecCmd):
         """
         @app.post('/annotation/archive/{constr}')
         async def anno_archive(req:Request, res:Response, constr:str):
-            signin = web.check_signin(req, res)
+            signin = web.signin.check_signin(req, res)
             if signin is not None:
                 raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
             try:
@@ -59,6 +59,7 @@ class AnnoArchive(cmdbox_web_exec_cmd.ExecCmd):
                     opt['svpath'] = output_path
                     opt['orverwrite'] = True
                     opt['upload_file'] = str(upload_file).replace('"','')
+                    web.options.audit_exec(req, res)
                     ret = self.exec_cmd(req, res, web, "file_upload", opt, nothread=True, appcls=self.appcls)
                     if len(ret) == 0 or 'success' not in ret[0]:
                         return ret

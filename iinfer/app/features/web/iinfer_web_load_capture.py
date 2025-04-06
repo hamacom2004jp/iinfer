@@ -18,12 +18,13 @@ class LoadCapture(feature.WebFeature):
         """
         @app.post('/gui/load_capture')
         async def load_capture(req:Request, res:Response):
-            signin = web.check_signin(req, res)
+            signin = web.signin.check_signin(req, res)
             if signin is not None:
                 raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
             form = await req.form()
             current_path = form.get('current_path')
             ret = self.load_capture(web, current_path)
+            web.options.audit_exec(req, res)
             return ret
 
     def load_capture(self, web:Web, current_path:str) -> List[Dict[str, Any]]:

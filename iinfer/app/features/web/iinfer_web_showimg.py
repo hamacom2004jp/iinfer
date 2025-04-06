@@ -23,9 +23,10 @@ class Showimg(feature.WebFeature):
         @app.get('/showimg', response_class=HTMLResponse)
         @app.post('/showimg', response_class=HTMLResponse)
         def showimg(req:Request, res:Response):
-            signin = web.check_signin(req, res)
+            signin = web.signin.check_signin(req, res)
             if signin is not None:
                 return signin
+            web.options.audit_exec(req, res)
             res.headers['Access-Control-Allow-Origin'] = '*'
             return web.showimg_html_data
 

@@ -81,7 +81,7 @@
             "name": "Python: iinfer install",
             "type": "python",
             "request": "launch",
-            "args": ["-m","install","-c","server","-f"],
+            "args": ["-m","install","-c","mmdet","--data","/home/ubuntu/.iinfer","--install_use_gpu"],
             "module": "iinfer",
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",

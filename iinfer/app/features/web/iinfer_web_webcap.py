@@ -23,7 +23,7 @@ class Webcap(feature.WebFeature):
         @app.get('/webcap', response_class=HTMLResponse)
         @app.post('/webcap', response_class=HTMLResponse)
         async def webcap(req:Request, res:Response):
-            signin = web.check_signin(req, res)
+            signin = web.signin.check_signin(req, res)
             if signin is not None:
                 return signin
             res.headers['Access-Control-Allow-Origin'] = '*'

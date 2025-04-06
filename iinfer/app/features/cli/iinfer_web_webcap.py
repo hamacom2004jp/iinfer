@@ -39,6 +39,21 @@ class WebWebcap(feature.UnsupportEdgeFeature):
             discription_ja="webcapモードを起動します。",
             discription_en="Start webcap mode.",
             choice=[
+                dict(opt="host", type=Options.T_STR, default=self.default_host, required=True, multi=False, hide=True, choice=None, web="mask",
+                     discription_ja="Redisサーバーのサービスホストを指定します。",
+                     discription_en="Specify the service host of the Redis server."),
+                dict(opt="port", type=Options.T_INT, default=self.default_port, required=True, multi=False, hide=True, choice=None, web="mask",
+                     discription_ja="Redisサーバーのサービスポートを指定します。",
+                     discription_en="Specify the service port of the Redis server."),
+                dict(opt="password", type=Options.T_STR, default=self.default_pass, required=True, multi=False, hide=True, choice=None, web="mask",
+                     discription_ja="Redisサーバーのアクセスパスワード(任意)を指定します。省略時は `password` を使用します。",
+                     discription_en="Specify the access password of the Redis server (optional). If omitted, `password` is used."),
+                dict(opt="svname", type=Options.T_STR, default="server", required=True, multi=False, hide=True, choice=None, web="readonly",
+                     discription_ja="サーバーのサービス名を指定します。省略時は `server` を使用します。",
+                     discription_en="Specify the service name of the inference server. If omitted, `server` is used."),
+                dict(opt="data", type=Options.T_FILE, default=common.HOME_DIR / f".{self.ver.__appid__}", required=False, multi=False, hide=False, choice=None,
+                     discription_ja=f"省略した時は `$HONE/.{self.ver.__appid__}` を使用します。",
+                     discription_en=f"When omitted, `$HONE/.{self.ver.__appid__}` is used."),
                 dict(opt="allow_host", type=Options.T_STR, default="0.0.0.0", required=False, multi=False, hide=False, choice=None,
                      discription_ja="省略した時は `0.0.0.0` を使用します。",
                      discription_en="If omitted, `0.0.0.0` is used."),
@@ -91,7 +106,8 @@ class WebWebcap(feature.UnsupportEdgeFeature):
             return 1, msg
         w = None
         try:
-            w = web.Web(logger, Path(args.data), appcls=self.appcls, ver=self.ver)
+            w = web.Web(logger, Path(args.data), appcls=self.appcls, ver=self.ver,
+                        redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
 
             w.webcap(args.allow_host, args.listen_webcap_port, image_type=args.image_type, outputs_key=args.outputs_key,
                      capture_frame_width=args.capture_frame_width, capture_frame_height=args.capture_frame_height,

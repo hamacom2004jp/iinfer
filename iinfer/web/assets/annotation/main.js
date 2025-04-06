@@ -1,7 +1,7 @@
 
 $(() => {
-  // ダークモード対応
-  cmdbox.change_dark_mode(window.matchMedia('(prefers-color-scheme: dark)').matches);
+  // カラーモード対応
+  cmdbox.change_color_mode();
   // スプリッター初期化
   $('.split-pane').splitPane();
   // アイコンを表示

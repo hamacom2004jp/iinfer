@@ -23,9 +23,10 @@ class Annotation(feature.WebFeature):
         @app.get('/annotation', response_class=HTMLResponse)
         @app.post('/annotation', response_class=HTMLResponse)
         async def annotation(req:Request, res:Response):
-            signin = web.check_signin(req, res)
+            signin = web.signin.check_signin(req, res)
             if signin is not None:
                 return signin
+            web.options.audit_exec(req, res)
             res.headers['Access-Control-Allow-Origin'] = '*'
             return web.anno_html_data
 

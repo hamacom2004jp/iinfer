@@ -26,7 +26,7 @@ class PubImg(feature.WebFeature):
                 req (Request): リクエスト
                 res (Response): レスポンス
             """
-            signin = web.check_signin(req, res)
+            signin = web.signin.check_signin(req, res)
             if signin is not None:
                 raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
             if req.headers.get('content-type').startswith('multipart/form-data'):

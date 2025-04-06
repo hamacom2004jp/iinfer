@@ -26,7 +26,7 @@ class PubImgProxyChk(feature.WebFeature):
             Returns:
                 str: 起動している場合は`ok`、起動していない場合は`ng`
             """
-            signin = web.check_signin(req, res)
+            signin = web.signin.check_signin(req, res)
             if signin is not None:
                 raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
             try:

@@ -188,7 +188,8 @@ class Web(web.Web):
                                 "level":"NOTSET",
                                 "qualname":"uvicorn"}}}
 
-        th = web.ThreadedUvicorn(self.logger, config=Config(app=app, host=self.allow_host, port=self.listen_webcap_port, log_config=log_config))
+        th = web.ThreadedUvicorn(self.logger, config=Config(app=app, host=self.allow_host, port=self.listen_webcap_port, log_config=log_config),
+                                 guvicorn_config=dict(workers=-1, timeout=15))
         th.start()
         try:
             tm = time.time()

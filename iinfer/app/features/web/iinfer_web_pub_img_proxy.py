@@ -29,7 +29,7 @@ class PubImgProxy(feature.WebFeature):
                 res (Response): レスポンス
                 port (int): webcapプロセスのポート番号
             """
-            signin = web.check_signin(req, res)
+            signin = web.signin.check_signin(req, res)
             if signin is not None:
                 raise HTTPException(status_code=401, detail=self.DEFAULT_401_MESSAGE)
             if web.logger.level == logging.DEBUG:
