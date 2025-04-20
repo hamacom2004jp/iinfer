@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>iinfer.app.web &mdash; iinfer 2025/02/17 documentation</title>
+  <title>iinfer.app.web &mdash; iinfer 2025/04/18 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=9eac6ff8"></script>
+      <script src="../../../_static/documentation_options.js?v=18224466"></script>
       <script src="../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -279,7 +279,8 @@
                                 <span class="s2">&quot;level&quot;</span><span class="p">:</span><span class="s2">&quot;NOTSET&quot;</span><span class="p">,</span>
                                 <span class="s2">&quot;qualname&quot;</span><span class="p">:</span><span class="s2">&quot;uvicorn&quot;</span><span class="p">}}}</span>
 
-        <span class="n">th</span> <span class="o">=</span> <span class="n">web</span><span class="o">.</span><span class="n">ThreadedUvicorn</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">Config</span><span class="p">(</span><span class="n">app</span><span class="o">=</span><span class="n">app</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">allow_host</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">listen_webcap_port</span><span class="p">,</span> <span class="n">log_config</span><span class="o">=</span><span class="n">log_config</span><span class="p">))</span>
+        <span class="n">th</span> <span class="o">=</span> <span class="n">web</span><span class="o">.</span><span class="n">ThreadedUvicorn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">Config</span><span class="p">(</span><span class="n">app</span><span class="o">=</span><span class="n">app</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">allow_host</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">listen_webcap_port</span><span class="p">,</span> <span class="n">log_config</span><span class="o">=</span><span class="n">log_config</span><span class="p">),</span>
+                                 <span class="n">guvicorn_config</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">workers</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">15</span><span class="p">))</span>
         <span class="n">th</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">tm</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>

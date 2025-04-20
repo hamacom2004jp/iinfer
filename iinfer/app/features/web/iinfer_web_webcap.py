@@ -26,6 +26,7 @@ class Webcap(feature.WebFeature):
             signin = web.signin.check_signin(req, res)
             if signin is not None:
                 return signin
+            web.options.audit_exec(req, res, web)
             res.headers['Access-Control-Allow-Origin'] = '*'
             return web.webcap_html_data
 

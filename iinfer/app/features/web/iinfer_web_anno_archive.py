@@ -59,7 +59,7 @@ class AnnoArchive(cmdbox_web_exec_cmd.ExecCmd):
                     opt['svpath'] = output_path
                     opt['orverwrite'] = True
                     opt['upload_file'] = str(upload_file).replace('"','')
-                    web.options.audit_exec(req, res)
+                    web.options.audit_exec(req, res, web)
                     ret = self.exec_cmd(req, res, web, "file_upload", opt, nothread=True, appcls=self.appcls)
                     if len(ret) == 0 or 'success' not in ret[0]:
                         return ret

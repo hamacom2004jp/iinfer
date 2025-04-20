@@ -25,7 +25,7 @@ class LoadResult(feature.WebFeature):
             form = await req.form()
             current_path = form.get('current_path')
             ret = self.load_result(web, current_path)
-            web.options.audit_exec(req, res)
+            web.options.audit_exec(req, res, web)
             return ret
 
     def load_result(self, web:Web, current_path:str) -> List[Dict[str, Any]]:

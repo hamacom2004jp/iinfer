@@ -1,5 +1,5 @@
 collectlicense
-cmdbox>=0.4.4
+cmdbox
 cryptography
 motpy
 opencv-python
