@@ -14,11 +14,13 @@ RUN groupadd ${MKUSER} && \
 RUN chown -R ${MKUSER}:${MKUSER} /home/${MKUSER}
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Asia/Tokyo
-#{INSTALL_PYTHON}
 RUN apt-get update && \
-    apt-get install -y libgl1-mesa-dev libglib2.0-0 git build-essential && \
+    apt-get install -y libgl1-mesa-dev libglib2.0-0 git wget
+#{INSTALL_PYTHON}
+RUN apt-get install -y pkg-config libxml2-dev libxmlsec1-dev libxmlsec1-openssl build-essential libopencv-dev && \
     apt-get install -y iputils-ping net-tools
 RUN pip install --upgrade pip && \
+    pip install xmlsec==1.3.13 python3-saml && \
     pip install #{INSTALL_CMDBOX} && cmdbox --version && \
     pip install #{INSTALL_IINFER} && iinfer --version
 

@@ -109,9 +109,14 @@ class Install(object):
                                  f'RUN wget https://www.python.org/ftp/python/3.11.11/Python-3.11.11.tar.xz\n' + \
                                  f'RUN tar xJf Python-3.11.11.tar.xz && cd Python-3.11.11 && ./configure && make && make install\n' + \
                                  f'RUN update-alternatives --install /usr/bin/python python /usr/local/bin/python3.11 1'
+                                 #f'RUN update-alternatives --install /usr/bin/python python /usr/local/bin/python3.11 1\n' + \
+                                 #f'RUN wget https://bootstrap.pypa.io/get-pip.py && python get-pip.py\n'
                 text = text.replace('#{INSTALL_PYTHON}', install_python)
             elif not install_no_python:
                 text = text.replace('#{INSTALL_PYTHON}', f'RUN apt-get update && apt-get install -y python3.11 python3.11-distutils python3-pip python-is-python3')
+                #text = text.replace('#{INSTALL_PYTHON}', f'RUN apt-get update && apt-get install -y python3.11 python3.11-distutils python3.11-dev\n' + \
+                #                                         f'RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.11 1\n' + \
+                #                                         f'RUN wget https://bootstrap.pypa.io/get-pip.py && python get-pip.py && apt-get install -y python3.11-venv\n')
             else:
                 text = text.replace('#{INSTALL_PYTHON}', '')
             text = text.replace('#{INSTALL_TAG}', install_tag)

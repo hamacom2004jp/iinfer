@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>開発者向け情報 &mdash; iinfer 2025/04/18 documentation</title>
+  <title>開発者向け情報 &mdash; iinfer 2025/04/29 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=3fafac33" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=18224466"></script>
+      <script src="../_static/documentation_options.js?v=110ab0b3"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -284,10 +284,31 @@ sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w
 </div>
 </div></blockquote>
 </li>
+<li><p>python3.11のインストール</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt-get<span class="w"> </span>update
+sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>python3.11<span class="w"> </span>python3.11-distutils<span class="w"> </span>python3.11-dev<span class="w"> </span>libopencv-dev
+sudo<span class="w"> </span>update-alternatives<span class="w"> </span>--install<span class="w"> </span>/usr/bin/python<span class="w"> </span>python<span class="w"> </span>/usr/bin/python3.11<span class="w"> </span><span class="m">1</span>
+wget<span class="w"> </span>https://bootstrap.pypa.io/get-pip.py
+sudo<span class="w"> </span>python<span class="w"> </span>get-pip.py
+sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>python3.11-venv
+sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>pkg-config<span class="w"> </span>libxml2-dev<span class="w"> </span>libxmlsec1-dev<span class="w"> </span>libxmlsec1-openssl<span class="w"> </span>build-essential<span class="w"> </span>libopencv-dev
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+</ol>
+<ol class="arabic" start="4">
 <li><p>WSL-Ubuntu-dockerイメージファイル作成</p>
 <blockquote>
 <div><p>Windowsコマンドプロンプトで以下のコマンドを実行します:</p>
 <div class="highlight-bat notranslate"><div class="highlight"><pre><span></span>wsl --shutdown
+diskpart
+diskpart <span class="p">&gt;</span> select vdisk file=<span class="s2">&quot;&lt;任意のパス&gt;\ext4.vhdx&quot;</span>
+diskpart <span class="p">&gt;</span> attach vdisk readonly
+diskpart <span class="p">&gt;</span> compact vdisk
+diskpart <span class="p">&gt;</span> detach vdisk
+diskpart <span class="p">&gt;</span> exit
 wsl --export Ubuntu-22.04 <span class="p">&lt;</span>任意のパス<span class="p">&gt;</span>/Ubuntu_docker-22.04.tar
 wsl --unregister Ubuntu-22.04
 </pre></div>

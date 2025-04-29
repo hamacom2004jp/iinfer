@@ -181,6 +181,17 @@ iinferの開発環境を構築するための手順を説明します。
         sudo apt-get update
         sudo apt-get install nvidia-container-runtime
 
+4. python3.11のインストール
+
+    .. code-block:: bash
+
+        sudo apt-get update
+        sudo apt-get install -y python3.11 python3.11-distutils python3.11-dev libopencv-dev
+        sudo update-alternatives --install /usr/bin/python python /usr/bin/python3.11 1
+        wget https://bootstrap.pypa.io/get-pip.py
+        sudo python get-pip.py
+        sudo apt-get install -y python3.11-venv
+        sudo apt-get install -y pkg-config libxml2-dev libxmlsec1-dev libxmlsec1-openssl build-essential libopencv-dev
 
 4. WSL-Ubuntu-dockerイメージファイル作成
 
@@ -189,6 +200,12 @@ iinferの開発環境を構築するための手順を説明します。
     .. code-block:: bat
 
         wsl --shutdown
+        diskpart
+        diskpart > select vdisk file="<任意のパス>\ext4.vhdx"
+        diskpart > attach vdisk readonly
+        diskpart > compact vdisk
+        diskpart > detach vdisk
+        diskpart > exit
         wsl --export Ubuntu-22.04 <任意のパス>/Ubuntu_docker-22.04.tar
         wsl --unregister Ubuntu-22.04
 
