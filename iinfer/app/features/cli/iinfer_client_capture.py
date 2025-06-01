@@ -1,4 +1,4 @@
-from cmdbox.app import common, edge, feature
+from cmdbox.app import common, edge_tool, feature
 from cmdbox.app.options import Options
 from iinfer.app import client
 from typing import Dict, Any, Tuple, Union, List
@@ -131,7 +131,7 @@ class ClientCapture(feature.Feature):
                 pass
         return 0, ret, cl
 
-    def edgerun(self, opt:Dict[str, Any], tool:edge.Tool, logger:logging.Logger, timeout:int, prevres:Any=None):
+    def edgerun(self, opt:Dict[str, Any], tool:edge_tool.Tool, logger:logging.Logger, timeout:int, prevres:Any=None):
         """
         この機能のエッジ側の実行を行います
 

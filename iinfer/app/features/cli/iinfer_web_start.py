@@ -4,6 +4,7 @@ from cmdbox.app.options import Options
 from iinfer.app import web
 from pathlib import Path
 from typing import Dict, Any, Tuple, List
+from urllib.request import pathname2url
 import argparse
 import logging
 import traceback
@@ -58,11 +59,23 @@ class WebStart(cmdbox_web_start.WebStart):
                         client_only=args.client_only, doc_root=args.doc_root, gui_html=args.gui_html, filer_html=args.filer_html, assets=args.assets,
                         signin_html=args.signin_html, signin_file=args.signin_file, gui_mode=False,
                         showimg_html=args.showimg_html, webcap_html=args.webcap_html, anno_html=args.anno_html)
-            w.start(args.allow_host, args.listen_port, ssl_listen_port=args.ssl_listen_port,
+            agent_runner = None
+            mcp = None
+            logger.info(f"Agent={args.agent}")
+            if args.agent=='use':
+                if args.agent_session_store == 'sqlite':
+                    args.agent_session_dburl = "sqlite://" + pathname2url(str(w.agent_path / 'session.db'))
+                elif args.agent_session_store == 'postgresql':
+                    args.agent_session_dburl = f"postgresql+psycopg://{args.agent_pg_user}:{args.agent_pg_password}@{args.agent_pg_host}:{args.agent_pg_port}/{args.agent_pg_dbname}"
+                else:
+                    args.agent_session_dburl = None
+                agent_runner, mcp = self.init_agent_runner(logger, args)
+            w.start(allow_host=args.allow_host, listen_port=args.listen_port, ssl_listen_port=args.ssl_listen_port,
                     ssl_cert=ssl_cert, ssl_key=ssl_key, ssl_keypass=args.ssl_keypass, ssl_ca_certs=ssl_ca_certs,
-                    session_domain=args.session_domain, session_path=args.session_path, session_secure=args.session_secure,
-                    session_timeout=args.session_timeout, outputs_key=args.outputs_key,
-                    guvicorn_workers=args.guvicorn_workers, guvicorn_timeout=args.guvicorn_timeout)
+                    session_domain=args.session_domain, session_path=args.session_path,
+                    session_secure=args.session_secure, session_timeout=args.session_timeout, outputs_key=args.outputs_key,
+                    guvicorn_workers=args.guvicorn_workers, guvicorn_timeout=args.guvicorn_timeout,
+                    agent_runner=agent_runner, mcp=mcp, mcp_listen_port=args.mcp_listen_port, mcp_ssl_listen_port=args.mcp_ssl_listen_port)
 
             msg = {"success":"web complate."}
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)

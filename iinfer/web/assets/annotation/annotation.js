@@ -74,7 +74,7 @@ anno.load_conf = (svpath) => {
       if (!label || !color) return;
       anno.add_label(label, color, tags_labels_elem);
       tags_labels_elem.find('.new_label').val('');
-      tags_labels_elem.find('.new_label_color').attr('value', `#${cmdbox.randam_color()}`);
+      tags_labels_elem.find('.new_label_color').attr('value', `#${cmdbox.random_color()}`);
       event.stopPropagation();
     });
   });
@@ -92,7 +92,7 @@ anno.load_label = (svpath) => {
     const anno_list_elem = anno.canvas_container.find('.anno-list');
     const svg_elem = anno.canvas_container.find('svg');
     labels.forEach((label, i) => {
-      const color = cmdbox.randam_color();
+      const color = cmdbox.random_color();
       anno.add_label(label, color, tags_labels_elem);
       svg_elem.find(`[data-anno-label="${label}"]`).attr('stroke', `#${color}`);
       anno_list_elem.each((i, elem) => {
@@ -142,7 +142,7 @@ anno.add_label = (label, color, tags_labels_elem) => {
     anno.tool.label = f_a_elem.attr('data-label');
     anno.tool.color = f_a_elem.attr('data-color');
     anno.tool.label = anno.tool.label ? anno.tool.label : '';
-    anno.tool.color = anno.tool.color ? anno.tool.color : cmdbox.randam_color();
+    anno.tool.color = anno.tool.color ? anno.tool.color : cmdbox.random_color();
     anno.canvas_container.find('.tag_label').text(anno.tool.label);
     anno.canvas_container.find('.tag_label_color').attr('value', `#${anno.tool.color}`);
     anno.reflesh_svg();
@@ -194,7 +194,7 @@ anno.load_color = (svpath) => {
             return c.toString(16).padStart(2, '0');
           }).join('');
         } else {
-          color = cmdbox.randam_color();
+          color = cmdbox.random_color();
         }
         $(ak).attr('data-color', color).find('input').attr('value', `#${color}`);
         const label = $(ak).attr('data-label');
@@ -304,12 +304,12 @@ anno.save_anno = (svpath, image_path, svg_elem, nomsg=false, success_func=undefi
     const img_src = fl_img_elem.attr('src');
     if (svg_src) {
       // アノテーション画像がすでに存在している場合はリロード
-      fl_svg_elem.attr('src', `${svg_src.split('?')[0]}?r=${cmdbox.randam_string(8)}`);
+      fl_svg_elem.attr('src', `${svg_src.split('?')[0]}?r=${cmdbox.random_string(8)}`);
     } else if (img_src) {
       // アノテーション画像が無く元画像が存在している場合はSVGを追加
       const conary = atob(img_src.split('?')[0].split('/').slice(-1)[0]).split('\t');
       const constr = "annotation/get_img/" + btoa(`${conary.slice(0, 4).join('\t')}\t${svpath}${image_path}.svg\t${conary.slice(5, 6)}\t${conary.slice(6, 7)}`);
-      const svg_elem = $(`<img src="${constr}?r=${cmdbox.randam_string(8)}" data-path="${svpath}${image_path}.svg" style="position: absolute; left: 0px; top: 0px;"/>`);
+      const svg_elem = $(`<img src="${constr}?r=${cmdbox.random_string(8)}" data-path="${svpath}${image_path}.svg" style="position: absolute; left: 0px; top: 0px;"/>`);
       svg_elem.attr('width', fl_img_elem.attr('width')).attr('height', fl_img_elem.attr('height'));
       fl_img_elem.parent().append(svg_elem);
     }
@@ -468,7 +468,7 @@ anno.load_filelist = (basepath, svpath, current_ul_elem) => {
         const thum_size = 100;
         const img_name = n['path'].split('/').slice(-1)[0];
         const constr = btoa(`${opt['host']}\t${opt['port']}\t${opt['svname']}\t${opt['password']}\t${n['path']}\t${opt['scope']}\t${thum_size}`);
-        const img_elem = $(`<img src="annotation/get_img/${constr}?r=${cmdbox.randam_string(8)}" data-path="${n['path']}" alt="${img_name}"/>`);
+        const img_elem = $(`<img src="annotation/get_img/${constr}?r=${cmdbox.random_string(8)}" data-path="${n['path']}" alt="${img_name}"/>`);
         let card_elem = undefined;
         // SVGファイルの場合は元画像があるかどうかを確認
         if(n['path'].endsWith('.svg')) {
@@ -577,7 +577,7 @@ anno.load_image = (node, opt) => {
       const svg_elem = $(svg_str);
       svg_elem.css('position','absolute').css('left',`4px`).css('top',`4px`).css('width','').css('height','');
       svg_elem.children().each((i, comp) => {
-        $(comp).attr('id', cmdbox.randam_string(16));
+        $(comp).attr('id', cmdbox.random_string(16));
       });
       anno.disable_contextmenu(svg_elem); // 右クリックメニューを無効化
       card_elem.find('.card-body').append(svg_elem);
@@ -926,7 +926,7 @@ anno.make_rect_dom = (x1, y1, x2, y2, stroke, fill, stroke_width, label) => {
   const h = Math.abs(y2-y1);
   if (w <= 0 || h <= 0) return null;
   const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-  rect.setAttribute('id', cmdbox.randam_string(16));
+  rect.setAttribute('id', cmdbox.random_string(16));
   rect.setAttribute('x', Math.min(x1, x2));
   rect.setAttribute('y', Math.min(y1, y2));
   rect.setAttribute('width', w);
@@ -950,7 +950,7 @@ anno.make_rect_dom = (x1, y1, x2, y2, stroke, fill, stroke_width, label) => {
  **/
 anno.make_polylines_dom = (points_str, stroke, fill, stroke_width, label) => {
   const polyline = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
-  polyline.setAttribute('id', cmdbox.randam_string(16));
+  polyline.setAttribute('id', cmdbox.random_string(16));
   polyline.setAttribute('points', points_str);
   polyline.setAttribute('fill', `${fill}`);
   polyline.setAttribute('stroke', `${stroke}`);
@@ -972,7 +972,7 @@ anno.make_polylines_dom = (points_str, stroke, fill, stroke_width, label) => {
  **/
 anno.make_polygon_dom = (points_str, stroke, fill, stroke_width, label, lastcomp=undefined) => {
   const polygon = !lastcomp ? document.createElementNS("http://www.w3.org/2000/svg", "polygon") : lastcomp;
-  if (!lastcomp) polygon.setAttribute('id', cmdbox.randam_string(16));
+  if (!lastcomp) polygon.setAttribute('id', cmdbox.random_string(16));
   polygon.setAttribute('points', points_str);
   polygon.setAttribute('fill', `${fill}`);
   polygon.setAttribute('stroke', `${stroke}`);
@@ -1119,7 +1119,7 @@ anno.load_annoall_coco = (menu_elem) => {
     const tags_labels_elem = anno.canvas_container.find('#tags_labels');
     tags_labels_elem.children('.dropdown-labels').remove();
     for (let i=0; i<labels.length; i++) {
-      if (i >= colors.length) colors.push(cmdbox.randam_color());
+      if (i >= colors.length) colors.push(cmdbox.random_color());
       anno.add_label(labels[i]['name'], colors[i], tags_labels_elem);
     }
     anno.canvas_container.find('#tags_labels').find('.dropdown-item:first').click();
@@ -1253,7 +1253,7 @@ anno.save_annoall_coco = (menu_elem) => {
         if(!n['path'].endsWith('.svg')) continue;
         // SVGファイルの読込
         const constr = btoa(`${opt['host']}\t${opt['port']}\t${opt['svname']}\t${opt['password']}\t${n['path']}\t${opt['scope']}\t0.0`);
-        const svg_str = await (await fetch(`annotation/get_img/${constr}?r=${cmdbox.randam_string(8)}`)).text();
+        const svg_str = await (await fetch(`annotation/get_img/${constr}?r=${cmdbox.random_string(8)}`)).text();
         const svg_elem = $(svg_str);
         // 画像情報を取得
         const img_id = coco['images'].length;
@@ -1408,7 +1408,7 @@ anno.save_annoall_cityscapes = (menu_elem) => {
                 // SVGファイルの読込
                 const constr = btoa(`${opt['host']}\t${opt['port']}\t${opt['svname']}\t${opt['password']}\t${n['path']}\t${opt['scope']}\t0.0`);
                 cmdbox.progress(0, progress_max, progress_count, 'Loading SVG files..', true, false);
-                const res = await fetch(`annotation/get_img/${constr}?r=${cmdbox.randam_string(8)}`);
+                const res = await fetch(`annotation/get_img/${constr}?r=${cmdbox.random_string(8)}`);
                 const svg_str = await res.text();
                 const svg_elem = $(svg_str);
                 // SVGからPNGを生成

@@ -97,7 +97,8 @@ class Install(object):
             install_use_gpu_opt = '--install_use_gpu' if install_use_gpu else ''
             base_image = 'python:3.11.9-slim' #'python:3.8.18-slim'
             if install_use_gpu:
-                base_image = 'nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu22.04'
+                #base_image = 'nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu22.04'
+                base_image = 'pytorch/pytorch:2.7.0-cuda12.8-cudnn9-runtime'
             if install_from is not None and install_from != '':
                 base_image = install_from
             text = text.replace('#{FROM}', f'FROM {base_image}')
@@ -240,12 +241,14 @@ class Install(object):
 
     def _mmcv(self, install_use_gpu:bool=False):
         if install_use_gpu:
-            returncode, _, _cmd = common.cmd('pip install mmcv==2.1.0 -f https://download.openmmlab.com/mmcv/dist/cu118/torch2.1/index.html', logger=self.logger, slise=-1)
+            returncode, _, _cmd = common.cmd('mim install mmcv==2.1.0', logger=self.logger, slise=-1)
+            #returncode, _, _cmd = common.cmd('pip install mmcv==2.1.0 -f https://download.openmmlab.com/mmcv/dist/cu118/torch2.1/index.html', logger=self.logger, slise=-1)
             if returncode != 0:
                 self.logger.warning(f"Failed to install mmcv. cmd:{_cmd}")
                 return {"error": f"Failed to install mmcv. cmd:{_cmd}"}
         else:
-            returncode, _, _cmd = common.cmd('mim install mmcv>=2.0.0', logger=self.logger, slise=-1)
+            returncode, _, _cmd = common.cmd('mim install mmcv==2.1.0', logger=self.logger, slise=-1)
+            #returncode, _, _cmd = common.cmd('mim install mmcv>=2.0.0', logger=self.logger, slise=-1)
         if returncode != 0:
             self.logger.warning(f"Failed to install mmcv. cmd:{_cmd}")
             return {"error": f"Failed to install mmcv. cmd:{_cmd}"}
@@ -267,8 +270,8 @@ class Install(object):
         shutil.copytree(srcdir, data_dir / 'mmdetection', dirs_exist_ok=True, ignore=shutil.ignore_patterns('.git'))
         shutil.rmtree(srcdir, ignore_errors=True)
 
-        ret = self._torch(install_use_gpu)
-        if "error" in ret: return ret
+        #ret = self._torch(install_use_gpu)
+        #if "error" in ret: return ret
         ret = self._openmin(install_use_gpu)
         if "error" in ret: return ret
         ret = self._mmcv(install_use_gpu)
@@ -292,8 +295,8 @@ class Install(object):
         shutil.copytree(srcdir, data_dir / 'mmsegmentation', dirs_exist_ok=True, ignore=shutil.ignore_patterns('.git'))
         shutil.rmtree(srcdir, ignore_errors=True)
 
-        ret = self._torch(install_use_gpu)
-        if "error" in ret: return ret
+        #ret = self._torch(install_use_gpu)
+        #if "error" in ret: return ret
         ret = self._openmin(install_use_gpu)
         if "error" in ret: return ret
         ret = self._mmcv(install_use_gpu)
@@ -320,8 +323,8 @@ class Install(object):
 
     def mmcls(self, data_dir:Path, install_use_gpu:bool=False):
 
-        ret = self._torch(install_use_gpu)
-        if "error" in ret: return ret
+        #ret = self._torch(install_use_gpu)
+        #if "error" in ret: return ret
         ret = self._openmin(install_use_gpu)
         if "error" in ret: return ret
         ret = self._mmcv(install_use_gpu)
@@ -343,8 +346,8 @@ class Install(object):
         shutil.copytree(srcdir, data_dir / 'mmpretrain', dirs_exist_ok=True, ignore=shutil.ignore_patterns('.git'))
         shutil.rmtree(srcdir, ignore_errors=True)
 
-        ret = self._torch(install_use_gpu)
-        if "error" in ret: return ret
+        #ret = self._torch(install_use_gpu)
+        #if "error" in ret: return ret
         ret = self._openmin(install_use_gpu)
         if "error" in ret: return ret
         ret = self._mmcv(install_use_gpu)
