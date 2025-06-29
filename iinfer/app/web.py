@@ -20,7 +20,7 @@ import uvicorn
 
 class Web(web.Web):
     def __init__(self, logger:logging.Logger, data:Path, appcls=None, ver=None,
-                 redis_host:str="localhost", redis_port:int = 6379, redis_password:str = None, svname:str='server',
+                 redis_host:str="localhost", redis_port:int=6379, redis_password:str=None, svname:str='server',
                  client_only:bool=False, doc_root:Path=None, gui_html:str=None, filer_html:str=None, result_html:str=None, users_html:str=None,
                  audit_html:str=None, agent_html:str=None, assets:List[str]=None, signin_html:str=None, signin_file:str=None, gui_mode:bool=False,
                  web_features_packages:List[str]=None, web_features_prefix:List[str]=[],
