@@ -19,14 +19,14 @@ class GuiStart(cmdbox_gui_start.GuiStart):
         opt = super().get_option()
         opt["choice"] += [
             dict(opt="showimg_html", type=Options.T_FILE, default=None, required=False, multi=False, hide=False, choice=None,
-                 discription_ja="`showimg.html` を指定します。省略時はiinfer内蔵のHTMLファイルを使用します。",
-                 discription_en="Specify `showimg.html`. If omitted, the iinfer built-in HTML file is used."),
+                 description_ja="`showimg.html` を指定します。省略時はiinfer内蔵のHTMLファイルを使用します。",
+                 description_en="Specify `showimg.html`. If omitted, the iinfer built-in HTML file is used."),
             dict(opt="webcap_html", type=Options.T_FILE, default=None, required=False, multi=False, hide=False, choice=None,
-                 discription_ja="`webcap.html` を指定します。省略時はiinfer内蔵のHTMLファイルを使用します。",
-                 discription_en="Specify `webcap.html`. If omitted, the iinfer built-in HTML file is used."),
+                 description_ja="`webcap.html` を指定します。省略時はiinfer内蔵のHTMLファイルを使用します。",
+                 description_en="Specify `webcap.html`. If omitted, the iinfer built-in HTML file is used."),
             dict(opt="anno_html", type=Options.T_FILE, default=None, required=False, multi=False, hide=False, choice=None,
-                 discription_ja="`annotation.html` を指定します。省略時はiinfer内蔵のHTMLファイルを使用します。",
-                 discription_en="Specify `annotation.html`. If omitted, the iinfer built-in HTML file is used."),
+                 description_ja="`annotation.html` を指定します。省略時はiinfer内蔵のHTMLファイルを使用します。",
+                 description_en="Specify `annotation.html`. If omitted, the iinfer built-in HTML file is used."),
         ]
         return opt
 

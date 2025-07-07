@@ -16,7 +16,7 @@ VERSION = version.__version__
 PYTHON_REQUIRES = '>=3.8'
 INSTALL_REQUIRES = [
     'argcomplete',
-    'cmdbox>=0.6.1,<0.6.2',
+    'cmdbox>=0.6.2,<0.6.3',
     'cryptography',
     'motpy',
     'opencv-python',

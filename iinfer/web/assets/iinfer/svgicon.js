@@ -1,4 +1,4 @@
-const init_svgicons = () => {
+init_svgicons = () => {
     const svgicons = document.getElementById('svgicons');
     svgicons.insertAdjacentHTML('beforeend',
         `<symbol id="btn_box_arrow_in_down" viewBox="0 0 16 16">`
