@@ -4,7 +4,6 @@ ARG MKUSER
 
 #{COPY_CMDBOX}
 #{COPY_IINFER}
-#{COPY_IINFER_START}
 
 RUN groupadd ${MKUSER} && \
     useradd -m -g ${MKUSER} -s /usr/bin/bash ${MKUSER} && \
@@ -40,4 +39,6 @@ ENV MKUSER=${MKUSER}
 ENV LISTEN_PORT=8081
 ENV SVCOUNT=${SVCOUNT}
 
+WORKDIR /home/${MKUSER}/
+#{COPY_IINFER_START}
 CMD bash /home/${MKUSER}/scripts/start.sh
