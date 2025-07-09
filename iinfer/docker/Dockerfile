@@ -41,4 +41,4 @@ ENV SVCOUNT=${SVCOUNT}
 
 WORKDIR /home/${MKUSER}/
 #{COPY_IINFER_START}
-CMD bash /home/${MKUSER}/scripts/start.sh
+CMD bash

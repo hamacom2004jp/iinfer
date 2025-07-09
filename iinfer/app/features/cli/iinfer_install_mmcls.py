@@ -83,3 +83,12 @@ class InstallMmcls(feature.UnsupportEdgeFeature):
         if 'success' not in ret:
             return 1, ret, inst
         return 0, ret, inst
+
+    def audited_by(self):
+        """
+        この機能が監査ログを記録する対象かどうかを返します
+
+        Returns:
+            bool: 監査ログを記録する場合はTrue
+        """
+        return False

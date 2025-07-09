@@ -162,7 +162,8 @@ class Install(object):
                     f'{data}:/home/{user}/.iinfer',
                     f'/home/{user}/scripts:/home/{user}/scripts',
                     f'/home/{user}:/home/{user}'
-                ]
+                ],
+                command=f'CMD bash /home/{user}/scripts/start.sh'
             )
             if install_use_gpu:
                 services[f'iinfer_server{install_tag}']['deploy'] = dict(
