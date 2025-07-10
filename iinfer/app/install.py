@@ -114,7 +114,9 @@ class Install(object):
                                  #f'RUN wget https://bootstrap.pypa.io/get-pip.py && python get-pip.py\n'
                 text = text.replace('#{INSTALL_PYTHON}', install_python)
             elif not install_no_python:
-                text = text.replace('#{INSTALL_PYTHON}', f'RUN apt-get update && apt-get install -y python3.11 python3.11-distutils python3-pip python-is-python3')
+                # pytorch/pytorch:2.7.0-cuda12.8-cudnn9-runtime の場合python3.11はインストール済み
+                text = text.replace('#{INSTALL_PYTHON}', '')
+                #text = text.replace('#{INSTALL_PYTHON}', f'RUN apt-get update && apt-get install -y python3.11 python3.11-distutils python3-pip python-is-python3')
                 #text = text.replace('#{INSTALL_PYTHON}', f'RUN apt-get update && apt-get install -y python3.11 python3.11-distutils python3.11-dev\n' + \
                 #                                         f'RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.11 1\n' + \
                 #                                         f'RUN wget https://bootstrap.pypa.io/get-pip.py && python get-pip.py && apt-get install -y python3.11-venv\n')
