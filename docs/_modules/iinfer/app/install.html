@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>iinfer.app.install &mdash; iinfer 2025/06/01 documentation</title>
+  <title>iinfer.app.install &mdash; iinfer 2025/07/13 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=de8a5b00"></script>
+      <script src="../../../_static/documentation_options.js?v=3b03b92d"></script>
       <script src="../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -208,7 +208,9 @@
                                  <span class="c1">#f&#39;RUN wget https://bootstrap.pypa.io/get-pip.py &amp;&amp; python get-pip.py\n&#39;</span>
                 <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;#</span><span class="si">{INSTALL_PYTHON}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">install_python</span><span class="p">)</span>
             <span class="k">elif</span> <span class="ow">not</span> <span class="n">install_no_python</span><span class="p">:</span>
-                <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;#</span><span class="si">{INSTALL_PYTHON}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;RUN apt-get update &amp;&amp; apt-get install -y python3.11 python3.11-distutils python3-pip python-is-python3&#39;</span><span class="p">)</span>
+                <span class="c1"># pytorch/pytorch:2.7.0-cuda12.8-cudnn9-runtime の場合python3.11はインストール済み</span>
+                <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;#</span><span class="si">{INSTALL_PYTHON}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+                <span class="c1">#text = text.replace(&#39;#{INSTALL_PYTHON}&#39;, f&#39;RUN apt-get update &amp;&amp; apt-get install -y python3.11 python3.11-distutils python3-pip python-is-python3&#39;)</span>
                 <span class="c1">#text = text.replace(&#39;#{INSTALL_PYTHON}&#39;, f&#39;RUN apt-get update &amp;&amp; apt-get install -y python3.11 python3.11-distutils python3.11-dev\n&#39; + \</span>
                 <span class="c1">#                                         f&#39;RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.11 1\n&#39; + \</span>
                 <span class="c1">#                                         f&#39;RUN wget https://bootstrap.pypa.io/get-pip.py &amp;&amp; python get-pip.py &amp;&amp; apt-get install -y python3.11-venv\n&#39;)</span>
@@ -256,7 +258,8 @@
                     <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s1">:/home/</span><span class="si">{</span><span class="n">user</span><span class="si">}</span><span class="s1">/.iinfer&#39;</span><span class="p">,</span>
                     <span class="sa">f</span><span class="s1">&#39;/home/</span><span class="si">{</span><span class="n">user</span><span class="si">}</span><span class="s1">/scripts:/home/</span><span class="si">{</span><span class="n">user</span><span class="si">}</span><span class="s1">/scripts&#39;</span><span class="p">,</span>
                     <span class="sa">f</span><span class="s1">&#39;/home/</span><span class="si">{</span><span class="n">user</span><span class="si">}</span><span class="s1">:/home/</span><span class="si">{</span><span class="n">user</span><span class="si">}</span><span class="s1">&#39;</span>
-                <span class="p">]</span>
+                <span class="p">],</span>
+                <span class="n">command</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;CMD bash /home/</span><span class="si">{</span><span class="n">user</span><span class="si">}</span><span class="s1">/scripts/start.sh&#39;</span>
             <span class="p">)</span>
             <span class="k">if</span> <span class="n">install_use_gpu</span><span class="p">:</span>
                 <span class="n">services</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;iinfer_server</span><span class="si">{</span><span class="n">install_tag</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">][</span><span class="s1">&#39;deploy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>

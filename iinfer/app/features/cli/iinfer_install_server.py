@@ -39,9 +39,9 @@ class InstallServer(feature.UnsupportEdgeFeature):
             description_ja="`推論サーバー` のdockerイメージを `build` します。`build` が成功すると、実行時ディレクトリに `docker-compose.yml` ファイルが生成されます。",
             description_en="`Build` the docker image of the `inference server`. If the `build` is successful, a `docker-compose.yml` file is generated in the execution directory.",
             choice=[
-                dict(opt="data", type=Options.T_FILE, default=common.HOME_DIR / f".{self.ver.__appid__}", required=False, multi=False, hide=False, choice=None,
-                     description_ja="省略した時は f`$HONE/.{version.__appid__}` を使用します。",
-                     description_en="When omitted, f`$HONE/.{version.__appid__}` is used."),
+                dict(opt="data", type=Options.T_DIR, default=self.default_data, required=False, multi=False, hide=False, choice=None,
+                     description_ja=f"省略した時は `$HONE/.{self.ver.__appid__}` を使用します。",
+                     description_en=f"When omitted, `$HONE/.{self.ver.__appid__}` is used."),
                 dict(opt="install_cmdbox", type=Options.T_STR, default='cmdbox', required=False, multi=False, hide=True, choice=None,
                      description_ja=f"省略した時は `cmdbox` を使用します。 `cmdbox=={version.__version__}` といった指定も可能です。",
                      description_en=f"When omitted, `cmdbox` is used. You can also specify `cmdbox=={version.__version__}`.",

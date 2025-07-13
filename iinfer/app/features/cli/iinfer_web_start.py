@@ -18,13 +18,13 @@ class WebStart(cmdbox_web_start.WebStart):
         """
         opt = super().get_option()
         opt["choice"] += [
-            dict(opt="showimg_html", type=Options.T_FILE, default=None, required=False, multi=False, hide=False, choice=None,
+            dict(opt="showimg_html", type=Options.T_FILE, default=None, required=False, multi=False, hide=False, choice=None, fileio="in",
                  description_ja="`showimg.html` を指定します。省略時はiinfer内蔵のHTMLファイルを使用します。",
                  description_en="Specify `showimg.html`. If omitted, the iinfer built-in HTML file is used."),
-            dict(opt="webcap_html", type=Options.T_FILE, default=None, required=False, multi=False, hide=False, choice=None,
+            dict(opt="webcap_html", type=Options.T_FILE, default=None, required=False, multi=False, hide=False, choice=None, fileio="in",
                  description_ja="`webcap.html` を指定します。省略時はiinfer内蔵のHTMLファイルを使用します。",
                  description_en="Specify `webcap.html`. If omitted, the iinfer built-in HTML file is used."),
-            dict(opt="anno_html", type=Options.T_FILE, default=None, required=False, multi=False, hide=False, choice=None,
+            dict(opt="anno_html", type=Options.T_FILE, default=None, required=False, multi=False, hide=False, choice=None, fileio="in",
                  description_ja="`annotation.html` を指定します。省略時はiinfer内蔵のHTMLファイルを使用します。",
                  description_en="Specify `annotation.html`. If omitted, the iinfer built-in HTML file is used."),
         ]
