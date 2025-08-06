@@ -129,7 +129,7 @@ class ClientCapture(feature.Feature):
                 cv2.destroyWindow('preview')
             except:
                 pass
-        return 0, ret, cl
+        return self.RESP_SUCCESS, ret, cl
 
     def edgerun(self, opt:Dict[str, Any], tool:edge_tool.Tool, logger:logging.Logger, timeout:int, prevres:Any=None):
         """

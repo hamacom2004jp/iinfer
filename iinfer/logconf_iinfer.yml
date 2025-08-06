@@ -1,0 +1,199 @@
+version: 1
+
+formatters:
+    fmt:
+        format: '[%(asctime)s] %(levelname)s - %(message)s'
+        datefmt: '%Y-%m-%d %H:%M:%S'
+        class: logging.Formatter
+    fmt_rich:
+        format: '%(message)s'
+        class: logging.Formatter
+handlers:
+    std:
+        class: cmdbox.app.commons.loghandler.ColorfulStreamHandler
+        level: INFO
+        formatter: fmt
+        stream: ext://sys.stdout
+    rich:
+        class: rich.logging.RichHandler
+        level: INFO
+        formatter: fmt_rich
+        show_path: false
+        omit_repeated_times: false
+        tracebacks_word_wrap: false
+        log_time_format: '[%Y-%m-%d %H:%M]'
+    audit:
+        class: cmdbox.app.commons.loghandler.TimedRotatingFileHandler
+        level: INFO
+        formatter: fmt
+        backupCount: 5
+        when : 'D'
+        encoding : 'utf-8'
+        filename: .logs/iinfer_audit.log
+    client:
+        class: cmdbox.app.commons.loghandler.TimedRotatingFileHandler
+        level: INFO
+        formatter: fmt
+        backupCount: 5
+        when : 'D'
+        encoding : 'utf-8'
+        filename: .logs/iinfer_client.log
+    cmdbox:
+        class: cmdbox.app.commons.loghandler.TimedRotatingFileHandler
+        level: INFO
+        formatter: fmt
+        backupCount: 5
+        when : 'D'
+        encoding : 'utf-8'
+        filename: .logs/cmdbox.log
+    edge:
+        class: cmdbox.app.commons.loghandler.TimedRotatingFileHandler
+        level: INFO
+        formatter: fmt
+        backupCount: 5
+        when : 'D'
+        encoding : 'utf-8'
+        filename: .logs/iinfer_edge.log
+    gui:
+        class: cmdbox.app.commons.loghandler.TimedRotatingFileHandler
+        level: INFO
+        formatter: fmt
+        backupCount: 5
+        when : 'D'
+        encoding : 'utf-8'
+        filename: .logs/iinfer_gui.log
+    iinfer:
+        class: cmdbox.app.commons.loghandler.TimedRotatingFileHandler
+        level: INFO
+        formatter: fmt
+        backupCount: 5
+        when : 'D'
+        encoding : 'utf-8'
+        filename: .logs/iinfer.log
+    install:
+        class: cmdbox.app.commons.loghandler.TimedRotatingFileHandler
+        level: INFO
+        formatter: fmt
+        backupCount: 5
+        when : 'D'
+        encoding : 'utf-8'
+        filename: .logs/iinfer_install.log
+    mcp:
+        class: cmdbox.app.commons.loghandler.TimedRotatingFileHandler
+        level: INFO
+        formatter: fmt
+        backupCount: 5
+        when : 'D'
+        encoding : 'utf-8'
+        filename: .logs/iinfer_mcp.log
+    postprocess:
+        class: cmdbox.app.commons.loghandler.TimedRotatingFileHandler
+        level: INFO
+        formatter: fmt
+        backupCount: 5
+        when : 'D'
+        encoding : 'utf-8'
+        filename: .logs/iinfer_postprocess.log
+    redis:
+        class: cmdbox.app.commons.loghandler.TimedRotatingFileHandler
+        level: INFO
+        formatter: fmt
+        backupCount: 5
+        when : 'D'
+        encoding : 'utf-8'
+        filename: .logs/iinfer_redis.log
+    server:
+        class: cmdbox.app.commons.loghandler.TimedRotatingFileHandler
+        level: INFO
+        formatter: fmt
+        backupCount: 5
+        when : 'D'
+        encoding : 'utf-8'
+        filename: .logs/iinfer_server.log
+    tts:
+        class: cmdbox.app.commons.loghandler.TimedRotatingFileHandler
+        level: INFO
+        formatter: fmt
+        backupCount: 5
+        when : 'D'
+        encoding : 'utf-8'
+        filename: .logs/iinfer_tts.log
+    web:
+        class: cmdbox.app.commons.loghandler.TimedRotatingFileHandler
+        level: INFO
+        formatter: fmt
+        backupCount: 5
+        when : 'D'
+        encoding : 'utf-8'
+        filename: .logs/iinfer_web.log
+
+loggers:
+    audit:
+        handlers: [audit, std]
+        level: INFO
+        qualname: audit
+        propagate: false
+    client:
+        handlers: [client, std]
+        level: INFO
+        qualname: client
+        propagate: false
+    cmdbox:
+        handlers: [cmdbox, std]
+        level: INFO
+        qualname: cmdbox
+        propagate: false
+    edge:
+        handlers: [edge, std]
+        level: INFO
+        qualname: edge
+        propagate: false
+    gui:
+        handlers: [gui, std]
+        level: INFO
+        qualname: gui
+        propagate: false
+    iinfer:
+        handlers: [iinfer, std]
+        level: INFO
+        qualname: iinfer
+        propagate: false
+    install:
+        handlers: [install, std]
+        level: INFO
+        qualname: install
+        propagate: false
+    mcp:
+        handlers: [mcp, std]
+        level: INFO
+        qualname: mcp
+        propagate: false
+    postprocess:
+        handlers: [postprocess, std]
+        level: INFO
+        qualname: postprocess
+        propagate: false
+    redis:
+        handlers: [redis, std]
+        level: INFO
+        qualname: redis
+        propagate: false
+    server:
+        handlers: [server, std]
+        level: INFO
+        qualname: server
+        propagate: false
+    tts:
+        handlers: [tts, std]
+        level: INFO
+        qualname: tts
+        propagate: false
+    web:
+        handlers: [web, std]
+        level: INFO
+        qualname: web
+        propagate: false
+
+#root:
+#    handlers: [std]
+#    level: NOTSET

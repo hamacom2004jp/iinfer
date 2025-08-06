@@ -183,7 +183,7 @@ class ClientPredict(feature.Feature):
         if args.svname is None:
             msg = {"warn":f"Please specify the --svname option."}
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return 1, msg, None
+            return self.RESP_WARN, msg, None
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
 
         try:
@@ -210,7 +210,7 @@ class ClientPredict(feature.Feature):
                     if logger.level == logging.DEBUG:
                         msg_str = common.to_str(msg, slise=100)
                         logger.debug(f"app.main: args.mode={args.mode}, args.cmd={args.cmd}, msg={msg_str}")
-                    return 1, msg, cl
+                    return self.RESP_WARN, msg, cl
                 if args.pred_input_type in ['capture']:
                     def _pred(args, line, tm):
                         if logger.level == logging.DEBUG:
@@ -247,14 +247,14 @@ class ClientPredict(feature.Feature):
                 if logger.level == logging.DEBUG:
                     msg_str = common.to_str(msg, slise=100)
                     logger.debug(f"app.main: args.mode={args.mode}, args.cmd={args.cmd}, msg={msg_str}")
-                return 1, msg, cl
+                return self.RESP_WARN, msg, cl
         finally:
             try:
                 cv2.destroyWindow('preview')
             except:
                 pass
 
-        return 0, None, cl
+        return self.RESP_SUCCESS, None, cl
 
     def is_cluster_redirect(self):
         """
@@ -379,7 +379,7 @@ class ClientPredict(feature.Feature):
                 _set_perftime(output, predict_process_start, before_injections_end, predict_end,
                              tracker_end, after_injections_end, predict_process_end)
                 redis_cli.rpush(reskey, output)
-                return self.RESP_SCCESS
+                return self.RESP_SUCCESS
             output = dict(success=outputs)
             # 後処理を実行
             output, _ = _after_injection(reskey, name, output, None, session)
@@ -387,7 +387,7 @@ class ClientPredict(feature.Feature):
             _set_perftime(output, predict_process_start, before_injections_end, predict_end,
                             tracker_end, after_injections_end, predict_process_end)
             redis_cli.rpush(reskey, output)
-            return self.RESP_SCCESS
+            return self.RESP_SUCCESS
         except Exception as e:
             logger.warning(f"Failed to run inference: {e}", exc_info=True)
             redis_cli.rpush(reskey, {"warn": f"Failed to run inference: {e}"})

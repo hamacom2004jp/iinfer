@@ -78,13 +78,13 @@ class InstallMmseg(feature.UnsupportEdgeFeature):
         if args.data is None:
             msg = {"warn":f"Please specify the --data option."}
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return 1, msg
+            return self.RESP_WARN, msg
         ret = inst.mmseg(Path(args.data), install_use_gpu=args.install_use_gpu)
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
 
         if 'success' not in ret:
-            return 1, ret, inst
-        return 0, ret, inst
+            return self.RESP_WARN, ret, inst
+        return self.RESP_SUCCESS, ret, inst
 
     def audited_by(self, logger:logging.Logger, args:argparse.Namespace) -> bool:
         """

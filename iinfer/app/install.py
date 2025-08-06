@@ -42,7 +42,8 @@ class Install(object):
     def server(self, data:Path, install_cmdbox_tgt:str='cmdbox', install_iinfer_tgt:str='iinfer', install_onnx:bool=True,
                install_mmdet:bool=True, install_mmseg:bool=True, install_mmcls:bool=False, install_mmpretrain:bool=True,
                install_insightface=False, install_from:str=None, install_no_python:bool=False, install_compile_python:bool=False,
-               install_tag:str=None, install_use_gpu:bool=False):
+               install_tag:str=None, install_use_gpu:bool=False,
+               tts_engine:str=None, voicevox_ver:str=None, voicevox_arc:str=None, voicevox_whl:str=None):
         """
         iinferが含まれるdockerイメージをインストールします。
 
@@ -61,6 +62,10 @@ class Install(object):
             install_compile_python (bool): pythonをコンパイルしてインストール
             install_tag (str): インストールタグ
             install_use_gpu (bool): GPUを使用するモジュール構成でインストールします。
+            tts_engine (str): TTSエンジンの指定
+            voicevox_ver (str): VoiceVoxのバージョン
+            voicevox_arc (str): VoiceVoxのアーキテクチャ
+            voicevox_whl (str): VoiceVoxのwhlファイルの名前
 
         Returns:
             dict: 処理結果
@@ -122,6 +127,11 @@ class Install(object):
                 #                                         f'RUN wget https://bootstrap.pypa.io/get-pip.py && python get-pip.py && apt-get install -y python3.11-venv\n')
             else:
                 text = text.replace('#{INSTALL_PYTHON}', '')
+            install_voicevox = ''
+            if tts_engine is not None and tts_engine.lower() == 'voicevox':
+                install_voicevox = f'RUN iinfer -m tts -c install --data /home/{user}/.iinfer --client_only --tts_engine voicevox ' \
+                                 + f'--voicevox_ver {voicevox_ver} --voicevox_os linux --voicevox_arc {voicevox_arc} ' \
+                                 + f'--voicevox_device {"cuda" if install_use_gpu else "cpu"} --voicevox_whl {voicevox_whl} --debug'
             text = text.replace('#{INSTALL_TAG}', install_tag)
             text = text.replace('#{INSTALL_CMDBOX}', install_cmdbox_tgt)
             text = text.replace('#{INSTALL_IINFER}', install_iinfer_tgt)
@@ -131,6 +141,7 @@ class Install(object):
             text = text.replace('#{INSTALL_MMCLS}', f'RUN iinfer -m install -c mmcls --data /home/{user}/.iinfer {install_use_gpu_opt} --debug' if install_mmcls else '')
             text = text.replace('#{INSTALL_MMPRETRAIN}', f'RUN iinfer -m install -c mmpretrain --data /home/{user}/.iinfer {install_use_gpu_opt} --debug' if install_mmpretrain else '')
             text = text.replace('#{INSTALL_INSIGHTFACE}', f'RUN iinfer -m install -c insightface --data /home/{user}/.iinfer {install_use_gpu_opt} --debug' if install_insightface else '')
+            text = text.replace('#{INSTALL_VOICEVOX}', install_voicevox)
             fp.write(text)
         docker_compose_path = Path('docker-compose.yml')
         if not docker_compose_path.exists():

@@ -84,4 +84,4 @@ class RedisDockerRun(feature.UnsupportEdgeFeature):
         ret = rd.docker_run(args.port, args.password)
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
 
-        return 0, ret, rd
+        return self.RESP_SUCCESS, ret, rd

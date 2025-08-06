@@ -82,8 +82,8 @@ class InstallRedis(feature.UnsupportEdgeFeature):
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
 
         if 'success' not in ret:
-            return 1, ret, inst
-        return 0, ret, inst
+            return self.RESP_WARN, ret, inst
+        return self.RESP_SUCCESS, ret, inst
 
     def audited_by(self, logger:logging.Logger, args:argparse.Namespace) -> bool:
         """

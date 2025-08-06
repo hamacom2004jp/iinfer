@@ -83,6 +83,29 @@ class InstallServer(feature.UnsupportEdgeFeature):
                 dict(opt="install_use_gpu", type=Options.T_BOOL, default=False, required=False, multi=False, hide=False, choice=[True, False],
                      description_ja="GPUを使用するモジュール構成でインストールします。",
                      description_en="Install with a module configuration that uses the GPU."),
+
+                dict(opt="tts_engine", type=Options.T_STR, default="voicevox", required=True, multi=False, hide=False,
+                     choice=["voicevox"],
+                     choice_show=dict(voicevox=["voicevox_ver", "voicevox_arc", "voicevox_whl"]),
+                     description_ja="使用するTTSエンジンを指定します。",
+                     description_en="Specify the TTS engine to use."),
+                dict(opt="voicevox_ver", type=Options.T_STR, default='0.16.0', required=False, multi=False, hide=False, choice=['0.16.0'],
+                     description_ja="使用するTTSエンジンのバージョンを指定します。",
+                     description_en="Specify the version of the TTS engine to use."),
+                dict(opt="voicevox_arc", type=Options.T_STR, default='x64', required=False, multi=False, hide=False, choice=['x64', 'arm64'],
+                     description_ja="使用するTTSエンジンのアーキテクチャを指定します。",
+                     description_en="Specify the architecture for the TTS engine."),
+                dict(opt="voicevox_whl", type=Options.T_STR, default='voicevox_core-0.16.0-cp310-abi3-win32.whl', required=False, multi=False, hide=False,
+                     choice=['voicevox_core-0.16.0-cp310-abi3-win32.whl',
+                             'voicevox_core-0.16.0-cp310-abi3-win_amd64.whl',
+                             'voicevox_core-0.16.0-cp310-abi3-macosx_10_12_x86_64.whl',
+                             'voicevox_core-0.16.0-cp310-abi3-macosx_11_0_arm64.whl',
+                             'voicevox_core-0.16.0-cp310-abi3-manylinux_2_34_aarch64.whl',
+                             'voicevox_core-0.16.0-cp310-abi3-manylinux_2_34_x86_64.whl'],
+                     choice_edit=True,
+                     description_ja="使用するTTSエンジンのホイールファイルを指定します。",
+                     description_en="Specify the wheel file for the TTS engine."),
+
                 dict(opt="output_json", short="o", type=Options.T_FILE, default=None, required=False, multi=False, hide=True, choice=None, fileio="out",
                      description_ja="処理結果jsonの保存先ファイルを指定。",
                      description_en="Specify the destination file for saving the processing result json."),
@@ -119,7 +142,7 @@ class InstallServer(feature.UnsupportEdgeFeature):
         if args.data is None:
             msg = {"warn":f"Please specify the --data option."}
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return 1, msg
+            return self.RESP_WARN, msg
         ret = inst.server(Path(args.data),
                           install_cmdbox_tgt=args.install_cmdbox,
                           install_iinfer_tgt=args.install_iinfer,
@@ -132,12 +155,14 @@ class InstallServer(feature.UnsupportEdgeFeature):
                           install_from=args.install_from,
                           install_no_python=args.install_no_python,
                           install_compile_python=args.install_compile_python,
-                          install_tag=args.install_tag, install_use_gpu=args.install_use_gpu)
+                          install_tag=args.install_tag, install_use_gpu=args.install_use_gpu,
+                          tts_engine=args.tts_engine, voicevox_ver=args.voicevox_ver,
+                          voicevox_arc=args.voicevox_arc, voicevox_whl=args.voicevox_whl)
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
 
         if 'success' not in ret:
-            return 1, ret, inst
-        return 0, ret, inst
+            return self.RESP_WARN, ret, inst
+        return self.RESP_SUCCESS, ret, inst
 
     def audited_by(self, logger:logging.Logger, args:argparse.Namespace) -> bool:
         """

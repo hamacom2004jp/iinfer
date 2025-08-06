@@ -114,7 +114,7 @@ class ClientReadDir(feature.Feature):
         if args.svname is None:
             msg = {"warn":f"Please specify the --svname option."}
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return 1, msg, None
+            return self.RESP_WARN, msg, None
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
 
         root_dir = Path(args.root_dir) if args.root_dir is not None else Path('.')
@@ -134,6 +134,6 @@ class ClientReadDir(feature.Feature):
         except Exception as e:
             msg = {"warn":f"{e}"}
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return 1, msg, cl
+            return self.RESP_WARN, msg, cl
 
-        return 0, ret, cl
+        return self.RESP_SUCCESS, ret, cl

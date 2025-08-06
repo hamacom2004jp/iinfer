@@ -46,8 +46,8 @@ class GuiStart(cmdbox_gui_start.GuiStart):
         if args.data is None:
             msg = {"warn":f"Please specify the --data option."}
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return 1, msg
-        w = web.Web(logger, Path(args.data), appcls=self.appcls, ver=self.ver,
+            return self.RESP_WARN, msg
+        w = web.Web.getInstance(logger, Path(args.data), appcls=self.appcls, ver=self.ver,
                     redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname,
                     client_only=args.client_only, doc_root=args.doc_root, gui_html=args.gui_html, filer_html=args.filer_html, assets=args.assets,
                     signin_html=args.signin_html, signin_file=args.signin_file, gui_mode=True,
@@ -62,4 +62,4 @@ class GuiStart(cmdbox_gui_start.GuiStart):
 
         msg = {"success":"gui complate."}
         common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-        return 0, msg
+        return self.RESP_SUCCESS, msg

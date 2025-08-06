@@ -2,6 +2,7 @@
 
 - onnx又はmmlabフォーマットのAIモデルファイルを実行するアプリケーションです。
 - ドキュメントは[こちら](https://hamacom2004jp.github.io/iinfer/)。
+- このアプリケーションは[cmdbox](https://github.com/hamacom2004jp/cmdbox/)をベースにしています。
 - iinferを使用することで、AIモデルを簡単に実行することが出来ます。
 - 動作確認したモデルは[動作確認済みモデル](https://hamacom2004jp.github.io/iinfer/docs/models.html)に記載しています。
 - 主なAIタスクは、画像分類、物体検知、領域検知、顔検知、顔認識です。

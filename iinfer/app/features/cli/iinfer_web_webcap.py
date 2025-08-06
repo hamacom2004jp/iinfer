@@ -103,10 +103,10 @@ class WebWebcap(feature.UnsupportEdgeFeature):
         if args.data is None:
             msg = {"warn":f"Please specify the --data option."}
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return 1, msg
+            return self.RESP_WARN, msg
         w = None
         try:
-            w = web.Web(logger, Path(args.data), appcls=self.appcls, ver=self.ver,
+            w = web.Web.getInstance(logger, Path(args.data), appcls=self.appcls, ver=self.ver,
                         redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
 
             w.webcap(args.allow_host, args.listen_webcap_port, image_type=args.image_type, outputs_key=args.outputs_key,
@@ -117,4 +117,4 @@ class WebWebcap(feature.UnsupportEdgeFeature):
                 cv2.destroyWindow('preview')
             except:
                 pass
-        return 0, None, w
+        return self.RESP_SUCCESS, None, w

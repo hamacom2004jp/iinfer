@@ -55,5 +55,5 @@ class PostprocessFeature(feature.Feature):
         else:
             msg = {"warn":f"Image file or stdin is empty."}
             common.print_format(msg, format, tm, output_json, output_json_append, pf=pf)
-            return 1, msg
-        return 0, ret
+            return self.RESP_WARN, msg
+        return self.RESP_SUCCESS, ret

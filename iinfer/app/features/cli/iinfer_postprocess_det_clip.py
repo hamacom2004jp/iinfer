@@ -84,9 +84,9 @@ class PostprocessDetClip(postprocess_feature.PostprocessFeature):
         except Exception as e:
             msg = {"warn":f"Failed to initialize. {e}"}
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return 1, msg, proc
+            return self.RESP_WARN, msg, proc
         code, ret = self._exec_proc(args.input_file, args.stdin, proc, args.timeout, False, tm,
                                     None, False, output_image_file=None, output_csv=args.output_csv, pf=pf)
         if code != 0:
             return code, ret
-        return 0, ret, proc
+        return self.RESP_SUCCESS, ret, proc

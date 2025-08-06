@@ -76,4 +76,4 @@ class ClientPredictTypeList(feature.OneshotResultEdgeFeature):
                                 required_model_conf=None, required_model_weight=None))
         ret = dict(success=type_list)
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-        return 0, ret, None
+        return self.RESP_SUCCESS, ret, None

@@ -301,7 +301,7 @@ class ClientDeploy(feature.OneshotNotifyEdgeFeature):
         if args.svname is None:
             msg = {"warn":f"Please specify the --svname option."}
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return 1, msg, None
+            return self.RESP_WARN, msg, None
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
 
         if args.model_conf_file is not None:
@@ -327,9 +327,9 @@ class ClientDeploy(feature.OneshotNotifyEdgeFeature):
                         overwrite=args.overwrite, retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
         if 'success' not in ret:
-            return 1, ret, cl
+            return self.RESP_WARN, ret, cl
 
-        return 0, ret, cl
+        return self.RESP_SUCCESS, ret, cl
 
     def is_cluster_redirect(self):
         """
@@ -597,7 +597,7 @@ class ClientDeploy(feature.OneshotNotifyEdgeFeature):
             return self.RESP_WARN
 
         redis_cli.rpush(reskey, {"success": f"Save conf.json to {str(deploy_dir)}"})
-        return self.RESP_SCCESS
+        return self.RESP_SUCCESS
 
     def _gitpull(self, data_dir:Path, logger:logging.Logger, redis_cli:redis_client.RedisClient, reskey:str, deploy_dir:Path, predict_type:str):
         if predict_type.startswith('mmpretrain_'):

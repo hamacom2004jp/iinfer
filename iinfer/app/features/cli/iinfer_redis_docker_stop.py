@@ -78,4 +78,4 @@ class RedisDockerStop(feature.UnsupportEdgeFeature):
         ret = rd.docker_stop()
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
 
-        return 0, ret, rd
+        return self.RESP_SUCCESS, ret, rd

@@ -112,16 +112,16 @@ class ClientDeployList(feature.OneshotResultEdgeFeature):
         if args.svname is None:
             msg = {"warn":f"Please specify the --svname option."}
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
-            return 1, msg, None
+            return self.RESP_WARN, msg, None
         cl = client.Client(logger, redis_host=args.host, redis_port=args.port, redis_password=args.password, svname=args.svname)
 
         ret = cl.deploy_list(retry_count=args.retry_count, retry_interval=args.retry_interval, timeout=args.timeout)
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
 
         if 'success' not in ret:
-            return 1, ret, cl
+            return self.RESP_WARN, ret, cl
 
-        return 0, ret, cl
+        return self.RESP_SUCCESS, ret, cl
 
     def is_cluster_redirect(self):
         """
@@ -190,4 +190,4 @@ class ClientDeployList(feature.OneshotResultEdgeFeature):
                             row[k] = 'exists' if len([True for p in row[k] if  Path(p).exists()]) > 0 else None
                 deploy_list.append(row)
         redis_cli.rpush(reskey, {"success": deploy_list})
-        return self.RESP_SCCESS
+        return self.RESP_SUCCESS
