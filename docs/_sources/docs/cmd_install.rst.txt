@@ -121,6 +121,9 @@
     "--install_from <イメージ名>","","作成するdockerイメージの元となるFROMイメージを指定します。"
     "--install_tag <追加のタグ名>","","指定すると作成するdockerイメージのタグ名に追記出来ます。"
     "--install_use_gpu","","GPUを使用するモジュール構成でインストールします。"
-    
+    "--tts_engine <TTS Engine>","","使用するTTSエンジンを指定します。"
+    "--voicevox_ver <version>","","使用するTTSエンジンのバージョンを指定します。"
+    "--voicevox_arc <arch>","","使用するTTSエンジンのアーキテクチャを指定します。"
+    "--voicevox_whl <whl>","","使用するTTSエンジンのホイールファイルを指定します。"
 
 - ※1 : `mmclassification` と `mmpretrain` はバージョンによって共存できない場合があります。

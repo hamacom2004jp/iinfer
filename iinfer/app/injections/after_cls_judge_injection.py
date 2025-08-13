@@ -1,9 +1,9 @@
-from iinfer.app.injections import after_det_jadge_injection
+from iinfer.app.injections import after_det_judge_injection
 from PIL import Image
 from typing import Tuple, Dict, Any
 
 
-class AfterClsJadgeInjection(after_det_jadge_injection.AfterDetJadgeInjection):
+class AfterClsJadgeInjection(after_det_judge_injection.AfterDetJadgeInjection):
 
     def action(self, reskey:str, name:str, outputs:Dict[str, Any], output_image:Image.Image, session:Dict[str, Any]) -> Tuple[Dict[str, Any], Image.Image]:
         """

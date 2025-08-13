@@ -270,8 +270,8 @@ def _test_10_04_postprocess_det_filter(capfd):
     assert 'success' in result.keys()
 
 @pytest.mark.run(order=11)
-def test_11_01_postprocess_det_jadge(capfd):
-    cmd = f"-m postprocess -c det_jadge -i onnx_det_YoloX_Lite.json --output_preview " \
+def test_11_01_postprocess_det_judge(capfd):
+    cmd = f"-m postprocess -c det_judge -i onnx_det_YoloX_Lite.json --output_preview " \
           f"--ok_score_th 0.9 --ok_labels dog --ok_labels person " \
           f"--ng_score_th 0.8 --ng_labels truck --ng_labels bicycle " \
           f"--ext_score_th 0.3 --ext_labels car --ext_labels pottedplant".split(' ')
@@ -280,8 +280,8 @@ def test_11_01_postprocess_det_jadge(capfd):
     assert 'success' in result.keys()
 
 @pytest.mark.run(order=11)
-def test_11_02_postprocess_det_jadge(capfd):
-    cmd = f"-m postprocess -c det_jadge -i mmdet_det_YoloX_Lite.json --output_preview " \
+def test_11_02_postprocess_det_judge(capfd):
+    cmd = f"-m postprocess -c det_judge -i mmdet_det_YoloX_Lite.json --output_preview " \
           f"--ok_score_th 0.3 --ok_classes 16 --ok_classes 0 " \
           f"--ng_score_th 0.8 --ng_classes 7 --ng_classes 1 " \
           f"--ext_score_th 0.3 --ext_labels 2 --ext_labels pottedplant".split(' ')
@@ -290,8 +290,8 @@ def test_11_02_postprocess_det_jadge(capfd):
     assert 'success' in result.keys()
 
 @pytest.mark.run(order=11)
-def test_11_03_postprocess_cls_jadge(capfd):
-    cmd = f"-m postprocess -c cls_jadge -i onnx_cls_EfficientNet_Lite4.json --output_preview " \
+def test_11_03_postprocess_cls_judge(capfd):
+    cmd = f"-m postprocess -c cls_judge -i onnx_cls_EfficientNet_Lite4.json --output_preview " \
           f"--ok_score_th 0.8 --ok_classes 249 --ok_classes 235 " \
           f"--ng_score_th 0.2 --ng_classes 250 " \
           f"--ext_score_th 0.1 --ext_classes 248".split(' ')
@@ -301,8 +301,8 @@ def test_11_03_postprocess_cls_jadge(capfd):
     assert 'success' in result.keys()
 
 @pytest.mark.run(order=11)
-def test_11_04_postprocess_cls_jadge(capfd):
-    cmd = f"-m postprocess -c cls_jadge -i mmpretrain_cls_swin_Lite.json --output_preview " \
+def test_11_04_postprocess_cls_judge(capfd):
+    cmd = f"-m postprocess -c cls_judge -i mmpretrain_cls_swin_Lite.json --output_preview " \
           f"--ok_score_th 0.8 --ok_classes 249 --ok_classes 235 " \
           f"--ng_score_th 0.2 --ng_classes 250 " \
           f"--ext_score_th 0.1 --ext_classes 248".split(' ')

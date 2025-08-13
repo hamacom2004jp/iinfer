@@ -11,7 +11,7 @@
 
     .. code-block:: bash
 
-         $ iinfer -m client -c capture --image_type capture | iinfer -m client -c predict --name mmdet_det_YoloX --image_type capture --stdin --nodraw | iinfer -m postprocess -c det_filter --stdin --score_th 0.1 --labels dog --labels person --output_preview | iinfer -m postprocess -c det_jadge --stdin --ok_score_th 0.5 --ok_labels person --ng_score_th 0.3 --ng_labels dog --output_preview | iinfer -m postprocess -c csv --stdin
+         $ iinfer -m client -c capture --image_type capture | iinfer -m client -c predict --name mmdet_det_YoloX --image_type capture --stdin --nodraw | iinfer -m postprocess -c det_filter --stdin --score_th 0.1 --labels dog --labels person --output_preview | iinfer -m postprocess -c det_judge --stdin --ok_score_th 0.5 --ok_labels person --ng_score_th 0.3 --ng_labels dog --output_preview | iinfer -m postprocess -c csv --stdin
 
 - 前のコマンドが出力した内容を入力として受け付けるには、 `--stdin` オプションを指定します。
 

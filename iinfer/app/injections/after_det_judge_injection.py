@@ -44,7 +44,7 @@ class AfterDetJadgeInjection(injection.AfterInjection):
             self.add_warning(outputs, str(e))
             return outputs, output_image
 
-        self.add_success(outputs, outputs['success']['output_jadge'])
+        self.add_success(outputs, outputs['success']['output_judge'])
 
         return outputs, output_image
 
@@ -97,30 +97,30 @@ class AfterDetJadgeInjection(injection.AfterInjection):
         if 'output_scores' not in data or 'output_classes' not in data:
             raise Exception('Invalid outputs. outputs[\'success\'][\'output_scores\'] and outputs[\'success\'][\'output_classes\'] must be set.')
 
-        output_jadge_score = [0.0, 0.0, 0.0] # ok, ng, ext
+        output_judge_score = [0.0, 0.0, 0.0] # ok, ng, ext
         for i, cls in enumerate(data['output_classes']):
             label = data['output_labels'][i] if 'output_labels' in data else None
             if ext_classes is not None and cls in ext_classes or ext_labels is not None and label in ext_labels:
-                output_jadge_score[2] = max(output_jadge_score[2], data['output_scores'][i])
+                output_judge_score[2] = max(output_judge_score[2], data['output_scores'][i])
             elif ng_classes is not None and cls in ng_classes or ng_labels is not None and label in ng_labels:
-                output_jadge_score[1] = max(output_jadge_score[1], data['output_scores'][i])
+                output_judge_score[1] = max(output_judge_score[1], data['output_scores'][i])
             elif ok_classes is not None and cls in ok_classes or ok_labels is not None and label in ok_labels:
-                output_jadge_score[0] = max(output_jadge_score[0], data['output_scores'][i])
+                output_judge_score[0] = max(output_judge_score[0], data['output_scores'][i])
             else:
-                output_jadge_score[2] = max(output_jadge_score[2], data['output_scores'][i])
+                output_judge_score[2] = max(output_judge_score[2], data['output_scores'][i])
 
-        output_jadge_label = ['ok', 'ng', 'gray']
-        output_jadge = 'gray'
-        if ext_score_th is not None and output_jadge_score[2] >= ext_score_th:
-            output_jadge = 'gray'
-        elif ng_score_th is not None and output_jadge_score[1] >= ng_score_th:
-            output_jadge = 'ng'
-        elif ok_score_th is not None and output_jadge_score[0] >= ok_score_th:
-            output_jadge = 'ok'
+        output_judge_label = ['ok', 'ng', 'gray']
+        output_judge = 'gray'
+        if ext_score_th is not None and output_judge_score[2] >= ext_score_th:
+            output_judge = 'gray'
+        elif ng_score_th is not None and output_judge_score[1] >= ng_score_th:
+            output_judge = 'ng'
+        elif ok_score_th is not None and output_judge_score[0] >= ok_score_th:
+            output_judge = 'ok'
 
-        data['output_jadge_score'] = output_jadge_score
-        data['output_jadge_label'] = output_jadge_label
-        data['output_jadge'] = output_jadge
+        data['output_judge_score'] = output_judge_score
+        data['output_judge_label'] = output_judge_label
+        data['output_judge'] = output_judge
 
         return outputs
 
@@ -136,18 +136,18 @@ class AfterDetJadgeInjection(injection.AfterInjection):
         if 'success' not in outputs or type(outputs['success']) != dict:
             raise Exception('Invalid outputs. outputs[\'success\'] must be dict.')
         data = outputs['success']
-        if 'output_jadge_score' not in data:
-            raise Exception('Invalid outputs. outputs[\'success\'][\'output_jadge_score\'] must be set.')
-        if 'output_jadge' not in data:
-            raise Exception('Invalid outputs. outputs[\'success\'][\'output_jadge\'] must be set.')
-        output_jadge_score = data['output_jadge_score']
-        output_jadge = data['output_jadge']
+        if 'output_judge_score' not in data:
+            raise Exception('Invalid outputs. outputs[\'success\'][\'output_judge_score\'] must be set.')
+        if 'output_judge' not in data:
+            raise Exception('Invalid outputs. outputs[\'success\'][\'output_judge\'] must be set.')
+        output_judge_score = data['output_judge_score']
+        output_judge = data['output_judge']
 
-        jadge_score = output_jadge_score[output_jadge_score.index(max(output_jadge_score))]
+        judge_score = output_judge_score[output_judge_score.index(max(output_judge_score))]
         draw = ImageDraw.Draw(output_image)
 
-        color = cmn.make_color(str(jadge_score*1000))
+        color = cmn.make_color(str(judge_score*1000))
         draw.rectangle(((0, 0), (output_image.width, 10)), outline=color, fill=color)
-        draw.text((0, 0), f"{output_jadge}:{jadge_score}", tuple([int(255-c) for c in color]))
+        draw.text((0, 0), f"{output_judge}:{judge_score}", tuple([int(255-c) for c in color]))
 
         return output_image

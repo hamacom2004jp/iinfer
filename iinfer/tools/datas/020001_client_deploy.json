@@ -26,7 +26,7 @@
     "before_injection_py": [],
     "after_injection_type": [
         "after_det_filter_injection",
-        "after_det_jadge_injection"
+        "after_det_judge_injection"
     ],
     "after_injection_conf": "iinfer/tools/datas/injections/after_yolox_injection.json",
     "after_injection_py": [],

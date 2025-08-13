@@ -26,7 +26,7 @@ Armin Rigo, Maciej Fijalkowski	MIT License	cffi	http://cffi.readthedocs.org	1.17
 "Ahmed R. TAHRI" <tahri.ahmed@proton.me>	MIT License	charset-normalizer	https://github.com/jawah/charset_normalizer/blob/master/CHANGELOG.md	3.4.2	iinfer\licenses\LICENSE_charset-normalizer_3_4_2_MIT_License.txt
 UNKNOWN	UNKNOWN	click	https://github.com/pallets/click/	8.2.1	iinfer\licenses\LICENSE_click_8_2_1_UNKNOWN.txt
 The cloudpickle developer team	BSD License	cloudpickle	https://github.com/cloudpipe/cloudpickle	3.1.1	iinfer\licenses\LICENSE_cloudpickle_3_1_1_BSD_License.txt
-hamacom2004jp	MIT License	cmdbox	https://github.com/hamacom2004jp/cmdbox	0.6.4	iinfer\licenses\LICENSE_cmdbox_0_6_4_MIT_License.txt
+hamacom2004jp	MIT License	cmdbox	https://github.com/hamacom2004jp/cmdbox	0.6.4.1	iinfer\licenses\LICENSE_cmdbox_0_6_4_1_MIT_License.txt
 Jonathan Hartley <tartley@tartley.com>	BSD License	colorama	https://github.com/tartley/colorama	0.4.6	iinfer\licenses\LICENSE_colorama_0_4_6_BSD_License.txt
 Ian Thomas <ianthomas23@gmail.com>	BSD License	contourpy	https://github.com/contourpy/contourpy	1.3.3	iinfer\licenses\LICENSE_contourpy_1_3_3_BSD_License.txt
 The cryptography developers <cryptography-dev@python.org>	Apache-2.0 OR BSD-3-Clause	cryptography	https://github.com/pyca/cryptography	45.0.5	iinfer\licenses\LICENSE_cryptography_45_0_5_Apache-2_0_OR_BSD-3-Clause.txt

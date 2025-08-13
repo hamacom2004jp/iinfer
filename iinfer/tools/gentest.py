@@ -77,9 +77,9 @@ def main():
             opt_list_false = dict()
             opt_list_stdin = dict()
             for name in names:
-                opt_list_true[name] = dict(opt_list=[], jadge=True)
-                opt_list_chk[name] = dict(opt_list=[], jadge=False)
-                opt_list_false[name] = dict(opt_list=[], jadge=False)
+                opt_list_true[name] = dict(opt_list=[], judge=True)
+                opt_list_chk[name] = dict(opt_list=[], judge=False)
+                opt_list_false[name] = dict(opt_list=[], judge=False)
                 for choice in choices:
                     set_false = True
                     if "test_false" in choice and name in choice["test_false"]:
@@ -107,7 +107,7 @@ def main():
                     del opt_list_false[name]
 
             test_assert = option.get_cmd_attr(mode_key, cmd_key, "test_assert")
-            test_assert = test_assert if test_assert is not None else "assert 'success' {jadge} result.keys()"
+            test_assert = test_assert if test_assert is not None else "assert 'success' {judge} result.keys()"
             jointxt = '",\n           "'
             for name in names:
                 temp = TEMP_TEST
@@ -120,7 +120,7 @@ def main():
                     opt_list = ["-m", mode_key, "-c", cmd_key] + opt_list_true[name]["opt_list"]
                     opt_list = [str(x) for x in opt_list if str(x) != "--debug"] + ["--debug"]
                     cmd_line = temp.format(index=index, mode_key=mode_key, cmd_key=cmd_key,
-                                                name=name, jadge="in", opt_list=jointxt.join(opt_list),
+                                                name=name, judge="in", opt_list=jointxt.join(opt_list),
                                                 stdin_file=stdin_file)
                     buffer.write(cmd_line)
                     index += 1
@@ -129,7 +129,7 @@ def main():
                     opt_list = ["-m", mode_key, "-c", cmd_key] + opt_list_false[name]["opt_list"]
                     opt_list = [str(x) for x in opt_list if str(x) != "--debug"] + ["--debug"]
                     cmd_line = temp.format(index=index, mode_key=mode_key, cmd_key=cmd_key,
-                                                name=name, jadge="not in", opt_list=jointxt.join(opt_list),
+                                                name=name, judge="not in", opt_list=jointxt.join(opt_list),
                                                 stdin_file=stdin_file)
                     buffer.write(cmd_line)
                     index += 1

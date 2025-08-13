@@ -1,6 +1,6 @@
 from cmdbox.app.commons import convert
 from iinfer.app import postprocess
-from iinfer.app.injections import after_det_jadge_injection
+from iinfer.app.injections import after_det_judge_injection
 from PIL import Image
 from typing import Dict, Any, Tuple, List
 import cv2
@@ -35,7 +35,7 @@ class DetJadge(postprocess.Postprocess):
                            ng_score_th=ng_score_th, ng_classes=ng_classes, ng_labels=ng_labels,
                            ext_score_th=ext_score_th, ext_classes=ext_classes, ext_labels=ext_labels,
                            nodraw=nodraw, output_preview=output_preview)
-        self.injection = after_det_jadge_injection.AfterDetJadgeInjection(self.config, self.logger)
+        self.injection = after_det_judge_injection.AfterDetJadgeInjection(self.config, self.logger)
 
     def post(self, outputs:Dict[str, Any], output_image:Image.Image) -> Tuple[Dict[str, Any], Image.Image]:
         """

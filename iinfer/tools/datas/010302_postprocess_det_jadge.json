@@ -1,7 +1,7 @@
 {
     "mode": "postprocess",
-    "cmd": "det_jadge",
-    "title": "010302_postprocess_det_jadge",
+    "cmd": "det_judge",
+    "title": "010302_postprocess_det_judge",
     "input_file": "tests\\output_010301_postprocess_det_filter.json",
     "stdin": false,
     "ok_score_th": 0.5,

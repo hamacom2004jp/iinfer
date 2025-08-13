@@ -6,7 +6,7 @@
 
 - postprocessモードのコマンド一覧です。
 
-後処理(画像分類判定) : `iinfer -m postprocess -c cls_jadge <Option>`
+後処理(画像分類判定) : `iinfer -m postprocess -c cls_judge <Option>`
 ==============================================================================
 
 .. csv-table::
@@ -129,7 +129,7 @@ Face Detection and Recognitionで検知した顔特徴データを個所を切�
     "-P,--output_preview","","推論結果画像を`cv2.imshow`で表示します。"
 
 
-後処理(物体検知判定) : `iinfer -m postprocess -c det_jadge <Option>`
+後処理(物体検知判定) : `iinfer -m postprocess -c det_judge <Option>`
 ==============================================================================
 
 .. csv-table::

@@ -46,7 +46,16 @@ agentrule:                              # Specifies a list of rules that determi
     cmds: [list, load]                  # Specify the "cmd" to which the rule applies. Multiple items can be specified in a list.
     rule: allow                         # Specifies whether the specified command is allowed or not. Values are allow or deny.
   - mode: client
-    cmds: [http]
+    cmds: [file_download, file_list, http, server_info]
+    rule: allow
+  - mode: client
+    cmds: [deploy_list, predict_type_list, predict, start, stop, train_type_list]
+    rule: allow
+  - mode: postprocess
+    cmds: [cls_judge, csv, det_clip, det_face_store, det_filter, det_judge, httpreq, seg_bbox, seg_filter, showimg]
+    rule: allow
+  - mode: server
+    cmds: [list]
     rule: allow
   - mode: tts
     cmds: [say]

@@ -1,9 +1,9 @@
-from iinfer.app.injections.after_det_jadge_injection import AfterDetJadgeInjection
+from iinfer.app.injections.after_det_judge_injection import AfterDetJadgeInjection
 from PIL import Image
 from unittest.mock import Mock
 import numpy as np
 
-def test_after_det_jadge_injection_action():
+def test_after_det_judge_injection_action():
     """
     このテストは、まずAfterDetJadgeInjectionのインスタンスを作成します。
     次に、テスト用の入力データを定義します。
@@ -39,9 +39,9 @@ def test_after_det_jadge_injection_action():
     assert "output_tracks" in result_outputs["success"]
 
     # スコアが 0.8 以上の結果のみが残ることを確認します
-    assert result_outputs["success"]["output_jadge_score"] == [0.9, 0.0, 0.6]
-    assert result_outputs["success"]["output_jadge_label"] == ["ok", "ng", "gray"]
-    assert result_outputs["success"]["output_jadge"] == "ok"
+    assert result_outputs["success"]["output_judge_score"] == [0.9, 0.0, 0.6]
+    assert result_outputs["success"]["output_judge_label"] == ["ok", "ng", "gray"]
+    assert result_outputs["success"]["output_judge"] == "ok"
     assert result_outputs["injection_success"] == ["ok"]
 
     

@@ -1,13 +1,13 @@
 from cmdbox.app import common
 from cmdbox.app.options import Options
 from iinfer.app.features.cli import postprocess_feature
-from iinfer.app.postprocesses import det_jadge
+from iinfer.app.postprocesses import det_judge
 from typing import Dict, Any, Tuple, Union, List
 import argparse
 import logging
 
 
-class PostprocessDetJadge(postprocess_feature.PostprocessFeature):
+class PostprocessDetJudge(postprocess_feature.PostprocessFeature):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -24,7 +24,7 @@ class PostprocessDetJadge(postprocess_feature.PostprocessFeature):
         Returns:
             str: コマンド
         """
-        return 'det_jadge'
+        return 'det_judge'
     
     def get_option(self):
         """
@@ -113,7 +113,7 @@ class PostprocessDetJadge(postprocess_feature.PostprocessFeature):
         """
         proc = None
         try:
-            proc = det_jadge.DetJadge(logger, ok_score_th=args.ok_score_th, ok_classes=args.ok_classes, ok_labels=args.ok_labels,
+            proc = det_judge.DetJadge(logger, ok_score_th=args.ok_score_th, ok_classes=args.ok_classes, ok_labels=args.ok_labels,
                                       ng_score_th=args.ng_score_th, ng_classes=args.ng_classes, ng_labels=args.ng_labels,
                                       ext_score_th=args.ext_score_th, ext_classes=args.ext_classes, ext_labels=args.ext_labels,
                                       nodraw=args.nodraw, output_preview=args.output_preview)

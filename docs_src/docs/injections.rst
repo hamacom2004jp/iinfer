@@ -52,7 +52,7 @@
 後処理タイプ設定項目一覧（ `--after_injection_type` で指定可能な値）
 --------------------------------------------------------------------
 
-- `after_cls_jadge_injection`
+- `after_cls_judge_injection`
 
     .. csv-table::
         :widths: 20, 10, 70
@@ -148,7 +148,7 @@
             "labels": ["person", "car"]
         }
 
-- `after_det_jadge_injection`
+- `after_det_judge_injection`
 
     .. csv-table::
         :widths: 20, 10, 70

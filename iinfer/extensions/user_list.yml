@@ -67,7 +67,7 @@ cmdrule:                       # A list of command rules, Specify a rule that de
     rule: allow
   - groups: [user]
     mode: postprocess
-    cmds: [cls_jadge, csv, det_clip, det_filter, det_jadge, httpreq, seg_bbox, seg_filter, showimg]
+    cmds: [cls_judge, csv, det_clip, det_filter, det_judge, httpreq, seg_bbox, seg_filter, showimg]
     rule: allow
   - groups: [user]
     mode: web

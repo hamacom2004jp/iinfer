@@ -1,6 +1,6 @@
 import pytest
 from PIL import Image
-from iinfer.app.postprocesses.det_jadge import DetJadge
+from iinfer.app.postprocesses.det_judge import DetJadge
 import logging
 
 
@@ -30,7 +30,7 @@ def test_post():
     output_image = Image.new('RGB', (100, 100))
 
     # DetJadgeクラスのインスタンスを作成
-    det_jadge = DetJadge(
+    det_judge = DetJadge(
         logging.getLogger(),
         ok_score_th=ok_score_th,
         ok_classes=ok_classes,
@@ -44,9 +44,9 @@ def test_post():
     )
 
     # post_jsonメソッドを呼び出し、結果を取得
-    result, result_image = det_jadge.post(json_data, output_image)
+    result, result_image = det_judge.post(json_data, output_image)
 
     # 結果を検証
-    assert result['success']['output_jadge_score'] == [0.7, 0.4, 0.0]
-    assert result['success']['output_jadge_label'] == ['ok', 'ng', 'gray']
-    assert result['success']['output_jadge'] == 'ng'
+    assert result['success']['output_judge_score'] == [0.7, 0.4, 0.0]
+    assert result['success']['output_judge_label'] == ['ok', 'ng', 'gray']
+    assert result['success']['output_judge'] == 'ng'

@@ -60,11 +60,11 @@
 ５．検知した領域の内容から画像判定する（通常Windowsから実行）
 =============================================================
 
-- `iinfer -m postprocess -c det_jadge <Option>` コマンドで検知した領域の内容から画像判定が行えます。製造業における良否判定などに利用できます。
+- `iinfer -m postprocess -c det_judge <Option>` コマンドで検知した領域の内容から画像判定が行えます。製造業における良否判定などに利用できます。
 
     .. code-block:: bash
 
-         $ iinfer -m client -c capture --image_type capture | iinfer -m client -c predict --name mmseg_seg_PSPNet --image_type capture --stdin --nodraw | iinfer -m postprocess -c seg_filter --stdin --score_th 0.1 --labels dog --labels person --output_preview | iinfer -m postprocess -c seg_jadge --stdin --ok_score_th 0.5 --ok_labels person --ng_score_th 0.3 --ng_labels dog --output_preview > /dev/null
+         $ iinfer -m client -c capture --image_type capture | iinfer -m client -c predict --name mmseg_seg_PSPNet --image_type capture --stdin --nodraw | iinfer -m postprocess -c seg_filter --stdin --score_th 0.1 --labels dog --labels person --output_preview | iinfer -m postprocess -c seg_judge --stdin --ok_score_th 0.5 --ok_labels person --ng_score_th 0.3 --ng_labels dog --output_preview > /dev/null
 
 ６．画像判定をCSV形式で出力する（通常Windowsから実行）
 =============================================================
@@ -73,4 +73,4 @@
 
     .. code-block:: bash
 
-         $ iinfer -m client -c capture --image_type capture | iinfer -m client -c predict --name mmseg_seg_PSPNet --image_type capture --stdin --nodraw | iinfer -m postprocess -c seg_filter --stdin --score_th 0.1 --labels dog --labels person --output_preview | iinfer -m postprocess -c seg_jadge --stdin --ok_score_th 0.5 --ok_labels person --ng_score_th 0.3 --ng_labels dog --output_preview | iinfer -m postprocess -c csv --stdin
+         $ iinfer -m client -c capture --image_type capture | iinfer -m client -c predict --name mmseg_seg_PSPNet --image_type capture --stdin --nodraw | iinfer -m postprocess -c seg_filter --stdin --score_th 0.1 --labels dog --labels person --output_preview | iinfer -m postprocess -c seg_judge --stdin --ok_score_th 0.5 --ok_labels person --ng_score_th 0.3 --ng_labels dog --output_preview | iinfer -m postprocess -c csv --stdin

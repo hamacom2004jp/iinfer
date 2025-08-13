@@ -1,8 +1,8 @@
-from iinfer.app.postprocesses import det_jadge
+from iinfer.app.postprocesses import det_judge
 from typing import List
 import logging
 
-class ClaJadge(det_jadge.DetJadge):
+class ClaJadge(det_judge.DetJadge):
     def __init__(self, logger:logging.Logger,
                  ok_score_th:float=None, ok_classes:List[int]=None, ok_labels:List[str]=None,
                  ng_score_th:float=None, ng_classes:List[int]=None, ng_labels:List[str]=None,
