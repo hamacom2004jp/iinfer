@@ -15,7 +15,6 @@ import logging
 import sys
 import traceback
 import time
-import uvicorn
 
 
 class Web(web.Web):
@@ -194,24 +193,11 @@ class Web(web.Web):
                                 "level":"NOTSET",
                                 "qualname":"uvicorn"}}}
 
-        class ThreadedUvicorn(web.ThreadedUvicorn):
-            def __init__(self, logger:logging.Logger, config:Config):
-                self.logger = logger
-                self.server = uvicorn.Server(config)
-                self.thread = web.RaiseThread(daemon=True, target=self.server.run)
-            def start(self):
-                self.thread.start()
-                asyncio.run(self.wait_for_started())
-            def stop(self):
-                if self.thread.is_alive():
-                    self.server.should_exit = True
-                    self.thread.raise_exception()
-                    while self.thread.is_alive():
-                                time.sleep(0.1)
-            def is_alive(self):
-                return self.thread.is_alive()
+        class ThreadedASGI(web.ThreadedASGI):
+            def __init__(self, app:FastAPI, logger:logging.Logger, config:Config, gunicorn_config:Dict[str, Any]=None):
+                super().__init__(app, logger, config, gunicorn_config=gunicorn_config, force_single=True)
 
-        th = ThreadedUvicorn(self.logger, config=Config(app=app, host=self.allow_host, port=self.listen_webcap_port, log_config=log_config))
+        th = ThreadedASGI(app, self.logger, config=Config(app=app, host=self.allow_host, port=self.listen_webcap_port))
         th.start()
         try:
             tm = time.time()

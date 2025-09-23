@@ -103,7 +103,9 @@ class Install(object):
             base_image = 'python:3.11.9-slim' #'python:3.8.18-slim'
             if install_use_gpu:
                 #base_image = 'nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu22.04'
-                base_image = 'pytorch/pytorch:2.7.0-cuda12.8-cudnn9-runtime'
+                #base_image = 'pytorch/pytorch:2.7.0-cuda12.8-cudnn9-runtime'
+                #base_image = 'pytorch/pytorch:2.1.0-cuda12.1-cudnn8-runtime'
+                base_image = 'pytorch/pytorch:2.4.0-cuda12.1-cudnn9-runtime'
             if install_from is not None and install_from != '':
                 base_image = install_from
             text = text.replace('#{FROM}', f'FROM {base_image}')
@@ -230,6 +232,17 @@ class Install(object):
             return {"error": f"Failed to install insightface. cmd:{_cmd}"}
         return {"success": f"Success to install insightface."}
 
+    def _numpy(self):
+        if sys.version_info[0] >= 3 and sys.version_info[1] >= 10:
+            returncode, _, _cmd = common.cmd('pip install numpy==1.26.4', logger=self.logger, slise=-1)
+        else:
+            returncode, _, _cmd = common.cmd('pip install numpy==1.24.1', logger=self.logger, slise=-1)
+        if returncode != 0:
+            self.logger.warning(f"Failed to install numpy. cmd:{_cmd}")
+            return {"error": f"Failed to install numpy. cmd:{_cmd}"}
+        return {"success": f"Success to install numpy. cmd:{_cmd}"}
+
+    """
     def _torch(self, install_use_gpu:bool=False):
         if install_use_gpu:
             if sys.version_info[0] >= 3 and sys.version_info[1] >= 10:
@@ -245,7 +258,7 @@ class Install(object):
             self.logger.warning(f"Failed to install torch torchvision torchaudio. cmd:{_cmd}")
             return {"error": f"Failed to install torch torchvision torchaudio. cmd:{_cmd}"}
         return {"success": f"Success to install torch torchvision torchaudio. cmd:{_cmd}"}
-
+    """
     def _openmin(self, install_use_gpu:bool=False):
         returncode, _, _cmd = common.cmd('pip install openmim', logger=self.logger, slise=-1)
         if returncode != 0:
@@ -254,14 +267,19 @@ class Install(object):
         return {"success": f"Success to install openmim. cmd:{_cmd}"}
 
     def _mmcv(self, install_use_gpu:bool=False):
+        msg = self._numpy()
+        if "success" not in msg: return msg
         if install_use_gpu:
-            returncode, _, _cmd = common.cmd('mim install mmcv==2.1.0', logger=self.logger, slise=-1)
+            #returncode, _, _cmd = common.cmd('pip install mmcv==2.1.0 -f https://download.openmmlab.com/mmcv/dist/cu121/torch2.1/index.html', logger=self.logger, slise=-1)
+            returncode, _, _cmd = common.cmd('pip install mmcv==2.2.0 -f https://download.openmmlab.com/mmcv/dist/cu121/torch2.4/index.html', logger=self.logger, slise=-1)
+            #returncode, _, _cmd = common.cmd('mim install mmcv==2.2.0', logger=self.logger, slise=-1)
             #returncode, _, _cmd = common.cmd('pip install mmcv==2.1.0 -f https://download.openmmlab.com/mmcv/dist/cu118/torch2.1/index.html', logger=self.logger, slise=-1)
             if returncode != 0:
                 self.logger.warning(f"Failed to install mmcv. cmd:{_cmd}")
                 return {"error": f"Failed to install mmcv. cmd:{_cmd}"}
         else:
-            returncode, _, _cmd = common.cmd('mim install mmcv==2.1.0', logger=self.logger, slise=-1)
+            returncode, _, _cmd = common.cmd('mim install mmcv==2.2.0', logger=self.logger, slise=-1)
+            #returncode, _, _cmd = common.cmd('mim install mmcv==2.1.0', logger=self.logger, slise=-1)
             #returncode, _, _cmd = common.cmd('mim install mmcv>=2.0.0', logger=self.logger, slise=-1)
         if returncode != 0:
             self.logger.warning(f"Failed to install mmcv. cmd:{_cmd}")
@@ -290,11 +308,18 @@ class Install(object):
         if "error" in ret: return ret
         ret = self._mmcv(install_use_gpu)
         if "error" in ret: return ret
+        msg = self._numpy()
+        if "success" not in msg: return msg
 
-        ret, _, _cmd = common.cmd('mim install mmengine mmdet', logger=self.logger, slise=-1)
+        ret, _, _cmd = common.cmd('mim install mmdet', logger=self.logger, slise=-1)
         if ret != 0:
-            self.logger.warning(f"Failed to install mmengine mmdet. cmd:{_cmd}")
-            return {"error": f"Failed to install mmengine mmdet. cmd:{_cmd}"}
+            self.logger.warning(f"Failed to install mmdet. cmd:{_cmd}")
+            return {"error": f"Failed to install mmdet. cmd:{_cmd}"}
+
+        ret, _, _cmd = common.cmd(f'sed -i "s/mmcv_maximum_version = \'2.2.0\'/mmcv_maximum_version = \'2.2.1\'/" /opt/conda/lib/python3.11/site-packages/mmdet/__init__.py', logger=self.logger, slise=-1)
+        if ret != 0:
+            self.logger.warning(f"Failed to install mmdet. cmd:{_cmd}")
+            return {"error": f"Failed to install mmdet. cmd:{_cmd}"}
 
         if srcdir.exists():
             return {"success": f"Please remove '{srcdir / 'mmdetection'}' manually. cmd:{_cmd}"}
@@ -315,11 +340,13 @@ class Install(object):
         if "error" in ret: return ret
         ret = self._mmcv(install_use_gpu)
         if "error" in ret: return ret
+        msg = self._numpy()
+        if "success" not in msg: return msg
 
-        ret, _, _cmd = common.cmd('mim install mmengine mmsegmentation', logger=self.logger, slise=-1)
+        ret, _, _cmd = common.cmd('mim install mmsegmentation', logger=self.logger, slise=-1)
         if ret != 0:
-            self.logger.warning(f"Failed to install mmengine mmsegmentation. cmd:{_cmd}")
-            return {"error": f"Failed to install mmengine mmsegmentation. cmd:{_cmd}"}
+            self.logger.warning(f"Failed to install mmsegmentation. cmd:{_cmd}")
+            return {"error": f"Failed to install mmsegmentation. cmd:{_cmd}"}
 
         ret, _, _cmd = common.cmd('pip install ftfy', logger=self.logger, slise=-1)
         if ret != 0:
@@ -343,11 +370,13 @@ class Install(object):
         if "error" in ret: return ret
         ret = self._mmcv(install_use_gpu)
         if "error" in ret: return ret
+        msg = self._numpy()
+        if "success" not in msg: return msg
 
-        ret, _, _cmd = common.cmd('mim install mmengine mmcls', logger=self.logger, slise=-1)
+        ret, _, _cmd = common.cmd('mim install mmcls', logger=self.logger, slise=-1)
         if ret != 0:
-            self.logger.warning(f"Failed to install mmengine mmcls. cmd:{_cmd}")
-            return {"error": f"Failed to install mmengine mmcls. cmd:{_cmd}"}
+            self.logger.warning(f"Failed to install mmcls. cmd:{_cmd}")
+            return {"error": f"Failed to install mmcls. cmd:{_cmd}"}
 
         return {"success": f"Success to install mmcls. cmd:{_cmd}"}
 
@@ -366,8 +395,10 @@ class Install(object):
         if "error" in ret: return ret
         ret = self._mmcv(install_use_gpu)
         if "error" in ret: return ret
+        msg = self._numpy()
+        if "success" not in msg: return msg
 
-        ret, _, _cmd = common.cmd('mim install mmengine mmpretrain', logger=self.logger, slise=-1)
+        ret, _, _cmd = common.cmd('mim install mmpretrain', logger=self.logger, slise=-1)
         if ret != 0:
             self.logger.warning(f"Failed to install mmpretrain. cmd:{_cmd}")
             return {"error": f"Failed to install mmpretrain. cmd:{_cmd}"}

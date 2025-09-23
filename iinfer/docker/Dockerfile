@@ -24,6 +24,7 @@ RUN pip install --upgrade pip && \
     pip install #{INSTALL_CMDBOX} && cmdbox --version && \
     pip install #{INSTALL_IINFER} && iinfer --version
 
+#{INSTALL_VOICEVOX}
 #{INSTALL_ONNX}
 #{INSTALL_MMDET}
 #{INSTALL_MMSEG}
@@ -39,7 +40,6 @@ ENV SVNAME=server#{INSTALL_TAG}
 ENV MKUSER=${MKUSER}
 ENV LISTEN_PORT=8081
 ENV SVCOUNT=${SVCOUNT}
-#{INSTALL_VOICEVOX}
 
 WORKDIR /home/${MKUSER}/
 #{COPY_IINFER_START}

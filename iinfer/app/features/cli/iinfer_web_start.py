@@ -64,5 +64,5 @@ class WebStart(cmdbox_web_start.WebStart):
                 ssl_cert=args.ssl_cert, ssl_key=args.ssl_key, ssl_keypass=args.ssl_keypass, ssl_ca_certs=args.ssl_ca_certs,
                 session_domain=args.session_domain, session_path=args.session_path,
                 session_secure=args.session_secure, session_timeout=args.session_timeout,
-                outputs_key=args.outputs_key, guvicorn_workers=args.guvicorn_workers, guvicorn_timeout=args.guvicorn_timeout,
+                outputs_key=args.outputs_key, gunicorn_workers=args.gunicorn_workers, gunicorn_timeout=args.gunicorn_timeout,
                 agent_runner=agent_runner, mcp=mcp,)

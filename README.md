@@ -22,7 +22,27 @@
 
 ## インストール方法
 
-インストール方法は [こちら](https://hamacom2004jp.github.io/iinfer/docs/install.html) を参照してください。
+- 次のコマンドで iinfer をインストールしてください。
+- また、Docker 版の Redis サーバーもインストールしてください。
+- 詳細なインストール方法は [こちら](https://hamacom2004jp.github.io/iinfer/docs/install.html) を参照してください。
+
+```bash
+docker run -p 6379:6379 --name redis -e REDIS_PASSWORD=password -it ubuntu/redis:latest
+pip install iinfer
+iinfer -v
+```
+
+- WebモードでSAMLを使用する場合、依存関係のあるモジュールをインストールしてください。
+```bash
+pip install xmlsec==1.3.13 python3-saml
+apt-get install -y pkg-config libxml2-dev libxmlsec1-dev libxmlsec1-openssl build-essential libopencv-dev
+```
+
+- Webモードで`--agent use`を使用する場合、依存関係のあるモジュールをインストールしてください。
+```bash
+pip install google-adk litellm fastmcp
+pip install backoff cryptography orjson apscheduler litellm-enterprise email-validator fastapi-sso
+```
 
 ## iinferの使用方法
 
