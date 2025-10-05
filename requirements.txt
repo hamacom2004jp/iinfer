@@ -1,12 +1,10 @@
+build
 collectlicense
 cmdbox
-cryptography
 motpy
 opencv-python
 pytest
 pytest-order
-requests
-requests_mock
 twine
 six
 sphinx

@@ -1,0 +1,108 @@
+[build-system]
+requires = ["setuptools>=77.0.3", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "iinfer"
+dynamic = ["version"] 
+description = "iinfer: An application that executes AI model files in onnx or mmlab format."
+readme = "README.md"
+authors = [
+    { name = "hamacom2004jp", email = "hamacom2004jp@gmail.com" },
+]
+license = { text = "MIT" }
+requires-python = ">=3.8"
+keywords = [
+    "mmdetection",
+    "mmsegmentation",
+    "onnxruntime",
+    "inference",
+    "image",
+    "ai",
+    "model",
+    # cmdbox
+    "audit",
+    "cli",
+    "excel",
+    "fastapi",
+    "mcp",
+    "redis",
+    "restapi",
+    "web",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Information Technology",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: Japanese",
+    "Programming Language :: Python",
+    "Topic :: Utilities"
+]
+dependencies = [
+    'cmdbox>=0.6.6,<0.6.7',
+    'motpy',
+    'opencv-python',
+    'urllib3',
+]
+
+[project.optional-dependencies]
+agent = [
+    "fastmcp",
+    "google-adk",
+    "litellm",
+]
+saml = [
+    "python3-saml",
+    "xmlsec==1.3.13",
+]
+
+[project.urls]
+Homepage = "https://github.com/hamacom2004jp/iinfer"
+Documentation = "https://hamacom2004jp.github.io/iinfer/index.html"
+Repository = "https://github.com/hamacom2004jp/iinfer"
+
+[project.scripts]
+iinfer = "iinfer.app.app:main"
+
+# ----------------------------------------------------------------------
+# setuptools固有の設定 (setup.cfgに相当する内容をsetuptoolsテーブルで記述)
+# ----------------------------------------------------------------------
+
+[tool.setuptools]
+packages = [
+    'iinfer',
+    'iinfer.app',
+    'iinfer.app.commons',
+    'iinfer.app.features.cli',
+    'iinfer.app.features.web',
+    'iinfer.app.injections',
+    'iinfer.app.postprocesses',
+    'iinfer.app.predicts',
+    'iinfer.app.trains',
+    'iinfer.docker',
+    'iinfer.extensions'
+]
+
+[tool.setuptools.package-data]
+# setup()のpackage_dataとexclude_package_dataに相当
+iinfer = [
+    "*.yml",
+    "extensions/**",
+    "extensions/sample_project/.vscode/**",
+    "docker/**",
+    "licenses/*",
+    "tools/datas/**",
+    "web/**",
+    "!extensions/data/*.json",
+    "!extensions/data/*/*.jpg",
+    "!extensions/data/*/*.svg",
+]
+
+[tool.setuptools.exclude-package-data]
+cmdbox = [
+    "extensions/data/*.json",
+    "extensions/data/*/*.jpg",
+    "extensions/data/*/*.svg",
+]

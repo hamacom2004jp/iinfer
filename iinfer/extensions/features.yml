@@ -51,6 +51,9 @@ agentrule:                              # Specifies a list of rules that determi
   - mode: client
     cmds: [deploy_list, predict_type_list, predict, start, stop, train_type_list]
     rule: allow
+  - mode: excel
+    cmds: [cell_details, cell_search, cell_values, sheet_list]
+    rule: allow
   - mode: postprocess
     cmds: [cls_judge, csv, det_clip, det_face_store, det_filter, det_judge, httpreq, seg_bbox, seg_filter, showimg]
     rule: allow

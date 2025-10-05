@@ -34,14 +34,14 @@ iinfer -v
 
 - WebモードでSAMLを使用する場合、依存関係のあるモジュールをインストールしてください。
 ```bash
-pip install xmlsec==1.3.13 python3-saml
+pip install iinfer[saml]
 apt-get install -y pkg-config libxml2-dev libxmlsec1-dev libxmlsec1-openssl build-essential libopencv-dev
 ```
 
 - Webモードで`--agent use`を使用する場合、依存関係のあるモジュールをインストールしてください。
 ```bash
-pip install google-adk litellm fastmcp
-pip install backoff cryptography orjson apscheduler litellm-enterprise email-validator fastapi-sso
+pip install iinfer[agent]
+pip install backoff orjson apscheduler litellm-enterprise fastapi-sso
 ```
 
 ## iinferの使用方法

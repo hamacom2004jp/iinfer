@@ -1,62 +1,23 @@
-from iinfer import version
 from pathlib import Path
 from setuptools import setup
 from setuptools.command.install import install
+import io
 import platform
+import re
 
+def get_info(rel_path):
+    fpath = Path(__file__).parent / rel_path
+    version = ''
+    with io.open(fpath, encoding='utf-8') as fp:
+        content = fp.read()
+        version = re.search(r"^__version__\s+=\s+'(.*)'", content, re.M).group(1)
+    return version
 
-DESCRIPTION = 'iinfer: An application that executes AI model files in onnx or mmlab format.'
-NAME = 'iinfer'
-AUTHOR = 'hamacom2004jp'
-AUTHOR_EMAIL = 'hamacom2004jp@gmail.com'
-URL = version.__srcurl__
-LICENSE = 'MIT'
-DOWNLOAD_URL = URL
-VERSION = version.__version__
-PYTHON_REQUIRES = '>=3.8'
-INSTALL_REQUIRES = [
-    'argcomplete',
-    'cmdbox>=0.6.5,<0.6.6',
-    'cryptography',
-    'motpy',
-    'opencv-python',
-    'requests',
-    'urllib3',
-    'wheel',
-]
-PACKAGES = [
-    'iinfer',
-    'iinfer.app',
-    'iinfer.app.commons',
-    'iinfer.app.features.cli',
-    'iinfer.app.features.web',
-    'iinfer.app.injections',
-    'iinfer.app.postprocesses',
-    'iinfer.app.predicts',
-    'iinfer.app.trains',
-    'iinfer.docker',
-    'iinfer.extensions'
-]
-KEYWORDS = 'onnxruntime predict inference image ai model'
-CLASSIFIERS=[
-    'Development Status :: 4 - Beta',
-    'Intended Audience :: Developers',
-    'Intended Audience :: Information Technology',
-    'Intended Audience :: System Administrators',
-    'License :: OSI Approved :: MIT License',
-    'Natural Language :: Japanese',
-    'Programming Language :: Python',
-    'Topic :: Utilities'
-]
-with open('README.md', 'r', encoding='utf-8') as fp:
-    readme = fp.read()
-LONG_DESCRIPTION = readme
-LONG_DESCRIPTION_CONTENT_TYPE = 'text/markdown'
-RESORCE_TEXT_FILES = dict(iinfer=['*.yml', 'extensions/*', 'extensions/*/*', 'extensions/*/*/*',
-                                  'docker/*', 'docker/*/*', 'licenses/*',
-                                  'tools/datas/*', 'tools/datas/*/*',
-                                  'web/*', 'web/*/*', 'web/*/*/*', 'web/*/*/*/*', 'web/*/*/*/*/*'])
-EXCLUDE_RESORCE_TEXT_FILES =dict(iinfer=['extensions/data/*.json', 'extensions/data/*/*.jpg', 'extensions/data/*/*.svg'])
+VERSION = get_info('iinfer/version.py')
+
+# ------------------------------------------
+# カスタムインストールのロジック (pyproject.tomlで置き換え不可)
+# ------------------------------------------
 class CustomInstallCommand(install):
     def run(self):
         super().run()
@@ -73,27 +34,11 @@ class CustomInstallCommand(install):
         with open(bashrc, 'a') as fp:
             fp.write('\n'+CMD)
 
+# setup()関数の呼び出しは、残りの設定をpyproject.tomlから取得するために最小限に抑えます
+# dynamic = [...] の設定を有効にするために、setuptoolsのversionは渡しません
 setup(
-    name=NAME,
-    version=VERSION,
-    description=DESCRIPTION,
-    long_description=LONG_DESCRIPTION,
-    long_description_content_type=LONG_DESCRIPTION_CONTENT_TYPE,
-    python_requires=PYTHON_REQUIRES,
-    author=AUTHOR,
-    author_email=AUTHOR_EMAIL,
-    maintainer=AUTHOR,
-    maintainer_email=AUTHOR_EMAIL,
-    url=URL,
-    download_url=URL,
-    packages=PACKAGES,
-    classifiers=CLASSIFIERS,
-    license=LICENSE,
-    keywords=KEYWORDS,
-    install_requires=INSTALL_REQUIRES,
-    package_data=RESORCE_TEXT_FILES,
-    include_package_data=True,
-    exclude_package_data=EXCLUDE_RESORCE_TEXT_FILES,
-    entry_points=dict(console_scripts=['iinfer=iinfer.app.app:main']),
+    version=VERSION,  # pyproject.tomlの[project]のversionフィールドを無効化するために渡す
+    # setup.cfg/pyproject.tomlと互換性を持たせるため、cmdclassとcmdclassに依存する
+    # install_requires/versionを除く最小限の引数のみを保持
     cmdclass={'install': CustomInstallCommand},
 )
