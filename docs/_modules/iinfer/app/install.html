@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>iinfer.app.install &mdash; iinfer 2025/09/23 documentation</title>
+  <title>iinfer.app.install &mdash; iinfer 2025/12/07 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=6ef6a16d"></script>
+      <script src="../../../_static/documentation_options.js?v=071380fa"></script>
       <script src="../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -259,10 +259,11 @@
                     <span class="n">REDIS_PASSWORD</span><span class="o">=</span><span class="s1">&#39;${REDIS_PASSWORD:-password}&#39;</span><span class="p">,</span>
                     <span class="n">SVNAME</span><span class="o">=</span><span class="s1">&#39;${SVNAME:-server&#39;</span><span class="o">+</span><span class="n">install_tag</span><span class="o">+</span><span class="s1">&#39;}&#39;</span><span class="p">,</span>
                     <span class="n">LISTEN_PORT</span><span class="o">=</span><span class="s1">&#39;$</span><span class="si">{LISTEN_PORT:-8081}</span><span class="s1">&#39;</span><span class="p">,</span>
+                    <span class="n">MCPSV_LISTEN_PORT</span><span class="o">=</span><span class="s1">&#39;$</span><span class="si">{MCPSV_LISTEN_PORT:-8082}</span><span class="s1">&#39;</span><span class="p">,</span>
                     <span class="n">SVCOUNT</span><span class="o">=</span><span class="s1">&#39;$</span><span class="si">{SVCOUNT:-2}</span><span class="s1">&#39;</span><span class="p">,</span>
                 <span class="p">),</span>
                 <span class="n">user</span><span class="o">=</span><span class="n">user</span><span class="p">,</span>
-                <span class="n">ports</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;$</span><span class="si">{LISTEN_PORT:-8081}</span><span class="s1">:$</span><span class="si">{LISTEN_PORT:-8081}</span><span class="s1">&#39;</span><span class="p">],</span>
+                <span class="n">ports</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;$</span><span class="si">{LISTEN_PORT:-8081}</span><span class="s1">:$</span><span class="si">{LISTEN_PORT:-8081}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;$</span><span class="si">{MCPSV_LISTEN_PORT:-8082}</span><span class="s1">:$</span><span class="si">{MCPSV_LISTEN_PORT:-8082}</span><span class="s1">&#39;</span><span class="p">],</span>
                 <span class="n">privileged</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="n">restart</span><span class="o">=</span><span class="s1">&#39;always&#39;</span><span class="p">,</span>
                 <span class="n">working_dir</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;/home/</span><span class="si">{</span><span class="n">user</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>

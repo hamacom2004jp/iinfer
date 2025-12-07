@@ -21,7 +21,7 @@ class Web(web.Web):
     def __init__(self, logger:logging.Logger, data:Path, appcls=None, ver=None,
                  redis_host:str="localhost", redis_port:int=6379, redis_password:str=None, svname:str='server',
                  client_only:bool=False, doc_root:Path=None, gui_html:str=None, filer_html:str=None, result_html:str=None, users_html:str=None,
-                 audit_html:str=None, agent_html:str=None, assets:List[str]=None, signin_html:str=None, signin_file:str=None, gui_mode:bool=False,
+                 audit_html:str=None, assets:List[str]=None, signin_html:str=None, signin_file:str=None, gui_mode:bool=False,
                  web_features_packages:List[str]=None, web_features_prefix:List[str]=[],
                  showimg_html:str=None, webcap_html:str=None, anno_html:str=None):
         """
@@ -43,7 +43,6 @@ class Web(web.Web):
             result_html (str, optional): 結果表示のHTMLファイル. Defaults to None.
             users_html (str, optional): ユーザー管理のHTMLファイル. Defaults to None.
             audit_html (str, optional): 監査ログのHTMLファイル. Defaults to None.
-            agent_html (str, optional): エージェント管理のHTMLファイル. Defaults to None.
             assets (List[str], optional): 静的ファイルのリスト. Defaults to None.
             signin_html (str, optional): ログイン画面のHTMLファイル. Defaults to None.
             signin_file (str, optional): ログイン情報のファイル. Defaults to args.signin_file.
@@ -59,10 +58,9 @@ class Web(web.Web):
         super().__init__(logger=logger, data=data, appcls=appcls, ver=ver,
                          redis_host=redis_host, redis_port=redis_port, redis_password=redis_password, svname=svname,
                          client_only=client_only, doc_root=doc_root, gui_html=gui_html, filer_html=filer_html,
-                         result_html=result_html, users_html=users_html, audit_html=audit_html, agent_html=agent_html,
+                         result_html=result_html, users_html=users_html, audit_html=audit_html,
                          assets=assets, signin_html=signin_html, signin_file=signin_file, gui_mode=gui_mode,
                          web_features_packages=web_features_packages, web_features_prefix=web_features_prefix)
-
         self.showimg_html = Path(showimg_html) if showimg_html is not None else Path(__file__).parent.parent / 'web' / 'showimg.html'
         self.webcap_html = Path(webcap_html) if webcap_html is not None else Path(__file__).parent.parent / 'web' / 'webcap.html'
         self.anno_html = Path(anno_html) if anno_html is not None else Path(__file__).parent.parent / 'web' / 'annotation.html'

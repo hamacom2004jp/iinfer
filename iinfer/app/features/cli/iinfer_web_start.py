@@ -49,14 +49,12 @@ class WebStart(cmdbox_web_start.WebStart):
                     assets=args.assets, signin_html=args.signin_html, signin_file=args.signin_file, gui_mode=args.gui_mode)
         return w
 
-    def start(self, w:web.Web, agent_runner, mcp, logger:logging.Logger, args:argparse.Namespace) -> None:
+    def start(self, w:web.Web, logger:logging.Logger, args:argparse.Namespace) -> None:
         """
         Webモードを起動します
 
         Args:
             w (web.Web): Webオブジェクト
-            agent_runner: エージェントランナー
-            mcp: MCPオブジェクト
             logger (logging.Logger): ロガー
             args (argparse.Namespace): 引数
         """
@@ -64,5 +62,4 @@ class WebStart(cmdbox_web_start.WebStart):
                 ssl_cert=args.ssl_cert, ssl_key=args.ssl_key, ssl_keypass=args.ssl_keypass, ssl_ca_certs=args.ssl_ca_certs,
                 session_domain=args.session_domain, session_path=args.session_path,
                 session_secure=args.session_secure, session_timeout=args.session_timeout,
-                outputs_key=args.outputs_key, gunicorn_workers=args.gunicorn_workers, gunicorn_timeout=args.gunicorn_timeout,
-                agent_runner=agent_runner, mcp=mcp,)
+                outputs_key=args.outputs_key, gunicorn_workers=args.gunicorn_workers, gunicorn_timeout=args.gunicorn_timeout)
