@@ -131,9 +131,10 @@ class Install(object):
                 text = text.replace('#{INSTALL_PYTHON}', '')
             install_voicevox = ''
             if tts_engine is not None and tts_engine.lower() == 'voicevox':
-                install_voicevox = f'RUN iinfer -m tts -c install --data /home/{user}/.iinfer --client_only --tts_engine voicevox ' \
-                                 + f'--voicevox_ver {voicevox_ver} --voicevox_os linux --voicevox_arc {voicevox_arc} ' \
-                                 + f'--voicevox_device {"cuda" if install_use_gpu else "cpu"} --voicevox_whl {voicevox_whl} --debug'
+                install_voicevox = f'RUN pip install https://github.com/VOICEVOX/voicevox_core/releases/download/{voicevox_ver}/{voicevox_whl}'
+                #install_voicevox = f'RUN iinfer -m tts -c install --data /home/{user}/.iinfer --client_only --tts_engine voicevox ' \
+                #                 + f'--voicevox_ver {voicevox_ver} --voicevox_os linux --voicevox_arc {voicevox_arc} ' \
+                #                 + f'--voicevox_device {"cuda" if install_use_gpu else "cpu"} --voicevox_whl {voicevox_whl} --debug'
             text = text.replace('#{INSTALL_TAG}', install_tag)
             text = text.replace('#{INSTALL_CMDBOX}', install_cmdbox_tgt)
             text = text.replace('#{INSTALL_IINFER}', install_iinfer_tgt)
