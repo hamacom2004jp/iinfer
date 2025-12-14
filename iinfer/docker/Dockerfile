@@ -31,6 +31,7 @@ RUN pip install --upgrade pip && \
 #{INSTALL_MMCLS}
 #{INSTALL_MMPRETRAIN}
 #{INSTALL_INSIGHTFACE}
+RUN pip install rich==14.2.0
 RUN mkdir -p /home/${MKUSER}/.iinfer && chown -R ${MKUSER}:${MKUSER} /home/${MKUSER}/.iinfer
 
 ENV REDIS_HOST=redis

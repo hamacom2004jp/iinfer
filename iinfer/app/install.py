@@ -43,7 +43,7 @@ class Install(object):
                install_mmdet:bool=True, install_mmseg:bool=True, install_mmcls:bool=False, install_mmpretrain:bool=True,
                install_insightface=False, install_from:str=None, install_no_python:bool=False, install_compile_python:bool=False,
                install_tag:str=None, install_use_gpu:bool=False,
-               tts_engine:str=None, voicevox_ver:str=None, voicevox_arc:str=None, voicevox_whl:str=None):
+               tts_engine:str=None, voicevox_ver:str=None, voicevox_whl:str=None):
         """
         iinferが含まれるdockerイメージをインストールします。
 
@@ -64,7 +64,6 @@ class Install(object):
             install_use_gpu (bool): GPUを使用するモジュール構成でインストールします。
             tts_engine (str): TTSエンジンの指定
             voicevox_ver (str): VoiceVoxのバージョン
-            voicevox_arc (str): VoiceVoxのアーキテクチャ
             voicevox_whl (str): VoiceVoxのwhlファイルの名前
 
         Returns:
