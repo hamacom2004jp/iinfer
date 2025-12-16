@@ -19,7 +19,10 @@ RUN apt-get update && \
 RUN apt-get install -y pkg-config libxml2-dev libxmlsec1-dev libxmlsec1-openssl build-essential libopencv-dev && \
     apt-get install -y iputils-ping net-tools
 RUN pip install --upgrade pip && \
-    pip install xmlsec==1.3.13 python3-saml google-adk litellm fastmcp && \
+    pip install 'xmlsec==1.3.13' python3-saml && \
+    pip install "pydantic>=2.0.0,<3.0.0" && \
+    pip install 'fastmcp>=2.14.0' 'mcp>=1.10.0,<2.0.0' && \
+    pip install 'google-adk>=1.21.0' litellm && \
     pip install backoff cryptography orjson apscheduler litellm-enterprise email-validator fastapi-sso && \
     pip install #{INSTALL_CMDBOX} && cmdbox --version && \
     pip install #{INSTALL_IINFER} && iinfer --version

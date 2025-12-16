@@ -49,14 +49,14 @@ dependencies = [
 
 [project.optional-dependencies]
 agent = [
-    "fastmcp",
-    "google-adk",
-    "litellm",
-    "mcp",
-#    "fastmcp>=2.14.0",
-#    "google-adk>=1.21.0",
+#    "fastmcp",
+#    "google-adk",
 #    "litellm",
-#    "mcp>=1.10.0,<2.0.0",
+#    "mcp",
+    "fastmcp>=2.14.0",
+    "google-adk>=1.21.0",
+    "litellm",
+    "mcp>=1.10.0,<2.0.0",
 ]
 saml = [
     "python3-saml",
