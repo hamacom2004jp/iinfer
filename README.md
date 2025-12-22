@@ -40,8 +40,9 @@ apt-get install -y pkg-config libxml2-dev libxmlsec1-dev libxmlsec1-openssl buil
 
 - Webモードで`--agent use`を使用する場合、依存関係のあるモジュールをインストールしてください。
 ```bash
-pip install iinfer[agent]
-pip install backoff orjson apscheduler litellm-enterprise fastapi-sso
+pip install "pydantic>=2.0.0,<3.0.0"
+pip install "fastmcp>=2.14.0" "mcp>=1.10.0,<2.0.0"
+pip install "google-adk>=1.21.0" "litellm"
 ```
 
 ## iinferの使用方法

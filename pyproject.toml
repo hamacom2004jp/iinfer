@@ -41,7 +41,7 @@ classifiers = [
     "Topic :: Utilities"
 ]
 dependencies = [
-    'cmdbox>=0.7.0,<0.7.1',
+    'cmdbox>=0.7.1,<0.7.2',
     'motpy',
     'opencv-python',
     'urllib3',
@@ -53,10 +53,11 @@ agent = [
 #    "google-adk",
 #    "litellm",
 #    "mcp",
+    "pydantic>=2.0.0,<3.0.0",
     "fastmcp>=2.14.0",
+    "mcp>=1.10.0,<2.0.0",
     "google-adk>=1.21.0",
     "litellm",
-    "mcp>=1.10.0,<2.0.0",
 ]
 saml = [
     "python3-saml",

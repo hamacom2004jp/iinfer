@@ -277,6 +277,6 @@ iinferの開発環境を構築するための手順を説明します。
 
         sphinx-apidoc -F -o docs_src/resources iinfer
         sphinx-build -b html docs_src docs
-        python setup.py sdist
-        python setup.py bdist_wheel
+        python -m collectlicense --out iinfer/licenses --clear
+        python -m build
 
