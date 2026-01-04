@@ -23,6 +23,7 @@ RUN pip install --upgrade pip && \
     pip install "pydantic>=2.0.0,<3.0.0" && \
     pip install 'fastmcp>=2.14.0' 'mcp>=1.10.0,<2.0.0' && \
     pip install 'google-adk>=1.21.0' litellm && \
+    pip install 'a2a-sdk>=0.3.4,<0.4.0' && \
     pip install backoff cryptography orjson apscheduler litellm-enterprise email-validator fastapi-sso && \
     pip install #{INSTALL_CMDBOX} && cmdbox --version && \
     pip install #{INSTALL_IINFER} && iinfer --version
