@@ -28,7 +28,7 @@ class Redis(object):
                 return {"warn":f"wsl_user option is required."}
             code, _, _cmd = common.cmd(f"wsl -d {self.wsl_name} -u {self.wsl_user} {docker_cmd}" ,self.logger)
             return {"output":code}
-        elif platform.system() == 'Linux':
+        elif platform.system() == 'Linux' or platform.system() == 'Darwin':
             code, _, _cmd = common.cmd(docker_cmd, self.logger)
             return {"output":code}
         else:
@@ -44,7 +44,7 @@ class Redis(object):
             code, _, _cmd = common.cmd(f"wsl -d {self.wsl_name} -u {self.wsl_user} docker rm redis", self.logger)
             common.cmd(f"wsl --shutdown", self.logger)
             return {"output":code}
-        elif platform.system() == 'Linux':
+        elif platform.system() == 'Linux' or platform.system() == 'Darwin':
             code, _, _cmd = common.cmd(f"docker stop redis", self.logger)
             return {"output":code}
         else:

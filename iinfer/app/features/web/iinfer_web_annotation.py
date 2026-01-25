@@ -1,9 +1,9 @@
 from cmdbox.app import feature
 from iinfer.app.web import Web
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI, Request, Response, HTTPException
 from fastapi.responses import HTMLResponse
 from typing import Dict, Any
-
+import logging
 
 class Annotation(feature.WebFeature):
     def route(self, web:Web, app:FastAPI) -> None:
@@ -14,11 +14,13 @@ class Annotation(feature.WebFeature):
             web (Web): Webオブジェクト
             app (FastAPI): FastAPIオブジェクト
         """
-        if web.anno_html is not None:
-            if not web.anno_html.is_file():
-                raise FileNotFoundError(f'anno_html is not found. ({web.anno_html})')
-            with open(web.anno_html, 'r', encoding='utf-8') as f:
-                web.anno_html_data = f.read()
+        ondemand_load = web.logger.level == logging.DEBUG
+        if not ondemand_load:
+            if web.anno_html is not None:
+                if not web.anno_html.is_file():
+                    raise FileNotFoundError(f'anno_html is not found. ({web.anno_html})')
+                with open(web.anno_html, 'r', encoding='utf-8') as f:
+                    web.anno_html_data = f.read()
 
         @app.get('/annotation', response_class=HTMLResponse)
         @app.post('/annotation', response_class=HTMLResponse)
@@ -28,7 +30,15 @@ class Annotation(feature.WebFeature):
                 return signin
             web.options.audit_exec(req, res, web)
             res.headers['Access-Control-Allow-Origin'] = '*'
-            return web.anno_html_data
+            if ondemand_load:
+                if not web.anno_html.is_file():
+                    raise HTTPException(status_code=404, detail=f'anno_html is not found. ({web.anno_html})')
+                with open(web.anno_html, 'r', encoding='utf-8') as f:
+                    web.options.audit_exec(req, res, web)
+                    return HTMLResponse(f.read())
+            else:
+                web.options.audit_exec(req, res, web)
+                return HTMLResponse(web.anno_html_data)
 
     def toolmenu(self, web:Web) -> Dict[str, Any]:
         """

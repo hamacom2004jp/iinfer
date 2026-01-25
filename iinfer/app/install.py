@@ -4,6 +4,7 @@ from pathlib import Path
 import getpass
 import logging
 import platform
+import re
 import shutil
 import sys
 import yaml
@@ -29,7 +30,7 @@ class Install(object):
                 return {"error": f"Failed to install redis-server. cmd:{_cmd}"}
             return {"success": f"Success to install redis-server. cmd:{_cmd}"}
 
-        elif platform.system() == 'Linux':
+        elif platform.system() == 'Linux' or platform.system() == 'Darwin':
             returncode, _, _cmd = common.cmd(f"{cmd}", self.logger, slise=-1)
             if returncode != 0:
                 self.logger.warning(f"Failed to install redis-server. cmd:{_cmd}")
@@ -73,6 +74,8 @@ class Install(object):
             return {"warn": f"Build server command is Unsupported in windows platform."}
         from importlib.resources import read_text
         user = getpass.getuser()
+        if re.match(r'^[0-9]', user):
+            user = f'_{user}' # ユーザー名が数字始まりの場合、先頭にアンダースコアを付与
         install_tag = f"_{install_tag}" if install_tag is not None else ''
         with open('Dockerfile', 'w', encoding='utf-8') as fp:
             text = read_text(f'iinfer.docker', 'Dockerfile')
@@ -165,11 +168,14 @@ class Install(object):
                     REDIS_PASSWORD='${REDIS_PASSWORD:-password}',
                     SVNAME='${SVNAME:-server'+install_tag+'}',
                     LISTEN_PORT='${LISTEN_PORT:-8081}',
-                    MCPSV_LISTEN_PORT='${MCPSV_LISTEN_PORT:-8082}',
+                    MCPSV_LISTEN_PORT='${MCPSV_LISTEN_PORT:-8091}',
+                    A2ASV_LISTEN_PORT='${A2ASV_LISTEN_PORT:-8071}',
                     SVCOUNT='${SVCOUNT:-2}',
                 ),
                 user=user,
-                ports=['${LISTEN_PORT:-8081}:${LISTEN_PORT:-8081}', '${MCPSV_LISTEN_PORT:-8082}:${MCPSV_LISTEN_PORT:-8082}'],
+                ports=['${LISTEN_PORT:-8081}:${LISTEN_PORT:-8081}',
+                       '${MCPSV_LISTEN_PORT:-8091}:${MCPSV_LISTEN_PORT:-8091}',
+                       '${A2ASV_LISTEN_PORT:-8071}:${A2ASV_LISTEN_PORT:-8071}'],
                 privileged=True,
                 restart='always',
                 working_dir=f'/home/{user}',
@@ -179,7 +185,7 @@ class Install(object):
                     f'/home/{user}/scripts:/home/{user}/scripts',
                     f'/home/{user}:/home/{user}'
                 ],
-                command=f'CMD bash /home/{user}/scripts/start.sh'
+                command=f'bash /home/{user}/scripts/start.sh'
             )
             if install_use_gpu:
                 services[f'iinfer_server{install_tag}']['deploy'] = dict(
