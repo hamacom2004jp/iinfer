@@ -44,7 +44,8 @@ class Install(object):
                install_mmdet:bool=True, install_mmseg:bool=True, install_mmcls:bool=False, install_mmpretrain:bool=True,
                install_insightface=False, install_from:str=None, install_no_python:bool=False, install_compile_python:bool=False,
                install_tag:str=None, install_use_gpu:bool=False,
-               tts_engine:str=None, voicevox_ver:str=None, voicevox_whl:str=None):
+               tts_engine:str=None, voicevox_ver:str=None, voicevox_whl:str=None,
+               language:str=None):
         """
         iinferが含まれるdockerイメージをインストールします。
 
@@ -66,7 +67,7 @@ class Install(object):
             tts_engine (str): TTSエンジンの指定
             voicevox_ver (str): VoiceVoxのバージョン
             voicevox_whl (str): VoiceVoxのwhlファイルの名前
-
+            language (str): 言語の指定
         Returns:
             dict: 処理結果
         """
@@ -171,6 +172,8 @@ class Install(object):
                     MCPSV_LISTEN_PORT='${MCPSV_LISTEN_PORT:-8091}',
                     A2ASV_LISTEN_PORT='${A2ASV_LISTEN_PORT:-8071}',
                     SVCOUNT='${SVCOUNT:-2}',
+                    LANGUAGE='${LANGUAGE:-'+(language if language else 'ja_JP')+'}',
+                    SETUPTOOLS_USE_DISTUTILS='stdlib'
                 ),
                 user=user,
                 ports=['${LISTEN_PORT:-8081}:${LISTEN_PORT:-8081}',

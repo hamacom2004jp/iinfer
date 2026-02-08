@@ -155,7 +155,8 @@ class InstallServer(feature.UnsupportEdgeFeature):
                           install_no_python=args.install_no_python,
                           install_compile_python=args.install_compile_python,
                           install_tag=args.install_tag, install_use_gpu=args.install_use_gpu,
-                          tts_engine=args.tts_engine, voicevox_ver=args.voicevox_ver, voicevox_whl=args.voicevox_whl)
+                          tts_engine=args.tts_engine, voicevox_ver=args.voicevox_ver, voicevox_whl=args.voicevox_whl,
+                          language=args.language)
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
 
         if 'success' not in ret:

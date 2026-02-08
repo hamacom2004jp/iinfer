@@ -21,13 +21,14 @@ RUN pip install --upgrade pip && \
     pip install 'fastmcp>=2.14.0' 'mcp>=1.10.0,<2.0.0' && \
     pip install 'google-adk>=1.21.0' litellm && \
     pip install 'a2a-sdk>=0.3.4,<0.4.0' && \
+    pip install "transformers>=4.48.0" "sentence-transformers" "sqlite_vec" "torch" && \
     pip install backoff cryptography orjson apscheduler litellm-enterprise email-validator fastapi-sso
 
 #{COPY_CMDBOX}
 #{COPY_IINFER}
 
-RUN pip install #{INSTALL_CMDBOX} && cmdbox --version && \
-    pip install #{INSTALL_IINFER} && iinfer --version
+RUN pip install #{INSTALL_CMDBOX} && cmdbox --version
+RUN pip install #{INSTALL_IINFER} && iinfer --version
 
 #{INSTALL_VOICEVOX}
 #{INSTALL_ONNX}
@@ -47,6 +48,7 @@ ENV MKUSER=${MKUSER}
 ENV LISTEN_PORT=8081
 ENV MCPSV_LISTEN_PORT=8091
 ENV A2ASV_LISTEN_PORT=8071
+ENV LANGUAGE=${LANGUAGE}
 ENV SVCOUNT=${SVCOUNT}
 
 WORKDIR /home/${MKUSER}/

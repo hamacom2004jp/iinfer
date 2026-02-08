@@ -1,10 +1,10 @@
 import datetime
 
-dt_now = datetime.datetime(2026, 1, 25)
+dt_now = datetime.datetime(2026, 2, 8)
 days_ago = (datetime.datetime.now() - dt_now).days
 __appid__ = 'iinfer'
 __title__ = 'iinfer (Image Inference Application)'
-__version__ = '0.12.3'
+__version__ = '0.12.4'
 __copyright__ = f'Copyright © 2023-{dt_now.strftime("%Y")} hamacom2004jp'
 __pypiurl__ = 'https://pypi.org/project/iinfer/'
 __srcurl__ = 'https://github.com/hamacom2004jp/iinfer'

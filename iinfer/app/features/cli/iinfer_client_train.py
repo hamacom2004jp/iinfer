@@ -13,8 +13,8 @@ import threading
 
 
 class ClientTrain(feature.OneshotNotifyEdgeFeature):
-    def __init__(self, appcls, ver):
-        super().__init__(appcls, ver)
+    def __init__(self, appcls, ver, language:str=None):
+        super().__init__(appcls, ver, language)
         self.train_thread = None
 
     def get_mode(self) -> Union[str, List[str]]:

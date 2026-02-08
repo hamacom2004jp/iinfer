@@ -46,7 +46,7 @@ agentrule:                              # Specifies a list of rules that determi
     cmds: [list, load]                  # Specify the "cmd" to which the rule applies. Multiple items can be specified in a list.
     rule: allow                         # Specifies whether the specified command is allowed or not. Values are allow or deny.
   - mode: agent
-    cmds: [chat, agent_list, llm_list, mcp_client, mcpsv_list, runner_list, session_list]
+    cmds: [chat, agent_list, mcp_client, mcpsv_list, runner_list, session_list]
     rule: allow
   - mode: client
     cmds: [file_download, file_list, http, server_info]
@@ -56,6 +56,12 @@ agentrule:                              # Specifies a list of rules that determi
     rule: allow
   - mode: excel
     cmds: [cell_details, cell_search, cell_values, sheet_list]
+    rule: allow
+  - mode: embed
+    cmds: [list]
+    rule: allow
+  - mode: llm
+    cmds: [list]
     rule: allow
   - mode: postprocess
     cmds: [cls_judge, csv, det_clip, det_face_store, det_filter, det_judge, httpreq, seg_bbox, seg_filter, showimg]

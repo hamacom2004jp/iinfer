@@ -18,7 +18,7 @@ import time
 
 
 class Web(web.Web):
-    def __init__(self, logger:logging.Logger, data:Path, appcls=None, ver=None,
+    def __init__(self, logger:logging.Logger, data:Path, appcls=None, ver=None, language:str=None,
                  redis_host:str="localhost", redis_port:int=6379, redis_password:str=None, svname:str='server',
                  client_only:bool=False, doc_root:Path=None, gui_html:str=None, filer_html:str=None, result_html:str=None, users_html:str=None,
                  audit_html:str=None, assets:List[str]=None, signin_html:str=None, signin_file:str=None, gui_mode:bool=False,
@@ -32,6 +32,7 @@ class Web(web.Web):
             data (Path): コマンドやパイプラインの設定ファイルを保存するディレクトリ
             appcls ([type], optional): アプリケーションクラス. Defaults to None.
             ver ([type], optional): バージョン. Defaults to None.
+            language (str, optional): 言語. Defaults to None.
             redis_host (str, optional): Redisサーバーのホスト名. Defaults to "localhost".
             redis_port (int, optional): Redisサーバーのポート番号. Defaults to 6379.
             redis_password (str, optional): Redisサーバーのパスワード. Defaults to None.
@@ -55,7 +56,7 @@ class Web(web.Web):
         """
         doc_root = doc_root if doc_root is not None else Path(__file__).parent.parent / 'web'
         assets = assets if assets is not None else [str(Path(__file__).parent.parent / 'web' / 'assets')]
-        super().__init__(logger=logger, data=data, appcls=appcls, ver=ver,
+        super().__init__(logger=logger, data=data, appcls=appcls, ver=ver, language=language,
                          redis_host=redis_host, redis_port=redis_port, redis_password=redis_password, svname=svname,
                          client_only=client_only, doc_root=doc_root, gui_html=gui_html, filer_html=filer_html,
                          result_html=result_html, users_html=users_html, audit_html=audit_html,
