@@ -20,7 +20,7 @@ keywords = [
     "image",
     "ai",
     "model",
-    # cmdbox
+    "cmdbox",
     "audit",
     "cli",
     "excel",
@@ -41,7 +41,7 @@ classifiers = [
     "Topic :: Utilities"
 ]
 dependencies = [
-    'cmdbox>=0.7.4,<0.7.5',
+    'cmdbox>=0.7.5,<0.7.6',
     'motpy',
     'opencv-python',
     'urllib3',
@@ -64,9 +64,32 @@ agent_mem = [
     "transformers>=4.48.0",
     "torch",
 ]
+rag = [
+    "chunklet-py[document]",
+    "langchain_community",
+    "markdown",
+    "pdfplumber",
+]
+omni = [
+    "accelerate>=1.12.0",
+    "qwen-omni-utils>=0.0.9",
+    "torchvision>=0.25.0",
+]
 saml = [
     "python3-saml",
     "xmlsec==1.3.13",
+]
+all = ["cmdbox[agent_mcp,agent_adk,agent_mem,rag,omni,saml]"]
+dev = [
+    "build",
+    "collectlicense",
+    "sphinx",
+    "sphinx-rtd-theme",
+    "sphinx_fontawesome",
+    "sphinx-intl",
+    "sphinx-sitemap",
+    "twine",
+    "wheel",
 ]
 
 [project.urls]

@@ -5,17 +5,17 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>iinfer.app.install &mdash; iinfer 2025/12/22 documentation</title>
+  <title>iinfer.app.install &mdash; iinfer 2026/03/03 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=3fafac33" />
 
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=9685becc"></script>
-      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/documentation_options.js?v=241bd053"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -91,6 +91,7 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">getpass</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">platform</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">yaml</span>
@@ -120,7 +121,7 @@
                 <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Failed to install redis-server. cmd:</span><span class="si">{</span><span class="n">_cmd</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">}</span>
             <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;success&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Success to install redis-server. cmd:</span><span class="si">{</span><span class="n">_cmd</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">}</span>
 
-        <span class="k">elif</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;Linux&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;Linux&#39;</span> <span class="ow">or</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;Darwin&#39;</span><span class="p">:</span>
             <span class="n">returncode</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_cmd</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="n">slise</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">returncode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to install redis-server. cmd:</span><span class="si">{</span><span class="n">_cmd</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -137,7 +138,8 @@
                <span class="n">install_mmdet</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">install_mmseg</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">install_mmcls</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">install_mmpretrain</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                <span class="n">install_insightface</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">install_from</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">install_no_python</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">install_compile_python</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                <span class="n">install_tag</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">install_use_gpu</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-               <span class="n">tts_engine</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">voicevox_ver</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">voicevox_whl</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+               <span class="n">tts_engine</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">voicevox_ver</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">voicevox_whl</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+               <span class="n">language</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        iinferが含まれるdockerイメージをインストールします。</span>
 
@@ -159,7 +161,7 @@
 <span class="sd">            tts_engine (str): TTSエンジンの指定</span>
 <span class="sd">            voicevox_ver (str): VoiceVoxのバージョン</span>
 <span class="sd">            voicevox_whl (str): VoiceVoxのwhlファイルの名前</span>
-
+<span class="sd">            language (str): 言語の指定</span>
 <span class="sd">        Returns:</span>
 <span class="sd">            dict: 処理結果</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -167,6 +169,8 @@
             <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;warn&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Build server command is Unsupported in windows platform.&quot;</span><span class="p">}</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">importlib.resources</span><span class="w"> </span><span class="kn">import</span> <span class="n">read_text</span>
         <span class="n">user</span> <span class="o">=</span> <span class="n">getpass</span><span class="o">.</span><span class="n">getuser</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^[0-9]&#39;</span><span class="p">,</span> <span class="n">user</span><span class="p">):</span>
+            <span class="n">user</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;_</span><span class="si">{</span><span class="n">user</span><span class="si">}</span><span class="s1">&#39;</span> <span class="c1"># ユーザー名が数字始まりの場合、先頭にアンダースコアを付与</span>
         <span class="n">install_tag</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">install_tag</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">install_tag</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;Dockerfile&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
             <span class="n">text</span> <span class="o">=</span> <span class="n">read_text</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;iinfer.docker&#39;</span><span class="p">,</span> <span class="s1">&#39;Dockerfile&#39;</span><span class="p">)</span>
@@ -259,11 +263,16 @@
                     <span class="n">REDIS_PASSWORD</span><span class="o">=</span><span class="s1">&#39;${REDIS_PASSWORD:-password}&#39;</span><span class="p">,</span>
                     <span class="n">SVNAME</span><span class="o">=</span><span class="s1">&#39;${SVNAME:-server&#39;</span><span class="o">+</span><span class="n">install_tag</span><span class="o">+</span><span class="s1">&#39;}&#39;</span><span class="p">,</span>
                     <span class="n">LISTEN_PORT</span><span class="o">=</span><span class="s1">&#39;$</span><span class="si">{LISTEN_PORT:-8081}</span><span class="s1">&#39;</span><span class="p">,</span>
-                    <span class="n">MCPSV_LISTEN_PORT</span><span class="o">=</span><span class="s1">&#39;$</span><span class="si">{MCPSV_LISTEN_PORT:-8082}</span><span class="s1">&#39;</span><span class="p">,</span>
+                    <span class="n">MCPSV_LISTEN_PORT</span><span class="o">=</span><span class="s1">&#39;$</span><span class="si">{MCPSV_LISTEN_PORT:-8091}</span><span class="s1">&#39;</span><span class="p">,</span>
+                    <span class="n">A2ASV_LISTEN_PORT</span><span class="o">=</span><span class="s1">&#39;$</span><span class="si">{A2ASV_LISTEN_PORT:-8071}</span><span class="s1">&#39;</span><span class="p">,</span>
                     <span class="n">SVCOUNT</span><span class="o">=</span><span class="s1">&#39;$</span><span class="si">{SVCOUNT:-2}</span><span class="s1">&#39;</span><span class="p">,</span>
+                    <span class="n">LANGUAGE</span><span class="o">=</span><span class="s1">&#39;${LANGUAGE:-&#39;</span><span class="o">+</span><span class="p">(</span><span class="n">language</span> <span class="k">if</span> <span class="n">language</span> <span class="k">else</span> <span class="s1">&#39;ja_JP&#39;</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;}&#39;</span><span class="p">,</span>
+                    <span class="n">SETUPTOOLS_USE_DISTUTILS</span><span class="o">=</span><span class="s1">&#39;stdlib&#39;</span>
                 <span class="p">),</span>
                 <span class="n">user</span><span class="o">=</span><span class="n">user</span><span class="p">,</span>
-                <span class="n">ports</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;$</span><span class="si">{LISTEN_PORT:-8081}</span><span class="s1">:$</span><span class="si">{LISTEN_PORT:-8081}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;$</span><span class="si">{MCPSV_LISTEN_PORT:-8082}</span><span class="s1">:$</span><span class="si">{MCPSV_LISTEN_PORT:-8082}</span><span class="s1">&#39;</span><span class="p">],</span>
+                <span class="n">ports</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;$</span><span class="si">{LISTEN_PORT:-8081}</span><span class="s1">:$</span><span class="si">{LISTEN_PORT:-8081}</span><span class="s1">&#39;</span><span class="p">,</span>
+                       <span class="s1">&#39;$</span><span class="si">{MCPSV_LISTEN_PORT:-8091}</span><span class="s1">:$</span><span class="si">{MCPSV_LISTEN_PORT:-8091}</span><span class="s1">&#39;</span><span class="p">,</span>
+                       <span class="s1">&#39;$</span><span class="si">{A2ASV_LISTEN_PORT:-8071}</span><span class="s1">:$</span><span class="si">{A2ASV_LISTEN_PORT:-8071}</span><span class="s1">&#39;</span><span class="p">],</span>
                 <span class="n">privileged</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="n">restart</span><span class="o">=</span><span class="s1">&#39;always&#39;</span><span class="p">,</span>
                 <span class="n">working_dir</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;/home/</span><span class="si">{</span><span class="n">user</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
@@ -273,7 +282,7 @@
                     <span class="sa">f</span><span class="s1">&#39;/home/</span><span class="si">{</span><span class="n">user</span><span class="si">}</span><span class="s1">/scripts:/home/</span><span class="si">{</span><span class="n">user</span><span class="si">}</span><span class="s1">/scripts&#39;</span><span class="p">,</span>
                     <span class="sa">f</span><span class="s1">&#39;/home/</span><span class="si">{</span><span class="n">user</span><span class="si">}</span><span class="s1">:/home/</span><span class="si">{</span><span class="n">user</span><span class="si">}</span><span class="s1">&#39;</span>
                 <span class="p">],</span>
-                <span class="n">command</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;CMD bash /home/</span><span class="si">{</span><span class="n">user</span><span class="si">}</span><span class="s1">/scripts/start.sh&#39;</span>
+                <span class="n">command</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;bash /home/</span><span class="si">{</span><span class="n">user</span><span class="si">}</span><span class="s1">/scripts/start.sh&#39;</span>
             <span class="p">)</span>
             <span class="k">if</span> <span class="n">install_use_gpu</span><span class="p">:</span>
                 <span class="n">services</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;iinfer_server</span><span class="si">{</span><span class="n">install_tag</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">][</span><span class="s1">&#39;deploy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
@@ -530,7 +539,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright Copyright (c) 2023-2025 hamacom2004jp All Rights Reserved..</p>
+    <p>&#169; Copyright Copyright (c) 2023-2026 hamacom2004jp All Rights Reserved..</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

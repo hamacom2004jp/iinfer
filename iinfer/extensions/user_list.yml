@@ -135,12 +135,6 @@ cmdrule:                       # A list of command rules, Specify a rule that de
     cmds: [det_face_store]
     rule: allow
   - groups: [editor]
-    mode: agent
-    cmds: [agent_del, mcpsv_del, runner_del,
-           agent_load, mcpsv_load, runner_load,
-           agent_save, mcpsv_save, runner_save,]
-    rule: allow
-  - groups: [editor]
     mode: llm
     cmds: [del, load, save]
     rule: allow
