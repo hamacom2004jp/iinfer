@@ -1,6 +1,5 @@
 from cmdbox.app import common, feature
 from cmdbox.app.options import Options
-from iinfer.app import install
 from typing import Dict, Any, Tuple, Union, List
 import argparse
 import logging
@@ -37,6 +36,9 @@ class InstallOnnx(feature.UnsupportEdgeFeature):
             description_ja="`onnxruntime` をインストールします。",
             description_en="Install `onnxruntime`.",
             choice=[
+                dict(opt="install_use_gpu", type=Options.T_BOOL, default=False, required=False, multi=False, hide=False, choice=[True, False],
+                     description_ja="GPUを使用するモジュール構成でインストールします。",
+                     description_en="Install with a module configuration that uses the GPU."),
                 dict(opt="output_json", short="o", type=Options.T_FILE, default=None, required=False, multi=False, hide=True, choice=None, fileio="out",
                      description_ja="処理結果jsonの保存先ファイルを指定。",
                      description_en="Specify the destination file for saving the processing result json.",
@@ -69,14 +71,24 @@ class InstallOnnx(feature.UnsupportEdgeFeature):
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
-        inst = install.Install(logger=logger, wsl_name=args.wsl_name, wsl_user=args.wsl_user)
-
-        ret = inst.onnx(install_use_gpu=args.install_use_gpu)
+        ret = self.onnx(logger, install_use_gpu=args.install_use_gpu)
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
 
         if 'success' not in ret:
-            return self.RESP_WARN, ret, inst
-        return self.RESP_SUCCESS, ret, inst
+            return self.RESP_WARN, ret, None
+        return self.RESP_SUCCESS, ret, None
+
+    def onnx(self, logger:logging.Logger, install_use_gpu:bool=False):
+        returncode, _, _cmd = common.cmd('pip install onnxruntime', logger=logger, slise=-1)
+        if returncode != 0:
+            logger.warning(f"Failed to install onnxruntime. cmd:{_cmd}")
+            return {"error": f"Failed to install onnxruntime. cmd:{_cmd}"}
+        if install_use_gpu:
+            returncode, _, _cmd = common.cmd('pip install onnxruntime-gpu', logger=logger, slise=-1)
+            if returncode != 0:
+                logger.warning(f"Failed to install onnxruntime-gpu. cmd:{_cmd}")
+                return {"error": f"Failed to install onnxruntime-gpu. cmd:{_cmd}"}
+        return {"success": f"Success to install onnxruntime."}
 
     def audited_by(self, logger:logging.Logger, args:argparse.Namespace) -> bool:
         """

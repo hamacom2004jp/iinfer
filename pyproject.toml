@@ -115,7 +115,6 @@ packages = [
     'iinfer.app.postprocesses',
     'iinfer.app.predicts',
     'iinfer.app.trains',
-    'iinfer.docker',
     'iinfer.extensions'
 ]
 
@@ -125,7 +124,6 @@ iinfer = [
     "*.yml",
     "extensions/**",
     "extensions/sample_project/.vscode/**",
-    "docker/**",
     "licenses/*",
     "tools/datas/**",
     "web/**",

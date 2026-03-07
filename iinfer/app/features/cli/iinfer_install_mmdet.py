@@ -1,13 +1,14 @@
-from cmdbox.app import common, feature
+from cmdbox.app import common
 from cmdbox.app.options import Options
-from iinfer.app import install
+from iinfer.app.features.cli import iinfer_install_mmcv
 from pathlib import Path
 from typing import Dict, Any, Tuple, Union, List
 import argparse
 import logging
+import shutil
 
 
-class InstallMmdet(feature.UnsupportEdgeFeature):
+class InstallMmdet(iinfer_install_mmcv.InstallMmcv):
     def get_mode(self) -> Union[str, List[str]]:
         """
         この機能のモードを返します
@@ -33,32 +34,15 @@ class InstallMmdet(feature.UnsupportEdgeFeature):
         Returns:
             Dict[str, Any]: オプション
         """
-        return dict(
-            use_redis=self.USE_REDIS_FALSE, nouse_webmode=True,
-            description_ja="`mmdetection` をインストールします。",
-            description_en="Install `mmdetection`.",
-            choice=[
-                dict(opt="install_use_gpu", type=Options.T_BOOL, default=False, required=False, multi=False, hide=False, choice=[True, False],
-                     description_ja="GPUを使用するモジュール構成でインストールします。",
-                     description_en="Install with a module configuration that uses the GPU.",
-                     test_true={"win":True}),
-                dict(opt="output_json", short="o", type=Options.T_FILE, default=None, required=False, multi=False, hide=True, choice=None, fileio="out",
-                     description_ja="処理結果jsonの保存先ファイルを指定。",
-                     description_en="Specify the destination file for saving the processing result json."),
-                dict(opt="output_json_append", short="a", type=Options.T_BOOL, default=False, required=False, multi=False, hide=True, choice=[True, False],
-                     description_ja="処理結果jsonファイルを追記保存します。",
-                     description_en="Save the processing result json file by appending."),
-                dict(opt="stdout_log", type=Options.T_BOOL, default=True, required=False, multi=False, hide=True, choice=[True, False],
-                     description_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をConsole logに出力します。",
-                     description_en="Available only in GUI mode. Outputs standard output during command execution to Console log."),
-                dict(opt="capture_stdout", type=Options.T_BOOL, default=True, required=False, multi=False, hide=True, choice=[True, False],
-                     description_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力をキャプチャーし、実行結果画面に表示します。",
-                     description_en="Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."),
-                dict(opt="capture_maxsize", type=Options.T_INT, default=self.DEFAULT_CAPTURE_MAXSIZE, required=False, multi=False, hide=True, choice=None,
-                     description_ja="GUIモードでのみ使用可能です。コマンド実行時の標準出力の最大キャプチャーサイズを指定します。",
-                     description_en="Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."),
-            ]
-        )
+        opt = super().get_option()
+        opt['description_ja'] = "`mmdetection` をインストールします。"
+        opt['description_en'] = "Install `mmdetection`."
+        opt['choice'] += [
+            dict(opt="data", type=Options.T_DIR, default=self.default_data, required=True, multi=False, hide=False, choice=None, web="mask",
+                 description_ja=f"省略した時は `$HONE/.{self.ver.__appid__}` を使用します。",
+                 description_en=f"When omitted, `$HONE/.{self.ver.__appid__}` is used."),
+        ]
+        return opt
 
     def apprun(self, logger:logging.Logger, args:argparse.Namespace, tm:float, pf:List[Dict[str, float]]=[]) -> Tuple[int, Dict[str, Any], Any]:
         """
@@ -73,26 +57,43 @@ class InstallMmdet(feature.UnsupportEdgeFeature):
         Returns:
             Tuple[int, Dict[str, Any], Any]: 終了コード, 結果, オブジェクト
         """
-        inst = install.Install(logger=logger, wsl_name=args.wsl_name, wsl_user=args.wsl_user)
-
         if args.data is None:
             msg = {"warn":f"Please specify the --data option."}
             common.print_format(msg, args.format, tm, args.output_json, args.output_json_append, pf=pf)
             return self.RESP_WARN, msg
-        ret = inst.mmdet(Path(args.data), install_use_gpu=args.install_use_gpu)
+        ret = self.mmdet(logger, Path(args.data), install_use_gpu=args.install_use_gpu)
         common.print_format(ret, args.format, tm, args.output_json, args.output_json_append, pf=pf)
 
         if 'success' not in ret:
-            return self.RESP_WARN, ret, inst
-        return self.RESP_SUCCESS, ret, inst
+            return self.RESP_WARN, ret, None
+        return self.RESP_SUCCESS, ret, None
 
-    def audited_by(self, logger:logging.Logger, args:argparse.Namespace) -> bool:
-        """
-        この機能が監査ログを記録する対象かどうかを返します
+    def mmdet(self, logger:logging.Logger, data_dir:Path, install_use_gpu:bool=False):
+        returncode, _, _cmd = common.cmd(f'git clone https://github.com/open-mmlab/mmdetection.git', logger=logger, slise=-1)
+        if returncode != 0:
+            logger.warning(f"Failed to git clone mmdetection. Delete mmdetection as it probably already exists. cmd:{_cmd}")
+            return {"error": f"Failed to git clone mmdetection. Delete mmdetection as it probably already exists. cmd:{_cmd}"}
+        srcdir = Path('.') / 'mmdetection'
+        shutil.copytree(srcdir, data_dir / 'mmdetection', dirs_exist_ok=True, ignore=shutil.ignore_patterns('.git'))
+        shutil.rmtree(srcdir, ignore_errors=True)
 
-        Returns:
-            logger (logging.Logger): ロガー
-            args (argparse.Namespace): 引数
-            bool: 監査ログを記録する場合はTrue
-        """
-        return False
+        ret = self._openmin(install_use_gpu)
+        if "error" in ret: return ret
+        ret = self._mmcv(install_use_gpu)
+        if "error" in ret: return ret
+        msg = self._numpy()
+        if "success" not in msg: return msg
+
+        ret, _, _cmd = common.cmd('mim install mmdet', logger=logger, slise=-1)
+        if ret != 0:
+            logger.warning(f"Failed to install mmdet. cmd:{_cmd}")
+            return {"error": f"Failed to install mmdet. cmd:{_cmd}"}
+
+        ret, _, _cmd = common.cmd(f'sed -i "s/mmcv_maximum_version = \'2.2.0\'/mmcv_maximum_version = \'2.2.1\'/" /opt/conda/lib/python3.11/site-packages/mmdet/__init__.py', logger=logger, slise=-1)
+        if ret != 0:
+            logger.warning(f"Failed to install mmdet. cmd:{_cmd}")
+            return {"error": f"Failed to install mmdet. cmd:{_cmd}"}
+
+        if srcdir.exists():
+            return {"success": f"Please remove '{srcdir / 'mmdetection'}' manually. cmd:{_cmd}"}
+        return {"success": f"Success to install mmdet. cmd:{_cmd}"}
