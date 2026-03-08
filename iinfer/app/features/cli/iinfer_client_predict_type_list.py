@@ -33,7 +33,7 @@ class ClientPredictTypeList(feature.OneshotResultEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False,
+            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False, use_agent=True,
             description_ja="推論タイプ一覧を取得します。",
             description_en="Get a list of inference types.",
             choice=[

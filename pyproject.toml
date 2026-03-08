@@ -41,7 +41,7 @@ classifiers = [
     "Topic :: Utilities"
 ]
 dependencies = [
-    'cmdbox>=0.7.5,<0.7.6',
+    'cmdbox>=0.7.6,<0.7.7',
     'motpy',
     'opencv-python',
     'urllib3',

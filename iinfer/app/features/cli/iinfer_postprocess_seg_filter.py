@@ -34,7 +34,7 @@ class PostprocessSegFilter(postprocess_feature.PostprocessFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False,
+            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False, use_agent=True,
             description_ja="SemanticSegmentationで検知した個所をフィルタリングします。",
             description_en="Filter the detected area in SemanticSegmentation.",
             choice=[

@@ -33,7 +33,7 @@ class ClientTrainTypeList(feature.OneshotResultEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False,
+            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False, use_agent=True,
             description_ja="学習タイプ一覧を取得します。",
             description_en="Get a list of train types.",
             choice=[

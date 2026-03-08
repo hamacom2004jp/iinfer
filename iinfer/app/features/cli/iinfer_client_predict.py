@@ -40,7 +40,7 @@ class ClientPredict(feature.Feature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_TRUE, nouse_webmode=False,
+            use_redis=self.USE_REDIS_TRUE, nouse_webmode=False, use_agent=True,
             description_ja="AIモデルを指定して推論を実行します。",
             description_en="Perform inference by specifying the AI model.",
             choice=[

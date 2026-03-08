@@ -34,7 +34,7 @@ class PostprocessClsJudge(postprocess_feature.PostprocessFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False,
+            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False, use_agent=True,
             description_ja="推論結果を使用して画像分類判定を行います。",
             description_en="Perform image classification judgment using the inference result.",
             choice=[

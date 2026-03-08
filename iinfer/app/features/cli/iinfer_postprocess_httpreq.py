@@ -34,7 +34,7 @@ class PostprocessHttpreq(postprocess_feature.PostprocessFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False,
+            use_redis=self.USE_REDIS_FALSE, nouse_webmode=False, use_agent=True,
             description_ja="推論結果を指定したHTTPサーバーに送信します。",
             description_en="Send the inference result to the specified HTTP server.",
             choice=[

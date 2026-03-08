@@ -35,7 +35,7 @@ class ClientStop(feature.OneshotNotifyEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_TRUE, nouse_webmode=False,
+            use_redis=self.USE_REDIS_TRUE, nouse_webmode=False, use_agent=False,
             description_ja="AIモデルを指定して推論サーバーを停止します。",
             description_en="Stop the inference server by specifying the AI model.",
             choice=[

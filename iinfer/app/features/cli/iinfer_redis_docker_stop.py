@@ -33,7 +33,7 @@ class RedisDockerStop(feature.UnsupportEdgeFeature):
             Dict[str, Any]: オプション
         """
         return dict(
-            use_redis=self.USE_REDIS_FALSE, nouse_webmode=True,
+            use_redis=self.USE_REDIS_FALSE, nouse_webmode=True, use_agent=False,
             description_ja="installモードで `iinfer -m install -c server` を実行している場合は、 `docker-compose down` を使用してください。",
             description_en="If you are running `iinfer -m install -c server` in install mode, use `docker-compose down`.",
             choice=[
