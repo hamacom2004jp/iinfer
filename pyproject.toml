@@ -41,7 +41,7 @@ classifiers = [
     "Topic :: Utilities"
 ]
 dependencies = [
-    'cmdbox>=0.7.6,<0.7.7',
+    'cmdbox>=0.7.7,<0.7.8',
     'motpy',
     'opencv-python',
     'urllib3',
@@ -117,6 +117,9 @@ packages = [
     'iinfer.app.trains',
     'iinfer.extensions'
 ]
+
+[tool.setuptools.dynamic]
+version = { attr = "iinfer.version.__version__" }
 
 [tool.setuptools.package-data]
 # setup()のpackage_dataとexclude_package_dataに相当

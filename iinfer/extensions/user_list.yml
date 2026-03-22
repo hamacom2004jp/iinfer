@@ -62,6 +62,7 @@ cmdrule:                       # A list of command rules, Specify a rule that de
   - groups: [user]
     mode: agent
     cmds: [chat, agent_list, mcp_client, mcpsv_list, memory_list, runner_list,
+           memory_status, runner_load,
            session_list, session_del, start, stop]
     rule: allow
   - groups: [user]
@@ -78,7 +79,9 @@ cmdrule:                       # A list of command rules, Specify a rule that de
     rule: allow
   - groups: [user]
     mode: extract
-    cmds: [list]
+    cmds: [list, pdfplumber, chunklet]
+    coercion:
+      fwpath: "[f'/.users/{user_name}']+[f'/.groups/{g}' for g in groups]"
     rule: allow
   - groups: [user]
     mode: llm

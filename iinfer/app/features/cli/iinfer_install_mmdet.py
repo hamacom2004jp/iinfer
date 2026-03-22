@@ -77,11 +77,11 @@ class InstallMmdet(iinfer_install_mmcv.InstallMmcv):
         shutil.copytree(srcdir, data_dir / 'mmdetection', dirs_exist_ok=True, ignore=shutil.ignore_patterns('.git'))
         shutil.rmtree(srcdir, ignore_errors=True)
 
-        ret = self._openmin(install_use_gpu)
+        ret = self._openmin(logger)
         if "error" in ret: return ret
-        ret = self._mmcv(install_use_gpu)
+        ret = self.mmcv(logger, install_use_gpu)
         if "error" in ret: return ret
-        msg = self._numpy()
+        msg = self._numpy(logger)
         if "success" not in msg: return msg
 
         ret, _, _cmd = common.cmd('mim install mmdet', logger=logger, slise=-1)
