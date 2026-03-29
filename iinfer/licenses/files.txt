@@ -39,7 +39,7 @@ Armin Rigo, Maciej Fijalkowski	MIT	cffi	https://cffi.readthedocs.io/en/latest/wh
 speedyk_005 <speedy40115719@gmail.com>	MIT	chunklet-py	https://github.com/speedyk-005/chunklet-py	2.2.0	iinfer\licenses\LICENSE_chunklet-py_2_2_0_MIT.txt
 UNKNOWN	BSD-3-Clause	click	https://github.com/pallets/click/	8.3.1	iinfer\licenses\LICENSE_click_8_3_1_BSD-3-Clause.txt
 The cloudpickle developer team	BSD License	cloudpickle	https://github.com/cloudpipe/cloudpickle	3.1.2	iinfer\licenses\LICENSE_cloudpickle_3_1_2_BSD_License.txt
-hamacom2004jp <hamacom2004jp@gmail.com>	MIT License	cmdbox	https://github.com/hamacom2004jp/cmdbox	0.7.5.5	iinfer\licenses\LICENSE_cmdbox_0_7_5_5_MIT_License.txt
+hamacom2004jp <hamacom2004jp@gmail.com>	MIT License	cmdbox	https://github.com/hamacom2004jp/cmdbox	0.7.8	iinfer\licenses\LICENSE_cmdbox_0_7_8_MIT_License.txt
 Michael Williamson	BSD License	cobble	http://github.com/mwilliamson/python-cobble	0.1.4	iinfer\licenses\LICENSE_cobble_0_1_4_BSD_License.txt
 Jonathan Hartley <tartley@tartley.com>	BSD License	colorama	https://github.com/tartley/colorama	0.4.6	iinfer\licenses\LICENSE_colorama_0_4_6_BSD_License.txt
 Ian Thomas <ianthomas23@gmail.com>	BSD License	contourpy	https://github.com/contourpy/contourpy	1.3.3	iinfer\licenses\LICENSE_contourpy_1_3_3_BSD_License.txt
@@ -206,6 +206,7 @@ Gustavo Niemeyer	Apache Software License; BSD License	python-dateutil	https://gi
 Steve Canny <stcanny@gmail.com>	MIT License	python-docx	https://github.com/python-openxml/python-docx	1.2.0	iinfer\licenses\LICENSE_python-docx_1_2_0_MIT_License.txt
 Saurabh Kumar <me+github@saurabh-kumar.com>	BSD-3-Clause	python-dotenv	https://github.com/theskumar/python-dotenv	1.2.2	iinfer\licenses\LICENSE_python-dotenv_1_2_2_BSD-3-Clause.txt
 Andrew Dunham <andrew@du.nham.ca>, Marcelo Trylesinski <marcelotryle@gmail.com>	Apache-2.0	python-multipart	https://github.com/Kludex/python-multipart	0.0.22	iinfer\licenses\LICENSE_python-multipart_0_0_22_Apache-2_0.txt
+Xavi Vinaixa <xavi@sorensen.ai>	MIT	python-toon	https://github.com/xaviviro/python-toon	0.1.3	iinfer\licenses\LICENSE_python-toon_0_1_3_MIT.txt
 Mark Hammond (et al)	Python Software Foundation License	pywin32	https://github.com/mhammond/pywin32	311	iinfer\licenses\LICENSE_pywin32_311_Python_Software_Foundation_License.txt
 Enthought Inc.	BSD-3-Clause	pywin32-ctypes	https://github.com/enthought/pywin32-ctypes	0.2.3	iinfer\licenses\LICENSE_pywin32-ctypes_0_2_3_BSD-3-Clause.txt
 Tom Bocklisch	MIT License	questionary	https://github.com/tmbo/questionary	2.1.1	iinfer\licenses\LICENSE_questionary_2_1_1_MIT_License.txt
