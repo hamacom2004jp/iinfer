@@ -1,11 +1,18 @@
 features:
   cli:                                  # Specify a list of package names in which the module implementing the command is located.
-    - package: iinfer.app.features.cli  # Package Name. Classes inheriting from cmdbox.app.feature.Feature.
-      prefix: iinfer_                   # Module name prefix. Modules that begin with this letter are eligible.
-      exclude_modules: []               # Specify the module name to exclude from the list of modules to be loaded.
+    - package: cmdbox.app.features.cli  # Package Name. Classes inheriting from cmdbox.app.feature.Feature.
+      prefix: cmdbox_                   # Module name prefix. Modules that begin with this letter are eligible.
+      exclude_modules:                  # Specify the module name to exclude from the list of modules to be loaded.
+        - cmdbox_gui_start
+        - cmdbox_web_start
+    - package: iinfer.app.features.cli
+      prefix: iinfer_
+      exclude_modules: []
   web:                                  # Specify a list of package names with modules that implement web screens and RESTAPIs.
-    - package: iinfer.app.features.web  # Package Name. Classes inheriting from cmdbox.app.feature.WebFeature .
-      prefix: iinfer_web_               # Module name prefix. Modules that begin with this letter are eligible.
+    - package: cmdbox.app.features.web  # Package Name. Classes inheriting from cmdbox.app.feature.WebFeature .
+      prefix: cmdbox_web_               # Module name prefix. Modules that begin with this letter are eligible.
+    - package: iinfer.app.features.web
+      prefix: iinfer_web_
 args:                                   # Specifies default or forced arguments for the specified command.
   cli:                                  # Specify rules to apply default values or force arguments.
     - rule:                             # Specify the rules for applying default values and forced arguments for each command line option.

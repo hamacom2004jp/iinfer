@@ -78,6 +78,7 @@ class InstallServer(cmdbox_cmdbox_server_install.CmdboxServerInstall):
             return self.RESP_WARN, msg, None
         install_use_gpu_opt = '--install_use_gpu' if args.install_use_gpu else ''
         run_extra_post = args.run_extra_post if args.run_extra_post is not None and isinstance(args.run_extra_post, list) else []
+        run_extra_post.append(f'{self.ver.__appid__} --version')
         if args.install_onnx:
             run_extra_post.append(f'{self.ver.__appid__} -m install -c onnx {install_use_gpu_opt} --debug')
         if args.install_mmdet:
