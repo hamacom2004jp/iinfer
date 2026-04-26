@@ -1,35 +1,45 @@
 .. -*- coding: utf-8 -*-
 
-****************************************************
-コマンドリファレンス（redisモード）
-****************************************************
+********************************
+Command Reference ( redis mode )
+********************************
 
-- redisモードのコマンド一覧です。
+List of redis mode commands.
 
-Redisサーバー起動 : `iinfer -m redis -c docker_run <Option>`
-==============================================================================
+redis ( docker_run ) : ``cmdbox -m redis -c docker_run <Option>``
+=================================================================
 
-- installモードで `iinfer -m install -c server` を実行している場合は、 `docker-compose up -d` を使用してください。
-
-.. csv-table::
-    :widths: 20, 10, 70
-    :header-rows: 1
-
-    "Option","Required","Description"
-    "--port <ポート番号>","","Redisサーバーのサービスポートを指定します。"
-    "--password <パスワード>","","Redisサーバーのアクセスパスワードを指定します。省略時は`password`を使用します。"
-    "--wsl_name <ディストリビューション名>","Windowsの場合は〇","Windowsの場合はWSLのディストリビューションの名前を指定します。"
-    "--wsl_user <user名>","Windowsの場合は〇","Windowsの場合はWSL内のユーザー名を指定します。"
-
-Redisサーバー停止 : `iinfer -m redis -c docker_stop <Option>`
-==============================================================================
-
-- installモードで `iinfer -m install -c server` を実行している場合は、 `docker-compose down` を使用してください。
+- If you are running `iinfer -m install -c server` in install mode, use `docker-compose up -d`.
 
 .. csv-table::
     :widths: 20, 10, 70
     :header-rows: 1
 
     "Option","Required","Description"
-    "--wsl_name <ディストリビューション名>","Windowsの場合は〇","Windowsの場合はWSLのディストリビューションの名前を指定します。"
-    "--wsl_user <user名>","Windowsの場合は〇","Windowsの場合はWSL内のユーザー名を指定します。"
+    "--port <port>","required","Specify the service port of the Redis server."
+    "--password <password>","required","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--wsl_name <wsl_name>","","For Windows, specify the name of the WSL distribution."
+    "--wsl_user <wsl_user>","","For Windows, specify the user name in WSL."
+    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
+    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
+    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
+    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
+    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
+
+redis ( docker_stop ) : ``cmdbox -m redis -c docker_stop <Option>``
+===================================================================
+
+- If you are running `iinfer -m install -c server` in install mode, use `docker-compose down`.
+
+.. csv-table::
+    :widths: 20, 10, 70
+    :header-rows: 1
+
+    "Option","Required","Description"
+    "--wsl_name <wsl_name>","","For Windows, specify the name of the WSL distribution."
+    "--wsl_user <wsl_user>","","For Windows, specify the user name in WSL."
+    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
+    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
+    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
+    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
+    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."

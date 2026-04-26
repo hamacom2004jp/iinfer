@@ -1,227 +1,281 @@
 .. -*- coding: utf-8 -*-
 
-****************************************************
-コマンドリファレンス（clientモード）
-****************************************************
+*********************************
+Command Reference ( client mode )
+*********************************
 
-clientモードのコマンド一覧です。
+List of client mode commands.
 
-クライアント(キャプチャーの実行) : `iinfer -m client -c capture <Option>`
-==============================================================================
+client ( capture ) : ``cmdbox -m client -c capture <Option>``
+=============================================================
 
-このコマンドは、パイプで接続して下記のように使用します。
-
-.. code-block:: bat
-
-   iinfer -m client -c capture <Option> | iinfer -m client -c predict --stdin --pred_image_type capture <Option>
+- Get a capture image on the client side.
 
 .. csv-table::
     :widths: 20, 10, 70
     :header-rows: 1
 
     "Option","Required","Description"
-    "--capture_device <ディバイス>","","キャプチャーディバイスを指定します。 `cv2.VideoCapture` の第一引数に渡される値。"
-    "--image_type <出力する画像タイプ>","","出力する画像のタイプを指定する。指定可能な画像タイプは `bmp` , `png` , `jpeg` , `capture` "
-    "--capture_frame_width <キャプチャーサイズ(横px)>","","キャプチャーする画像の横px。 `cv2.VideoCapture` オブジェクトの `cv2.CAP_PROP_FRAME_WIDTH` オプションに指定する値。"
-    "--capture_frame_height <キャプチャーサイズ(縦px)>","","キャプチャーする画像の縦px。 `cv2.VideoCapture` オブジェクトの `cv2.CAP_PROP_FRAME_HEIGHT` オプションに指定する値。"
-    "--capture_fps <キャプチャーFPS>","","キャプチャーする画像のFPS。キャプチャーが指定した値より高速な場合に残り時間分をsleepします"
-    "--capture_count <キャプチャー回数>","","キャプチャーする回数。"
-    "--output_preview","","推論結果画像を `cv2.imshow` で表示します"
-    "--output_csv <処理結果csvの保存先ファイル>","","キャプチャーした内容をcsvで保存します。これを指定した場合、標準出力は行いません。"
-    "-o, --output_json <処理結果jsonの保存先ファイル>","","このオプションは使用できません"
-    "-a, --output_json_append","","このオプションは使用できません"
+    "--capture_device <capture_device>","required","Specify the capture device. The value passed to the first argument of `cv2.VideoCapture`."
+    "--image_type <image_type>","required","Specify the type of image to output."
+    "--capture_frame_width <capture_frame_width>","","Width px of the image to be captured. The value to be specified in the `cv2.CAP_PROP_FRAME_WIDTH` option of the `cv2.VideoCapture` object."
+    "--capture_frame_height <capture_frame_height>","","Height px of the image to be captured. The value to be specified in the `cv2.CAP_PROP_FRAME_HEIGHT` option of the `cv2.VideoCapture` object."
+    "--capture_fps <capture_fps>","","FPS of the image to be captured. If the capture is faster than the specified value, sleep for the remaining time."
+    "--capture_count <capture_count>","","Number of captures."
+    "--output_preview <output_preview>","","Display the inference result image with `cv2.imshow`."
+    "--output_csv <output_csv>","","Saves the input as a csv file. If this is specified, no standard output is performed."
+    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
+    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
+    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
 
+client ( deploy ) : ``cmdbox -m client -c deploy <Option>``
+===========================================================
 
-クライアント(AIモデルの配備一覧) : `iinfer -m client -c deploy_list <Option>`
-==============================================================================
-
-.. csv-table::
-    :widths: 20, 10, 70
-    :header-rows: 1
-
-    "Option","Required","Description"
-    "--host <IPアドレス又はホスト名>","","Redisサーバーのサービスホストを指定します"
-    "--port <ポート番号>","","Redisサーバーのサービスポートを指定します"
-    "--password <パスワード>","","Redisサーバーのアクセスパスワード(任意)を指定します。省略時は `password` を使用します"
-    "--svname <推論サービス名>","","推論サーバーのサービス名を指定します。省略時は `server` を使用します"
-    "--retry_count <リトライ回数>","","Redisサーバーへの再接続回数を指定。0以下を指定すると永遠に再接続を行う。"
-    "--retry_interval <リトライ間隔>","","Redisサーバーに再接続までの秒数を指定"
-    "--timeout <タイムアウト>","","サーバーの応答が返ってくるまでの最大待ち時間を指定"
-
-
-クライアント(AIモデルの配備) : `iinfer -m client -c deploy <Option>`
-==============================================================================
+- Deploy AI model to server.
 
 .. csv-table::
     :widths: 20, 10, 70
     :header-rows: 1
 
     "Option","Required","Description"
-    "--host <IPアドレス又はホスト名>","","Redisサーバーのサービスホストを指定します"
-    "--port <ポート番号>","","Redisサーバーのサービスポートを指定します"
-    "--password <パスワード>","","Redisサーバーのアクセスパスワード(任意)を指定します。省略時は `password` を使用します"
-    "--svname <推論サービス名>","","推論サーバーのサービス名を指定します。省略時は `server` を使用します"
-    "-n,--name <登録名>","〇","AIモデルの登録名を指定します"
-    "--model_file <モデルファイル>","〇","学習済みのモデルファイルのパス又はダウンロードURLを指定します"
-    "--model_conf_file <モデル設定ファイル>","","モデル設定ファイルを指定します。複数指定可能ですが、最初に指定したファイルが `start` 時に使用されます。"
-    "--model_img_width <モデルのINPUTサイズ(横px)>","","AIモデルのINPUTサイズ(横px)を指定します"
-    "--model_img_height <モデルのINPUTサイズ(縦px)>","","AIモデルのINPUTサイズ(縦px)を指定します"
-    "--predict_type <推論タイプ>","〇","AIモデルの推論タイプを指定します。 :ref:`参照<predict_type_list>` "
-    "--custom_predict_py <カスタム推論pyファイル>","","独自の推論タイプを作成するときに指定。この時は `--predict_type Custom` を指定"
-    "--label_file <ラベルファイル>","","推論結果のクラスラベルファイルを指定。改行区切りでラベル名(行indexがクラスと一致する)を指定したファイル。"
-    "--color_file <色ファイル>","","推論結果の可視化画像の色ファイルを指定。改行区切りで色(行indexがクラスと一致する)を指定したファイル。"
-    "--before_injection_type <前処理タイプ>","","前処理を作成させるときに指定。参照： :doc:`./injections` "
-    "--before_injection_py <前処理pyファイル>","","独自の前処理を作成するときに指定"
-    "--before_injection_conf <前処理py用設定ファイル>","","前処理に対する設定ファイルを指定"
-    "--after_injection_type <後処理タイプ>","","後処理を作成させるときに指定。参照： :doc:`./injections` "
-    "--after_injection_py <後処理pyファイル>","","独自の後処理を作成するときに指定"
-    "--after_injection_conf <後処理py用設定ファイル>","","後処理に対する設定ファイルを指定"
-    "--overwrite","","デプロイ済みであっても上書きする指定"
-    "--retry_count <リトライ回数>","","Redisサーバーへの再接続回数を指定。0以下を指定すると永遠に再接続を行う。"
-    "--retry_interval <リトライ間隔>","","Redisサーバーに再接続までの秒数を指定"
-    "--timeout <タイムアウト>","","サーバーの応答が返ってくるまでの最大待ち時間を指定"
+    "--host <host>","required","Specify the service host of the Redis server."
+    "--port <port>","required","Specify the service port of the Redis server."
+    "--password <password>","required","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <svname>","required","Specify the service name of the inference server. If omitted, `server` is used."
+    "-n, --name <name>","required","Specify the registration name of the AI model."
+    "--model_file <model_file>","required","Specify the path or download URL of the trained model file."
+    "--model_conf_file <model_conf_file>","","Specify the model configuration file. Multiple specifications are possible, but the file specified first is used at `start` time."
+    "--model_img_width <model_img_width>","","Specify the INPUT size (width px) of the AI model."
+    "--model_img_height <model_img_height>","","Specify the INPUT size (height px) of the AI model."
+    "--predict_type <predict_type>","","Specify the inference type of the AI model."
+    "--custom_predict_py <custom_predict_py>","","Specify when creating a custom inference type. In this case, specify `--predict_type Custom`."
+    "--label_file <label_file>","","Specify the class label file of the inference result. A file specifying the label name (the row index matches the class) separated by line breaks."
+    "--color_file <color_file>","","Specify the color file of the visualization image of the inference result. A file specifying the color (the row index matches the class) separated by line breaks."
+    "--before_injection_type <before_injection_type>","","Specify when you want to execute preprocessing."
+    "--before_injection_conf <before_injection_conf>","","Specify the setting file for preprocessing."
+    "--before_injection_py <before_injection_py>","","Specify when creating a custom preprocessing."
+    "--after_injection_type <after_injection_type>","","Specify when you want to create post-processing."
+    "--after_injection_conf <after_injection_conf>","","Specify the setting file for post-processing."
+    "--after_injection_py <after_injection_py>","","Specify when creating custom post-processing."
+    "--overwrite <overwrite>","","Specify to overwrite even if it is already deployed."
+    "--train_type <train_type>","","Specify the train type of the AI model."
+    "--train_dataset <train_dataset>","","Specifies the data set directory."
+    "--train_dataset_upload <train_dataset_upload>","","Upload the data set to the server."
+    "--custom_train_py <custom_train_py>","","Specify when creating a custom train type. In this case, specify `--train_type Custom`."
+    "--retry_count <retry_count>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
+    "--retry_interval <retry_interval>","","Specifies the number of seconds before reconnecting to the Redis server."
+    "--timeout <timeout>","","Specify the maximum waiting time until the server responds."
+    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
+    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
+    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
+    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
+    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
 
+client ( deploy_list ) : ``cmdbox -m client -c deploy_list <Option>``
+=====================================================================
 
-.. _predict_type_list:
-
-クライアント(推論タイプ一覧) : `iinfer -m client -c predict_type_list <Option>`
-================================================================================
-
-推論タイプ一覧を出力します。オプションの指定はありません。
-
-
-クライアント(推論の実行) : `iinfer -m client -c predict <Option>`
-==============================================================================
-
-.. csv-table::
-    :widths: 20, 10, 70
-    :header-rows: 1
-
-    "Option","Required","Description"
-    "--host <IPアドレス又はホスト名>","","Redisサーバーのサービスホストを指定します"
-    "--port <ポート番号>","","Redisサーバーのサービスポートを指定します"
-    "--password <パスワード>","","Redisサーバーのアクセスパスワード(任意)を指定します。省略時は `password` を使用します"
-    "--svname <推論サービス名>","","推論サーバーのサービス名を指定します。省略時は `server` を使用します"
-    "-n,--name <登録名>","〇","AIモデルの登録名を指定します"
-    "-i,--input_file <推論対象の画像ファイル>","","推論させる画像をファイルで指定します"
-    "--stdin","","推論させる画像を標準入力から読み込む"
-    "--nodraw","","推論結果画像にbbox等の描き込みを行わない"
-    "--pred_input_type <推論対象の入力タイプ>","","推論させる入力タイプを指定します。指定可能な入力タイプは `bmp` , `png` , `jpeg` , `capture` , `output_json` "
-    "--output_image <推論結果画像の保存先ファイル>","","推論結果画像の保存先ファイルを指定します"
-    "-P,--output_preview","","推論結果画像を `cv2.imshow` で表示します"
-    "--retry_count <リトライ回数>","","Redisサーバーへの再接続回数を指定。0以下を指定すると永遠に再接続を行う。"
-    "--retry_interval <リトライ間隔>","","Redisサーバーに再接続までの秒数を指定"
-    "--timeout <タイムアウト>","","サーバーの応答が返ってくるまでの最大待ち時間"
-
-
-クライアント(ディレクトリ内の画像ファイルを取得) : `iinfer -m client -c read_dir <Option>`
-================================================================================================
-
-このコマンドは、パイプで接続して下記のように使用します。
-
-.. code-block:: bat
-
-   iinfer -m client -c read_dir <Option> | iinfer -m client -c predict --stdin --pred_image_type capture <Option>
+- Get a list of AI models deployed on the server.
 
 .. csv-table::
     :widths: 20, 10, 70
     :header-rows: 1
 
     "Option","Required","Description"
-    "--glob_str <globパターン>","〇","読込むファイルのglobパターンを指定する。"
-    "--read_input_type <読込む画像のタイプ>","","読込む画像のタイプを指定する。指定可能な画像タイプは `bmp` , `png` , `jpeg` , `capture` , `filelist` "
-    "--image_type <出力する画像タイプ>","","出力する画像のタイプを指定する。指定可能な画像タイプは `bmp` , `png` , `jpeg` , `capture` "
-    "--root_dir <ルートディレクトリ>","","検索の基準となるルートディレクトリを指定する。"
-    "--include_hidden","","読込むファイルの種類に隠しファイルを含めるかどうかを指定する。"
-    "--moveto <移動する先のディレクトリ>","","読み込んだファイルを移動する先のディレクトリを指定する。"
-    "--polling","","定期的にディレクトリ内の読込みを繰り返すかどうかを指定する。"
-    "--polling_count <繰り返し回数>","","ディレクトリ内の読込みの繰り返し回数を指定する。"
-    "--polling_interval <繰り返し間隔>","","ディレクトリ内の読込みの繰り返し間隔(秒)を指定する。"
-    "--output_csv <処理結果csvの保存先ファイル>","","キャプチャーした内容をcsvで保存します。これを指定した場合、標準出力は行いません。"
-    "-o, --output_json <処理結果jsonの保存先ファイル>","","このオプションは使用できません"
-    "-a, --output_json_append","","このオプションは使用できません"
+    "--host <host>","required","Specify the service host of the Redis server."
+    "--port <port>","required","Specify the service port of the Redis server."
+    "--password <password>","required","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <svname>","required","Specify the service name of the inference server. If omitted, `server` is used."
+    "--retry_count <retry_count>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
+    "--retry_interval <retry_interval>","","Specifies the number of seconds before reconnecting to the Redis server."
+    "--timeout <timeout>","","Specify the maximum waiting time until the server responds."
+    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
+    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
+    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
+    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
+    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
 
+client ( predict ) : ``cmdbox -m client -c predict <Option>``
+=============================================================
 
-クライアント(AIモデルの起動) : `iinfer -m client -c start <Option>`
-==============================================================================
-
-.. csv-table::
-    :widths: 20, 10, 70
-    :header-rows: 1
-
-    "Option","Required","Description"
-    "--host <IPアドレス又はホスト名>","","Redisサーバーのサービスホストを指定します"
-    "--port <ポート番号>","","Redisサーバーのサービスポートを指定します"
-    "--password <パスワード>","","Redisサーバーのアクセスパスワード(任意)を指定します。省略時は `password` を使用します"
-    "--svname <推論サービス名>","","推論サーバーのサービス名を指定します。省略時は `server` を使用します"
-    "-n,--name <登録名>","〇","AIモデルの登録名を指定します"
-    "--model_provider <モデルプロバイダー>","","ONNX形式のモデルファイルの場合に指定可能。指定可能なプロバイダーは `CPUExecutionProvider` , `CUDAExecutionProvider` , `TensorrtExecutionProvider` "
-    "--use_track","","ObjectDetectionタスクの場合に指定可能。motpyを使ってトラッキングID付与を行う"
-    "--gpuid <GPUのid>","","GPUのディバイスIDを指定します。"
-    "--retry_count <リトライ回数>","","Redisサーバーへの再接続回数を指定。0以下を指定すると永遠に再接続を行う。"
-    "--retry_interval <リトライ間隔>","","Redisサーバーに再接続までの秒数を指定"
-    "--timeout <タイムアウト>","","サーバーの応答が返ってくるまでの最大待ち時間"
-
-
-クライアント(AIモデルの停止) : `iinfer -m client -c stop <Option>`
-==============================================================================
+- Perform inference by specifying the AI model.
 
 .. csv-table::
     :widths: 20, 10, 70
     :header-rows: 1
 
     "Option","Required","Description"
-    "--host <IPアドレス又はホスト名>","","Redisサーバーのサービスホストを指定します"
-    "--port <ポート番号>","","Redisサーバーのサービスポートを指定します"
-    "--password <パスワード>","","Redisサーバーのアクセスパスワード(任意)を指定します。省略時は `password` を使用します"
-    "--svname <推論サービス名>","","推論サーバーのサービス名を指定します。省略時は `server` を使用します"
-    "-n,--name <登録名>","〇","AIモデルの登録名を指定します"
-    "--retry_count <リトライ回数>","","Redisサーバーへの再接続回数を指定。0以下を指定すると永遠に再接続を行う。"
-    "--retry_interval <リトライ間隔>","","Redisサーバーに再接続までの秒数を指定"
-    "--timeout <タイムアウト>","","サーバーの応答が返ってくるまでの最大待ち時間"
+    "--host <host>","required","Specify the service host of the Redis server."
+    "--port <port>","required","Specify the service port of the Redis server."
+    "--password <password>","required","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <svname>","required","Specify the service name of the inference server. If omitted, `server` is used."
+    "-n, --name <name>","required","Specify the registration name of the AI model to be deleted."
+    "-i, --input_file <input_file>","","Specify the image to be inferred by file."
+    "--stdin <stdin>","","Read the image to be inferred from standard input."
+    "--nodraw <nodraw>","","Do not draw bboxes etc. on the inference result image."
+    "--pred_input_type <pred_input_type>","required","Specifies the input type to be inferred."
+    "--output_image <output_image>","","Specify the destination file for saving the inference result image."
+    "-P, --output_preview <output_preview>","","Display the inference result image with `cv2.imshow`."
+    "--retry_count <retry_count>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
+    "--retry_interval <retry_interval>","","Specifies the number of seconds before reconnecting to the Redis server."
+    "--timeout <timeout>","","Specify the maximum waiting time until the server responds."
+    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
+    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
+    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
+    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
+    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
 
+client ( predict_type_list ) : ``cmdbox -m client -c predict_type_list <Option>``
+=================================================================================
 
-.. _train_type_list:
-
-クライアント(学習タイプ一覧) : `iinfer -m client -c train_type_list <Option>`
-================================================================================
-
-学習タイプ一覧を出力します。オプションの指定はありません。
-
-
-クライアント(AIモデルの学習) : `iinfer -m client -c train <Option>`
-==============================================================================
-
-.. csv-table::
-    :widths: 20, 10, 70
-    :header-rows: 1
-
-    "Option","Required","Description"
-    "--host <IPアドレス又はホスト名>","","Redisサーバーのサービスホストを指定します"
-    "--port <ポート番号>","","Redisサーバーのサービスポートを指定します"
-    "--password <パスワード>","","Redisサーバーのアクセスパスワード(任意)を指定します。省略時は `password` を使用します"
-    "--svname <推論サービス名>","","推論サーバーのサービス名を指定します。省略時は `server` を使用します"
-    "-n,--name <登録名>","〇","AIモデルの登録名を指定します"
-    "--overwrite","","学習済みであっても上書きする指定"
-    "--retry_count <リトライ回数>","","Redisサーバーへの再接続回数を指定。0以下を指定すると永遠に再接続を行う。"
-    "--retry_interval <リトライ間隔>","","Redisサーバーに再接続までの秒数を指定"
-    "--timeout <タイムアウト>","","サーバーの応答が返ってくるまでの最大待ち時間を指定"
-
-
-クライアント(AIモデルの配備解除) : `iinfer -m client -c undeploy <Option>`
-==============================================================================
+- Get a list of inference types.
 
 .. csv-table::
     :widths: 20, 10, 70
     :header-rows: 1
 
     "Option","Required","Description"
-    "--host <IPアドレス又はホスト名>","","Redisサーバーのサービスホストを指定します"
-    "--port <ポート番号>","","Redisサーバーのサービスポートを指定します"
-    "--password <パスワード>","","Redisサーバーのアクセスパスワード(任意)を指定します。省略時は `password` を使用します"
-    "--svname <推論サービス名>","","推論サーバーのサービス名を指定します。省略時は `server` を使用します"
-    "-n,--name <登録名>","〇","AIモデルの登録名を指定します"
-    "--retry_count <リトライ回数>","","Redisサーバーへの再接続回数を指定。0以下を指定すると永遠に再接続を行う。"
-    "--retry_interval <リトライ間隔>","","Redisサーバーに再接続までの秒数を指定"
-    "--timeout <タイムアウト>","","サーバーの応答が返ってくるまでの最大待ち時間"
+    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
+    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
+    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
+    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
+    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
 
+client ( read_dir ) : ``cmdbox -m client -c read_dir <Option>``
+===============================================================
+
+- Get image files in the directory on the client side.
+
+.. csv-table::
+    :widths: 20, 10, 70
+    :header-rows: 1
+
+    "Option","Required","Description"
+    "--glob_str <glob_str>","required","Specifies the glob pattern of the file to be read."
+    "--read_input_type <read_input_type>","required","Specifies the type of image to be loaded."
+    "--image_type <image_type>","required","Specify the type of image to output."
+    "--root_dir <root_dir>","required","Specifies the root directory on which to base the search."
+    "--include_hidden <include_hidden>","","Specify whether to include hidden files in the types of files to be read."
+    "--moveto <moveto>","","Specifies the destination directory to which loaded files are to be moved."
+    "--polling <polling>","","Specifies whether to repeat reading in the directory periodically."
+    "--polling_count <polling_count>","","Specifies the number of repeated readings in the directory.If it is less than or equal to 0, it repeats indefinitely."
+    "--polling_interval <polling_interval>","","Specifies the repetition interval (in seconds) for reading in the directory."
+    "--output_csv <output_csv>","","Saves the input as a csv file. If this is specified, no standard output is performed."
+    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
+    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
+    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
+
+client ( start ) : ``cmdbox -m client -c start <Option>``
+=========================================================
+
+- Start the inference server by specifying the AI model.
+
+.. csv-table::
+    :widths: 20, 10, 70
+    :header-rows: 1
+
+    "Option","Required","Description"
+    "--host <host>","required","Specify the service host of the Redis server."
+    "--port <port>","required","Specify the service port of the Redis server."
+    "--password <password>","required","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <svname>","required","Specify the service name of the inference server. If omitted, `server` is used."
+    "-n, --name <name>","required","Specify the registration name of the AI model to be deleted."
+    "--model_provider <model_provider>","","Specify when the model file is in ONNX format."
+    "-T, --use_track <use_track>","","Specify when the task is ObjectDetection. Assign a tracking ID using motpy."
+    "--gpuid <gpuid>","","Specify the device ID of the GPU."
+    "--retry_count <retry_count>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
+    "--retry_interval <retry_interval>","","Specifies the number of seconds before reconnecting to the Redis server."
+    "--timeout <timeout>","","Specify the maximum waiting time until the server responds."
+    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
+    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
+    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
+    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
+    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
+
+client ( stop ) : ``cmdbox -m client -c stop <Option>``
+=======================================================
+
+- Stop the inference server by specifying the AI model.
+
+.. csv-table::
+    :widths: 20, 10, 70
+    :header-rows: 1
+
+    "Option","Required","Description"
+    "--host <host>","required","Specify the service host of the Redis server."
+    "--port <port>","required","Specify the service port of the Redis server."
+    "--password <password>","required","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <svname>","required","Specify the service name of the inference server. If omitted, `server` is used."
+    "-n, --name <name>","required","Specify the registration name of the AI model to be deleted."
+    "--retry_count <retry_count>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
+    "--retry_interval <retry_interval>","","Specifies the number of seconds before reconnecting to the Redis server."
+    "--timeout <timeout>","","Specify the maximum waiting time until the server responds."
+    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
+    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
+    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
+    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
+    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
+
+client ( train ) : ``cmdbox -m client -c train <Option>``
+=========================================================
+
+- AI model training.
+
+.. csv-table::
+    :widths: 20, 10, 70
+    :header-rows: 1
+
+    "Option","Required","Description"
+    "--host <host>","required","Specify the service host of the Redis server."
+    "--port <port>","required","Specify the service port of the Redis server."
+    "--password <password>","required","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <svname>","required","Specify the service name of the inference server. If omitted, `server` is used."
+    "-n, --name <name>","required","Specify the registration name of the AI model."
+    "--overwrite <overwrite>","","Specify to overwrite even if it is already trained."
+    "--retry_count <retry_count>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
+    "--retry_interval <retry_interval>","","Specifies the number of seconds before reconnecting to the Redis server."
+    "--timeout <timeout>","","Specify the maximum waiting time until the server responds."
+    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
+    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
+    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
+    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
+    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
+
+client ( train_type_list ) : ``cmdbox -m client -c train_type_list <Option>``
+=============================================================================
+
+- Get a list of train types.
+
+.. csv-table::
+    :widths: 20, 10, 70
+    :header-rows: 1
+
+    "Option","Required","Description"
+    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
+    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
+    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
+    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
+    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
+
+client ( undeploy ) : ``cmdbox -m client -c undeploy <Option>``
+===============================================================
+
+- Delete AI models deployed on the server.
+
+.. csv-table::
+    :widths: 20, 10, 70
+    :header-rows: 1
+
+    "Option","Required","Description"
+    "--host <host>","required","Specify the service host of the Redis server."
+    "--port <port>","required","Specify the service port of the Redis server."
+    "--password <password>","required","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <svname>","required","Specify the service name of the inference server. If omitted, `server` is used."
+    "-n, --name <name>","required","Specify the registration name of the AI model to be deleted."
+    "--retry_count <retry_count>","","Specifies the number of reconnections to the Redis server.If less than 0 is specified, reconnection is forever."
+    "--retry_interval <retry_interval>","","Specifies the number of seconds before reconnecting to the Redis server."
+    "--timeout <timeout>","","Specify the maximum waiting time until the server responds."
+    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
+    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
+    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
+    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
+    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."

@@ -1,129 +1,150 @@
 .. -*- coding: utf-8 -*-
 
-****************************************************
-コマンドリファレンス（installモード）
-****************************************************
+**********************************
+Command Reference ( install mode )
+**********************************
 
-- installモードのコマンド一覧です。
-- `iinfer` をインストールした直後にはAIフレームワークのインストールがされていない状態です。
-- 通常推論サーバー側にしかAIフレームワークが必要ないため、任意でインストールする必要があります。
+List of install mode commands.
 
+install ( insightface ) : ``cmdbox -m install -c insightface <Option>``
+=======================================================================
 
-インストール(insightface) : `iinfer -m install -c insightface`
-==============================================================================
-
-`insightface` をインストールします。オプションは以下の通りです。
+- Install `insightface`.
 
 .. csv-table::
     :widths: 20, 10, 70
     :header-rows: 1
 
     "Option","Required","Description"
-    "--install_use_gpu","","GPUを使用するモジュール構成でインストールします。"
+    "--install_use_gpu <install_use_gpu>","","Install with a module configuration that uses the GPU."
+    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
+    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
+    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
+    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
+    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
 
+install ( mmcv ) : ``cmdbox -m install -c mmcv <Option>``
+=========================================================
 
-インストール(mmcls) : `iinfer -m install -c mmcls`
-==============================================================================
-
-`mmcls` をインストールします。オプションは以下の通りです。
-
-.. csv-table::
-    :widths: 20, 10, 70
-    :header-rows: 1
-
-    "Option","Required","Description"
-    "--install_use_gpu","","GPUを使用するモジュール構成でインストールします。"
-
-
-インストール(mmdet) : `iinfer -m install -c mmdet`
-==============================================================================
-
-`mmdetection` をインストールします。オプションは以下の通りです。
+- Install `mmcv`.
 
 .. csv-table::
     :widths: 20, 10, 70
     :header-rows: 1
 
     "Option","Required","Description"
-    "--install_use_gpu","","GPUを使用するモジュール構成でインストールします。"
+    "--install_use_gpu <install_use_gpu>","","Install with a module configuration that uses the GPU."
+    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
+    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
+    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
+    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
+    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
 
+install ( mmdet ) : ``cmdbox -m install -c mmdet <Option>``
+===========================================================
 
-インストール(mmpretrain) : `iinfer -m install -c mmpretrain`
-==============================================================================
-
-`mmpretrain` をインストールします。オプションは以下の通りです。
-
-.. csv-table::
-    :widths: 20, 10, 70
-    :header-rows: 1
-
-    "Option","Required","Description"
-    "--install_use_gpu","","GPUを使用するモジュール構成でインストールします。"
-
-
-インストール(mmseg) : `iinfer -m install -c mmseg`
-==============================================================================
-
-`mmsegmentation` をインストールします。オプションは以下の通りです。
+- Install `mmdetection`.
 
 .. csv-table::
     :widths: 20, 10, 70
     :header-rows: 1
 
     "Option","Required","Description"
-    "--install_use_gpu","","GPUを使用するモジュール構成でインストールします。"
+    "--install_use_gpu <install_use_gpu>","","Install with a module configuration that uses the GPU."
+    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
+    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
+    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
+    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
+    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
+    "--data <data>","required","When omitted, `$HONE/.iinfer` is used."
 
+install ( mmpretrain ) : ``cmdbox -m install -c mmpretrain <Option>``
+=====================================================================
 
-インストール(onnx) : `iinfer -m install -c onnx`
-==============================================================================
-
-`onnxruntime` をインストールします。オプションの指定はありません。
-
-
-インストール(redis) : `iinfer -m install -c redis <Option>`
-==============================================================================
-
-`redis-server` のdockerイメージをPULLします。オプションは以下の通りです。
-
-.. csv-table::
-    :widths: 20, 10, 70
-    :header-rows: 1
-
-    "Option","Required","Description"
-    "--wsl_name <ディストリビューション名>","Windowsの場合は〇","Windowsの場合はWSLのディストリビューションの名前を指定します。"
-    "--wsl_user <user名>","Windowsの場合は〇","Windowsの場合はWSL内のユーザー名を指定します。"
-
-
-インストール(server) : `iinfer -m install -c server <Option>`
-==============================================================================
-
-- `推論サーバー` のdockerイメージを `build` します。オプションは以下の通りです。
-- `build` が成功すると、実行時ディレクトリに `docker-compose.yml` ファイルが生成されます。
-- サーバーを起動させるには、 `docker-compose.yml` ファイルがある場所で `docker-compose up -d` を実行してください。
-- サーバーを停止させるには、 `docker-compose.yml` ファイルがある場所で `docker-compose down` を実行してください。
-- windows環境ではこのコマンドは未サポートです。
+- Install `mmpretrain`.
 
 .. csv-table::
     :widths: 20, 10, 70
     :header-rows: 1
 
     "Option","Required","Description"
-    "--data <データフォルダ>","","省略した時は `$HONE/.iinfer` を使用します。"
-    "--install_iinfer <iinferモジュール名>","","省略した時は `iinfer` を使用します。 `iinfer==0.10.7` といった指定も可能です。"
-    "--install_cmdbox <cmdboxモジュール名>","","省略した時は `cmdbox` を使用します。 `cmdbox==0.4.5` といった指定も可能です。"
-    "--install_onnx","","dockerイメージ内に `onnxruntime` をインストールします。"
-    "--install_mmdet","","dockerイメージ内に `mmdetection` をインストールします。"
-    "--install_mmseg","","dockerイメージ内に `mmsegmentation` をインストールします。"
-    "--install_mmcls","","dockerイメージ内に `mmclassification` をインストールします。※1"
-    "--install_mmpretrain","","dockerイメージ内に `mmpretrain` をインストールします。"
-    "--install_insightface","","dockerイメージ内に `insightface` をインストールします。"
-    "--install_no_python","","dockerイメージ内に `python` をインストールしません。"
-    "--install_from <イメージ名>","","作成するdockerイメージの元となるFROMイメージを指定します。"
-    "--install_tag <追加のタグ名>","","指定すると作成するdockerイメージのタグ名に追記出来ます。"
-    "--install_use_gpu","","GPUを使用するモジュール構成でインストールします。"
-    "--tts_engine <TTS Engine>","","使用するTTSエンジンを指定します。"
-    "--voicevox_ver <version>","","使用するTTSエンジンのバージョンを指定します。"
-    "--voicevox_arc <arch>","","使用するTTSエンジンのアーキテクチャを指定します。"
-    "--voicevox_whl <whl>","","使用するTTSエンジンのホイールファイルを指定します。"
+    "--install_use_gpu <install_use_gpu>","","Install with a module configuration that uses the GPU."
+    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
+    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
+    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
+    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
+    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
+    "--data <data>","required","When omitted, `$HONE/.iinfer` is used."
 
-- ※1 : `mmclassification` と `mmpretrain` はバージョンによって共存できない場合があります。
+install ( mmseg ) : ``cmdbox -m install -c mmseg <Option>``
+===========================================================
+
+- Install `mmsegmentation`.
+
+.. csv-table::
+    :widths: 20, 10, 70
+    :header-rows: 1
+
+    "Option","Required","Description"
+    "--install_use_gpu <install_use_gpu>","","Install with a module configuration that uses the GPU."
+    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
+    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
+    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
+    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
+    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
+    "--data <data>","required","When omitted, `$HONE/.iinfer` is used."
+
+install ( onnx ) : ``cmdbox -m install -c onnx <Option>``
+=========================================================
+
+- Install `onnxruntime`.
+
+.. csv-table::
+    :widths: 20, 10, 70
+    :header-rows: 1
+
+    "Option","Required","Description"
+    "--install_use_gpu <install_use_gpu>","","Install with a module configuration that uses the GPU."
+    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
+    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
+    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
+    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
+    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
+
+install ( server ) : ``cmdbox -m install -c server <Option>``
+=============================================================
+
+- `Build` the docker image of the `inference server`.
+- If the `build` is successful, a `docker-compose.yml` file is generated in the execution directory.
+
+.. csv-table::
+    :widths: 20, 10, 70
+    :header-rows: 1
+
+    "Option","Required","Description"
+    "--data <data>","","When omitted, `$HONE/.iinfer` is used."
+    "--install_cmdbox <install_cmdbox>","","When omitted, `cmdbox==0.7.9` is used."
+    "--install_from <install_from>","","Specify the FROM image that will be the source of the docker image to be created."
+    "--install_no_python <install_no_python>","","Do not install python."
+    "--install_compile_python <install_compile_python>","","Compile and install python3; if install_no_python is specified, it is preferred."
+    "--install_tag <install_tag>","","If specified, you can add to the tag name of the docker image to create."
+    "--install_use_gpu <install_use_gpu>","","Install with a module configuration that uses the GPU."
+    "--tts_engine <tts_engine>","required","Specify the TTS engine to use."
+    "--voicevox_ver <voicevox_ver>","","Specify the version of VOICEVOX to use."
+    "--voicevox_whl <voicevox_whl>","","Specify the VOICEVOX wheel file to use."
+    "--init_extra <init_extra>","","Specify the command to be executed immediately after “from”."
+    "--run_extra_pre <run_extra_pre>","","Specify additional commands to run before install_extra execution."
+    "--run_extra_post <run_extra_post>","","Specify additional commands to run after install_extra execution."
+    "--install_extra <install_extra>","","Specify additional packages to install."
+    "--compose_path <compose_path>","","Specify the `docker-compose.yml` file."
+    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
+    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
+    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
+    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
+    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
+    "--install_iinfer <install_iinfer>","","When omitted, `iinfer` is used. You can also specify `iinfer==0.13.4`."
+    "--install_onnx <install_onnx>","","Install `onnxruntime` in the docker image."
+    "--install_mmdet <install_mmdet>","","Install `mmdetection` in the docker image."
+    "--install_mmseg <install_mmseg>","","Install `mmsegmentation` in the docker image."
+    "--install_mmpretrain <install_mmpretrain>","","Install `mmpretrain` in the docker image."
+    "--install_insightface <install_insightface>","","Install `insightface` in the docker image."

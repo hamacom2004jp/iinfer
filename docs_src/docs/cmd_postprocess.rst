@@ -1,229 +1,264 @@
 .. -*- coding: utf-8 -*-
 
-****************************************************
-コマンドリファレンス（postprocessモード）
-****************************************************
+**************************************
+Command Reference ( postprocess mode )
+**************************************
 
-- postprocessモードのコマンド一覧です。
+List of postprocess mode commands.
 
-後処理(画像分類判定) : `iinfer -m postprocess -c cls_judge <Option>`
-==============================================================================
+postprocess ( cls_judge ) : ``cmdbox -m postprocess -c cls_judge <Option>``
+===========================================================================
 
-.. csv-table::
-    :widths: 20, 10, 70
-    :header-rows: 1
-
-    "Option","Required","Description"
-    "-i,--input_file <推論結果ファイル>","`--stdin` を指定しない場合〇","後処理させる推論結果をファイルで指定します。"
-    "--stdin","`--input_file` を指定しない場合〇","後処理させる推論結果を標準入力から読み込みます。"
-    "--ok_score_th","","クラススコアがこの値以上のものはok判定されます"
-    "--ok_classes","`ok_score_th` を指定する場合は `ok_classes` か `ok_labels` が〇","okクラスに含めるクラスindexを指定します。複数指定できます。"
-    "--ok_labels","`ok_score_th` を指定する場合は `ok_classes` か `ok_labels` が〇","okクラスに含めるクラスラベルを指定します。複数指定できます。"
-    "--ng_score_th","","クラススコアがこの値以上のものはng判定されます"
-    "--ng_classes","`ng_score_th` を指定する場合は `ng_classes` か `ng_labels` が〇","ngクラスに含めるクラスindexを指定します。複数指定できます。"
-    "--ng_labels","`ng_score_th` を指定する場合は `ng_classes` か `ng_labels` が〇","ngクラスに含めるクラスラベルを指定します。複数指定できます。"
-    "--ext_score_th","","クラススコアがこの値以上のものはgray判定されます"
-    "--ext_classes","`ext_score_th` を指定する場合は `ext_classes` か `ext_labels` が〇","grayクラスに含めるクラスindexを指定します。複数指定できます。"
-    "--ext_labels","`ext_score_th` を指定する場合は `ext_classes` か `ext_labels` が〇","grayクラスに含めるクラスラベルを指定します。複数指定できます。"
-    "--output_image <後処理結果画像の保存先ファイル>","","後処理結果画像の保存先ファイルを指定します"
-    "--nodraw","","推論結果画像にbbox等の描き込みを行いません。"
-    "-P,--output_preview","","判定結果画像を`cv2.imshow`で表示します。"
-
-
-後処理(コマンド実行) : `iinfer -m postprocess -c cmd <Option>`
-==============================================================================
+- Perform image classification judgment using the inference result.
 
 .. csv-table::
     :widths: 20, 10, 70
     :header-rows: 1
 
     "Option","Required","Description"
-    "-i,--input_file <推論結果ファイル>","`--stdin` を指定しない場合〇","後処理させる推論結果をファイルで指定します。"
-    "--stdin","`--input_file` を指定しない場合〇","後処理させる推論結果を標準入力から読み込みます。"
-    "--cmdline <任意のコマンド>","","実行するコマンドを指定します。設定される環境変数は `outputs` , `output_image` です。この値は一時ファイルのファイルパスです。"
-    "--output_image_ext <出力する画像タイプ>","","出力画像のフォーマットを指定します。指定可能な画像タイプは `bmp` , `png` , `jpeg`"
-    "--output_maxsize <最大サイズ>","","コマンド実行結果をキャプチャーする最大サイズを指定します。"
-    "-o, -output_json <処理結果jsonの保存先ファイル>","","このオプションは使用できません"
-    "-a, -output_json_append","","このオプションは使用できません"
+    "-i, --input_file <input_file>","","Specify the inference result to be post-processed by file."
+    "--stdin <stdin>","","Read the inference result to be post-processed from standard input."
+    "--ok_score_th <ok_score_th>","","Class scores greater than this value are judged as ok."
+    "--ok_classes <ok_classes>","","Specify the class index to include in the ok class. Multiple specifications are possible."
+    "--ok_labels <ok_labels>","","Specify the class label to include in the ok class. Multiple specifications are possible."
+    "--ng_score_th <ng_score_th>","","Class scores greater than this value are judged as ng."
+    "--ng_classes <ng_classes>","","Specify the class index to include in the ng class. Multiple specifications are possible."
+    "--ng_labels <ng_labels>","","Specify the class label to include in the ng class. Multiple specifications are possible."
+    "--ext_score_th <ext_score_th>","","Class scores greater than this value are judged as gray."
+    "--ext_classes <ext_classes>","","Specify the class index to include in the gray class. Multiple specifications are possible."
+    "--ext_labels <ext_labels>","","Specify the class label to include in the gray class. Multiple specifications are possible."
+    "--nodraw <nodraw>","","Do not draw bboxes, etc. on the inference result image."
+    "-P, --output_preview <output_preview>","","Display the judgment result image with `cv2.imshow`."
+    "--output_image <output_image>","","Specify the destination file for saving the post-processing result image."
+    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
+    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
+    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
+    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
+    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
 
+postprocess ( cmd ) : ``cmdbox -m postprocess -c cmd <Option>``
+===============================================================
 
-後処理(CSV出力) : `iinfer -m postprocess -c csv <Option>`
-==============================================================================
-
-.. csv-table::
-    :widths: 20, 10, 70
-    :header-rows: 1
-
-    "Option","Required","Description"
-    "-i,--input_file <推論結果ファイル>","`--stdin` を指定しない場合〇","後処理させる推論結果をファイルで指定します。"
-    "--stdin","`--input_file` を指定しない場合〇","後処理させる推論結果を標準入力から読み込みます。"
-    "--out_headers","","出力するヘッダーを指定します。複数指定できます。"
-    "--noheader","","ヘッダー行の出力を行いません。"
-    "--output_csv <処理結果csvの保存先ファイル>","","内容をcsvで保存します。これを指定した場合、標準出力は行いません。"
-    "-o, -output_json <処理結果jsonの保存先ファイル>","","このオプションは使用できません"
-    "-a, -output_json_append","","このオプションは使用できません"
-    "-f,--format","","このコマンドではこのオプションは無視されます。"
-
-
-後処理(物体検知個所切り出し) : `iinfer -m postprocess -c det_clip <Option>`
-==============================================================================
-
-ObjectDetectionで検知した個所を切り出し、caprute形式のcsvで出力します。
+- Set the inference result to an environment variable and execute an arbitrary command.
 
 .. csv-table::
     :widths: 20, 10, 70
     :header-rows: 1
 
     "Option","Required","Description"
-    "-i,--input_file <推論結果ファイル>","`--stdin` を指定しない場合〇","後処理させる推論結果をファイルで指定します。"
-    "--stdin","`--input_file` を指定しない場合〇","後処理させる推論結果を標準入力から読み込みます。"
-    "--image_type <出力する画像タイプ>","","出力する画像のタイプを指定します。指定可能な画像タイプは `bmp` , `png` , `jpeg` , `capture` "
-    "--clip_margin <マージン幅>","","検視したbboxの周囲に余白を設けるピクセル数です。但し、元画像の外側に余白が出る場合は、確保できるだけ余白を取得します。"
-    "--output_csv <処理結果csvの保存先ファイル>","","内容をcsvで保存します。これを指定した場合、標準出力は行いません。"
-    "-o, -output_json <処理結果jsonの保存先ファイル>","","このオプションは使用できません"
-    "-a, -output_json_append","","このオプションは使用できません"
-    "-f,--format","","このコマンドではこのオプションは無視されます。"
+    "-i, --input_file <input_file>","","Specify the inference result to be post-processed by file."
+    "--stdin <stdin>","","Read the inference result to be post-processed from standard input."
+    "--cmdline <cmdline>","required","Specifies the command to execute. The environment variables set are `outputs` , `output_image`. The value is the file path of the temporary file."
+    "--output_image_ext <output_image_ext>","required","Specifies the format of the output image.Acceptable image types are `bmp` , `png`, and `jpeg`."
+    "--output_maxsize <output_maxsize>","required","Specifies the maximum size of the command execution results to be captured."
+    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
+    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
+    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
 
+postprocess ( csv ) : ``cmdbox -m postprocess -c csv <Option>``
+===============================================================
 
-後処理(顔認識用ストアファイル生成) : `iinfer -m postprocess -c det_face_store <Option>`
-==============================================================================================
-
-Face Detection and Recognitionで検知した顔特徴データを個所を切り出し、顔認識ストアファイルを生成します。顔認識ストアファイルの使用方法は以下のとおりです。
-1. 生成したファイルをテキストエディタで開き、face_label項目に名前を入力します。
-2. 生成したファイルを `client` モードの `deploy` コマンドの `--model_conf_file` オプションに指定し、上書きデプロイします。
-3. デプロイしたモデルを `client` モードの `start` コマンドで起動します。
-4. 起動したモデルに対して、 `client` モードの `predict` コマンドで推論を実行します。
-5. 推論結果の `output_labels` に顔認識結果が出力されます。
+- Convert the inference result to a CSV file.
 
 .. csv-table::
     :widths: 20, 10, 70
     :header-rows: 1
 
     "Option","Required","Description"
-    "-i,--input_file <推論結果ファイル>","`--stdin` を指定しない場合〇","後処理させる推論結果をファイルで指定します。"
-    "--stdin","`--input_file` を指定しない場合〇","後処理させる推論結果を標準入力から読み込みます。"
-    "--image_type <出力する画像タイプ>","","出力する画像のタイプを指定します。指定可能な画像タイプは `bmp` , `png` , `jpeg` , `capture` "
-    "--face_threshold <顔スコアに対する閾値>","","顔スコアが閾値以下の場合は、顔特徴量ストアに含まれないようにします。※1"
-    "--clip_margin <マージン幅>","","検視したbboxの周囲に余白を設けるピクセル数です。但し、元画像の外側に余白が出る場合は、確保できるだけ余白を取得します。"
+    "-i, --input_file <input_file>","","Specify the inference result to be post-processed by file."
+    "--stdin <stdin>","","Read the inference result to be post-processed from standard input."
+    "--out_headers <out_headers>","","Specify the headers to output. Multiple specifications are possible."
+    "--noheader <noheader>","","Do not output the header row."
+    "--output_csv <output_csv>","","Save the contents in csv. If this is specified, no standard output will be performed."
+    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
+    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
+    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
 
-- ※1 : 顔特徴量ストアに登録されている顔特徴量と、推論結果の顔特徴量との差が顔スコアになります。
+postprocess ( det_clip ) : ``cmdbox -m postprocess -c det_clip <Option>``
+=========================================================================
 
-
-後処理(物体検知フィルター) : `iinfer -m postprocess -c det_filter <Option>`
-==============================================================================
-
-.. csv-table::
-    :widths: 20, 10, 70
-    :header-rows: 1
-
-    "Option","Required","Description"
-    "-i,--input_file <推論結果ファイル>","`--stdin` を指定しない場合〇","後処理させる推論結果をファイルで指定します。"
-    "--stdin","`--input_file` を指定しない場合〇","後処理させる推論結果を標準入力から読み込みます。"
-    "--score_th","","bboxのクラススコアがこの値以下のものは除去します。"
-    "--width_th","","bboxの横幅がこの長さ以下のものは除去します。"
-    "--height_th","","bboxの縦幅がこの長さ以下のものは除去します。"
-    "--classes","","このクラス以外のbboxは除去します。複数指定できます。"
-    "--labels","","このラベル以外のbboxは除去します。複数指定できます。"
-    "--output_image <後処理結果画像の保存先ファイル>","","後処理結果画像の保存先ファイルを指定します"
-    "--nodraw","","推論結果画像にbbox等の描き込みを行いません。"
-    "-P,--output_preview","","推論結果画像を`cv2.imshow`で表示します。"
-
-
-後処理(物体検知判定) : `iinfer -m postprocess -c det_judge <Option>`
-==============================================================================
+- Cut out the detected area in ObjectDetection and output it in caprute format csv.
 
 .. csv-table::
     :widths: 20, 10, 70
     :header-rows: 1
 
     "Option","Required","Description"
-    "-i,--input_file <推論結果ファイル>","`--stdin` を指定しない場合〇","後処理させる推論結果をファイルで指定します。"
-    "--stdin","`--input_file` を指定しない場合〇","後処理させる推論結果を標準入力から読み込みます。"
-    "--ok_score_th","","クラススコアがこの値以上のものはok判定されます"
-    "--ok_classes","`ok_score_th` を指定する場合は `ok_classes` か `ok_labels` が〇","okクラスに含めるクラスindexを指定します。複数指定できます。"
-    "--ok_labels","`ok_score_th` を指定する場合は `ok_classes` か `ok_labels` が〇","okクラスに含めるクラスラベルを指定します。複数指定できます。"
-    "--ng_score_th","","クラススコアがこの値以上のものはng判定されます"
-    "--ng_classes","`ng_score_th` を指定する場合は `ng_classes` か `ng_labels` が〇","ngクラスに含めるクラスindexを指定します。複数指定できます。"
-    "--ng_labels","`ng_score_th` を指定する場合は `ng_classes` か `ng_labels` が〇","ngクラスに含めるクラスラベルを指定します。複数指定できます。"
-    "--ext_score_th","","クラススコアがこの値以上のものはgray判定されます"
-    "--ext_classes","`ext_score_th` を指定する場合は `ext_classes` か `ext_labels` が〇","grayクラスに含めるクラスindexを指定します。複数指定できます。"
-    "--ext_labels","`ext_score_th` を指定する場合は `ext_classes` か `ext_labels` が〇","grayクラスに含めるクラスラベルを指定します。複数指定できます。"
-    "--output_image <後処理結果画像の保存先ファイル>","","後処理結果画像の保存先ファイルを指定します"
-    "--nodraw","","推論結果画像にbbox等の描き込みを行いません。"
-    "-P,--output_preview","","判定結果画像を`cv2.imshow`で表示します。"
+    "-i, --input_file <input_file>","","Specify the inference result to be post-processed by file."
+    "--stdin <stdin>","","Read the inference result to be post-processed from standard input."
+    "--image_type <image_type>","","Specify the type of image to output."
+    "--clip_margin <clip_margin>","","The number of pixels to provide margin around the bbox inspected. However, if there is a margin outside the original image, as much margin as possible is obtained."
+    "--output_csv <output_csv>","","Save the contents in csv. If this is specified, no standard output will be performed."
+    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
+    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
+    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
 
+postprocess ( det_face_store ) : ``cmdbox -m postprocess -c det_face_store <Option>``
+=====================================================================================
 
-後処理(HTTPリクエストの実行) : `iinfer -m postprocess -c httpreq <Option>`
-==============================================================================
+- Cut out the face feature data detected by Face Detection and Recognition and generate a face recognition store file.
 
 .. csv-table::
     :widths: 20, 10, 70
     :header-rows: 1
 
     "Option","Required","Description"
-    "-i,--input_file <推論結果ファイル>","`--stdin` を指定しない場合〇","後処理させる推論結果をファイルで指定します。"
-    "--stdin","`--input_file` を指定しない場合〇","後処理させる推論結果を標準入力から読み込みます。"
-    "--json_without_img","",JSONの送信時に画像を含めず送信します。"
-    "--fileup_name <パラメータ名>","〇","推論結果の画像をPOSTするときのパラメータ名を指定します。省略すると `file` が使用されます。"
-    "--outputs_url <URL>","〇","推論結果のJSONをPOSTするURLを指定します。"
-    "--output_image_url <URL>","","推論結果の画像をPOSTするURLを指定します。"
-    "--output_image_ext <フォーマット>","","推論結果の画像をフォーマットを指定します。 `bmp` , `png` , `jpeg` が指定できます。"
-    "--output_image_prefix <接頭語>","","推論結果の画像の接頭語を指定します。省略すると `output_` が使用されます。"
-    "-o, -output_json <処理結果jsonの保存先ファイル>","","このオプションは使用できません"
-    "-a, -output_json_append","","このオプションは使用できません"
+    "-i, --input_file <input_file>","","Specify the inference result to be post-processed by file."
+    "--stdin <stdin>","","Read the inference result to be post-processed from standard input."
+    "--image_type <image_type>","","Specify the type of image to output."
+    "--face_threshold <face_threshold>","","If the face score is below the threshold, it will not be included in the face feature store."
+    "--clip_margin <clip_margin>","","The number of pixels to provide margin around the bbox inspected. However, if there is a margin outside the original image, as much margin as possible is obtained."
+    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
+    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
+    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
+    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
+    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
 
+postprocess ( det_filter ) : ``cmdbox -m postprocess -c det_filter <Option>``
+=============================================================================
 
-後処理(領域ボックス検知) : `iinfer -m postprocess -c seg_bbox <Option>`
-==============================================================================
-
-.. csv-table::
-    :widths: 20, 10, 70
-    :header-rows: 1
-
-    "Option","Required","Description"
-    "-i,--input_file <推論結果ファイル>","`--stdin` を指定しない場合〇","後処理させる推論結果をファイルで指定します。"
-    "--stdin","`--input_file` を指定しない場合〇","後処理させる推論結果を標準入力から読み込みます。"
-    "--del_segments","","セグメンテーションマスクを結果から削除します。結果容量削減に効果があります。"
-    "--output_image <後処理結果画像の保存先ファイル>","","後処理結果画像の保存先ファイルを指定します"
-    "--nodraw","","推論結果画像にbbox等の描き込みを行いません。"
-    "--nodraw_bbox","","推論結果画像にbboxの描き込みを行いません。"
-    "--nodraw_rbbox","","推論結果画像に回転bboxの描き込みを行いません。"
-    "-P,--output_preview","","推論結果画像を`cv2.imshow`で表示します。"
-
-
-後処理(領域検知フィルター) : `iinfer -m postprocess -c seg_filter <Option>`
-==============================================================================
+- Filter the detected area in ObjectDetection.
 
 .. csv-table::
     :widths: 20, 10, 70
     :header-rows: 1
 
     "Option","Required","Description"
-    "-i,--input_file <推論結果ファイル>","`--stdin` を指定しない場合〇","後処理させる推論結果をファイルで指定します。"
-    "--stdin","`--input_file` を指定しない場合〇","後処理させる推論結果を標準入力から読み込みます。"
-    "--logits_th","","ピクセルごとのクラススコアがこの値以下のものは除去されます"
-    "--classes","","このクラス以外のマスクは除去します。複数指定できます。"
-    "--labels","","このラベル以外のマスクは除去します。複数指定できます。"
-    "--output_image <後処理結果画像の保存先ファイル>","","後処理結果画像の保存先ファイルを指定します"
-    "--nodraw","","推論結果画像にマスクの描き込みを行いません。"
-    "--del_logits","","セグメンテーションスコアを結果から削除します。結果容量削減に効果があります。"
-    "-P,--output_preview","","推論結果画像を`cv2.imshow`で表示します。"
+    "-i, --input_file <input_file>","","Specify the inference result to be post-processed by file."
+    "--stdin <stdin>","","Read the inference result to be post-processed from standard input."
+    "--score_th <score_th>","","Remove bboxes with class scores less"
+    "--width_th <width_th>","","Remove bboxes with a width less than this length."
+    "--height_th <height_th>","","Remove bboxes with a height less than this length."
+    "--classes <classes>","","Remove bboxes other than this class. Multiple specifications are possible."
+    "--labels <labels>","","Remove bboxes other than this label. Multiple specifications are possible."
+    "--nodraw <nodraw>","","Do not draw bboxes, etc. on the inference result image."
+    "-P, --output_preview <output_preview>","","Display the judgment result image with `cv2.imshow`."
+    "--output_image <output_image>","","Specify the destination file for saving the post-processing result image."
+    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
+    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
+    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
+    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
+    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
 
+postprocess ( det_judge ) : ``cmdbox -m postprocess -c det_judge <Option>``
+===========================================================================
 
-後処理(showimg転送) : `iinfer -m postprocess -c showimg <Option>`
-==============================================================================
+- Perform judgment using the detected area in ObjectDetection.
 
 .. csv-table::
     :widths: 20, 10, 70
     :header-rows: 1
 
     "Option","Required","Description"
-    "-i,--input_file <推論結果ファイル>","`--stdin` を指定しない場合〇","後処理させる推論結果をファイルで指定します。"
-    "--stdin","`--input_file` を指定しない場合〇","後処理させる推論結果を標準入力から読み込みます。"
-    "--host <IPアドレス又はホスト名>","","Redisサーバーのサービスホストを指定します。"
-    "--port <ポート番号>","","Redisサーバーのサービスポートを指定します。"
-    "--password <パスワード>","","Redisサーバーのアクセスパスワード(任意)を指定します。省略時は `password` を使用します。"
-    "--svname <推論サービス名>","","推論サーバーのサービス名を指定します。省略時は `server` を使用します"
-    "--maxrecsize <最大レコードサイズ>","","Redisサーバーに保存する推論結果の最大レコードサイズを指定します。"
+    "-i, --input_file <input_file>","","Specify the inference result to be post-processed by file."
+    "--stdin <stdin>","","Read the inference result to be post-processed from standard input."
+    "--ok_score_th <ok_score_th>","","Class scores greater than this value are judged as ok."
+    "--ok_classes <ok_classes>","","Specify the class index to include in the ok class. Multiple specifications are possible."
+    "--ok_labels <ok_labels>","","Specify the class label to include in the ok class. Multiple specifications are possible."
+    "--ng_score_th <ng_score_th>","","Class scores greater than this value are judged as ng."
+    "--ng_classes <ng_classes>","","Specify the class index to include in the ng class. Multiple specifications are possible."
+    "--ng_labels <ng_labels>","","Specify the class label to include in the ng class. Multiple specifications are possible."
+    "--ext_score_th <ext_score_th>","","Class scores greater than this value are judged as gray."
+    "--ext_classes <ext_classes>","","Specify the class index to include in the gray class. Multiple specifications are possible."
+    "--ext_labels <ext_labels>","","Specify the class label to include in the gray class. Multiple specifications are possible."
+    "--nodraw <nodraw>","","Do not draw bboxes, etc. on the inference result image."
+    "-P, --output_preview <output_preview>","","Display the judgment result image with `cv2.imshow`."
+    "--output_image <output_image>","","Specify the destination file for saving the post-processing result image."
+    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
+    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
+    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
+    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
+    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
 
+postprocess ( httpreq ) : ``cmdbox -m postprocess -c httpreq <Option>``
+=======================================================================
 
+- Send the inference result to the specified HTTP server.
+
+.. csv-table::
+    :widths: 20, 10, 70
+    :header-rows: 1
+
+    "Option","Required","Description"
+    "-i, --input_file <input_file>","","Specify the inference result to be post-processed by file."
+    "--stdin <stdin>","","Read the inference result to be post-processed from standard input."
+    "--json_without_img <json_without_img>","","Send JSON without including images when sending JSON."
+    "--fileup_name <fileup_name>","required","Specify the parameter name when posting the image of the inference result. If omitted, `file` is used."
+    "--outputs_url <outputs_url>","required","Specify the URL to POST the JSON of the inference result."
+    "--output_image_url <output_image_url>","","Specify the URL to POST the image of the inference result."
+    "--output_image_ext <output_image_ext>","","Specifies the format of the image of the inference result.You can specify `bmp` , `png`, or `jpeg`."
+    "--output_image_prefix <output_image_prefix>","","Specifies the prefix of the inferred result image. If omitted, `output_` is used."
+    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
+    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
+    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
+
+postprocess ( seg_bbox ) : ``cmdbox -m postprocess -c seg_bbox <Option>``
+=========================================================================
+
+- Convert the detected area in SemanticSegmentation to bbox.
+
+.. csv-table::
+    :widths: 20, 10, 70
+    :header-rows: 1
+
+    "Option","Required","Description"
+    "-i, --input_file <input_file>","","Specify the inference result to be post-processed by file."
+    "--stdin <stdin>","","Read the inference result to be post-processed from standard input."
+    "--del_segments <del_segments>","","Remove the segmentation mask from the result. This reduces the result capacity."
+    "--nodraw <nodraw>","","Do not draw bboxes, etc. on the inference result image."
+    "--nodraw_bbox <nodraw_bbox>","","Do not draw bboxes on the inference result image."
+    "--nodraw_rbbox <nodraw_rbbox>","","Do not draw rotated bboxes on the inference result image."
+    "-P, --output_preview <output_preview>","","Display the judgment result image with `cv2.imshow`."
+    "--output_image <output_image>","","Specify the destination file for saving the post-processing result image."
+    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
+    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
+    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
+    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
+    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
+
+postprocess ( seg_filter ) : ``cmdbox -m postprocess -c seg_filter <Option>``
+=============================================================================
+
+- Filter the detected area in SemanticSegmentation.
+
+.. csv-table::
+    :widths: 20, 10, 70
+    :header-rows: 1
+
+    "Option","Required","Description"
+    "-i, --input_file <input_file>","","Specify the inference result to be post-processed by file."
+    "--stdin <stdin>","","Read the inference result to be post-processed from standard input."
+    "--del_segments <del_segments>","","Remove the segmentation mask from the result. This reduces the result capacity."
+    "--logits_th <logits_th>","","Pixels with class scores less than this value are removed."
+    "--classes <classes>","","Remove areas other than this class. Multiple specifications are possible."
+    "--labels <labels>","","Remove areas other than this label. Multiple specifications are possible."
+    "--nodraw <nodraw>","","Do not draw masks on the inference result image."
+    "--del_logits <del_logits>","","Remove the segmentation score from the result. This reduces the result capacity."
+    "-P, --output_preview <output_preview>","","Display the judgment result image with `cv2.imshow`."
+    "--output_image <output_image>","","Specify the destination file for saving the post-processing result image."
+    "-o, --output_json <output_json>","","Specify the destination file for saving the processing result json."
+    "-a, --output_json_append <output_json_append>","","Save the processing result json file by appending."
+    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
+    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
+    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
+
+postprocess ( showimg ) : ``cmdbox -m postprocess -c showimg <Option>``
+=======================================================================
+
+- Forward the inference results to showimg.html.
+
+.. csv-table::
+    :widths: 20, 10, 70
+    :header-rows: 1
+
+    "Option","Required","Description"
+    "-i, --input_file <input_file>","","Specify the inference result to be post-processed by file."
+    "--stdin <stdin>","","Read the inference result to be post-processed from standard input."
+    "--host <host>","","Specify the service host of the Redis server."
+    "--port <port>","","Specify the service port of the Redis server."
+    "--password <password>","","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <svname>","","Specify the service name of the inference server. If omitted, `server` is used."
+    "--maxrecsize <maxrecsize>","","Specifies the maximum record size of inference results to be stored on the Redis server."
+    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
+    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
+    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."

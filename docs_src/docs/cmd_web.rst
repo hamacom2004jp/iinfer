@@ -1,40 +1,79 @@
 .. -*- coding: utf-8 -*-
 
-****************************************************
-コマンドリファレンス（webモード）
-****************************************************
+******************************
+Command Reference ( web mode )
+******************************
 
-- Webモードのコマンド一覧です。
+List of web mode commands.
 
-Webサービス起動 : `iinfer -m web -c start <Option>`
-==============================================================================
+web ( start ) : ``cmdbox -m web -c start <Option>``
+===================================================
 
-- `cmdboxのwebモードのstartコマンドオプション <https://hamacom2004jp.github.io/iinfer/docs/cmd_web.html#web-iinfer-m-web-c-start-option/>`_ に加えて下記のオプションが指定できます。
-
-.. csv-table::
-    :widths: 20, 10, 70
-    :header-rows: 1
-
-    "Option","Required","Description"
-    "--anno_html <annotation.htmlファイルのパス>","","`annotation.html` を指定します。省略時はiinfer内蔵のHTMLファイルを使用します。"
-    "--showimg_html <showimg.htmlファイルのパス>","","`showimg.html` を指定します。省略時はiinfer内蔵のHTMLファイルを使用します。"
-    "--webcap_html <webcap.htmlファイルのパス>","","`webcap.html` を指定します。省略時はiinfer内蔵のHTMLファイルを使用します。"
-
-
-Webcap起動 : `iinfer -m web -c webcap <Option>`
-==============================================================================
+- Start Web mode.
 
 .. csv-table::
     :widths: 20, 10, 70
     :header-rows: 1
 
     "Option","Required","Description"
-    "--allow_host <接続許可するIP>","","省略した時は `0.0.0.0` を使用します。"
-    "--listen_webcap_port <サービスポート>","","省略した時は `8082` を使用します。"
-    "--image_type <出力する画像タイプ>","","出力する画像のタイプを指定する。指定可能な画像タイプは `bmp` , `png` , `jpeg` , `capture` "
-    "--outputs_key <表示項目>","","webcap画面で表示する項目を指定します。省略した場合は全ての項目を表示します。"
-    "--capture_frame_width <キャプチャーサイズ(横px)>","","キャプチャーする画像の横px。受信した画像をリサイズする。"
-    "--capture_frame_height <キャプチャーサイズ(縦px)>","","キャプチャーする画像の縦px。受信した画像をリサイズする。"
-    "--capture_fps <キャプチャーFPS>","","キャプチャーする画像のFPS。webcap画面側がこの間隔で送信する。"
-    "--capture_count <キャプチャー回数>","","キャプチャーする回数。指定した回数受信したら終了する。"
+    "--host <host>","required","Specify the service host of the Redis server."
+    "--port <port>","required","Specify the service port of the Redis server."
+    "--password <password>","required","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <svname>","required","Specify the service name of the inference server. If omitted, `server` is used."
+    "--data <data>","","When omitted, `$HONE/.iinfer` is used."
+    "--allow_host <allow_host>","","If omitted, `0.0.0.0` is used."
+    "--listen_port <listen_port>","","If omitted, `8081` is used."
+    "--ssl_listen_port <ssl_listen_port>","","If omitted, `8443` is used."
+    "--ssl_cert <ssl_cert>","","Specify the SSL server certificate file."
+    "--ssl_key <ssl_key>","","Specify the SSL server private key file."
+    "--ssl_keypass <ssl_keypass>","","Specify the composite password for the SSL server private key file."
+    "--ssl_ca_certs <ssl_ca_certs>","","Specify the SSL server CA certificate file."
+    "--signin_file <signin_file>","required","Specify a file containing users and passwords with which they can signin.Typically, specify '.iinfer/user_list.yml'."
+    "--session_domain <session_domain>","","Specify the domain for which the signed-in user's session is valid."
+    "--session_path <session_path>","","Specify the session timeout in seconds for signed-in users."
+    "--session_secure <session_secure>","","Set the Secure flag for the signed-in user's session."
+    "--session_timeout <session_timeout>","","Specify the session timeout in seconds for signed-in users."
+    "--gunicorn_workers <gunicorn_workers>","","Specifies the number of gunicorn workers, valid only in Linux environment. If -1 or unspecified, the number of CPUs is used."
+    "--gunicorn_timeout <gunicorn_timeout>","","Specify the timeout duration of the gunicorn worker in seconds."
+    "--client_only <client_only>","","Do not make connections to the server."
+    "--outputs_key <outputs_key>","","Specify items to be displayed on the showimg and webcap screens. If omitted, all items are displayed."
+    "--doc_root <doc_root>","","Document root for custom files. URL mapping from the path of a folder-specified custom file with the path of doc_root removed."
+    "--gui_html <gui_html>","","Specify `gui.html`. If omitted, the cmdbox built-in HTML file is used."
+    "--filer_html <filer_html>","","Specify `filer.html`. If omitted, the cmdbox built-in HTML file is used."
+    "--result_html <result_html>","","Specify `result.html`. If omitted, the cmdbox built-in HTML file is used."
+    "--users_html <users_html>","","Specify `users.html`. If omitted, the cmdbox built-in HTML file is used."
+    "--agent_html <agent_html>","","Specify `agent.html`. If omitted, the cmdbox built-in HTML file is used."
+    "--assets <assets>","","Specify the asset file required when using html files."
+    "--signin_html <signin_html>","","Specify `signin.html`. If omitted, the cmdbox built-in HTML file is used."
+    "--stdout_log <stdout_log>","","Available only in GUI mode. Outputs standard output during command execution to Console log."
+    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
+    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."
+    "--showimg_html <showimg_html>","","Specify `showimg.html`. If omitted, the iinfer built-in HTML file is used."
+    "--webcap_html <webcap_html>","","Specify `webcap.html`. If omitted, the iinfer built-in HTML file is used."
+    "--anno_html <anno_html>","","Specify `annotation.html`. If omitted, the iinfer built-in HTML file is used."
 
+web ( webcap ) : ``cmdbox -m web -c webcap <Option>``
+=====================================================
+
+- Start webcap mode.
+
+.. csv-table::
+    :widths: 20, 10, 70
+    :header-rows: 1
+
+    "Option","Required","Description"
+    "--host <host>","required","Specify the service host of the Redis server."
+    "--port <port>","required","Specify the service port of the Redis server."
+    "--password <password>","required","Specify the access password of the Redis server (optional). If omitted, `password` is used."
+    "--svname <svname>","required","Specify the service name of the inference server. If omitted, `server` is used."
+    "--data <data>","","When omitted, `$HONE/.iinfer` is used."
+    "--allow_host <allow_host>","","If omitted, `0.0.0.0` is used."
+    "--listen_webcap_port <listen_webcap_port>","","If omitted, `8082` is used."
+    "--image_type <image_type>","required","Specify the type of image to output."
+    "--outputs_key <outputs_key>","","Specify items to be displayed on the webcap screens. If omitted, all items are displayed."
+    "--capture_frame_width <capture_frame_width>","","Width px of the image to be captured. Resize the received image."
+    "--capture_frame_height <capture_frame_height>","","Height px of the image to be captured. Resize the received image."
+    "--capture_fps <capture_fps>","","FPS of the image to be captured. If the capture is faster than the specified value, sleep for the remaining time."
+    "--capture_count <capture_count>","","Number of captures."
+    "--capture_stdout <capture_stdout>","","Available only in GUI mode. Captures standard output during command execution and displays it on the execution result screen."
+    "--capture_maxsize <capture_maxsize>","","Available only in GUI mode. Specifies the maximum capture size of standard output when executing commands."

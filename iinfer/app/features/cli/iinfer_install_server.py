@@ -107,6 +107,7 @@ class InstallServer(cmdbox_cmdbox_server_install.CmdboxServerInstall):
                                   tts_engine=args.tts_engine,
                                   voicevox_ver=args.voicevox_ver,
                                   voicevox_whl=args.voicevox_whl,
+                                  init_extra=args.init_extra,
                                   run_extra_pre=args.run_extra_pre,
                                   run_extra_post=run_extra_post,
                                   install_extra=install_extra,

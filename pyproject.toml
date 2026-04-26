@@ -41,7 +41,7 @@ classifiers = [
     "Topic :: Utilities"
 ]
 dependencies = [
-    'cmdbox>=0.7.8,<0.7.9',
+    'cmdbox>=0.7.9,<0.7.10',
     'motpy',
     'opencv-python',
     'urllib3',
@@ -49,47 +49,22 @@ dependencies = [
 
 [project.optional-dependencies]
 agent_mcp = [
-    "pydantic>=2.0.0,<3.0.0",
-    "fastmcp>=2.14.4",
-    "mcp>=1.23.0,<2.0.0",
+    "cmdbox[agent_mcp]",
 ]
 agent_adk = [
-    "google-adk>=1.23.0",
-    "a2a-sdk>=0.3.4,<0.4.0",
-    "litellm>=1.75.5,<1.80.17",
+    "cmdbox[agent_adk]",
 ]
 agent_mem = [
-    "sentence-transformers",
-    "sqlite_vec",
-    "transformers>=4.48.0",
-    "torch",
+    "cmdbox[agent_mem]",
 ]
 rag = [
-    "chunklet-py[document]",
-    "langchain_community",
-    "markdown",
-    "pdfplumber",
-]
-omni = [
-    "accelerate>=1.12.0",
-    "qwen-omni-utils>=0.0.9",
-    "torchvision>=0.25.0",
+    "cmdbox[rag]",
 ]
 saml = [
-    "python3-saml",
-    "xmlsec==1.3.13",
+    "cmdbox[saml]",
 ]
-all = ["cmdbox[agent_mcp,agent_adk,agent_mem,rag,omni,saml]"]
 dev = [
-    "build",
-    "collectlicense",
-    "sphinx",
-    "sphinx-rtd-theme",
-    "sphinx_fontawesome",
-    "sphinx-intl",
-    "sphinx-sitemap",
-    "twine",
-    "wheel",
+    "cmdbox[dev]",
 ]
 
 [project.urls]
