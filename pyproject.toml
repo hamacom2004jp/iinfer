@@ -66,6 +66,9 @@ saml = [
 dev = [
     "cmdbox[dev]",
 ]
+app = [
+    "cmdbox[app]",
+]
 
 [project.urls]
 Homepage = "https://github.com/hamacom2004jp/iinfer"
